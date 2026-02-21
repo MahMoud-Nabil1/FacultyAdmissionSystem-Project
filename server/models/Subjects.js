@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
+
 const Subjects = mongoose.model('Subjects', {
     id: {
         type: String,
