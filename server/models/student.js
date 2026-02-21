@@ -48,6 +48,24 @@ const studentSchema = new Schema({
     }
 });
 
+// set password and hash it
+
+studentSchema.virtual('password')
+    .set(function(passwordValue) {
+        this._password = passwordValue;
+
+        this.salt = "mock_generated_salt";
+        this.hash = "mock_hashed_version_of_" + passwordValue;
+    });
+
+studentSchema.pre('validate', function(next) {
+    if (this.isNew && !this._password) {
+        this.invalidate('password', 'Password is required');
+    }
+    next();
+});
+
+
 const Student = mongoose.model('Student', studentSchema);
 
 module.exports = { Student };
