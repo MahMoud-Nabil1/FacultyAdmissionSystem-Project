@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const subjectSchema = new Schema({
-    sid: {
+    id: {
         type: String,
         required: true,
         unique: true
