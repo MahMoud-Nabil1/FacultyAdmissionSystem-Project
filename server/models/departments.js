@@ -22,4 +22,4 @@ const departmentSchema = new Schema({
 
 const Departments = mongoose.model('Departments', departmentSchema);
 
-export default Departments;
+module.exports(Departments);

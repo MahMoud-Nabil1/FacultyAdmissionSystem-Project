@@ -19,4 +19,4 @@ const Subjects = mongoose.model('Subjects', {
     }
 });
 
-export default Subjects;
+module.exports(Subjects);
