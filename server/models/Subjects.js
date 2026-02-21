@@ -24,6 +24,4 @@ const subjectSchema = new Schema({
     }
 });
 
-const Subjects = mongoose.model('Subjects', subjectSchema);
-
-export default Subjects;
+module.exports(Subjects);
