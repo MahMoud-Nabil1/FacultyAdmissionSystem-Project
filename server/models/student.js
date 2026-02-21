@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const studentSchema = new Schema({
-    sid: {
+    id: {
         type: Number,
         required: [true, 'Student ID is required'],
         unique: true
@@ -47,8 +47,6 @@ const studentSchema = new Schema({
         ref: 'Departments'
     }
 });
-
-// set password and hash it
 
 studentSchema.virtual('password')
     .set(function(passwordValue) {

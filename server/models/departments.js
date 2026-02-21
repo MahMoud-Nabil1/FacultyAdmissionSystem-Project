@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const departmentSchema = new Schema({
-    did: {
+    id: {
         type: String,
         required: true,
         unique: true
