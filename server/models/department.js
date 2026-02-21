@@ -8,7 +8,7 @@ const departmentSchema = new Schema({
         required: true,
         unique: true
     },
-    dname: {
+    name: {
         type: String,
         required: true
     },
@@ -20,6 +20,6 @@ const departmentSchema = new Schema({
     ]
 });
 
-const Departments = mongoose.model('Departments', departmentSchema);
+const Department = mongoose.model('Department', departmentSchema);
 
-module.exports(Departments);
+module.exports(Department);

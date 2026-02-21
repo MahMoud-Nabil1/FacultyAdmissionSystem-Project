@@ -42,7 +42,7 @@ const studentSchema = new Schema({
         }
     ],
 
-    department: {
+    departments: {
         type: Schema.Types.ObjectId,
         ref: 'Departments'
     }

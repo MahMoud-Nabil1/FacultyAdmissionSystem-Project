@@ -22,7 +22,7 @@ const staffSchema = new schema({
     salt:{
         type: String,
     },
-    department: {
+    departments: {
         type: schema.Types.ObjectId,
         ref: 'Departments'
     },

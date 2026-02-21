@@ -15,7 +15,7 @@ const subjectSchema = new Schema({
     prerequisites: [
         {
             type: Schema.Types.ObjectId,
-            ref: 'Subjects'
+            ref: 'Subject'
         }
     ],
     creditHours: {
@@ -24,6 +24,6 @@ const subjectSchema = new Schema({
     }
 });
 
-const Subjects = mongoose.model('Subjects', subjectSchema);
+const Subject = mongoose.model('Subject', subjectSchema);
 
-module.exports(Subjects);
+module.exports(Subject);
