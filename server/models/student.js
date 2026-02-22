@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const {Schema} = mongoose;
 
 const studentSchema = new Schema({
-    id: {
+    studentId: {
         type: Number,
         required: [true, 'Student ID is required'],
         unique: true
@@ -11,7 +11,8 @@ const studentSchema = new Schema({
 
     name: {
         type: String,
-        required: [true, 'Name is required']
+        required: [true, 'Name is required'],
+        trim: true
     },
 
     hash: {
@@ -84,4 +85,4 @@ studentSchema.pre(/^find/, function(next) {
 
 const Student = mongoose.model('Student', studentSchema);
 
-module.exports = {Student};
+module.exports = mongoose.model('Student', studentSchema);
