@@ -25,7 +25,7 @@ exports.login = async (req, res) => {
             okStudent = await student.verifyPassword(req.body.password);
         }
         if (staff){
-            okStudent = await staff.verifyPassword(req.body.password);
+            okStaff = await staff.verifyPassword(req.body.password);
         }
 
         if (!okStudent && !okStaff){
