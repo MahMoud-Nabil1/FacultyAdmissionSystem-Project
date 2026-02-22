@@ -12,6 +12,7 @@
 - ExpressJS
 - NodeMon
 - ReactJS
+- bcrypt
 
 # Database design
 
