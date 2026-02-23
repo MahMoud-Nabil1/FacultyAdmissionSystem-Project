@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const AdminContact = () => {
+const ITContact = () => {
     const [formData, setFormData] = useState({
         studentCode: '',
         subjectName: '',
@@ -44,7 +44,7 @@ const AdminContact = () => {
 
             setStatus({
                 type: 'success',
-                text: 'Your message has been sent to the Admin. We will reply to your email soon.',
+                text: 'Your message has been sent to the IT Support team. We will reply to your email soon.',
             });
             setFormData({ studentCode: '', subjectName: '', message: '', replyEmail: '' });
         } catch {
@@ -55,24 +55,24 @@ const AdminContact = () => {
     };
 
     return (
-        <div className="contact-page">
+        <div className="contact-page it-theme">
             <div className="contact-card">
-
+                {/* Header */}
                 <div className="contact-header">
-                    <div className="contact-icon admin">🛡️</div>
-                    <h1>Contact Administration</h1>
-                    <p>Send a message directly to the academic administration team.</p>
+                    <div className="contact-icon it">💻</div>
+                    <h1>Contact IT Support</h1>
+                    <p>Report a technical issue to the IT support team.</p>
                 </div>
 
 
                 <form className="contact-form" onSubmit={handleSubmit} noValidate>
 
                     <div className="form-group">
-                        <label htmlFor="admin-studentCode">
+                        <label htmlFor="it-studentCode">
                             Student Code <span className="required">*</span>
                         </label>
                         <input
-                            id="admin-studentCode"
+                            id="it-studentCode"
                             type="text"
                             name="studentCode"
                             value={formData.studentCode}
@@ -85,11 +85,11 @@ const AdminContact = () => {
 
 
                     <div className="form-group">
-                        <label htmlFor="admin-subjectName">
+                        <label htmlFor="it-subjectName">
                             Course Code <span className="required">*</span>
                         </label>
                         <input
-                            id="admin-subjectName"
+                            id="it-subjectName"
                             type="text"
                             name="subjectName"
                             value={formData.subjectName}
@@ -103,11 +103,11 @@ const AdminContact = () => {
 
 
                     <div className="form-group">
-                        <label htmlFor="admin-message">
+                        <label htmlFor="it-message">
                             Describe Your Issue <span className="required">*</span>
                         </label>
                         <textarea
-                            id="admin-message"
+                            id="it-message"
                             name="message"
                             value={formData.message}
                             onChange={handleChange}
@@ -117,11 +117,11 @@ const AdminContact = () => {
 
 
                     <div className="form-group">
-                        <label htmlFor="admin-replyEmail">
+                        <label htmlFor="it-replyEmail">
                             Reply Email <span className="required">*</span>
                         </label>
                         <input
-                            id="admin-replyEmail"
+                            id="it-replyEmail"
                             type="email"
                             name="replyEmail"
                             value={formData.replyEmail}
@@ -139,10 +139,10 @@ const AdminContact = () => {
 
                     <button
                         type="submit"
-                        className="submit-btn admin-btn"
+                        className="submit-btn it-btn"
                         disabled={loading}
                     >
-                        {loading ? 'Sending…' : 'Send to Administration'}
+                        {loading ? 'Sending…' : 'Send to IT Support'}
                     </button>
                 </form>
             </div>
@@ -150,4 +150,4 @@ const AdminContact = () => {
     );
 };
 
-export default AdminContact;
+export default ITContact;
