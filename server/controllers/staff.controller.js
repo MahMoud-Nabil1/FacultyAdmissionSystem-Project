@@ -1,6 +1,6 @@
-import Staff from '../models/staff.js';
+const Staff = require('../models/staff');
 
-export const createStaff = async (req, res) => {
+exports.createStaff = async (req, res) => {
     try {
         const staff = new Staff(req.body);
         if (req.body.password) staff.password = req.body.password;
@@ -11,7 +11,7 @@ export const createStaff = async (req, res) => {
     }
 };
 
-export const getAllStaff = async (req, res) => {
+exports.getAllStaff = async (req, res) => {
     try {
         const staffList = await Staff.find().populate('departments students');
         res.json(staffList);
@@ -20,9 +20,9 @@ export const getAllStaff = async (req, res) => {
     }
 };
 
-export const getStaffById = async (req, res) => {
+exports.getStaffById = async (req, res) => {
     try {
-        const staff = await Staff.findOne({ staffId: req.params.id })
+        const staff = await Staff.findOne({ _id: req.params._id })
             .populate('departments students');
         if (!staff) return res.status(404).json({ error: "Staff not found" });
         res.json(staff);
@@ -31,9 +31,9 @@ export const getStaffById = async (req, res) => {
     }
 };
 
-export const updateStaff = async (req, res) => {
+exports.updateStaff = async (req, res) => {
     try {
-        const staff = await Staff.findOne({ staffId: req.params.id });
+        const staff = await Staff.findOne({ id: req.params._id });
         if (!staff) return res.status(404).json({ error: "Staff not found" });
 
         Object.assign(staff, req.body);
@@ -46,9 +46,9 @@ export const updateStaff = async (req, res) => {
     }
 };
 
-export const deleteStaff = async (req, res) => {
+exports.deleteStaff = async (req, res) => {
     try {
-        const staff = await Staff.findOneAndDelete({ staffId: req.params.id });
+        const staff = await Staff.findOneAndDelete({ _id: req.params._id });
         if (!staff) return res.status(404).json({ error: "Staff not found" });
         res.json({ message: "Deleted successfully" });
     } catch (err) {

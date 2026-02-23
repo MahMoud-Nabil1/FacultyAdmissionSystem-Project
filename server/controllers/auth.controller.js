@@ -1,38 +1,58 @@
 const Student = require('../models/student');
 const Staff = require('../models/staff');
+const jwt = require('jsonwebtoken');
 
-/*
-searches for student and staff, detecting whether the login is staff or just student
-This is for combined logins in case we want the staff to login to the same portal the student uses (and still enter the dashboard)
-Can be split later when a different decision is made
-- Abdallah
-*/
-exports.login = async (req, res) => {
+const JWT_SECRET = process.env.JWT_SECRET || 'faculty-admission-secret-key';
+
+exports.studentLogin = async (req, res) => {
     try {
-        const student = await Student //try student
-            .findOne({ id: req.body.studentId })
-            .select('+hash +salt');
-        const staff = await Staff //try staff
-            .findOne({id: req.body.id})
+        const student = await Student
+            .findOne({ studentId: req.body.studentId })
             .select('+hash +salt');
 
-        if (!student && !staff){
-            return res.status(401).json({ error: "Invalid credentials" });
-        }
-        let okStudent = false;
-        let okStaff = false;
-        if (student) {
-            okStudent = await student.verifyPassword(req.body.password);
-        }
-        if (staff){
-            okStaff = await staff.verifyPassword(req.body.password);
+        if (!student) {
+            return res.status(401).json({ error: "Invalid student ID or password" });
         }
 
-        if (!okStudent && !okStaff){
-            return res.status(401).json({ error: "Invalid credentials" });
+        const ok = await student.verifyPassword(req.body.password);
+        if (!ok) {
+            return res.status(401).json({ error: "Invalid student ID or password" });
         }
 
-        res.json({ message: "Login success" });
+        const token = jwt.sign(
+            { studentId: student.studentId, role: 'student' },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.json({ message: "Login success", token, role: 'student' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+exports.staffLogin = async (req, res) => {
+    try {
+        const staff = await Staff
+            .findOne({ email: req.body.email })
+            .select('+hash +salt');
+
+        if (!staff) {
+            return res.status(401).json({ error: "Invalid email or password" });
+        }
+
+        const ok = await staff.verifyPassword(req.body.password);
+        if (!ok) {
+            return res.status(401).json({ error: "Invalid email or password" });
+        }
+
+        const token = jwt.sign(
+            { _id: staff._id, role: 'staff' },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        res.json({ message: "Login success", token, role: 'staff' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
