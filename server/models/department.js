@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
@@ -15,11 +15,11 @@ const departmentSchema = new Schema({
     subjects: [
         {
             type: Schema.Types.ObjectId,
-            ref: 'Subjects'
+            ref: 'Subject'
         }
     ]
 });
 
 const Department = mongoose.model('Department', departmentSchema);
 
-module.exports(Department);
+module.exports = Department;
