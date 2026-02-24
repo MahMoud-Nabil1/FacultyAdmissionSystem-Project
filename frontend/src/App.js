@@ -36,7 +36,6 @@ function App() {
                     }
                 />
 
-
                 {/* Unprotected admin dashboard route for testing */}
                 <Route
                     path="/admin-dashboard-test"
