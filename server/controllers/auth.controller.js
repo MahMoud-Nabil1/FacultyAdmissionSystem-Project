@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const Student = require('../models/student');
 const Staff = require('../models/staff');
 const PasswordResetToken = require('../models/passwordResetToken');
-const { sendPasswordResetEmail } = require('../utils/email');
+const {sendPasswordResetEmail} = require('../utils/email');
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'faculty-admission-secret-key';
@@ -17,10 +17,10 @@ const INVALID_RESET_LINK = 'Invalid or expired reset link';
  */
 async function findValidResetToken(token) {
     if (!token) return null;
-    const resetDoc = await PasswordResetToken.findOne({ token });
+    const resetDoc = await PasswordResetToken.findOne({token});
     if (!resetDoc) return null;
     if (new Date() > resetDoc.expiresAt) {
-        await PasswordResetToken.deleteOne({ token });
+        await PasswordResetToken.deleteOne({token});
         return null;
     }
     return resetDoc;
@@ -29,54 +29,59 @@ async function findValidResetToken(token) {
 exports.studentLogin = async (req, res) => {
     try {
         const student = await Student
-            .findOne({ studentId: req.body.studentId })
+            .findOne({studentId: req.body.studentId})
             .select('+hash +salt');
 
         if (!student) {
-            return res.status(401).json({ error: "Invalid student ID or password" });
+            return res.status(401).json({error: "Invalid student ID or password"});
         }
 
         const ok = await student.verifyPassword(req.body.password);
         if (!ok) {
-            return res.status(401).json({ error: "Invalid student ID or password" });
+            return res.status(401).json({error: "Invalid student ID or password"});
         }
 
         const token = jwt.sign(
-            {id: student.studentId},
+            {id: student.studentId, role: 'student', name: student.name},
             JWT_SECRET,
-            { expiresIn: '24h' }
+            {expiresIn: '24h'}
         );
 
-        res.json({ message: "Login success", token, role: 'student' });
+        res.json({message: "Login success", token, role: 'student'});
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({error: err.message});
     }
 };
 
 exports.staffLogin = async (req, res) => {
     try {
         const staff = await Staff
-            .findOne({ email: req.body.email })
+            .findOne({email: req.body.email})
             .select('+hash +salt');
 
         if (!staff) {
-            return res.status(401).json({ error: "Invalid email or password" });
+            return res.status(401).json({error: "Invalid email or password"});
         }
 
         const ok = await staff.verifyPassword(req.body.password);
         if (!ok) {
-            return res.status(401).json({ error: "Invalid email or password" });
+            return res.status(401).json({error: "Invalid email or password"});
         }
 
         const token = jwt.sign(
-            { id: staff._id},
+            {
+                id: staff._id,
+                role: staff.role,         // e.g. 'admin' or 'staff'
+                name: staff.name,
+                department: staff.department,
+            },
             JWT_SECRET,
-            { expiresIn: '24h' }
+            {expiresIn: '24h'}
         );
 
-        res.json({ message: "Login success", token});
+        res.json({message: "Login success", token});
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({error: err.message});
     }
 };
 
@@ -89,12 +94,12 @@ exports.requestPasswordReset = async (req, res) => {
     try {
         const email = req.body.email?.trim()?.toLowerCase();
         if (!email) {
-            return res.status(400).json({ error: 'Email is required' });
+            return res.status(400).json({error: 'Email is required'});
         }
 
         const [staff, student] = await Promise.all([
-            Staff.findOne({ email }),
-            Student.findOne({ email })
+            Staff.findOne({email}),
+            Student.findOne({email})
         ]);
         const role = staff ? 'staff' : (student ? 'student' : null);
 
@@ -106,7 +111,7 @@ exports.requestPasswordReset = async (req, res) => {
 
         const token = crypto.randomBytes(32).toString('hex');
         const expiresAt = new Date(Date.now() + RESET_TOKEN_EXPIRY_MS);
-        await PasswordResetToken.create({ email, token, role, expiresAt });
+        await PasswordResetToken.create({email, token, role, expiresAt});
 
         await sendPasswordResetEmail(email, token);
 
@@ -114,7 +119,7 @@ exports.requestPasswordReset = async (req, res) => {
             message: 'message sent to the email'
         });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({error: err.message});
     }
 };
 
@@ -126,10 +131,10 @@ exports.requestPasswordResetFacultyEmail = async (req, res) => {
     try {
         const studentId = req.body.studentId != null ? Number(req.body.studentId) : NaN;
         if (!Number.isInteger(studentId) || studentId <= 0) {
-            return res.status(400).json({ error: 'Valid student ID is required' });
+            return res.status(400).json({error: 'Valid student ID is required'});
         }
 
-        const student = await Student.findOne({ studentId });
+        const student = await Student.findOne({studentId});
         if (!student) {
             return res.json({
                 message: 'cannot find account with this student ID in the database'
@@ -153,7 +158,7 @@ exports.requestPasswordResetFacultyEmail = async (req, res) => {
             message: 'message sent to the email'
         });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({error: err.message});
     }
 };
 
@@ -167,7 +172,7 @@ exports.verifyPasswordResetToken = async (req, res) => {
         const token = req.query.token || req.body.token;
         const resetDoc = await findValidResetToken(token);
         if (!resetDoc) {
-            return res.status(400).json({ error: INVALID_RESET_LINK });
+            return res.status(400).json({error: INVALID_RESET_LINK});
         }
 
         return res.json({
@@ -175,7 +180,7 @@ exports.verifyPasswordResetToken = async (req, res) => {
             message: 'Token valid. You can reset your password.'
         });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({error: err.message});
     }
 };
 
@@ -185,46 +190,46 @@ exports.verifyPasswordResetToken = async (req, res) => {
  */
 exports.resetPassword = async (req, res) => {
     try {
-        const { token, newPassword } = req.body;
+        const {token, newPassword} = req.body;
         if (!token || !newPassword) {
-            return res.status(400).json({ error: 'Token and newPassword are required' });
+            return res.status(400).json({error: 'Token and newPassword are required'});
         }
 
         const resetDoc = await findValidResetToken(token);
         if (!resetDoc) {
-            return res.status(400).json({ error: INVALID_RESET_LINK });
+            return res.status(400).json({error: INVALID_RESET_LINK});
         }
 
         if (typeof newPassword !== 'string' || newPassword.length < 6) {
-            return res.status(400).json({ error: 'newPassword must be at least 6 characters' });
+            return res.status(400).json({error: 'newPassword must be at least 6 characters'});
         }
 
-        const { email, role, studentId } = resetDoc;
+        const {email, role, studentId} = resetDoc;
 
         if (role === 'student') {
             const student = studentId != null
-                ? await Student.findOne({ studentId }).select('+hash +salt')
-                : await Student.findOne({ email }).select('+hash +salt');
+                ? await Student.findOne({studentId}).select('+hash +salt')
+                : await Student.findOne({email}).select('+hash +salt');
             if (!student) {
-                await PasswordResetToken.deleteOne({ token });
-                return res.status(400).json({ error: 'Account no longer found' });
+                await PasswordResetToken.deleteOne({token});
+                return res.status(400).json({error: 'Account no longer found'});
             }
             student.password = newPassword;
             await student.save();
         } else {
-            const staff = await Staff.findOne({ email }).select('+hash +salt');
+            const staff = await Staff.findOne({email}).select('+hash +salt');
             if (!staff) {
-                await PasswordResetToken.deleteOne({ token });
-                return res.status(400).json({ error: 'Account no longer found' });
+                await PasswordResetToken.deleteOne({token});
+                return res.status(400).json({error: 'Account no longer found'});
             }
             staff.password = newPassword;
             await staff.save();
         }
 
-        await PasswordResetToken.deleteOne({ token });
-        return res.json({ message: 'Password updated successfully' });
+        await PasswordResetToken.deleteOne({token});
+        return res.json({message: 'Password updated successfully'});
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({error: err.message});
     }
 };
 
@@ -239,9 +244,11 @@ exports.resetPassword = async (req, res) => {
 exports.getMe = async (req, res) => {
     try {
         res.json({
-            id: req.user._id || req.user.studentId,
-            role: req.user.role || "student",
+            id: req.user.id,
+            role: req.user.role,
             name: req.user.name,
+            ...(req.user.facultyEmail && { facultyEmail: req.user.facultyEmail }),
+            ...(req.user.department && { department: req.user.department }),
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
