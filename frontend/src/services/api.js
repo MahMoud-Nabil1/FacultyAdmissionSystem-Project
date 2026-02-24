@@ -1,6 +1,24 @@
 const API_BASE =
     process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 
+export { API_BASE };
+
+export async function apiPost(path, body) {
+    const res = await fetch(`${API_BASE}${path}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => ({}));
+    return { res, data };
+}
+
+export async function apiGet(path) {
+    const res = await fetch(`${API_BASE}${path}`);
+    const data = await res.json().catch(() => ({}));
+    return { res, data };
+}
+
 export async function CreatStaff() {
     const name = window.prompt('Enter staff name:');
     if (!name) return;

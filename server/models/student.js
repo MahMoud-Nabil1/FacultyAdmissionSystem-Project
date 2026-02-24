@@ -15,6 +15,14 @@ const studentSchema = new Schema({
         trim: true
     },
 
+    email: {
+        type: String,
+        trim: true,
+        lowercase: true,
+        sparse: true,
+        default: null
+    },
+
     hash: {
         type: String,
         select: false  

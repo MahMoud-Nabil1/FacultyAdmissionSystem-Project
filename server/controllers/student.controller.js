@@ -1,5 +1,5 @@
 const Student = require('../models/student');
-
+const nodemailer = require('nodemailer');
 exports.createStudent = async (req, res) => {
     try {
         const student = new Student(req.body);
@@ -71,5 +71,91 @@ exports.deleteStudent = async (req, res) => {
         res.json({ message: "Deleted successfully" });
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+};
+
+exports.contactIT = async (req, res) => {
+    try {
+        const { studentCode, subjectName, message, replyEmail } = req.body;
+
+        const student = await Student.findOne({ studentId: studentCode });
+        if (!student) {
+            return res.status(404).json({ error: "Student code not found." });
+        }
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.ADMIN_EMAIL,
+                pass: process.env.ADMIN_EMAIL_PASS
+            }
+        });
+
+        const mailOptions = {
+            from: replyEmail,
+            to: process.env.IT_EMAIL,
+            subject: `IT Support Request: ${subjectName} - Student: ${studentCode}`,
+            text: `
+            New Support Ticket:
+            ------------------
+            Student Code: ${studentCode}
+            Course: ${subjectName}
+            Reply to: ${replyEmail}
+            
+            Issue:
+            ${message}
+                        `
+                    };
+
+        await transporter.sendMail(mailOptions);
+
+        res.status(200).json({ message: "Success! Message sent to IT Support via Email." });
+
+    } catch (err) {
+        console.error("Email Error:", err);
+        res.status(500).json({ error: "Could not send email. " + err.message });
+    }
+};
+
+exports.contactAdmin = async (req, res) => {
+    try {
+        const { studentCode, subjectName, message, replyEmail } = req.body;
+
+        const student = await Student.findOne({ studentId: studentCode });
+        if (!student) {
+            return res.status(404).json({ error: "Student code not found." });
+        }
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.ADMIN_EMAIL,
+                pass: process.env.ADMIN_EMAIL_PASS
+            }
+        });
+
+        const mailOptions = {
+            from: replyEmail,
+            to: process.env.ADMIN_EMAIL,
+            subject: `Admin Request: ${subjectName} - Student: ${studentCode}`,
+            text: `
+New Administration Ticket:
+--------------------------
+Student Code: ${studentCode}
+Course: ${subjectName}
+Reply to: ${replyEmail}
+
+Message/Issue:
+${message}
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.status(200).json({ message: "Success! Message sent to Administration." });
+
+    } catch (err) {
+        console.error("Email Error:", err);
+        res.status(500).json({ error: "Could not send email. " + err.message });
     }
 };
