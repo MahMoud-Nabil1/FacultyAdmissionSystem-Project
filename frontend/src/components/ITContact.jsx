@@ -39,16 +39,29 @@ const ITContact = () => {
         setLoading(true);
         setStatus({ type: '', text: '' });
 
+        //
         try {
-            // the api call will be here
-
-            setStatus({
-                type: 'success',
-                text: 'Your message has been sent to the IT Support team. We will reply to your email soon.',
+            const response = await fetch('http://localhost:5000/api/students/contact-it', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
             });
-            setFormData({ studentCode: '', subjectName: '', message: '', replyEmail: '' });
-        } catch {
-            setStatus({ type: 'error', text: 'Something went wrong. Please try again later.' });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setStatus({
+                    type: 'success',
+                    text: 'Your message has been sent to the IT Support team. Check your email soon.',
+                });
+                setFormData({ studentCode: '', subjectName: '', message: '', replyEmail: '' });
+            } else {
+                setStatus({ type: 'error', text: data.error || 'Server rejected the request.' });
+            }
+        } catch (error) {
+            setStatus({ type: 'error', text: 'Connection failed. Is the server running?' });
         } finally {
             setLoading(false);
         }
