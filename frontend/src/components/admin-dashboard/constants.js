@@ -1,8 +1,8 @@
-export const PAGE_SIZE = 10;
+export const PAGE_SIZE = 30; //number of students/staff that show up before having to head to the next page
 
-export const ROLES = {
-    admin: "Admin",
-    academic_guide: "Academic Guide",
-    academic_guide_coordinator: "Academic Guide Coordinator",
-    reporter: "Reporter"
+export const ROLES = { //convert from enum to more readable names
+    admin: "ادمن",
+    academic_guide: "مرشد اكاديمى",
+    academic_guide_coordinator: "منسق للإرشاد الاكاديمى",
+    reporter: "Reporter" //TODO: make this name arabic idk how to translate it
 };
