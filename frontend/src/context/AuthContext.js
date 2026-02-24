@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-import { getMe } from "../services/api";
+import {jwtDecode} from 'jwt-decode';
 
 const AuthContext = createContext(null);
 
@@ -22,15 +22,16 @@ export const AuthProvider = ({ children }) => {
 
         setToken(savedToken);
 
-        getMe()
-            .then(data => setUser(data))
-            .catch(() => {
-                localStorage.removeItem('token');
-                setToken(null);
-                setUser(null);
-            })
-            .finally(() => setLoading(false));
-
+        try {
+            const payload = jwtDecode(savedToken);
+            setUser(payload);
+        } catch {
+            localStorage.removeItem('token');
+            setToken(null);
+            setUser(null);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
     const login = (tokenValue) => {
