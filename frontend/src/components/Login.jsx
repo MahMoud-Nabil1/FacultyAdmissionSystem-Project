@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Login.css';
+import { useNavigate } from 'react-router-dom';
+import {getMe} from "../services/api";
 
 const Login = () => {
     const { login } = useAuth();
@@ -11,7 +13,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-
+    const navigate = useNavigate();
     const isStudent = role === 'student';
 
     const handleSubmit = async (e) => {
@@ -41,7 +43,16 @@ const Login = () => {
                 return;
             }
 
-            login(data.token, data.role, data.id || userId);
+            login(data.token);
+
+            const me = await getMe();
+
+            if (me.role === 'student') {
+                navigate('/');
+            } else {
+                navigate('/admin-dashboard');
+            }
+
         } catch (err) {
             setError('لم يمكن التواصل مع السيرفر');
         } finally {

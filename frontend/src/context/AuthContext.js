@@ -1,8 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+import { getMe } from "../services/api";
+
 const AuthContext = createContext(null);
 
 export const useAuth = () => useContext(AuthContext);
+
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -11,28 +14,32 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const savedToken = localStorage.getItem('token');
-        const savedRole = localStorage.getItem('role');
-        const savedId = localStorage.getItem('userId');
 
-        if (savedToken && savedRole) {
-            setToken(savedToken);
-            setUser({ id: savedId, role: savedRole });
+        if (!savedToken) {
+            setLoading(false);
+            return;
         }
-        setLoading(false);
+
+        setToken(savedToken);
+
+        getMe()
+            .then(data => setUser(data))
+            .catch(() => {
+                localStorage.removeItem('token');
+                setToken(null);
+                setUser(null);
+            })
+            .finally(() => setLoading(false));
+
     }, []);
 
-    const login = (tokenValue, role, userId) => {
+    const login = (tokenValue) => {
         localStorage.setItem('token', tokenValue);
-        localStorage.setItem('role', role);
-        localStorage.setItem('userId', userId);
         setToken(tokenValue);
-        setUser({ id: userId, role });
     };
 
     const logout = () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('role');
-        localStorage.removeItem('userId');
         setToken(null);
         setUser(null);
     };

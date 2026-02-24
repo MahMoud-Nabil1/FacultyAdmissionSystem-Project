@@ -5,6 +5,10 @@ const authCtrl = require('../controllers/auth.controller');
 // Separated login endpoints
 router.post('/login/student', authCtrl.studentLogin);
 router.post('/login/staff', authCtrl.staffLogin);
+const { authenticate } = require("../middleware/authMiddleware");
+
+// Get user ID from JWT token
+router.get("/me", authenticate, authCtrl.getMe);
 
 // Forgot password: request reset link by email (token stored in DB, email sent)
 router.post('/forgot-password/faculty-email', authCtrl.requestPasswordResetFacultyEmail);

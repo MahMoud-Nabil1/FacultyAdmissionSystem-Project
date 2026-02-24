@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
@@ -46,3 +47,23 @@ mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 8000 })
         console.error('MongoDB connection error:', err.message);
         process.exit(1);
     });
+
+function requireRole(...allowedRoles) {
+    return (req, res, next) => {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+        try {
+            const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+            if (!allowedRoles.includes(payload.role)) {
+                return res.status(403).json({ error: "Forbidden" });
+            }
+
+            req.user = payload;
+            next();
+        } catch {
+            res.status(401).json({ error: "Invalid token" });
+        }
+    };
+}
