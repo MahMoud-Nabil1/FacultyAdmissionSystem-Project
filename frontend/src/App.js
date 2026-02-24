@@ -35,7 +35,7 @@ function App() {
                     }
                 />
 
-                {/* Unprotected admin dashboard route for testing */}
+                {/* DEV ONLY ADMIN ROUTE */}
                 <Route
                     path="/admin-dashboard-test"
                     element={
@@ -46,6 +46,25 @@ function App() {
                         </div>
                     }
                 />
+
+                <Route
+                    path="/admin-dashboard"
+                    element={
+                        <ProtectedRoute allowedRoles={['admin', 'academic_guide', 'academic_guide_coordinator', 'reporter']}>
+                            <button onClick={() => {
+                                localStorage.removeItem("token");
+                                window.location.href = "/login";
+                            }}>
+                                Sign out
+                            </button>
+                            <div style={{ padding: "2rem" }}>
+                                <h1>Admin Dashboard</h1>
+                                <hr />
+                                <AdminDashboard />
+                            </div>
+                        </ProtectedRoute>
+                    }
+                />
                 {/* Guest-only routes — redirect to / if already logged in */}
                 <Route path="/login" element={
                     <GuestRoute>
@@ -54,18 +73,18 @@ function App() {
                 }/>
                 <Route path="/forgot-password" element={
                     <GuestRoute>
-                        <ForgotPasswordChoice />
+                        <ForgotPasswordChoice/>
                     </GuestRoute>
                 }/>
                 <Route path="/ForgotPassWord" element={
                     <GuestRoute>
-                        <ForgotPassword />
+                        <ForgotPassword/>
                     </GuestRoute>
                 }/>
                 <Route path="/reset-password" element={
                     <GuestRoute>
                         <ResetPasswordRoute>
-                            <ResetPassword />
+                            <ResetPassword/>
                         </ResetPasswordRoute>
                     </GuestRoute>
                 }/>
