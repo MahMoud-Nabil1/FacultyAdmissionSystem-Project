@@ -10,6 +10,7 @@ import ForgotPassword from './components/ForgotPassword.jsx';
 import AdminDashboard from './components/admin-dashboard/adminDashboard.jsx';
 import AdminContact from "./components/AdminContact";
 import ITContact from "./components/ITContact";
+import Announcements from "./components/announcements";
 
 
 function App() {
@@ -34,6 +35,12 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+                <Route
+                    path="/announcements"
+                    element={
+                        <Announcements/>
+                    }>
+                </Route>
 
                 {/* DEV ONLY ADMIN ROUTE */}
                 <Route
