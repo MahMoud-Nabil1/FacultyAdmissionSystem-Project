@@ -2,9 +2,8 @@ const express = require('express');
 const router = express.Router();
 const authCtrl = require('../controllers/auth.controller');
 
-// Separated login endpoints
-router.post('/login/student', authCtrl.studentLogin);
-router.post('/login/staff', authCtrl.staffLogin);
+//login for both staff and students
+router.post('/login', authCtrl.login);
 const { authenticate } = require("../middleware/authMiddleware");
 
 // Get user ID from JWT token
