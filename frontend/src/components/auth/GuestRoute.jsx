@@ -9,16 +9,15 @@ import { useAuth } from '../../context/AuthContext';
  * Use this for /login, /register, /ForgotPassWord etc.
  */
 const GuestRoute = ({ children }) => {
-    const { isAuthenticated, loading } = useAuth();
+    const { isAuthenticated, user, loading } = useAuth();
 
-    // Wait until auth state is loaded from localStorage
     if (loading) return null;
 
-    if (isAuthenticated) {
+    if (isAuthenticated && user) {
+        if (user.role) return <Navigate to="/admin-dashboard" replace />;
         return <Navigate to="/" replace />;
     }
 
     return children;
 };
-
 export default GuestRoute;

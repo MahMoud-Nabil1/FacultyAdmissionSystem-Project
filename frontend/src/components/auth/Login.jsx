@@ -3,18 +3,16 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './css/Login.css';
 import { useNavigate } from 'react-router-dom';
-import { getMe } from "../../services/api";
+import {jwtDecode} from "jwt-decode";
 
 const Login = () => {
     const { login } = useAuth();
-    const [role, setRole] = useState('student');
     const [userId, setUserId] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
-    const isStudent = role === 'student';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,18 +20,13 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const endpoint = isStudent
-                ? 'http://localhost:5000/api/auth/login/student'
-                : 'http://localhost:5000/api/auth/login/staff';
-
-            const body = isStudent
-                ? { studentId: userId, password }
-                : { email: userId, password };
-
-            const res = await fetch(endpoint, {
+            const res = await fetch('http://localhost:5000/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body),
+                body: JSON.stringify({
+                    identifier: userId,
+                    password
+                }),
             });
 
             const data = await res.json();
@@ -45,13 +38,10 @@ const Login = () => {
 
             login(data.token);
 
-            const me = await getMe();
+            const payload = jwtDecode(data.token);
 
-            if (me.role === 'student') {
-                navigate('/');
-            } else {
-                navigate('/admin-dashboard');
-            }
+            if (payload.role) navigate("/admin-dashboard");
+            else navigate("/");
 
         } catch (err) {
             setError('لم يمكن التواصل مع السيرفر');
@@ -78,34 +68,8 @@ const Login = () => {
             <div className="login-form-side">
                 <div className="login-card">
                     <div className="login-header">
-                        <h1>{isStudent ? 'بوابة الطلاب' : 'بوابة هيئة التدريس'}</h1>
+                        <h1>{'تسجيل الدخول'}</h1>
                         <p>يرجى إدخال بيانات الاعتماد الخاصة بك للوصول.</p>
-                    </div>
-
-                    {/* ── Role Toggle ── */}
-                    <div className="role-toggle">
-                        <button
-                            type="button"
-                            className={`role-toggle-btn ${isStudent ? 'active' : ''}`}
-                            onClick={() => { setRole('student'); setError(''); }}
-                        >
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M22 10l-10-6L2 10l10 6 10-6z" />
-                                <path d="M6 12v5c0 0 3 3 6 3s6-3 6-3v-5" />
-                            </svg>
-                            طالب
-                        </button>
-                        <button
-                            type="button"
-                            className={`role-toggle-btn ${!isStudent ? 'active' : ''}`}
-                            onClick={() => { setRole('staff'); setError(''); }}
-                        >
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-                            </svg>
-                            موظف
-                        </button>
                     </div>
 
                     {error && (
@@ -122,7 +86,7 @@ const Login = () => {
                     <form onSubmit={handleSubmit} className="login-form">
                         <div className="form-group">
                             <label htmlFor="userId">
-                                {isStudent ? 'كود الطالب' : 'ايميل الموظف'}
+                                كود الطالب او الإيميل
                             </label>
                             <div className="input-wrapper">
                                 <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -132,7 +96,7 @@ const Login = () => {
                                 <input
                                     id="userId"
                                     type="text"
-                                    placeholder={isStudent ? 'ادخل كود الطلب الخاص بك' : 'ادخل ايميل الموظف الخاص بك'}
+                                    placeholder='ادخل كود الطالب او الإيميل الخاص بك'
                                     value={userId}
                                     onChange={(e) => setUserId(e.target.value)}
                                     required
@@ -187,7 +151,7 @@ const Login = () => {
 
                         <div className="form-footer">
                             <Link
-                                to={isStudent ? "/ITContact" : "/AdminContact"}
+                                to="/ITContact"
                                 className="support-link"
                             >
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -203,7 +167,7 @@ const Login = () => {
                             {loading ? (
                                 <span className="spinner"></span>
                             ) : (
-                                `سجل الدخول ك${isStudent ? 'طالب' : 'موظف'}`
+                                `سجل الدخول`
                             )}
                         </button>
                     </form>
