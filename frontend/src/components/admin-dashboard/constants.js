@@ -4,5 +4,5 @@ export const ROLES = { //convert from enum to more readable names
     admin: "ادمن",
     academic_guide: "مرشد اكاديمى",
     academic_guide_coordinator: "منسق للإرشاد الاكاديمى",
-    reporter: "مراسل"
+    reporter: "Reporter" //TODO: make this name arabic idk how to translate it
 };
