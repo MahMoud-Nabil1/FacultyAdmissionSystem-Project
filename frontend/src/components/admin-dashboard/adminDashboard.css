@@ -33,19 +33,6 @@ button {
     background: #1f52b5;
 }
 
-.copy-btn {
-    background: #6c757d;
-    color: white;
-    padding: 4px 6px;
-    font-size: 12px;
-    border-radius: 4px;
-    transition: background 0.2s ease;
-}
-
-.copy-btn:hover {
-    background: #5a6268;
-}
-
 form {
     margin-top: 20px;
     display: flex;
