@@ -30,7 +30,7 @@ const StudentPanel = () => {
     const slice = students.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
 
     return (
-        <div className="dashboard-container">
+        <div className="panel">
             <h2>الطلاب</h2>
 
             <button className="add-btn" onClick={() => setShowForm(true)}>
@@ -71,35 +71,35 @@ const StudentPanel = () => {
 
             <table>
                 <thead>
-                    <tr>
-                        <th>كود الطالب</th>
-                        <th>الإسم</th>
-                        <th>الإيميل</th>
-                        <th>المعدل التراكمى</th>
-                        <th>ID</th>
-                    </tr>
+                <tr>
+                    <th>كود الطالب</th>
+                    <th>الإسم</th>
+                    <th>الإيميل</th>
+                    <th>المعدل التراكمى</th>
+                    <th>ID</th>
+                </tr>
                 </thead>
                 <tbody>
-                    {slice.map(s => (
-                        <tr key={s._id}>
-                            <td>{s.studentId}</td>
-                            <td>{s.name}</td>
-                            <td>{s.email}</td>
-                            <td>{s.gpa}</td>
-                            <td>
-                                <button
-                                    className="copy-btn"
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(s._id);
-                                        setCopiedId(s._id);
-                                        setTimeout(() => setCopiedId(null), 3000);
-                                    }}
-                                >
-                                    {copiedId === s._id ? "تم!" : "نسخ"}
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
+                {slice.map(s => (
+                    <tr key={s._id}>
+                        <td>{s.studentId}</td>
+                        <td>{s.name}</td>
+                        <td>{s.email}</td>
+                        <td>{s.gpa}</td>
+                        <td>
+                            <button
+                                className="copy-btn"
+                                onClick={() => {
+                                    navigator.clipboard.writeText(s._id);
+                                    setCopiedId(s._id);
+                                    setTimeout(() => setCopiedId(null), 3000);
+                                }}
+                            >
+                                {copiedId === s._id ? "تم!" : "نسخ"}
+                            </button>
+                        </td>
+                    </tr>
+                ))}
                 </tbody>
             </table>
 
