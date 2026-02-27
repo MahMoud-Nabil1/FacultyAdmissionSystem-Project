@@ -37,13 +37,13 @@ const Login = () => {
             const data = await res.json();
 
             if (!res.ok) {
-                setError(data.error || 'فشل تسجيل الدخول');
+                setError(data.error || 'Login failed');
                 return;
             }
 
             login(data.token, data.role, data.id || userId);
         } catch (err) {
-            setError('لم يمكن التواصل مع السيرفر');
+            setError('Unable to connect to server');
         } finally {
             setLoading(false);
         }
@@ -69,8 +69,8 @@ const Login = () => {
                             </svg>
                         )}
                     </div>
-                    <h1>!مرحبًا بك</h1>
-                    <p>سجل الدخول ك{isStudent ? 'طالب' : 'موظف'}</p>
+                    <h1>Welcome Back</h1>
+                    <p>Sign in as {isStudent ? 'a Student' : 'Staff'}</p>
                 </div>
 
                 {/* ── Role Toggle ── */}
@@ -84,7 +84,7 @@ const Login = () => {
                             <path d="M22 10l-10-6L2 10l10 6 10-6z" />
                             <path d="M6 12v5c0 0 3 3 6 3s6-3 6-3v-5" />
                         </svg>
-                        طالب
+                        Student
                     </button>
                     <button
                         type="button"
@@ -95,7 +95,7 @@ const Login = () => {
                             <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
                             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
                         </svg>
-                        موظف
+                        Staff
                     </button>
                 </div>
 
@@ -113,7 +113,7 @@ const Login = () => {
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
                         <label htmlFor="userId">
-                            {isStudent ? 'كود الطالب' : 'ايميل الموظف'}
+                            {isStudent ? 'Student ID' : 'Staff email'}
                         </label>
                         <div className="input-wrapper">
                             <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -123,7 +123,7 @@ const Login = () => {
                             <input
                                 id="userId"
                                 type="text"
-                                placeholder={isStudent ? 'ادخل كود الطلب الخاص بك' : 'ادخل ايميل الموظف الخاص بك'}
+                                placeholder={isStudent ? 'Enter your Student ID' : 'Enter your Staff email'}
                                 value={userId}
                                 onChange={(e) => setUserId(e.target.value)}
                                 required
@@ -133,7 +133,7 @@ const Login = () => {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password">كلمة السر</label>
+                        <label htmlFor="password">Password</label>
                         <div className="input-wrapper">
                             <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -142,7 +142,7 @@ const Login = () => {
                             <input
                                 id="password"
                                 type={showPassword ? 'text' : 'password'}
-                                placeholder="ادخل كلمة السر الخاصة بك"
+                                placeholder="Enter your password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
@@ -172,7 +172,7 @@ const Login = () => {
 
                     <div className="form-footer">
                         <Link to="/forgot-password" className="forgot-link">
-                            نسيت كلمة السر؟
+                            Forgot password?
                         </Link>
                     </div>
 
@@ -180,7 +180,7 @@ const Login = () => {
                         {loading ? (
                             <span className="spinner"></span>
                         ) : (
-                            `سجل الدخول ك${isStudent ? 'طالب' : 'موظف'}`
+                            `Sign In as ${isStudent ? 'Student' : 'Staff'}`
                         )}
                     </button>
                 </form>
