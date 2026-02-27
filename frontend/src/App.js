@@ -1,16 +1,13 @@
 import './App.css';
-import {Navigate, Route, Routes} from 'react-router-dom';
-import ProtectedRoute from './components/ProtectedRoute.jsx';
-import GuestRoute from './components/GuestRoute.jsx';
-import ResetPasswordRoute from './components/ResetPasswordRoute.jsx';
-import ResetPassword from './components/ResetPassword.jsx';
-import Login from './components/Login.jsx';
-import ForgotPasswordChoice from './components/ForgotPasswordChoice.jsx';
-import ForgotPassword from './components/ForgotPassword.jsx';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
+import GuestRoute from './components/auth/GuestRoute.jsx';
+import ResetPassword from './components/auth/ResetPassword.jsx';
+import Login from './components/auth/Login.jsx';
+import ForgotPassword from './components/auth/ForgotPassword.jsx';
 import AdminDashboard from './components/admin-dashboard/adminDashboard.jsx';
-import AdminContact from "./components/AdminContact";
-import ITContact from "./components/ITContact";
-import Announcements from "./components/announcements";
+import SupportContact from "./components/support/SupportContact.jsx";
+import Announcements from "./components/admin-dashboard/announcements.jsx";
 
 
 function App() {
@@ -38,7 +35,7 @@ function App() {
                 <Route
                     path="/announcements"
                     element={
-                        <Announcements/>
+                        <Announcements />
                     }>
                 </Route>
 
@@ -46,10 +43,10 @@ function App() {
                 <Route
                     path="/admin-dashboard-test"
                     element={
-                        <div style={{padding: "2rem"}}>
+                        <div className="app-container">
                             <h1>Admin Dashboard (Test)</h1>
-                            <hr/>
-                            <AdminDashboard/>
+                            <hr />
+                            <AdminDashboard />
                         </div>
                     }
                 />
@@ -64,7 +61,7 @@ function App() {
                             }}>
                                 Sign out
                             </button>
-                            <div style={{ padding: "2rem" }}>
+                            <div className="app-container">
                                 <h1>Admin Dashboard</h1>
                                 <hr />
                                 <AdminDashboard />
@@ -75,39 +72,32 @@ function App() {
                 {/* Guest-only routes — redirect to / if already logged in */}
                 <Route path="/login" element={
                     <GuestRoute>
-                        <Login/>
+                        <Login />
                     </GuestRoute>
-                }/>
+                } />
                 <Route path="/forgot-password" element={
                     <GuestRoute>
-                        <ForgotPasswordChoice/>
+                        <ForgotPassword />
                     </GuestRoute>
-                }/>
-                <Route path="/ForgotPassWord" element={
-                    <GuestRoute>
-                        <ForgotPassword/>
-                    </GuestRoute>
-                }/>
+                } />
                 <Route path="/reset-password" element={
                     <GuestRoute>
-                        <ResetPasswordRoute>
-                            <ResetPassword/>
-                        </ResetPasswordRoute>
+                        <ResetPassword />
                     </GuestRoute>
-                }/>
+                } />
                 <Route path="/ITContact" element={
                     <GuestRoute>
-                        <ITContact/>
+                        <SupportContact target="it" />
                     </GuestRoute>
-                }/>
+                } />
                 <Route path="/AdminContact" element={
                     <GuestRoute>
-                        <AdminContact/>
+                        <SupportContact target="admin" />
                     </GuestRoute>
-                }/>
+                } />
 
                 {/* Catch-all: redirect unknown routes */}
-                <Route path="*" element={<Navigate to="/" replace/>}/>
+                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </div>
     );
