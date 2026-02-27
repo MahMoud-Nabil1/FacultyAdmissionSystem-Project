@@ -1,74 +1,46 @@
-import {jwtDecode} from 'jwt-decode';
+const API_BASE =
+    process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 
-const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 export { API_BASE };
 
-/** Get JWT token from localStorage */
-function getToken() {
-    return localStorage.getItem("token");
-}
-
-/** Decode JWT payload locally without hitting backend */
-export function decodeToken() {
-    const token = getToken();
-    if (!token) return null;
-
-    try {
-        return jwtDecode(token); // using jwt-decode package
-    } catch {
-        return null;
-    }
-}
-
-/** Generic POST request with optional auth */
-export async function apiPost(path, body, auth = true) {
-    const headers = { 'Content-Type': 'application/json' };
-    if (auth) {
-        const token = getToken();
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-    }
-
+export async function apiPost(path, body) {
     const res = await fetch(`${API_BASE}${path}`, {
         method: 'POST',
-        headers,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
     });
-
     const data = await res.json().catch(() => ({}));
     return { res, data };
 }
 
-/** Generic GET request with optional auth */
-export async function apiGet(path, auth = true) {
-    const headers = {};
-    if (auth) {
-        const token = getToken();
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const res = await fetch(`${API_BASE}${path}`, { headers });
+export async function apiGet(path) {
+    const res = await fetch(`${API_BASE}${path}`);
     const data = await res.json().catch(() => ({}));
     return { res, data };
 }
 
-/** Student endpoints */
 export async function createStudent(data) {
-    const { res, data: body } = await apiPost("/students", data);
-    if (!res.ok) throw new Error(body.error || "Failed to create student");
-    return body;
+    const res = await fetch("http://localhost:5000/api/students", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (!res.ok) throw new Error("Failed");
+    return res.json();
 }
 
 export async function getAllStudents() {
     const { res, data } = await apiGet("/students");
-    if (!res.ok) throw new Error(data.error || "Failed to fetch students");
-    return data;
-}
 
-/** Staff endpoints */
-export async function createStaff(data) {
-    const { res, data: body } = await apiPost("/staff", data);
-    if (!res.ok) throw new Error(body.error || "Failed to create staff");
-    return body;
+    if (!res.ok) {
+        throw new Error(data.error || "Failed to fetch students");
+    }
+
+    return data;
 }
 
 export async function getAllStaff() {
@@ -77,14 +49,21 @@ export async function getAllStaff() {
     return data;
 }
 
-/** Get current user info from decoded JWT */
-export async function getMe() {
-    const payload = decodeToken();
-    if (!payload) throw new Error("No valid token found");
+export async function createStaff(data) {
+    const { res, data: body } = await apiPost("/staff", data);
+    if (!res.ok) throw new Error(body.error || "Failed to create staff");
+    return body;
+}
 
-    return {
-        id: payload.id,
-        role: payload.role,
-        name: payload.name,
-    };
+//get user data from database
+export async function getMe() {
+    const res = await fetch("http://localhost:5000/api/auth/me", {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed");
+    return data;
 }
