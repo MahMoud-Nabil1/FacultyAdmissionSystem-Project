@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const Student = require('../models/student');
 const Staff = require('../models/staff');
 const PasswordResetToken = require('../models/passwordResetToken');
-const {sendPasswordResetEmail} = require('../middleware/email');
+const {sendPasswordResetEmail} = require('../utils/email');
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'faculty-admission-secret-key';
