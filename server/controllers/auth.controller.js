@@ -26,6 +26,65 @@ async function findValidResetToken(token) {
     return resetDoc;
 }
 
+// exports.studentLogin = async (req, res) => {
+//     try {
+//         const student = await Student
+//             .findOne({studentId: req.body.studentId})
+//             .select('+hash +salt');
+//
+//         if (!student) {
+//             return res.status(401).json({error: "Invalid student ID or password"});
+//         }
+//
+//         const ok = await student.verifyPassword(req.body.password);
+//         if (!ok) {
+//             return res.status(401).json({error: "Invalid student ID or password"});
+//         }
+//
+//         const token = jwt.sign(
+//             {id: student.studentId, role: 'student', name: student.name},
+//             JWT_SECRET,
+//             {expiresIn: '24h'}
+//         );
+//
+//         res.json({message: "Login success", token, role: 'student'});
+//     } catch (err) {
+//         res.status(500).json({error: err.message});
+//     }
+// };
+//
+// exports.staffLogin = async (req, res) => {
+//     try {
+//         const staff = await Staff
+//             .findOne({email: req.body.email})
+//             .select('+hash +salt');
+//
+//         if (!staff) {
+//             return res.status(401).json({error: "Invalid email or password"});
+//         }
+//
+//         const ok = await staff.verifyPassword(req.body.password);
+//         if (!ok) {
+//             return res.status(401).json({error: "Invalid email or password"});
+//         }
+//
+//         const token = jwt.sign(
+//             {
+//                 id: staff._id,
+//                 role: staff.role,         // e.g. 'admin' or 'staff'
+//                 name: staff.name,
+//                 department: staff.department,
+//             },
+//             JWT_SECRET,
+//             {expiresIn: '24h'}
+//         );
+//
+//         res.json({message: "Login success", token});
+//     } catch (err) {
+//         res.status(500).json({error: err.message});
+//     }
+// };
+
 /**
  * Forgot password: request a reset link by email.
  * Looks up email in both Student and Staff. If found, creates a token in DB and sends email.
