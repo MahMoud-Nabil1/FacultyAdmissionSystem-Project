@@ -54,16 +54,3 @@ export async function createStaff(data) {
     if (!res.ok) throw new Error(body.error || "Failed to create staff");
     return body;
 }
-
-//get user data from database
-export async function getMe() {
-    const res = await fetch("http://localhost:5000/api/auth/me", {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`
-        }
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed");
-    return data;
-}

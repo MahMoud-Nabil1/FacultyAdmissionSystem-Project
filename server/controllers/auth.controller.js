@@ -42,7 +42,7 @@ exports.studentLogin = async (req, res) => {
         }
 
         const token = jwt.sign(
-            {id: student.studentId},
+            { studentId: student.studentId, role: 'student' },
             JWT_SECRET,
             { expiresIn: '24h' }
         );
@@ -69,12 +69,12 @@ exports.staffLogin = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: staff._id},
+            { _id: staff._id, role: 'staff' },
             JWT_SECRET,
             { expiresIn: '24h' }
         );
 
-        res.json({ message: "Login success", token});
+        res.json({ message: "Login success", token, role: 'staff' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -223,26 +223,6 @@ exports.resetPassword = async (req, res) => {
 
         await PasswordResetToken.deleteOne({ token });
         return res.json({ message: 'Password updated successfully' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-};
-
-/**
- *
- * @param req
- * @param res
- * @returns {Promise<void>}
- *
- * Gets user information using JWT token
- */
-exports.getMe = async (req, res) => {
-    try {
-        res.json({
-            id: req.user._id || req.user.studentId,
-            role: req.user.role || "student",
-            name: req.user.name,
-        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
