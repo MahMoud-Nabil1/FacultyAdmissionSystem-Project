@@ -26,64 +26,64 @@ async function findValidResetToken(token) {
     return resetDoc;
 }
 
-// exports.studentLogin = async (req, res) => {
-//     try {
-//         const student = await Student
-//             .findOne({studentId: req.body.studentId})
-//             .select('+hash +salt');
-//
-//         if (!student) {
-//             return res.status(401).json({error: "Invalid student ID or password"});
-//         }
-//
-//         const ok = await student.verifyPassword(req.body.password);
-//         if (!ok) {
-//             return res.status(401).json({error: "Invalid student ID or password"});
-//         }
-//
-//         const token = jwt.sign(
-//             {id: student.studentId, role: 'student', name: student.name},
-//             JWT_SECRET,
-//             {expiresIn: '24h'}
-//         );
-//
-//         res.json({message: "Login success", token, role: 'student'});
-//     } catch (err) {
-//         res.status(500).json({error: err.message});
-//     }
-// };
-//
-// exports.staffLogin = async (req, res) => {
-//     try {
-//         const staff = await Staff
-//             .findOne({email: req.body.email})
-//             .select('+hash +salt');
-//
-//         if (!staff) {
-//             return res.status(401).json({error: "Invalid email or password"});
-//         }
-//
-//         const ok = await staff.verifyPassword(req.body.password);
-//         if (!ok) {
-//             return res.status(401).json({error: "Invalid email or password"});
-//         }
-//
-//         const token = jwt.sign(
-//             {
-//                 id: staff._id,
-//                 role: staff.role,         // e.g. 'admin' or 'staff'
-//                 name: staff.name,
-//                 department: staff.department,
-//             },
-//             JWT_SECRET,
-//             {expiresIn: '24h'}
-//         );
-//
-//         res.json({message: "Login success", token});
-//     } catch (err) {
-//         res.status(500).json({error: err.message});
-//     }
-// };
+exports.studentLogin = async (req, res) => {
+    try {
+        const student = await Student
+            .findOne({studentId: req.body.studentId})
+            .select('+hash +salt');
+
+        if (!student) {
+            return res.status(401).json({error: "Invalid student ID or password"});
+        }
+
+        const ok = await student.verifyPassword(req.body.password);
+        if (!ok) {
+            return res.status(401).json({error: "Invalid student ID or password"});
+        }
+
+        const token = jwt.sign(
+            {id: student.studentId, role: 'student', name: student.name},
+            JWT_SECRET,
+            {expiresIn: '24h'}
+        );
+
+        res.json({message: "Login success", token, role: 'student'});
+    } catch (err) {
+        res.status(500).json({error: err.message});
+    }
+};
+
+exports.staffLogin = async (req, res) => {
+    try {
+        const staff = await Staff
+            .findOne({email: req.body.email})
+            .select('+hash +salt');
+
+        if (!staff) {
+            return res.status(401).json({error: "Invalid email or password"});
+        }
+
+        const ok = await staff.verifyPassword(req.body.password);
+        if (!ok) {
+            return res.status(401).json({error: "Invalid email or password"});
+        }
+
+        const token = jwt.sign(
+            {
+                id: staff._id,
+                role: staff.role,         // e.g. 'admin' or 'staff'
+                name: staff.name,
+                department: staff.department,
+            },
+            JWT_SECRET,
+            {expiresIn: '24h'}
+        );
+
+        res.json({message: "Login success", token});
+    } catch (err) {
+        res.status(500).json({error: err.message});
+    }
+};
 
 /**
  * Forgot password: request a reset link by email.
@@ -230,73 +230,6 @@ exports.resetPassword = async (req, res) => {
         return res.json({message: 'Password updated successfully'});
     } catch (err) {
         res.status(500).json({error: err.message});
-    }
-};
-
-exports.login = async (req, res) => {
-    try {
-        const { identifier, password } = req.body;
-
-        if (!identifier || !password) {
-            return res.status(400).json({ error: "Identifier and password are required" });
-        }
-
-        const normalized = identifier.trim().toLowerCase();
-
-        let user = null;
-        let role = null;
-
-        // Check if identifier looks like an email
-        const isEmail = normalized.includes("@");
-
-        if (isEmail) {
-            // Check staff first
-            user = await Staff.findOne({ email: normalized }).select('+hash +salt');
-            if (user) {
-                role = user.role;
-            }
-
-            // If not staff check for student
-            if (!user) {
-                user = await Student.findOne({ email: normalized }).select('+hash +salt');
-                if (user) role = "student";
-            }
-        } else {
-            // No email: check ID
-            const studentId = Number(normalized);
-            if (Number.isInteger(studentId)) {
-                user = await Student.findOne({ studentId }).select('+hash +salt');
-                if (user) role = "student";
-            }
-        }
-
-        if (!user) {
-            return res.status(401).json({ error: "Invalid credentials" });
-        }
-
-        const ok = await user.verifyPassword(password);
-        if (!ok) {
-            return res.status(401).json({ error: "Invalid credentials" });
-        }
-
-        const token = jwt.sign(
-            {
-                id: role === "student" ? user.studentId : user._id,
-                role,
-                name: user.name,
-                ...(user.department && { department: user.department })
-            },
-            JWT_SECRET,
-            { expiresIn: "24h" }
-        );
-
-        return res.json({
-            message: "Login success",
-            token
-        });
-
-    } catch (err) {
-        res.status(500).json({ error: err.message });
     }
 };
 
