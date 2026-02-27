@@ -124,5 +124,3 @@ dist
 .vscode/
 *.swp
 *.swo
-*.env
-*.env.js
