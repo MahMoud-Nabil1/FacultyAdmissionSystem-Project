@@ -15,7 +15,7 @@ function App() {
         <div className="App">
 
             <Routes>
-                {/* Protected home route — require login */}
+                {}
                 <Route
                     path="/"
                     element={
@@ -39,7 +39,7 @@ function App() {
                     }>
                 </Route>
 
-                {/* DEV ONLY ADMIN ROUTE */}
+                {}
                 <Route
                     path="/admin-dashboard-test"
                     element={
@@ -69,7 +69,7 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-                {/* Guest-only routes — redirect to / if already logged in */}
+                {}
                 <Route path="/login" element={
                     <GuestRoute>
                         <Login />
@@ -96,8 +96,8 @@ function App() {
                     </GuestRoute>
                 } />
 
-                {/* Catch-all: redirect unknown routes */}
-                <Route path="*" element={<Navigate to="/" replace />} />
+                {}
+                <Route path="*" element={<Navigate to="/announcements" replace />} />
             </Routes>
         </div>
     );

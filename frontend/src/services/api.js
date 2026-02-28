@@ -3,24 +3,24 @@ import {jwtDecode} from 'jwt-decode';
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 export { API_BASE };
 
-/** Get JWT token from localStorage */
+
 function getToken() {
     return localStorage.getItem("token");
 }
 
-/** Decode JWT payload locally without hitting backend */
+
 export function decodeToken() {
     const token = getToken();
     if (!token) return null;
 
     try {
-        return jwtDecode(token); // using jwt-decode package
+        return jwtDecode(token); 
     } catch {
         return null;
     }
 }
 
-/** Generic POST request with optional auth */
+
 export async function apiPost(path, body, auth = true) {
     const headers = { 'Content-Type': 'application/json' };
     if (auth) {
@@ -38,7 +38,7 @@ export async function apiPost(path, body, auth = true) {
     return { res, data };
 }
 
-/** Generic GET request with optional auth */
+
 export async function apiGet(path, auth = true) {
     const headers = {};
     if (auth) {
@@ -51,7 +51,7 @@ export async function apiGet(path, auth = true) {
     return { res, data };
 }
 
-/** Student endpoints */
+
 export async function createStudent(data) {
     const { res, data: body } = await apiPost("/students", data);
     if (!res.ok) throw new Error(body.error || "Failed to create student");
@@ -64,7 +64,7 @@ export async function getAllStudents() {
     return data;
 }
 
-/** Staff endpoints */
+
 export async function createStaff(data) {
     const { res, data: body } = await apiPost("/staff", data);
     if (!res.ok) throw new Error(body.error || "Failed to create staff");
@@ -77,7 +77,7 @@ export async function getAllStaff() {
     return data;
 }
 
-/** Get current user info from decoded JWT */
+
 export async function getMe() {
     const payload = decodeToken();
     if (!payload) throw new Error("No valid token found");

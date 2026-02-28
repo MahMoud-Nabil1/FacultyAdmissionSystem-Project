@@ -44,7 +44,7 @@ const ForgotPassword = () => {
 
     return (
         <div className="login-page">
-            {/* ── Left Side (Image & Brand) ── */}
+            {}
             <div className="login-image-side">
                 <div className="brand-logo">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -56,7 +56,7 @@ const ForgotPassword = () => {
                 </div>
             </div>
 
-            {/* ── Right Side (Form) ── */}
+            {}
             <div className="login-form-side">
                 <div className="login-card">
                     <div className="login-header">
@@ -96,7 +96,7 @@ const ForgotPassword = () => {
                                 </div>
                             </div>
                             <button type="submit" className="login-btn" disabled={loading}>
-                                {loading ? <span className="spinner"></span> : 'إرسال رابط إعادة التعيين'}
+                                {'إرسال رابط إعادة التعيين'}
                             </button>
                         </form>
                     )}

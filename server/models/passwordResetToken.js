@@ -23,7 +23,7 @@ const passwordResetTokenSchema = new Schema({
         type: Date,
         required: true
     },
-    // Optional: when reset was requested via studentId/faculty email
+    
     studentId: {
         type: Number
     }

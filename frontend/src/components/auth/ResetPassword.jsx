@@ -8,7 +8,7 @@ const ResetPassword = () => {
     const token = searchParams.get('token');
 
     const navigate = useNavigate();
-    const [status, setStatus] = useState('loading'); // 'loading' | 'valid' | 'invalid'
+    const [status, setStatus] = useState('loading'); 
     const [verifyError, setVerifyError] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -47,7 +47,7 @@ const ResetPassword = () => {
         return () => { cancelled = true; };
     }, [token]);
 
-    // Submit new password
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -77,7 +77,7 @@ const ResetPassword = () => {
         }
     };
 
-    // Left side branding
+    
     const renderLeftSide = () => (
         <div className="login-image-side">
             <div className="brand-logo">
@@ -91,7 +91,7 @@ const ResetPassword = () => {
         </div>
     );
 
-    // Generic message card for loading, error, or success
+    
     const renderMessageCard = (title, message, linkText, linkTo) => (
         <div className="login-form-side">
             <div className="login-card text-center">
@@ -108,7 +108,7 @@ const ResetPassword = () => {
         </div>
     );
 
-    // Loading state
+    
     if (status === 'loading') return (
         <div className="login-page">
             {renderLeftSide()}
@@ -116,7 +116,7 @@ const ResetPassword = () => {
         </div>
     );
 
-    // Invalid token
+    
     if (status === 'invalid') return (
         <div className="login-page">
             {renderLeftSide()}
@@ -124,7 +124,7 @@ const ResetPassword = () => {
         </div>
     );
 
-    // Success
+    
     if (success) return (
         <div className="login-page">
             {renderLeftSide()}
@@ -132,7 +132,7 @@ const ResetPassword = () => {
         </div>
     );
 
-    // Valid token: show reset form
+    
     return (
         <div className="login-page">
             {renderLeftSide()}

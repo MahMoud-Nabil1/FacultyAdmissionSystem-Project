@@ -52,7 +52,7 @@ const Login = () => {
 
     return (
         <div className="login-page">
-            {/* ── Left Side (Image & Brand) ── */}
+            {}
             <div className="login-image-side">
                 <div className="brand-logo">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -64,7 +64,7 @@ const Login = () => {
                 </div>
             </div>
 
-            {/* ── Right Side (Form) ── */}
+            {}
             <div className="login-form-side">
                 <div className="login-card">
                     <div className="login-header">

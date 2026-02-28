@@ -1,4 +1,4 @@
-/* Login split-screen styles */
+
 
 .login-page {
     min-height: 100vh;
@@ -6,7 +6,7 @@
     background-color: var(--bg-white);
 }
 
-/* ── Left Side (Image & Brand) ── */
+
 .login-image-side {
     flex: 1;
     background: linear-gradient(
@@ -15,7 +15,7 @@
             rgba(0, 0, 0, 0.2) 50%,
             rgba(0, 0, 0, 0.28) 100%
     ),
-    url('/public/science.jpeg') center/cover no-repeat; /* this works ignore the error */
+    url('../../../assets/science.jpeg') center/cover no-repeat;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -55,7 +55,7 @@
     line-height: 1.6;
 }
 
-/* ── Right Side (Form) ── */
+
 .login-form-side {
     width: 100%;
     max-width: 560px;
@@ -73,11 +73,11 @@
 
 .login-header {
     text-align: left;
-    /* Image has left-aligned text */
+    
     margin-bottom: 32px;
 }
 
-/* RTL support for arabic text, but aligning to the right for RTL layout */
+
 [dir="rtl"] .login-header {
     text-align: right;
 }
@@ -96,7 +96,7 @@
     margin: 0;
 }
 
-/* ── Role Toggle ── */
+
 
 .role-toggle {
     display: flex;
@@ -142,7 +142,7 @@
     box-shadow: var(--shadow-sm);
 }
 
-/* ── Error Banner ── */
+
 
 .login-error {
     display: flex;
@@ -163,7 +163,7 @@
     flex-shrink: 0;
 }
 
-/* ── Form ── */
+
 
 .login-form {
     display: flex;
@@ -216,7 +216,7 @@
     background: var(--bg-white);
 }
 
-/* ── Toggle Password ── */
+
 
 .toggle-password {
     position: absolute;
@@ -240,7 +240,7 @@
     color: var(--text-dark);
 }
 
-/* ── Footer & Links ── */
+
 
 .form-footer {
     display: flex;
@@ -274,7 +274,7 @@
     height: 16px;
 }
 
-/* ── Submit Button ── */
+
 
 .login-btn {
     width: 100%;
@@ -307,7 +307,7 @@
     cursor: not-allowed;
 }
 
-/* ── Spinner ── */
+
 
 .spinner {
     width: 20px;
@@ -324,12 +324,12 @@
     }
 }
 
-/* ── Responsive ── */
+
 
 @media (max-width: 900px) {
     .login-image-side {
         display: none;
-        /* Hide image on smaller screens */
+        
     }
 
     .login-form-side {
@@ -347,7 +347,7 @@
     }
 }
 
-/* ── Utility Classes for Auth Components ── */
+
 
 .text-center {
     text-align: center;

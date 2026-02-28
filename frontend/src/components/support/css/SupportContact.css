@@ -1,4 +1,4 @@
-/* SupportContact styles (moved into support/css) */
+
 
 .contact-page {
     min-height: 100vh;
@@ -20,7 +20,7 @@
     color: var(--text-dark);
 }
 
-/* ── Header ── */
+
 
 .contact-header {
     display: flex;
@@ -63,7 +63,7 @@
     color: var(--text-gray);
 }
 
-/* ── Contact Form ── */
+
 
 .contact-form {
     display: flex;
@@ -126,7 +126,7 @@
     margin: 6px 0 10px;
 }
 
-/* ── Target Toggle (IT / Admin) ── */
+
 
 .contact-card .role-toggle {
     margin-bottom: 18px;
@@ -166,7 +166,7 @@
     box-shadow: var(--shadow-sm);
 }
 
-/* ── Status Messages ── */
+
 
 .status-msg {
     font-size: 0.85rem;
@@ -187,7 +187,7 @@
     color: #991b1b;
 }
 
-/* ── Submit Button ── */
+
 
 .submit-btn {
     width: 100%;
@@ -231,7 +231,7 @@
     box-shadow: none;
 }
 
-/* ── Responsive ── */
+
 
 @media (max-width: 480px) {
     .contact-card {

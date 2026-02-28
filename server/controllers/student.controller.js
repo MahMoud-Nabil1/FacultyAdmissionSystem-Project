@@ -74,88 +74,65 @@ exports.deleteStudent = async (req, res) => {
     }
 };
 
+
 exports.contactIT = async (req, res) => {
     try {
         const { studentCode, subjectName, message, replyEmail } = req.body;
 
-        const student = await Student.findOne({ studentId: studentCode });
-        if (!student) {
-            return res.status(404).json({ error: "Student code not found." });
+
+        if (!subjectName || !subjectName.trim()) {
+            return res.status(400).json({ error: "موضوع المشكلة مطلوب." });
         }
+
+        const student = await Student.findOne({ studentId: studentCode });
+        if (!student) return res.status(404).json({ error: "كود الطالب غير موجود." });
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
-            auth: {
-                user: process.env.ADMIN_EMAIL,
-                pass: process.env.ADMIN_EMAIL_PASS
-            }
+            auth: { user: process.env.ADMIN_EMAIL, pass: process.env.ADMIN_EMAIL_PASS }
         });
 
         const mailOptions = {
             from: replyEmail,
             to: process.env.IT_EMAIL,
-            subject: `IT Support Request: ${subjectName} - Student: ${studentCode}`,
-            text: `
-            New Support Ticket:
-            ------------------
-            Student Code: ${studentCode}
-            Course: ${subjectName}
-            Reply to: ${replyEmail}
-            
-            Issue:
-            ${message}
-                        `
-                    };
+            subject: `[IT Support] ${subjectName} - Student: ${studentCode}`,
+            text: `طلب دعم فني:\nكود الطالب: ${studentCode}\nالموضوع: ${subjectName}\nالبريد: ${replyEmail}\n\nالمشكلة:\n${message}`
+        };
 
         await transporter.sendMail(mailOptions);
-
-        res.status(200).json({ message: "Success! Message sent to IT Support via Email." });
-
+        res.status(200).json({ message: "تم الإرسال بنجاح." });
     } catch (err) {
-        console.error("Email Error:", err);
-        res.status(500).json({ error: "Could not send email. " + err.message });
+        res.status(500).json({ error: "خطأ في السيرفر: " + err.message });
     }
 };
+
 
 exports.contactAdmin = async (req, res) => {
     try {
         const { studentCode, subjectName, message, replyEmail } = req.body;
 
-        const student = await Student.findOne({ studentId: studentCode });
-        if (!student) {
-            return res.status(404).json({ error: "Student code not found." });
+        if (!subjectName || !subjectName.trim()) {
+            return res.status(400).json({ error: "كود المقرر مطلوب للإدارة." });
         }
+
+        const student = await Student.findOne({ studentId: studentCode });
+        if (!student) return res.status(404).json({ error: "كود الطالب غير موجود." });
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
-            auth: {
-                user: process.env.ADMIN_EMAIL,
-                pass: process.env.ADMIN_EMAIL_PASS
-            }
+            auth: { user: process.env.ADMIN_EMAIL, pass: process.env.ADMIN_EMAIL_PASS }
         });
 
         const mailOptions = {
             from: replyEmail,
             to: process.env.ADMIN_EMAIL,
-            subject: `Admin Request: ${subjectName} - Student: ${studentCode}`,
-            text: `
-New Administration Ticket:
---------------------------
-Student Code: ${studentCode}
-Course: ${subjectName}
-Reply to: ${replyEmail}
-
-Message/Issue:
-${message}
-            `
+            subject: `[Admin] Course: ${subjectName} - Student: ${studentCode}`,
+            text: `طلب إداري:\nكود الطالب: ${studentCode}\nكود المقرر: ${subjectName}\nالبريد: ${replyEmail}\n\nالرسالة:\n${message}`
         };
 
         await transporter.sendMail(mailOptions);
-
-        res.status(200).json({ message: "Success! Message sent to Administration." });
-
+        res.status(200).json({ message: "تم الإرسال بنجاح." });
     } catch (err) {
-        console.error("Email Error:", err);
-        res.status(500).json({ error: "Could not send email. " + err.message });
+        res.status(500).json({ error: "خطأ في السيرفر: " + err.message });
     }
 };

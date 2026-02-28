@@ -6,15 +6,13 @@ const {sendPasswordResetEmail} = require('../middleware/email');
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'faculty-admission-secret-key';
-const RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
+const RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000; 
 const FACULTY_EMAIL_PREFIX = '20';
 const FACULTY_EMAIL_DOMAIN = '@std.sci.cu.edu.eg';
 
 const INVALID_RESET_LINK = 'Invalid or expired reset link';
 
-/**
- * Find a valid password reset token. Returns the document or null (and deletes if expired).
- */
+
 async function findValidResetToken(token) {
     if (!token) return null;
     const resetDoc = await PasswordResetToken.findOne({token});
@@ -26,11 +24,7 @@ async function findValidResetToken(token) {
     return resetDoc;
 }
 
-/**
- * Forgot password: request a reset link by email.
- * Looks up email in both Student and Staff. If found, creates a token in DB and sends email.
- * Body: { email: string }
- */
+
 exports.requestPasswordReset = async (req, res) => {
     try {
         const email = req.body.email?.trim()?.toLowerCase();
@@ -64,10 +58,7 @@ exports.requestPasswordReset = async (req, res) => {
     }
 };
 
-/**
- * Forgot password via faculty email: user enters SID, we send reset link to {studentId}@std.sci.cu.edu.eg
- * Body: { studentId: number }
- */
+
 exports.requestPasswordResetFacultyEmail = async (req, res) => {
     try {
         const studentId = req.body.studentId != null ? Number(req.body.studentId) : NaN;
@@ -103,11 +94,7 @@ exports.requestPasswordResetFacultyEmail = async (req, res) => {
     }
 };
 
-/**
- * Verify the reset token (e.g. when user lands on reset page from email link).
- * If valid, client can show the "enter new password" form.
- * Token from query: ?token=xxx or body: { token: string }
- */
+
 exports.verifyPasswordResetToken = async (req, res) => {
     try {
         const token = req.query.token || req.body.token;
@@ -125,10 +112,7 @@ exports.verifyPasswordResetToken = async (req, res) => {
     }
 };
 
-/**
- * Reset password using the token from the email link.
- * Body: { token: string, newPassword: string }
- */
+
 exports.resetPassword = async (req, res) => {
     try {
         const {token, newPassword} = req.body;
@@ -187,23 +171,23 @@ exports.login = async (req, res) => {
         let user = null;
         let role = null;
 
-        // Check if identifier looks like an email
+        
         const isEmail = normalized.includes("@");
 
         if (isEmail) {
-            // Check staff first
+            
             user = await Staff.findOne({ email: normalized }).select('+hash +salt');
             if (user) {
                 role = user.role;
             }
 
-            // If not staff check for student
+            
             if (!user) {
                 user = await Student.findOne({ email: normalized }).select('+hash +salt');
                 if (user) role = "student";
             }
         } else {
-            // No email: check ID
+            
             const studentId = Number(normalized);
             if (Number.isInteger(studentId)) {
                 user = await Student.findOne({ studentId }).select('+hash +salt');
@@ -241,14 +225,7 @@ exports.login = async (req, res) => {
     }
 };
 
-/**
- *
- * @param req
- * @param res
- * @returns {Promise<void>}
- *
- * Gets user information using JWT token
- */
+
 exports.getMe = async (req, res) => {
     try {
         res.json({

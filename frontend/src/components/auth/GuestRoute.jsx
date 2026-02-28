@@ -2,12 +2,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-/**
- * GuestRoute — wraps routes that should only be accessible to guests (not logged in).
- * If the user IS authenticated, they are redirected to /.
- *
- * Use this for /login, /register, /ForgotPassWord etc.
- */
+
 const GuestRoute = ({ children }) => {
     const { isAuthenticated, user, loading } = useAuth();
 

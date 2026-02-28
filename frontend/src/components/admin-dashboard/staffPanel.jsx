@@ -79,8 +79,8 @@ const StaffPanel = () => {
                                     className="copy-btn"
                                     onClick={() => {
                                         navigator.clipboard.writeText(s._id);
-                                        setCopiedId(s._id);                // mark row as copied
-                                        setTimeout(() => setCopiedId(null), 3000); // reset after 3s
+                                        setCopiedId(s._id);                
+                                        setTimeout(() => setCopiedId(null), 3000); 
                                     }}
                                 >
                                     {copiedId === s._id ? "تم!" : "نسخ"}

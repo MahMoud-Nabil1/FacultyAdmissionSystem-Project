@@ -1,4 +1,4 @@
-/* Admin Dashboard Styles */
+
 
 .dashboard-grid {
     display: grid;
@@ -126,7 +126,7 @@ select:focus {
     background: #059669;
 }
 
-/* ===== Lists and Tables ===== */
+
 .student-list,
 .staff-list {
     margin-top: 32px;
@@ -212,7 +212,7 @@ tr:hover td {
     border-color: #e5e7eb;
 }
 
-/* Responsive Grid */
+
 @media (max-width: 1024px) {
     .dashboard-grid {
         grid-template-columns: 1fr;

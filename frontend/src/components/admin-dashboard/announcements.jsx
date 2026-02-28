@@ -29,7 +29,7 @@ const Announcements = () => {
 
     return (
         <div>
-            {/* Logo and Login in same row */}
+            {}
             <div className="announcements-header">
                 <div>
                     {!logoError && (
@@ -71,7 +71,7 @@ const Announcements = () => {
                 </div>
             )}
 
-            {/* GPA Range Filter - Numbers only, admin only can change */}
+            {}
             <div className="gpa-range-section">
                 <h4>GPA that allowed to sign the schedule</h4>
                 <div>

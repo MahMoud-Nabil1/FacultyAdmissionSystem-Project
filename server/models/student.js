@@ -52,7 +52,7 @@ const studentSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Department'
     }
-}, { timestamps: true }); // keeps track of create time and update time
+}, { timestamps: true }); 
 
 studentSchema.virtual('password')
     .set(function (password) {
