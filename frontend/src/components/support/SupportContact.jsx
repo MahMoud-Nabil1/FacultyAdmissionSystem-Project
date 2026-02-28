@@ -36,7 +36,8 @@ const SupportContact = ({ target = 'it' }) => {
         if (!message.trim()) return 'يرجى وصف مشكلتك بالتفصيل.';
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(replyEmail)) return 'Please enter a valid reply email.';
+        if (!emailRegex.test(replyEmail)) return 'يرجى إدخال بريد إلكتروني صحيح للرد.';
+
         return null;
     };
 
@@ -115,8 +116,6 @@ const SupportContact = ({ target = 'it' }) => {
                             placeholder={isIT ? "الموضوع" : "مثال: CS306"}
                         />
                     </div>
-
-                    <hr className="form-divider" />
 
                     <div className="form-group">
                         <label>تفاصيل الرسالة <span className="required">*</span></label>
