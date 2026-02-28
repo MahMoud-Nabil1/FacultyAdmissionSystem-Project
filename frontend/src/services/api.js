@@ -1,90 +1,90 @@
-const API_BASE =
-    process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
+import {jwtDecode} from 'jwt-decode';
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 export { API_BASE };
 
-export async function apiPost(path, body) {
+
+function getToken() {
+    return localStorage.getItem("token");
+}
+
+
+export function decodeToken() {
+    const token = getToken();
+    if (!token) return null;
+
+    try {
+        return jwtDecode(token); 
+    } catch {
+        return null;
+    }
+}
+
+
+export async function apiPost(path, body, auth = true) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (auth) {
+        const token = getToken();
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const res = await fetch(`${API_BASE}${path}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(body),
     });
+
     const data = await res.json().catch(() => ({}));
     return { res, data };
 }
 
-export async function apiGet(path) {
-    const res = await fetch(`${API_BASE}${path}`);
+
+export async function apiGet(path, auth = true) {
+    const headers = {};
+    if (auth) {
+        const token = getToken();
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${API_BASE}${path}`, { headers });
     const data = await res.json().catch(() => ({}));
     return { res, data };
 }
 
-export async function CreatStaff() {
-    const name = window.prompt('Enter staff name:');
-    if (!name) return;
 
-    const email = window.prompt('Enter staff email:');
-    if (!email) return;
-
-    const role =
-        window.prompt(
-            'Enter staff role (admin / academic_guide / academic_guide_coordinator / reporter):',
-            'admin'
-        ) || 'admin';
-
-    const password = window.prompt('Enter staff password:');
-    if (!password) return;
-
-    try {
-        const res = await fetch(`${API_BASE}/staff`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, role, password }),
-        });
-
-        if (!res.ok) {
-            const errorData = await res.json().catch(() => ({}));
-            throw new Error(errorData.error || 'Failed to create staff');
-        }
-
-        const data = await res.json();
-        alert(`Staff created successfully: ${data.name}`);
-    } catch (err) {
-        alert(`Error creating staff: ${err.message}`);
-    }
+export async function createStudent(data) {
+    const { res, data: body } = await apiPost("/students", data);
+    if (!res.ok) throw new Error(body.error || "Failed to create student");
+    return body;
 }
 
-export async function CreatStudent() {
-    const idInput = window.prompt('Enter student ID (number):');
-    if (!idInput) return;
+export async function getAllStudents() {
+    const { res, data } = await apiGet("/students");
+    if (!res.ok) throw new Error(data.error || "Failed to fetch students");
+    return data;
+}
 
-    const studentId = Number(idInput);
-    if (Number.isNaN(studentId)) {
-        alert('Student ID must be a number');
-        return;
-    }
 
-    const name = window.prompt('Enter student name:');
-    if (!name) return;
+export async function createStaff(data) {
+    const { res, data: body } = await apiPost("/staff", data);
+    if (!res.ok) throw new Error(body.error || "Failed to create staff");
+    return body;
+}
 
-    const password = window.prompt('Enter student password:');
-    if (!password) return;
+export async function getAllStaff() {
+    const { res, data } = await apiGet("/staff");
+    if (!res.ok) throw new Error(data.error || "Failed to fetch staff");
+    return data;
+}
 
-    try {
-        const res = await fetch(`${API_BASE}/students`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ studentId, name, password }),
-        });
 
-        if (!res.ok) {
-            const errorData = await res.json().catch(() => ({}));
-            throw new Error(errorData.error || 'Failed to create student');
-        }
+export async function getMe() {
+    const payload = decodeToken();
+    if (!payload) throw new Error("No valid token found");
 
-        const data = await res.json();
-        alert(`Student created successfully: ${data.name || studentId}`);
-    } catch (err) {
-        alert(`Error creating student: ${err.message}`);
-    }
+    return {
+        id: payload.id,
+        role: payload.role,
+        name: payload.name,
+    };
 }

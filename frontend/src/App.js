@@ -1,16 +1,13 @@
 import './App.css';
-import {Navigate, Route, Routes} from 'react-router-dom';
-import ProtectedRoute from './components/ProtectedRoute.jsx';
-import GuestRoute from './components/GuestRoute.jsx';
-import ResetPasswordRoute from './components/ResetPasswordRoute.jsx';
-import ResetPassword from './components/ResetPassword.jsx';
-import Login from './components/Login.jsx';
-import ForgotPasswordChoice from './components/ForgotPasswordChoice.jsx';
-import ForgotPassword from './components/ForgotPassword.jsx';
-import AdminDashboard from './components/adminDashboard.jsx';
-import {CreatStaff, CreatStudent} from "./services/api";
-import AdminContact from "./components/AdminContact";
-import ITContact from "./components/ITContact";
+import { Navigate, Route, Routes } from 'react-router-dom';
+import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
+import GuestRoute from './components/auth/GuestRoute.jsx';
+import ResetPassword from './components/auth/ResetPassword.jsx';
+import Login from './components/auth/Login.jsx';
+import ForgotPassword from './components/auth/ForgotPassword.jsx';
+import AdminDashboard from './components/admin-dashboard/adminDashboard.jsx';
+import SupportContact from "./components/support/SupportContact.jsx";
+import Announcements from "./components/admin-dashboard/announcements.jsx";
 
 
 function App() {
@@ -18,7 +15,7 @@ function App() {
         <div className="App">
 
             <Routes>
-                {/* Protected home route — require login */}
+                {}
                 <Route
                     path="/"
                     element={
@@ -35,57 +32,72 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+                <Route
+                    path="/announcements"
+                    element={
+                        <Announcements />
+                    }>
+                </Route>
 
-                {/* Unprotected admin dashboard route for testing */}
+                {}
                 <Route
                     path="/admin-dashboard-test"
                     element={
-                        <div style={{padding: "2rem"}}>
+                        <div className="app-container">
                             <h1>Admin Dashboard (Test)</h1>
-                            <hr/>
-                            <AdminDashboard
-                                onAddStaff={CreatStaff}
-                                onAddStudent={CreatStudent}
-                            />
+                            <hr />
+                            <AdminDashboard />
                         </div>
                     }
                 />
-                {/* Guest-only routes — redirect to / if already logged in */}
+
+                <Route
+                    path="/admin-dashboard"
+                    element={
+                        <ProtectedRoute allowedRoles={['admin', 'academic_guide', 'academic_guide_coordinator', 'reporter']}>
+                            <button onClick={() => {
+                                localStorage.removeItem("token");
+                                window.location.href = "/login";
+                            }}>
+                                Sign out
+                            </button>
+                            <div className="app-container">
+                                <h1>Admin Dashboard</h1>
+                                <hr />
+                                <AdminDashboard />
+                            </div>
+                        </ProtectedRoute>
+                    }
+                />
+                {}
                 <Route path="/login" element={
                     <GuestRoute>
-                        <Login/>
+                        <Login />
                     </GuestRoute>
-                }/>
+                } />
                 <Route path="/forgot-password" element={
-                    <GuestRoute>
-                        <ForgotPasswordChoice />
-                    </GuestRoute>
-                }/>
-                <Route path="/ForgotPassWord" element={
                     <GuestRoute>
                         <ForgotPassword />
                     </GuestRoute>
-                }/>
+                } />
                 <Route path="/reset-password" element={
                     <GuestRoute>
-                        <ResetPasswordRoute>
-                            <ResetPassword />
-                        </ResetPasswordRoute>
+                        <ResetPassword />
                     </GuestRoute>
-                }/>
+                } />
                 <Route path="/ITContact" element={
                     <GuestRoute>
-                        <ITContact/>
+                        <SupportContact target="it" />
                     </GuestRoute>
-                }/>
+                } />
                 <Route path="/AdminContact" element={
                     <GuestRoute>
-                        <AdminContact/>
+                        <SupportContact target="admin" />
                     </GuestRoute>
-                }/>
+                } />
 
-                {/* Catch-all: redirect unknown routes */}
-                <Route path="*" element={<Navigate to="/" replace/>}/>
+                {}
+                <Route path="*" element={<Navigate to="/announcements" replace />} />
             </Routes>
         </div>
     );

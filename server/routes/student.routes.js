@@ -10,6 +10,6 @@ router.delete('/:id', studentCtrl.deleteStudent);
 router.post('/contact-it', studentCtrl.contactIT);
 router.post('/contact-admin', studentCtrl.contactAdmin);
 
-//TODO: add further functionality like changing password and registering/removing subjects
+
 
 module.exports = router;

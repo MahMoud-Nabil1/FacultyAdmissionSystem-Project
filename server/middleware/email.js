@@ -2,10 +2,7 @@ const nodemailer = require('nodemailer');
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
-/**
- * Creates a Gmail transporter using credentials from .env.
- * SMTP_USER and SMTP_PASS must be set (use a Gmail App Password).
- */
+
 function createTransporter() {
     return nodemailer.createTransport({
         service: 'gmail',
@@ -16,10 +13,7 @@ function createTransporter() {
     });
 }
 
-/**
- * Send password reset email with link containing token.
- * In development without SMTP config, logs the link to console instead.
- */
+
 async function sendPasswordResetEmail(toEmail, token) {
     const resetUrl = `${FRONTEND_URL}/reset-password?token=${token}`;
 
