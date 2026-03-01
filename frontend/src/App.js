@@ -8,6 +8,7 @@ import ForgotPassword from './components/auth/ForgotPassword.jsx';
 import AdminDashboard from './components/admin-dashboard/adminDashboard.jsx';
 import SupportContact from "./components/support/SupportContact.jsx";
 import Announcements from "./components/admin-dashboard/announcements.jsx";
+import StaffTable from "./components/admin-dashboard/staffTable.tsx";
 
 
 function App() {
@@ -95,6 +96,14 @@ function App() {
                         <SupportContact target="admin" />
                     </GuestRoute>
                 } />
+                <Route
+                    path="/admin-dashboard/table"
+                    element={
+                        <ProtectedRoute allowedRoles={['admin']}>
+                            <StaffTable />
+                        </ProtectedRoute>
+                    }
+                />
 
                 {}
                 <Route path="*" element={<Navigate to="/announcements" replace />} />

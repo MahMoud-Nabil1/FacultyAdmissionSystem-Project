@@ -1,6 +1,6 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import { createStaff, getAllStaff } from "../../services/api";
-import Pagination from "./pagination";
+import { useNavigate } from "react-router-dom";
 import { PAGE_SIZE, ROLES } from "./constants";
 
 interface Staff {
@@ -19,7 +19,6 @@ interface StaffForm {
 
 const StaffPanel: React.FC = () => {
     const [staff, setStaff] = useState<Staff[]>([]);
-    const [page, setPage] = useState(0);
     const [showForm, setShowForm] = useState(false);
     const [form, setForm] = useState<StaffForm>({
         name: "",
@@ -29,8 +28,10 @@ const StaffPanel: React.FC = () => {
     });
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    const [copiedId, setCopiedId] = useState<string | null>(null);
 
+    const navigate = useNavigate();
+
+    // Load staff count (optional)
     const loadStaff = async () => {
         try {
             const data = await getAllStaff();
@@ -72,15 +73,11 @@ const StaffPanel: React.FC = () => {
         }
     };
 
-    const paginatedStaff = staff.slice(
-        page * PAGE_SIZE,
-        page * PAGE_SIZE + PAGE_SIZE
-    );
-
     return (
         <div className="dashboard-container">
             <h2>الموظفين</h2>
 
+            {/* Toggle form */}
             <button
                 className="add-btn"
                 onClick={() => setShowForm((prev) => !prev)}
@@ -88,10 +85,10 @@ const StaffPanel: React.FC = () => {
                 {showForm ? "إلغاء" : "اضف موظف جديد"}
             </button>
 
-            {error && <p className="error">{error}</p>}
-
             {showForm && (
                 <form className="form" onSubmit={handleSubmit}>
+                    {error && <p className="error">{error}</p>}
+
                     <input
                         name="name"
                         placeholder="الإسم"
@@ -132,39 +129,13 @@ const StaffPanel: React.FC = () => {
                 </form>
             )}
 
-            <table>
-                <thead>
-                <tr>
-                    <th>الإسم</th>
-                    <th>الإيميل</th>
-                    <th>الرتبة</th>
-                    <th>ID</th>
-                </tr>
-                </thead>
-                <tbody>
-                {paginatedStaff.map((s) => (
-                    <tr key={s._id}>
-                        <td>{s.name}</td>
-                        <td>{s.email}</td>
-                        <td>{ROLES[s.role]}</td>
-                        <td>
-                            <button
-                                className="copy-btn"
-                                onClick={() => {
-                                    navigator.clipboard.writeText(s._id);
-                                    setCopiedId(s._id);
-                                    setTimeout(() => setCopiedId(null), 2000);
-                                }}
-                            >
-                                {copiedId === s._id ? "تم!" : "نسخ"}
-                            </button>
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-
-            <Pagination page={page} setPage={setPage} total={staff.length} />
+            {/* Button to navigate to full staff table */}
+            <button
+                className="view-table-btn"
+                onClick={() => navigate("/admin-dashboard/table")}
+            >
+                عرض جميع الموظفين ({staff.length})
+            </button>
         </div>
     );
 };

@@ -231,3 +231,36 @@ tr:hover td {
         white-space: nowrap;
     }
 }
+
+/* Compact staff table adjustments */
+.staff-table th,
+.staff-table td {
+    padding: 8px 12px; /* smaller padding */
+    font-size: 0.85rem;
+}
+
+.copy-btn,
+.delete-btn {
+    padding: 4px 10px;
+    font-size: 0.8rem;
+}
+
+.delete-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+}
+
+.staff-table th {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+}
+
+.staff-table td button {
+    min-width: 60px;
+}
