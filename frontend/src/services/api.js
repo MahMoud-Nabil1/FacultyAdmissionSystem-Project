@@ -54,14 +54,12 @@ export async function apiGet(path, auth = true) {
 
 export async function createStudent(data) {
     const { res, data: body } = await apiPost("/students", data);
-
     if (!res.ok) {
-        const error = new Error(body.error || "Failed to create student");
-        error.status = res.status;
-        error.data = body;
-        throw error;
+        throw {
+            message: body.error || "Failed to create student",
+            status: res.status
+        };
     }
-
     return body;
 }
 
@@ -74,7 +72,12 @@ export async function getAllStudents() {
 
 export async function createStaff(data) {
     const { res, data: body } = await apiPost("/staff", data);
-    if (!res.ok) throw new Error(body.error || "Failed to create staff");
+    if (!res.ok) {
+        throw {
+            message: body.error || "Failed to create staff",
+            status: res.status
+        };
+    }
     return body;
 }
 

@@ -2,20 +2,21 @@ const Staff = require('../models/staff');
 
 exports.createStaff = async (req, res) => {
     try {
-        const { email, password, ...rest } = req.body;
+        const staff = new Staff(req.body);
+        if (req.body.password) staff.password = req.body.password;
 
-        // Check if a staff with the same email already exists
-        const existingStaff = await Staff.findOne({ email });
-        if (existingStaff) {
-            return res.status(409).json({ error: 'Staff with this email already exists' });
+        await staff.save();
+        res.status(201).json(staff);
+
+    } catch (err) {
+
+        // duplicate email
+        if (err.code === 11000 && err.keyPattern?.email) {
+            return res.status(409).json({
+                error: "يوجد موظف بنفس الإيميل بالفعل"
+            });
         }
 
-        const staff = new Staff({ email, ...rest });
-        if (password) staff.password = password; // hashed automatically upon saving
-        await staff.save();
-
-        res.status(201).json(staff);
-    } catch (err) {
         res.status(400).json({ error: err.message });
     }
 };
