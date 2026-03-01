@@ -37,6 +37,21 @@ exports.getAllStudents = async (req, res) => {
 exports.getStudentById = async (req, res) => {
     try {
         const student = await Student
+            .findOne({_id: req.params.id})
+            .populate('department');
+
+        if (!student)
+            return res.status(404).json({error: "Student not found"});
+
+        res.json(student);
+    } catch (err) {
+        res.status(500).json({error: err.message});
+    }
+};
+
+exports.getStudentByStudentId = async (req, res) => {
+    try {
+        const student = await Student
             .findOne({studentId: req.params.id})
             .populate('department');
 
@@ -51,7 +66,7 @@ exports.getStudentById = async (req, res) => {
 
 exports.updateStudent = async (req, res) => {
     try {
-        const student = await Student.findOne({studentId: req.params.id});
+        const student = await Student.findOne({_id: req.params.id});
 
         if (!student)
             return res.status(404).json({error: "Student not found"});
@@ -72,7 +87,7 @@ exports.updateStudent = async (req, res) => {
 exports.deleteStudent = async (req, res) => {
     try {
         const student = await Student.findOneAndDelete({
-            studentId: req.params.id
+            _id: req.params.id
         });
 
         if (!student)
