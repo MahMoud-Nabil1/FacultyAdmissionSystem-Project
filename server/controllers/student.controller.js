@@ -1,17 +1,27 @@
 const Student = require('../models/student');
 const nodemailer = require('nodemailer');
+
+
 exports.createStudent = async (req, res) => {
     try {
-        const student = new Student(req.body);
-        student.password = req.body.password;
+        const {email, studentId, password, ...rest} = req.body;
+
+        // Check if a student already exists with studentId
+        const existingStudent = await Student.findOne({studentId});
+
+        if (existingStudent) {
+            return res.status(409).json({error: 'Student with this email or ID already exists'});
+        }
+
+        const student = new Student({email, studentId, ...rest});
+        student.password = password; // gets automatically hashed upon saving
         await student.save();
 
         res.status(201).json(student);
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        res.status(400).json({error: err.message});
     }
 };
-
 exports.getAllStudents = async (req, res) => {
     try {
         const students = await Student
@@ -20,31 +30,31 @@ exports.getAllStudents = async (req, res) => {
 
         res.json(students);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({error: err.message});
     }
 };
 
 exports.getStudentById = async (req, res) => {
     try {
         const student = await Student
-            .findOne({ studentId: req.params.id })
+            .findOne({studentId: req.params.id})
             .populate('department');
 
         if (!student)
-            return res.status(404).json({ error: "Student not found" });
+            return res.status(404).json({error: "Student not found"});
 
         res.json(student);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({error: err.message});
     }
 };
 
 exports.updateStudent = async (req, res) => {
     try {
-        const student = await Student.findOne({ studentId: req.params.id });
+        const student = await Student.findOne({studentId: req.params.id});
 
         if (!student)
-            return res.status(404).json({ error: "Student not found" });
+            return res.status(404).json({error: "Student not found"});
 
         Object.assign(student, req.body);
 
@@ -55,7 +65,7 @@ exports.updateStudent = async (req, res) => {
 
         res.json(student);
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        res.status(400).json({error: err.message});
     }
 };
 
@@ -66,30 +76,30 @@ exports.deleteStudent = async (req, res) => {
         });
 
         if (!student)
-            return res.status(404).json({ error: "Student not found" });
+            return res.status(404).json({error: "Student not found"});
 
-        res.json({ message: "Deleted successfully" });
+        res.json({message: "Deleted successfully"});
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({error: err.message});
     }
 };
 
 
 exports.contactIT = async (req, res) => {
     try {
-        const { studentCode, subjectName, message, replyEmail } = req.body;
+        const {studentCode, subjectName, message, replyEmail} = req.body;
 
 
         if (!subjectName || !subjectName.trim()) {
-            return res.status(400).json({ error: "موضوع المشكلة مطلوب." });
+            return res.status(400).json({error: "موضوع المشكلة مطلوب."});
         }
 
-        const student = await Student.findOne({ studentId: studentCode });
-        if (!student) return res.status(404).json({ error: "كود الطالب غير موجود." });
+        const student = await Student.findOne({studentId: studentCode});
+        if (!student) return res.status(404).json({error: "كود الطالب غير موجود."});
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
-            auth: { user: process.env.ADMIN_EMAIL, pass: process.env.ADMIN_EMAIL_PASS }
+            auth: {user: process.env.ADMIN_EMAIL, pass: process.env.ADMIN_EMAIL_PASS}
         });
 
         const mailOptions = {
@@ -100,27 +110,27 @@ exports.contactIT = async (req, res) => {
         };
 
         await transporter.sendMail(mailOptions);
-        res.status(200).json({ message: "تم الإرسال بنجاح." });
+        res.status(200).json({message: "تم الإرسال بنجاح."});
     } catch (err) {
-        res.status(500).json({ error: "خطأ في السيرفر: " + err.message });
+        res.status(500).json({error: "خطأ في السيرفر: " + err.message});
     }
 };
 
 
 exports.contactAdmin = async (req, res) => {
     try {
-        const { studentCode, subjectName, message, replyEmail } = req.body;
+        const {studentCode, subjectName, message, replyEmail} = req.body;
 
         if (!subjectName || !subjectName.trim()) {
-            return res.status(400).json({ error: "كود المقرر مطلوب للإدارة." });
+            return res.status(400).json({error: "كود المقرر مطلوب للإدارة."});
         }
 
-        const student = await Student.findOne({ studentId: studentCode });
-        if (!student) return res.status(404).json({ error: "كود الطالب غير موجود." });
+        const student = await Student.findOne({studentId: studentCode});
+        if (!student) return res.status(404).json({error: "كود الطالب غير موجود."});
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
-            auth: { user: process.env.ADMIN_EMAIL, pass: process.env.ADMIN_EMAIL_PASS }
+            auth: {user: process.env.ADMIN_EMAIL, pass: process.env.ADMIN_EMAIL_PASS}
         });
 
         const mailOptions = {
@@ -131,8 +141,8 @@ exports.contactAdmin = async (req, res) => {
         };
 
         await transporter.sendMail(mailOptions);
-        res.status(200).json({ message: "تم الإرسال بنجاح." });
+        res.status(200).json({message: "تم الإرسال بنجاح."});
     } catch (err) {
-        res.status(500).json({ error: "خطأ في السيرفر: " + err.message });
+        res.status(500).json({error: "خطأ في السيرفر: " + err.message});
     }
 };
