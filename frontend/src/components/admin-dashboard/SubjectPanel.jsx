@@ -88,7 +88,9 @@ const SubjectPanel = () => {
     const slice = subjects.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
 
     const handlePrereqChange = (e) => {
-        const selected = Array.from(e.target.selectedOptions, (o) => o.value);
+        const selected = Array.from(e.target.selectedOptions, (option) => option.value).filter(
+            (id) => id !== ""
+        );
         setForm((f) => ({ ...f, prerequisites: selected }));
     };
 

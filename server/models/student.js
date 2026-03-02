@@ -8,7 +8,6 @@ const studentSchema = new Schema({
         required: [true, 'Student ID is required'],
         unique: true
     },
-
     name: {
         type: String,
         required: [true, 'Name is required'],
@@ -20,7 +19,8 @@ const studentSchema = new Schema({
         trim: true,
         lowercase: true,
         sparse: true,
-        default: null
+        default: null,
+        unique: true
     },
 
     hash: {

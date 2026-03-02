@@ -2,11 +2,6 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const groupSchema = new Schema({
-    id:{
-        type: String,
-        required: true,
-        unique: true
-    },
     number: {
         type: Number,
         required: true,

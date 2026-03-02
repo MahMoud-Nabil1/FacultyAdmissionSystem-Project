@@ -51,21 +51,21 @@ export async function apiGet(path, auth = true) {
     return { res, data };
 }
 
-export async function apiDelete(path, auth = true) {
-    const headers = {};
-    if (auth) {
-        const token = getToken();
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const res = await fetch(`${API_BASE}${path}`, {
-        method: 'DELETE',
-        headers,
-    });
-
-    const data = await res.json().catch(() => ({}));
-    return { res, data };
-}
+// export async function apiDelete(path, auth = true) {
+//     const headers = {};
+//     if (auth) {
+//         const token = getToken();
+//         if (token) headers['Authorization'] = `Bearer ${token}`;
+//     }
+//
+//     const res = await fetch(`${API_BASE}${path}`, {
+//         method: 'DELETE',
+//         headers,
+//     });
+//
+//     const data = await res.json().catch(() => ({}));
+//     return { res, data };
+// }
 
 
 export async function apiPut(path, body, auth = true) {
