@@ -40,18 +40,6 @@ function App() {
                     }>
                 </Route>
 
-                {}
-                <Route
-                    path="/admin-dashboard-test"
-                    element={
-                        <div className="app-container">
-                            <h1>Admin Dashboard (Test)</h1>
-                            <hr />
-                            <AdminDashboard />
-                        </div>
-                    }
-                />
-
                 <Route
                     path="/admin-dashboard"
                     element={
