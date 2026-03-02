@@ -51,10 +51,31 @@ export async function apiGet(path, auth = true) {
     return { res, data };
 }
 
+export async function apiDelete(path, auth = true) {
+    const headers = {};
+    if (auth) {
+        const token = getToken();
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${API_BASE}${path}`, {
+        method: 'DELETE',
+        headers,
+    });
+
+    const data = await res.json().catch(() => ({}));
+    return { res, data };
+}
+
 
 export async function createStudent(data) {
     const { res, data: body } = await apiPost("/students", data);
-    if (!res.ok) throw new Error(body.error || "Failed to create student");
+    if (!res.ok) {
+        throw {
+            message: body.error || "Failed to create student",
+            status: res.status
+        };
+    }
     return body;
 }
 
@@ -64,10 +85,20 @@ export async function getAllStudents() {
     return data;
 }
 
+export async function deleteStudent(id) {
+    const { res, data } = await apiDelete(`/students/${id}`);
+    if (!res.ok) throw new Error(data.error || "Failed to delete student");
+    return data;
+}
 
 export async function createStaff(data) {
     const { res, data: body } = await apiPost("/staff", data);
-    if (!res.ok) throw new Error(body.error || "Failed to create staff");
+    if (!res.ok) {
+        throw {
+            message: body.error || "Failed to create staff",
+            status: res.status
+        };
+    }
     return body;
 }
 
@@ -77,6 +108,11 @@ export async function getAllStaff() {
     return data;
 }
 
+export async function deleteStaff(id) {
+    const { res, data } = await apiDelete(`/staff/${id}`);
+    if (!res.ok) throw new Error(data.error || "Failed to delete staff");
+    return data;
+}
 
 export async function getMe() {
     const payload = decodeToken();

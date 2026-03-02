@@ -1,6 +1,6 @@
 import React from "react";
-import StudentPanel from "./studentPanel";
-import StaffPanel from "./staffPanel";
+import StudentPanel from "./studentPanel.tsx";
+import StaffPanel from "./staffPanel.tsx";
 import "./css/adminDashboard.css";
 
 const AdminDashboard = () => {
