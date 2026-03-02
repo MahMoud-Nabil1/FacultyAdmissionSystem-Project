@@ -1,6 +1,7 @@
 import React from "react";
 import StudentPanel from "./studentPanel";
 import StaffPanel from "./staffPanel";
+import SubjectPanel from "./SubjectPanel";
 import "./css/adminDashboard.css";
 
 const AdminDashboard = () => {
@@ -8,6 +9,7 @@ const AdminDashboard = () => {
         <div className="dashboard-grid">
             <StaffPanel />
             <StudentPanel />
+            <SubjectPanel />
         </div>
     );
 };

@@ -52,6 +52,34 @@ export async function apiGet(path, auth = true) {
 }
 
 
+export async function apiPut(path, body, auth = true) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (auth) {
+        const token = getToken();
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+    }
+    const res = await fetch(`${API_BASE}${path}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => ({}));
+    return { res, data };
+}
+
+
+export async function apiDelete(path, auth = true) {
+    const headers = {};
+    if (auth) {
+        const token = getToken();
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+    }
+    const res = await fetch(`${API_BASE}${path}`, { method: 'DELETE', headers });
+    const data = await res.json().catch(() => ({}));
+    return { res, data };
+}
+
+
 export async function createStudent(data) {
     const { res, data: body } = await apiPost("/students", data);
     if (!res.ok) throw new Error(body.error || "Failed to create student");
@@ -87,4 +115,35 @@ export async function getMe() {
         role: payload.role,
         name: payload.name,
     };
+}
+
+
+export async function getAllSubjects() {
+    const { res, data } = await apiGet("/subjects");
+    if (!res.ok) throw new Error(data.error || "Failed to fetch subjects");
+    return data;
+}
+
+export async function getSubjectById(id) {
+    const { res, data } = await apiGet(`/subjects/${id}`);
+    if (!res.ok) throw new Error(data.error || "Failed to fetch subject");
+    return data;
+}
+
+export async function createSubject(data) {
+    const { res, data: body } = await apiPost("/subjects", data);
+    if (!res.ok) throw new Error(body.error || "Failed to create subject");
+    return body;
+}
+
+export async function updateSubject(id, data) {
+    const { res, data: body } = await apiPut(`/subjects/${id}`, data);
+    if (!res.ok) throw new Error(body.error || "Failed to update subject");
+    return body;
+}
+
+export async function deleteSubject(id) {
+    const { res, data } = await apiDelete(`/subjects/${id}`);
+    if (!res.ok) throw new Error(data.error || "Failed to delete subject");
+    return data;
 }
