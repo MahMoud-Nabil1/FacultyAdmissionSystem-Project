@@ -14,7 +14,7 @@ export function decodeToken() {
     if (!token) return null;
 
     try {
-        return jwtDecode(token); 
+        return jwtDecode(token);
     } catch {
         return null;
     }
@@ -71,6 +71,7 @@ export async function apiDelete(path, auth = true) {
 export async function createStudent(data) {
     const { res, data: body } = await apiPost("/students", data);
     if (!res.ok) {
+        // eslint-disable-next-line no-throw-literal
         throw {
             message: body.error || "Failed to create student",
             status: res.status
@@ -94,6 +95,7 @@ export async function deleteStudent(id) {
 export async function createStaff(data) {
     const { res, data: body } = await apiPost("/staff", data);
     if (!res.ok) {
+        // eslint-disable-next-line no-throw-literal
         throw {
             message: body.error || "Failed to create staff",
             status: res.status
