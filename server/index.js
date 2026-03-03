@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const jwt = require("jsonwebtoken");
+const subjectRoutes = require('./routes/subject.routes');
 
 const app = express();
 
@@ -26,6 +27,7 @@ const staffRoutes = require('./routes/staff.routes');
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/staff', staffRoutes);
+app.use('/api/subjects', subjectRoutes);
 
 
 app.get('/', (req, res) => {
