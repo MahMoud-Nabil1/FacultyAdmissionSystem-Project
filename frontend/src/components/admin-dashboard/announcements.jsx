@@ -6,9 +6,12 @@ const Announcements = () => {
     const [loading, setLoading] = useState(true);
     const [gpaRange, setGpaRange] = useState({ min: 2.5, max: 5 });
     const [selectedLevel, setSelectedLevel] = useState('level 1');
+    const [posts, setPosts] = useState([]);
     const [logoError, setLogoError] = useState(false);
+    const [gpaError, setGpaError] = useState('');
 
     useEffect(() => {
+        // جلب بيانات المستخدم
         const userData = localStorage.getItem('user');
         if (userData) {
             try {
@@ -18,6 +21,31 @@ const Announcements = () => {
                 setUser(userData);
             }
         }
+
+        // جلب الإعلانات
+        const savedPosts = localStorage.getItem('announcements');
+        if (savedPosts) {
+            setPosts(JSON.parse(savedPosts));
+        }
+
+        // جلب إعدادات GPA
+        const savedGpa = localStorage.getItem('gpaSettings');
+        if (savedGpa) {
+            const parsedGpa = JSON.parse(savedGpa);
+            setGpaRange(parsedGpa);
+
+            // Check if max <= min
+            if (parsedGpa.max <= parsedGpa.min) {
+                setGpaError(`Invalid GPA Settings: Max (${parsedGpa.max}) must be greater than Min (${parsedGpa.min})`);
+            }
+        }
+
+        // جلب الـ Level
+        const savedLevel = localStorage.getItem('selectedLevel');
+        if (savedLevel) {
+            setSelectedLevel(savedLevel);
+        }
+
         setLoading(false);
     }, []);
 
@@ -29,7 +57,7 @@ const Announcements = () => {
 
     return (
         <div>
-            {}
+            {/* Header with Logo and Login */}
             <div className="announcements-header">
                 <div>
                     {!logoError && (
@@ -52,6 +80,7 @@ const Announcements = () => {
                 </div>
             </div>
 
+            {/* Admin Post Area - Only visible to admin */}
             {isAdmin && (
                 <div className="announcement-form">
                     <h3>Create Announcement</h3>
@@ -71,71 +100,61 @@ const Announcements = () => {
                 </div>
             )}
 
-            {}
-            <div className="gpa-range-section">
-                <h4>GPA that allowed to sign the schedule</h4>
-                <div>
-                    <span>Min GPA: </span>
-                    {isAdmin ? (
-                        <input
-                            type="number"
-                            min="0"
-                            max="5"
-                            step="0.1"
-                            value={gpaRange.min}
-                            onChange={(e) => setGpaRange({ ...gpaRange, min: parseFloat(e.target.value) })}
-                            className="gpa-input"
-                        />
-                    ) : (
-                        <span>{gpaRange.min}</span>
-                    )}
+            {/* GPA Range Display - Hidden if invalid, show error message instead */}
+            {gpaError ? (
+                <div className="gpa-error-section" style={{
+                    backgroundColor: '#ffebee',
+                    border: '1px solid #ef5350',
+                    borderRadius: '4px',
+                    padding: '15px',
+                    margin: '20px 0',
+                    textAlign: 'center'
+                }}>
+                    <h4 style={{ color: '#c62828', margin: '0 0 10px 0' }}>
+                        ⚠️ GPA Configuration Error
+                    </h4>
+                    <p style={{ color: '#b71c1c', fontSize: '16px', margin: '0' }}>
+                        {gpaError}
+                    </p>
+                    <p style={{ color: '#666', fontSize: '14px', marginTop: '10px' }}>
+                        Please contact the administrator to fix the GPA settings.
+                    </p>
                 </div>
-                <div className="gpa-row">
-                    <span>Max GPA: </span>
-                    {isAdmin ? (
-                        <input
-                            type="number"
-                            min="0"
-                            max="5"
-                            step="0.1"
-                            value={gpaRange.max}
-                            onChange={(e) => setGpaRange({ ...gpaRange, max: parseFloat(e.target.value) })}
-                            className="gpa-input"
-                        />
-                    ) : (
-                        <span>{gpaRange.max}</span>
-                    )}
+            ) : (
+                <div className="gpa-range-section">
+                    <h4>GPA that allowed to sign the schedule</h4>
+                    <div>
+                        <span>Min GPA: {gpaRange.min}</span>
+                    </div>
+                    <div className="gpa-row">
+                        <span>Max GPA: {gpaRange.max}</span>
+                    </div>
                 </div>
-            </div>
+            )}
 
-
+            {/* Level Display */}
             <div className="level-section">
                 <h4>Level to Sign Schedule</h4>
-                {isAdmin ? (
-                    <select
-                        value={selectedLevel}
-                        onChange={(e) => setSelectedLevel(e.target.value)}
-                        className="level-select"
-                    >
-                        <option value="">Choose Level</option>
-                        <option value="1">Level 1</option>
-                        <option value="2">Level 2</option>
-                        <option value="3">Level 3</option>
-                        <option value="4">Level 4</option>
-                    </select>
-                ) : (
-                    <span>{selectedLevel || 'Not selected'}</span>
-                )}
-                {selectedLevel && isAdmin && (
-                    <button className="sign-btn">
-                        Sign Schedule
-                    </button>
-                )}
+                <span>{selectedLevel || 'Not selected'}</span>
             </div>
 
+            {/* Announcements List */}
             <div className="announcements-list">
                 <h3>Announcements</h3>
-                <p>No announcements yet.</p>
+                {posts.length > 0 ? (
+                    posts.map(post => (
+                        <div key={post.id} className="announcement-item">
+                            <h4>{post.title}</h4>
+                            <p>{post.content}</p>
+                            <small>
+                                Posted by {post.author} on {new Date(post.createdAt).toLocaleDateString()}
+                            </small>
+                            <hr />
+                        </div>
+                    ))
+                ) : (
+                    <p>No announcements yet.</p>
+                )}
             </div>
         </div>
     );
