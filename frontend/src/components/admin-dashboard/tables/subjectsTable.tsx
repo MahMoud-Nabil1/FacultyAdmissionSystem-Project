@@ -89,7 +89,7 @@ const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
                         <td>
                             {(s.prerequisites || [])
                                 .map((p: any) =>
-                                    typeof p === "object" ? p.name : p
+                                    typeof p === "object" ? p.name + " (" + p.code + ")" : p
                                 )
                                 .join(", ") || "—"}
                         </td>
