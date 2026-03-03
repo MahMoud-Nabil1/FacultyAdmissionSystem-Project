@@ -1,7 +1,6 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import './css/announcements.css';
-import Pagination from "./pagination";
-import { PAGE_SIZE } from "./constants";
+
 
 interface AnnouncementForm {
     title: string;
@@ -23,7 +22,6 @@ interface Announcement {
 
 const emptyForm = { title: "", content: "" };
 
-// تغيير PAGE_SIZE إلى 2
 const ANNOUNCEMENTS_PER_PAGE = 2;
 
 const AnnouncementsPanel: React.FC = () => {
@@ -45,7 +43,6 @@ const AnnouncementsPanel: React.FC = () => {
         if (savedPosts) {
             const posts = JSON.parse(savedPosts);
             setAnnouncements(posts);
-            // إعادة تعيين الصفحة للصفحة الأولى بعد تحميل البيانات
             setPage(0);
         }
     };
@@ -57,7 +54,7 @@ const AnnouncementsPanel: React.FC = () => {
             setGpaSettings(parsedGpa);
 
             if (parsedGpa.max <= parsedGpa.min) {
-                setGpaError("Max GPA must be greater than Min GPA");
+                setGpaError("يجب أن يكون الحد الأقصى أكبر من الحد الأدنى");
             }
         }
 
@@ -99,13 +96,22 @@ const AnnouncementsPanel: React.FC = () => {
     };
 
     const handleGpaChange = (e: ChangeEvent<HTMLInputElement>, type: 'min' | 'max') => {
-        const value = parseFloat(e.target.value);
+        let value = parseFloat(e.target.value);
+
+        if (value < 0) {
+            value = 0;
+        }
+
+        if (value > 5) {
+            value = 5;
+        }
+
         const newSettings = { ...gpaSettings, [type]: value };
 
         if (type === 'max' && value <= gpaSettings.min) {
-            setGpaError("Max GPA must be greater than Min GPA");
+            setGpaError("يجب أن يكون الحد الأقصى أكبر من الحد الأدنى");
         } else if (type === 'min' && gpaSettings.max <= value) {
-            setGpaError("Min GPA must be less than Max GPA");
+            setGpaError("يجب أن يكون الحد الأدنى أصغر من الحد الأقصى");
         } else {
             setGpaError(null);
         }
@@ -114,7 +120,7 @@ const AnnouncementsPanel: React.FC = () => {
         localStorage.setItem('gpaSettings', JSON.stringify(newSettings));
 
         if (newSettings.max > newSettings.min) {
-            setSuccessMessage("GPA settings saved successfully!");
+            setSuccessMessage("تم حفظ إعدادات المعدل التراكمي بنجاح");
             setTimeout(() => setSuccessMessage(null), 3000);
         }
     };
@@ -123,7 +129,7 @@ const AnnouncementsPanel: React.FC = () => {
         const value = e.target.value;
         setSelectedLevel(value);
         localStorage.setItem('selectedLevel', value);
-        setSuccessMessage(`Level set to ${value} successfully!`);
+        setSuccessMessage(`تم تعيين المستوى إلى ${value} بنجاح`);
         setTimeout(() => setSuccessMessage(null), 3000);
     };
 
@@ -131,7 +137,7 @@ const AnnouncementsPanel: React.FC = () => {
         e.preventDefault();
 
         if (gpaSettings.max <= gpaSettings.min) {
-            setError("Cannot post announcement: Max GPA must be greater than Min GPA");
+            setError("لا يمكن نشر الإعلان: يجب أن يكون الحد الأقصى أكبر من الحد الأدنى");
             return;
         }
 
@@ -151,7 +157,7 @@ const AnnouncementsPanel: React.FC = () => {
                         }
                         : announcement
                 );
-                setSuccessMessage("Announcement updated successfully!");
+                setSuccessMessage("تم تحديث الإعلان بنجاح");
             } else {
                 const userData = localStorage.getItem('user');
                 let author = 'Admin';
@@ -172,30 +178,28 @@ const AnnouncementsPanel: React.FC = () => {
                     createdAt: new Date().toISOString()
                 };
                 updatedAnnouncements = [newPost, ...announcements];
-                setSuccessMessage("Announcement posted successfully!");
+                setSuccessMessage("تم نشر الإعلان بنجاح");
             }
 
             localStorage.setItem('announcements', JSON.stringify(updatedAnnouncements));
             setAnnouncements(updatedAnnouncements);
 
             closeForm();
-            // إعادة تعيين الصفحة للصفحة الأولى بعد إضافة إعلان جديد
             setPage(0);
             setTimeout(() => setSuccessMessage(null), 3000);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "An error occurred");
+            setError(err instanceof Error ? err.message : "حدث خطأ");
         } finally {
             setLoading(false);
         }
     };
 
     const handleDelete = (id: number) => {
-        if (window.confirm('Are you sure you want to delete this announcement?')) {
+        if (window.confirm('هل أنت متأكد من حذف هذا الإعلان؟')) {
             const updatedAnnouncements = announcements.filter(a => a.id !== id);
             localStorage.setItem('announcements', JSON.stringify(updatedAnnouncements));
             setAnnouncements(updatedAnnouncements);
-            setSuccessMessage("Announcement deleted successfully!");
-            // إعادة تعيين الصفحة للصفحة الأولى بعد الحذف
+            setSuccessMessage("تم حذف الإعلان بنجاح");
             setPage(0);
             setTimeout(() => setSuccessMessage(null), 3000);
         }
@@ -213,21 +217,18 @@ const AnnouncementsPanel: React.FC = () => {
         a.content.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // عرض بوستين فقط في الصفحة
     const startIndex = page * ANNOUNCEMENTS_PER_PAGE;
     const endIndex = startIndex + ANNOUNCEMENTS_PER_PAGE;
     const slice = filteredAnnouncements.slice(startIndex, endIndex);
     const totalPages = Math.ceil(filteredAnnouncements.length / ANNOUNCEMENTS_PER_PAGE);
     const currentPageInfo = `${page + 1}/${totalPages || 1}`;
 
-    // دالة للتحقق من وجود صفحة تالية
     const hasNextPage = page < totalPages - 1;
-    // دالة للتحقق من وجود صفحة سابقة
     const hasPrevPage = page > 0;
 
     return (
         <div className="dashboard-container">
-            <h2>Announcements & Settings Panel</h2>
+            <h2>لوحة تحكم الإعلانات والإعدادات</h2>
 
             {successMessage && (
                 <div style={{
@@ -245,21 +246,21 @@ const AnnouncementsPanel: React.FC = () => {
 
             <div style={{ display: "flex", gap: "15px", flexWrap: "wrap", marginBottom: "20px" }}>
                 <button className="add-btn" onClick={openAdd}>
-                    Create New Announcement
+                    إنشاء إعلان جديد
                 </button>
                 <button className="panel-btn" onClick={() => window.location.href = '/announcements'}>
-                    View Announcements Page
+                    عرض صفحة الإعلانات
                 </button>
             </div>
 
             {showForm && (
                 <form className="form" onSubmit={handleSubmit}>
-                    <h3>{editingId ? 'Edit Announcement' : 'Create New Announcement'}</h3>
+                    <h3>{editingId ? 'تعديل الإعلان' : 'إنشاء إعلان جديد'}</h3>
                     {error && <p style={{ color: "var(--error, #dc2626)" }}>{error}</p>}
 
                     <input
                         name="title"
-                        placeholder="Announcement Title"
+                        placeholder="عنوان الإعلان"
                         value={form.title}
                         onChange={handleChange}
                         required
@@ -267,7 +268,7 @@ const AnnouncementsPanel: React.FC = () => {
 
                     <textarea
                         name="content"
-                        placeholder="Announcement Content"
+                        placeholder="محتوى الإعلان"
                         value={form.content}
                         onChange={handleChange}
                         rows={5}
@@ -277,24 +278,23 @@ const AnnouncementsPanel: React.FC = () => {
 
                     <div style={{ display: "flex", gap: 8 }}>
                         <button type="submit" className="submit-btn" disabled={loading || !isGpaValid}>
-                            {loading ? "Processing..." : (editingId ? "Update Announcement" : "Post Announcement")}
+                            {loading ? "جاري المعالجة..." : (editingId ? "تحديث الإعلان" : "نشر الإعلان")}
                         </button>
                         <button type="button" onClick={closeForm} className="copy-btn">
-                            Cancel
+                            إلغاء
                         </button>
                     </div>
 
                     {!isGpaValid && (
                         <p style={{ color: 'red', fontSize: '0.9em', marginTop: '5px' }}>
-                            ⚠️ Fix GPA settings before posting
+                            ⚠️ قم بإصلاح إعدادات المعدل التراكمي قبل النشر
                         </p>
                     )}
                 </form>
             )}
 
-            {/* GPA Settings */}
             <div className="form" style={{ marginTop: '20px', padding: '15px' }}>
-                <h3>GPA Settings</h3>
+                <h3>إعدادات المعدل التراكمي (من 0 إلى 5)</h3>
 
                 {gpaError && (
                     <p style={{ color: 'red', fontWeight: 'bold', backgroundColor: '#ffeeee', padding: '10px', borderRadius: '4px' }}>
@@ -304,7 +304,7 @@ const AnnouncementsPanel: React.FC = () => {
 
                 <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                     <div>
-                        <label>Minimum GPA</label>
+                        <label>الحد الأدنى للمعدل (0 - 5)</label>
                         <input
                             type="number"
                             min="0"
@@ -312,11 +312,14 @@ const AnnouncementsPanel: React.FC = () => {
                             step="0.1"
                             value={gpaSettings.min}
                             onChange={(e) => handleGpaChange(e, 'min')}
-                            style={{ borderColor: gpaError ? 'red' : undefined }}
+                            style={{
+                                borderColor: gpaError ? 'red' : undefined,
+                                width: '100px'
+                            }}
                         />
                     </div>
                     <div>
-                        <label>Maximum GPA</label>
+                        <label>الحد الأقصى للمعدل (0 - 5)</label>
                         <input
                             type="number"
                             min="0"
@@ -324,38 +327,39 @@ const AnnouncementsPanel: React.FC = () => {
                             step="0.1"
                             value={gpaSettings.max}
                             onChange={(e) => handleGpaChange(e, 'max')}
-                            style={{ borderColor: gpaError ? 'red' : undefined }}
+                            style={{
+                                borderColor: gpaError ? 'red' : undefined,
+                                width: '100px'
+                            }}
                         />
                     </div>
                 </div>
 
                 <div style={{ marginTop: '10px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '4px' }}>
-                    <strong>Current Settings:</strong> Min = {gpaSettings.min}, Max = {gpaSettings.max}
+                    <strong>الإعدادات الحالية:</strong> الأدنى = {gpaSettings.min}, الأقصى = {gpaSettings.max}
                     {isGpaValid ? (
-                        <span style={{ color: 'green', marginLeft: '10px' }}>✅ Valid</span>
+                        <span style={{ color: 'green', marginLeft: '10px' }}>✅ صحيح</span>
                     ) : (
-                        <span style={{ color: 'red', marginLeft: '10px' }}>❌ Invalid (Max must be {'>'} Min)</span>
+                        <span style={{ color: 'red', marginLeft: '10px' }}>❌ خطأ (الأقصى يجب أن يكون أكبر من الأدنى)</span>
                     )}
                 </div>
             </div>
 
-            {/* Level Settings */}
             <div className="form" style={{ marginTop: '20px', padding: '15px' }}>
-                <h3>Level Settings</h3>
+                <h3>إعدادات المستوى</h3>
                 <select value={selectedLevel} onChange={handleLevelChange} style={{ padding: '8px', width: '200px' }}>
-                    <option value="">Choose Level</option>
-                    <option value="1">Level 1</option>
-                    <option value="2">Level 2</option>
-                    <option value="3">Level 3</option>
-                    <option value="4">Level 4</option>
+                    <option value="">اختر المستوى</option>
+                    <option value="1">المستوى الأول</option>
+                    <option value="2">المستوى الثاني</option>
+                    <option value="3">المستوى الثالث</option>
+                    <option value="4">المستوى الرابع</option>
                 </select>
             </div>
 
-            {/* Search Bar */}
             <div style={{ marginTop: '30px', marginBottom: '20px' }}>
                 <input
                     type="text"
-                    placeholder="🔍 Search by title or content..."
+                    placeholder="🔍 بحث بالعنوان أو المحتوى..."
                     value={searchTerm}
                     onChange={handleSearch}
                     style={{
@@ -368,9 +372,8 @@ const AnnouncementsPanel: React.FC = () => {
                 />
             </div>
 
-            {/* Announcements Table with Page Info */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <h3>Manage Announcements ({filteredAnnouncements.length} total)</h3>
+                <h3>إدارة الإعلانات ({filteredAnnouncements.length} إجمالي)</h3>
                 {filteredAnnouncements.length > 0 && (
                     <span style={{
                         backgroundColor: '#e0e0e0',
@@ -386,11 +389,11 @@ const AnnouncementsPanel: React.FC = () => {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                 <tr style={{ backgroundColor: '#f5f5f5' }}>
-                    <th style={{ padding: '10px', textAlign: 'left' }}>Title</th>
-                    <th style={{ padding: '10px', textAlign: 'left' }}>Content</th>
-                    <th style={{ padding: '10px', textAlign: 'left' }}>Author</th>
-                    <th style={{ padding: '10px', textAlign: 'left' }}>Date</th>
-                    <th style={{ padding: '10px', textAlign: 'left' }}>Actions</th>
+                    <th style={{ padding: '10px', textAlign: 'right' }}>العنوان</th>
+                    <th style={{ padding: '10px', textAlign: 'right' }}>المحتوى</th>
+                    <th style={{ padding: '10px', textAlign: 'right' }}>الناشر</th>
+                    <th style={{ padding: '10px', textAlign: 'right' }}>التاريخ</th>
+                    <th style={{ padding: '10px', textAlign: 'right' }}>الإجراءات</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -399,7 +402,7 @@ const AnnouncementsPanel: React.FC = () => {
                         <td style={{ padding: '10px' }}>{announcement.title}</td>
                         <td style={{ padding: '10px' }}>{announcement.content.substring(0, 50)}...</td>
                         <td style={{ padding: '10px' }}>{announcement.author}</td>
-                        <td style={{ padding: '10px' }}>{new Date(announcement.createdAt).toLocaleDateString()}</td>
+                        <td style={{ padding: '10px' }}>{new Date(announcement.createdAt).toLocaleDateString('ar-EG')}</td>
                         <td style={{ padding: '10px' }}>
                             <div style={{ display: 'flex', gap: '8px' }}>
                                 <button
@@ -414,7 +417,7 @@ const AnnouncementsPanel: React.FC = () => {
                                         fontWeight: 'bold'
                                     }}
                                 >
-                                    Edit
+                                    تعديل
                                 </button>
                                 <button
                                     style={{
@@ -428,7 +431,7 @@ const AnnouncementsPanel: React.FC = () => {
                                     }}
                                     onClick={() => handleDelete(announcement.id)}
                                 >
-                                    Delete
+                                    حذف
                                 </button>
                             </div>
                         </td>
@@ -437,14 +440,13 @@ const AnnouncementsPanel: React.FC = () => {
                 {slice.length === 0 && (
                     <tr>
                         <td colSpan={5} style={{ padding: '20px', textAlign: 'center' }}>
-                            No announcements found
+                            لا توجد إعلانات
                         </td>
                     </tr>
                 )}
                 </tbody>
             </table>
 
-            {/* Pagination Controls - Manual if Pagination component not working */}
             {filteredAnnouncements.length > ANNOUNCEMENTS_PER_PAGE && (
                 <div style={{
                     display: 'flex',
@@ -466,11 +468,11 @@ const AnnouncementsPanel: React.FC = () => {
                             cursor: hasPrevPage ? 'pointer' : 'not-allowed'
                         }}
                     >
-                        ← Previous
+                        → السابق
                     </button>
 
                     <span style={{ fontWeight: 'bold' }}>
-                        Page {page + 1} of {totalPages}
+                        صفحة {page + 1} من {totalPages}
                     </span>
 
                     <button
@@ -485,7 +487,7 @@ const AnnouncementsPanel: React.FC = () => {
                             cursor: hasNextPage ? 'pointer' : 'not-allowed'
                         }}
                     >
-                        Next →
+                        التالي ←
                     </button>
                 </div>
             )}
