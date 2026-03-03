@@ -9,10 +9,13 @@ import { useNavigate } from "react-router-dom";
 import {
     getAllSubjects,
     createSubject,
-    updateSubject,
+    updateSubject, deleteSubject,
 } from "../../services/api";
+import SubjectsTable from "./tables/subjectsTable.tsx";
+
 
 const emptyForm = {
+    code: "",
     name: "",
     creditHours: "",
     prerequisites: [],
@@ -34,6 +37,10 @@ const SubjectPanel = () => {
         const data = await getAllSubjects();
         setSubjects(data);
     }, []);
+
+    const handleEdit = (subject) => {
+        openEdit(subject);
+    };
 
     useEffect(() => {
         load();
@@ -59,7 +66,7 @@ const SubjectPanel = () => {
 
     const openAdd = () => {
         setShowForm((prev) => {
-            // If already open and not editing, close it
+            // If form is already open in add mode, close it
             if (prev && editingId === null) {
                 setForm(emptyForm);
                 setError("");
@@ -67,7 +74,7 @@ const SubjectPanel = () => {
                 return false;
             }
 
-            // Otherwise open it in "add mode"
+            // Open in add mode
             setEditingId(null);
             setForm(emptyForm);
             setError("");
@@ -76,9 +83,11 @@ const SubjectPanel = () => {
         });
     };
 
+    //to edit existing subjects
     const openEdit = (subject) => {
         setEditingId(subject._id);
         setForm({
+            code: subject.code || "",
             name: subject.name,
             creditHours: String(subject.creditHours),
             prerequisites: (subject.prerequisites || []).map((p) =>
@@ -112,14 +121,17 @@ const SubjectPanel = () => {
         e.preventDefault();
         setError("");
 
+        const code = form.code.trim().toUpperCase();
         const name = form.name.trim();
         const credit = Number(form.creditHours);
 
+        if (!code) return setError("رمز المقرر مطلوب");
         if (!name) return setError("اسم المقرر مطلوب");
         if (!Number.isInteger(credit) || credit < 0)
             return setError("عدد الساعات غير صحيح");
 
         const payload = {
+            code,
             name,
             creditHours: credit,
             prerequisites: form.prerequisites,
@@ -174,7 +186,15 @@ const SubjectPanel = () => {
                     )}
 
                     <input
-                        placeholder="اسم المقرر"
+                        placeholder="رمز المقرر (مثال: س202)"
+                        value={form.code}
+                        onChange={(e) =>
+                            setForm({ ...form, code: e.target.value })
+                        }
+                    />
+
+                    <input
+                        placeholder="اسم المقرر (مثال: هياكل البيانات والخوارزميات)"
                         value={form.name}
                         onChange={(e) =>
                             setForm({ ...form, name: e.target.value })
@@ -185,7 +205,7 @@ const SubjectPanel = () => {
                         type="number"
                         min="0"
                         step="1"
-                        placeholder="عدد الساعات"
+                        placeholder="عدد الساعات المعتمدة"
                         value={form.creditHours}
                         onChange={(e) =>
                             setForm({
@@ -229,7 +249,7 @@ const SubjectPanel = () => {
                                                 )
                                             }
                                         />
-                                        {s.name}
+                                        {s.name} ({s.code})
                                     </label>
                                 ))}
                             </div>

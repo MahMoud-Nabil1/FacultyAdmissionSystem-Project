@@ -1,18 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { getAllSubjects, deleteSubject } from "../../../services/api";
 import Pagination from "../pagination";
 import { PAGE_SIZE } from "../constants";
 
 interface Subject {
     _id: string;
+    code: string;
     name: string;
     creditHours: number;
     prerequisites?: any[];
 }
 
-const SubjectsTable: React.FC = () => {
+interface SubjectsTableProps {
+    onEdit: (subject: Subject) => void;
+}
+
+const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [page, setPage] = useState<number>(0);
+    const [search, setSearch] = useState<string>("");
 
     const load = async () => {
         const data = await getAllSubjects();
@@ -29,18 +35,44 @@ const SubjectsTable: React.FC = () => {
         await load();
     };
 
-    const slice = subjects.slice(
+    // Filter by code or name
+    const filteredSubjects = useMemo(() => {
+        const term = search.trim().toLowerCase();
+        if (!term) return subjects;
+        return subjects.filter(
+            (s) =>
+                s.name.toLowerCase().includes(term) ||
+                s.code.toLowerCase().includes(term)
+        );
+    }, [subjects, search]);
+
+    const slice = filteredSubjects.slice(
         page * PAGE_SIZE,
         page * PAGE_SIZE + PAGE_SIZE
     );
 
+    // Reset page when search changes
+    useEffect(() => {
+        setPage(0);
+    }, [search]);
+
     return (
-        <div className="dashboard-container">
-            <h2>جدول المقررات</h2>
+        <div>
+            {/* ===== Search Bar ===== */}
+            <div style={{ marginBottom: 15 }}>
+                <input
+                    type="text"
+                    placeholder="ابحث باسم المقرر..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    style={{ width: "100%", padding: "8px 10px" }}
+                />
+            </div>
 
             <table>
                 <thead>
                 <tr>
+                    <th>رمز المقرر</th>
                     <th>اسم المقرر</th>
                     <th>عدد الساعات</th>
                     <th>المتطلبات السابقة</th>
@@ -51,36 +83,42 @@ const SubjectsTable: React.FC = () => {
                 <tbody>
                 {slice.map((s) => (
                     <tr key={s._id}>
+                        <td>{s.code}</td>
                         <td>{s.name}</td>
                         <td>{s.creditHours}</td>
                         <td>
                             {(s.prerequisites || [])
                                 .map((p: any) =>
-                                    typeof p === "object"
-                                        ? p.name
-                                        : p
+                                    typeof p === "object" ? p.name : p
                                 )
                                 .join(", ") || "—"}
                         </td>
-                        <td>
+                        <td style={{ display: "flex", gap: 4 }}>
                             <button
                                 className="copy-btn"
-                                onClick={() =>
-                                    handleDelete(s._id)
-                                }
+                                style={{ color: "var(--error, #dc2626)" }}
+                                onClick={() => handleDelete(s._id)}
                             >
                                 حذف
                             </button>
                         </td>
                     </tr>
                 ))}
+
+                {slice.length === 0 && (
+                    <tr>
+                        <td colSpan={5} style={{ textAlign: "center" }}>
+                            لا توجد نتائج
+                        </td>
+                    </tr>
+                )}
                 </tbody>
             </table>
 
             <Pagination
                 page={page}
                 setPage={setPage}
-                total={subjects.length}
+                total={filteredSubjects.length}
             />
         </div>
     );
