@@ -69,14 +69,6 @@ const StudentsTable: React.FC = () => {
             <h2>جدول الطلاب</h2>
             {error && <p className="error">{error}</p>}
 
-            {/* Back button */}
-            <button
-                style={{ marginBottom: "16px", padding: "8px 16px", background: "#ddd" }}
-                onClick={() => navigate("/admin-dashboard")}
-            >
-                العودة إلى لوحة الإدارة
-            </button>
-
             {/* Search by ID */}
             <div style={{ display: "flex", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
                 <input
