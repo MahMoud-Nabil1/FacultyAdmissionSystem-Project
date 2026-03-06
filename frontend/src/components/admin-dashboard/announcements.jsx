@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import './css/announcements.css'; // تم تغيير المسار
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -72,43 +73,19 @@ const Announcements = () => {
     }, []);
 
     if (loading) {
-        return (
-            <div style={{
-                textAlign: 'center',
-                padding: '50px',
-                fontFamily: 'Arial, sans-serif',
-                fontSize: '18px',
-                color: '#666'
-            }}>
-                جاري التحميل...
-            </div>
-        );
+        return <div className="loading-container">جاري التحميل...</div>;
     }
 
     return (
-        <div dir="rtl" style={{
-            fontFamily: 'Arial, sans-serif',
-            maxWidth: '1200px',
-            margin: '0 auto',
-            padding: '20px'
-        }}>
+        <div className="announcements-container">
             {/* Header */}
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '15px 20px',
-                backgroundColor: '#f8f9fa',
-                borderBottom: '2px solid #e9ecef',
-                borderRadius: '8px 8px 0 0',
-                marginBottom: '20px'
-            }}>
+            <div className="header-wrapper">
                 <div>
                     {!logoError && (
                         <img
                             src="/logo.png"
                             alt="الشعار"
-                            style={{ height: '60px', width: 'auto' }}
+                            className="logo-img"
                             onError={() => setLogoError(true)}
                         />
                     )}
@@ -116,25 +93,13 @@ const Announcements = () => {
                 <div>
                     {!user ? (
                         <button
+                            className="login-btn"
                             onClick={() => window.location.href = '/login'}
-                            style={{
-                                backgroundColor: '#007bff',
-                                color: 'white',
-                                border: 'none',
-                                padding: '10px 20px',
-                                borderRadius: '5px',
-                                cursor: 'pointer',
-                                fontSize: '16px'
-                            }}
                         >
                             تسجيل الدخول
                         </button>
                     ) : (
-                        <span style={{
-                            fontSize: '18px',
-                            fontWeight: '500',
-                            color: '#343a40'
-                        }}>
+                        <span className="user-welcome">
                             مرحباً, {user.name} ({user.role === 'admin' ? 'مدير' : 'طالب'})
                         </span>
                     )}
@@ -143,105 +108,51 @@ const Announcements = () => {
 
             {/* GPA Section */}
             {gpaError ? (
-                <div style={{
-                    backgroundColor: '#ffebee',
-                    border: '1px solid #ef5350',
-                    borderRadius: '8px',
-                    padding: '20px',
-                    marginBottom: '20px',
-                    textAlign: 'center'
-                }}>
-                    <h4 style={{ color: '#c62828', margin: '0 0 10px 0' }}>⚠️ {gpaError}</h4>
-                    <p style={{ color: '#666' }}>يرجى التواصل مع المسؤول لإصلاح الإعدادات.</p>
+                <div className="gpa-error-section">
+                    <h4 className="gpa-error-title">⚠️ {gpaError}</h4>
+                    <p className="gpa-error-text">يرجى التواصل مع المسؤول لإصلاح الإعدادات.</p>
                 </div>
             ) : (
-                <div style={{
-                    backgroundColor: '#f5f5f5',
-                    padding: '20px',
-                    marginBottom: '20px',
-                    borderRadius: '8px'
-                }}>
-                    <h4 style={{ margin: '0 0 20px 0', textAlign: 'center', color: '#333' }}>
+                <div className="section-box">
+                    <h4 className="section-title">
                         المعدل التراكمي المطلوب للتسجيل في الجدول
                     </h4>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        gap: '30px',
-                        flexWrap: 'wrap'
-                    }}>
-                        <div style={{
-                            backgroundColor: 'white',
-                            padding: '20px 40px',
-                            borderRadius: '8px',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                            textAlign: 'center',
-                            minWidth: '120px',
-                            border: '2px solid #2196F3'
-                        }}>
-                            <span style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '5px' }}>من</span>
-                            <span style={{ fontSize: '28px', fontWeight: 'bold', color: '#2196F3' }}>{gpaMin}</span>
+                    <div className="flex-center-gap">
+                        <div className="gpa-card">
+                            <span className="card-label">من</span>
+                            <span className="card-value">{gpaMin}</span>
                         </div>
-                        <div style={{
-                            backgroundColor: 'white',
-                            padding: '20px 40px',
-                            borderRadius: '8px',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                            textAlign: 'center',
-                            minWidth: '120px',
-                            border: '2px solid #4CAF50'
-                        }}>
-                            <span style={{ fontSize: '14px', color: '#666', display: 'block', marginBottom: '5px' }}>إلى</span>
-                            <span style={{ fontSize: '28px', fontWeight: 'bold', color: '#4CAF50' }}>{gpaMax}</span>
+                        <div className="gpa-card">
+                            <span className="card-label">إلى</span>
+                            <span className="card-value">{gpaMax}</span>
                         </div>
                     </div>
                 </div>
             )}
 
             {/* Level Section */}
-            <div style={{
-                backgroundColor: '#f5f5f5',
-                padding: '20px',
-                marginBottom: '20px',
-                borderRadius: '8px',
-                textAlign: 'center'
-            }}>
-                <h4 style={{ margin: '0 0 20px 0', color: '#333' }}>المستوى المطلوب للتسجيل في الجدول</h4>
-                <div style={{
-                    backgroundColor: 'white',
-                    padding: '20px 40px',
-                    borderRadius: '8px',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                    display: 'inline-block',
-                    border: '2px solid #FF9800'
-                }}>
-                    <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#FF9800' }}>
-                        {level}
-                    </span>
+            <div className="section-box">
+                <h4 className="section-title">المستوى المطلوب للتسجيل في الجدول</h4>
+                <div className="gpa-card" style={{ maxWidth: '300px', margin: '0 auto' }}>
+                    <span className="card-value" style={{ color: 'var(--primary)' }}>{level}</span>
                 </div>
             </div>
 
             {/* Announcements List */}
-            <div style={{ marginTop: '30px' }}>
-                <h3 style={{ textAlign: 'center', marginBottom: '20px', color: '#333' }}>الإعلانات</h3>
+            <div className="posts-list">
+                <h3 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1.5rem' }}>الإعلانات</h3>
                 {posts.length > 0 ? (
                     posts.map(post => (
-                        <div key={post._id} style={{
-                            backgroundColor: '#fff',
-                            padding: '20px',
-                            marginBottom: '15px',
-                            borderRadius: '8px',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                        }}>
-                            <h4 style={{ color: '#333', marginBottom: '10px' }}>{post.title}</h4>
-                            <p style={{ color: '#666', lineHeight: '1.6', marginBottom: '10px' }}>{post.content}</p>
-                            <small style={{ color: '#999' }}>
+                        <div key={post._id} className="post-card">
+                            <h4>{post.title}</h4>
+                            <p>{post.content}</p>
+                            <small className="post-meta">
                                 نشر بواسطة {post.author} في {new Date(post.createdAt).toLocaleDateString('ar-EG')}
                             </small>
                         </div>
                     ))
                 ) : (
-                    <p style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
+                    <p style={{ textAlign: 'center', color: '#9ca3af', padding: '40px' }}>
                         لا توجد إعلانات حتى الآن
                     </p>
                 )}
