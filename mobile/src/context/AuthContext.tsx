@@ -2,8 +2,6 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import * as SecureStore from 'expo-secure-store';
 import { jwtDecode } from 'jwt-decode';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 export interface AuthUser {
     id: string;
     role: string;
@@ -19,8 +17,6 @@ interface AuthContextValue {
     logout: () => Promise<void>;
 }
 
-// ─── Context ──────────────────────────────────────────────────────────────────
-
 const AuthContext = createContext<AuthContextValue>({
     user: null,
     token: null,
@@ -32,14 +28,10 @@ const AuthContext = createContext<AuthContextValue>({
 
 export const useAuth = (): AuthContextValue => useContext(AuthContext);
 
-// ─── Provider ─────────────────────────────────────────────────────────────────
-
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
-
-    // Load persisted token on app start (replaces localStorage)
     useEffect(() => {
         (async () => {
             try {
