@@ -165,12 +165,12 @@ const SubjectPanel = () => {
             <h2>المقررات</h2>
 
             <div style={{ display: "flex", gap: 10 }}>
-                <button className="add-btn" onClick={openAdd}>
+                <button className="panel-btn" onClick={openAdd}>
                     إضافة مقرر جديد
                 </button>
 
                 <button
-                    className="copy-btn"
+                    className="panel-btn"
                     onClick={() =>
                         navigate(
                             "/admin-dashboard/table?type=subjects"

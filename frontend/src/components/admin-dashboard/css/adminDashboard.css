@@ -16,18 +16,33 @@
     --radius: 12px;
 }
 
-/* Layout Grid */
 .dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    padding: 40px;
+    display: flex;
+    flex-direction: row;
+    gap: 30px;           /* Gap between the columns */
+    padding: 32px;
     max-width: 1400px;
     margin: 0 auto;
     background: var(--bg-light);
-    min-height: 100vh;
-    font-family: 'Alexandria', sans-serif;
-    direction: rtl;
+    align-items: flex-start; /* Crucial: prevents items from stretching to match height */
+}
+
+/* Create two columns that distribute the panels */
+.dashboard-column {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    flex: 1;
+}
+
+/* Responsive: Stack columns on top of each other for tablets/phones */
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        flex-direction: column;
+    }
+    .dashboard-column {
+        width: 100%;
+    }
 }
 
 /* Dashboard Cards */
@@ -235,23 +250,19 @@ tr:last-child td {
 }
 
 tr:hover td {
-    background-color: #f1f5f9; /* Subtle highlight on hover */
+    background-color: #f1f5f9;
 }
 
-/* Fix for the "Tight" Actions Column */
 td style[display="flex"] {
     display: flex;
     gap: 8px;
     justify-content: flex-start;
 }
 
-/* Specific Table Classes from your TSX */
 .staff-table {
     min-width: 800px; /* Prevents squishing on medium screens */
 }
 
-/* Horizontal Scroll Container */
-/* Wrap your tables in a div with this class if they are still too wide for mobile */
 .table-responsive {
     width: 100%;
     overflow-x: auto;
@@ -313,8 +324,8 @@ td style[display="flex"] {
 /* Ensure specific columns like 'Actions' or 'Buttons' stay tidy */
 .dashboard-container td:last-child,
 .dashboard-container th:last-child {
-    text-align: center !important; /* Usually better for action buttons */
-    width: 150px; /* Gives the 'Delete/Edit' area a set width */
+    text-align: center !important;
+    width: 150px;
 }
 
 /* Header Specifics */
@@ -389,4 +400,35 @@ td style[display="flex"] {
     border: 1px solid var(--border-color);
     min-width: 80px;
     text-align: center;
+}
+
+.staff-table th:last-child,
+.staff-table td:last-child {
+    text-align: center !important;
+    width: 100px;
+}
+
+/* Select bar adjustments */
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23004a99' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: left 12px center; /* Puts arrow on the left side */
+    background-size: 16px;
+
+    padding-left: 40px !important;
+    padding-right: 15px !important;
+
+    cursor: pointer;
+    background-color: #f8fafc;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    font-family: 'Alexandria', sans-serif;
+}
+
+select::-ms-expand {
+    display: none;
 }

@@ -3,6 +3,7 @@ import StudentPanel from "./studentPanel.tsx";
 import StaffPanel from "./staffPanel.tsx";
 import SubjectPanel from "./SubjectPanel";
 import AnnouncementsPanel from "./createAnnouncementsPanel.tsx";
+import SettingsPanel from "./settingsPanel.tsx";
 import "./css/adminDashboard.css";
 
 const AdminDashboard = () => {
@@ -29,17 +30,23 @@ const AdminDashboard = () => {
 
     return (
         <div className="admin-dashboard-container">
-            {/* Header */}
             <header className="dashboard-header">
                 <h1>مرحبًا {userName}</h1>
             </header>
 
-            {/* Main Grid */}
             <div className="dashboard-grid">
-                <StaffPanel />
-                <StudentPanel />
-                <SubjectPanel />
-                <AnnouncementsPanel />
+                {/* Right Column */}
+                <div className="dashboard-column">
+                    <StaffPanel />
+                    <SubjectPanel />
+                    <AnnouncementsPanel />
+                </div>
+
+                {/* Left Column */}
+                <div className="dashboard-column">
+                    <StudentPanel />
+                    <SettingsPanel />
+                </div>
             </div>
         </div>
     );
