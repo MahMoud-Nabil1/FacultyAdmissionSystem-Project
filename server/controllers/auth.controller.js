@@ -228,7 +228,9 @@ exports.login = async (req, res) => {
 
 exports.getMe = async (req, res) => {
     try {
+        if (!req.user) return res.status(401).json({ error: "Unauthorized" });
 
+        // Staff
         if (req.user.role !== "student") {
             return res.json({
                 id: req.user.id,
@@ -236,21 +238,20 @@ exports.getMe = async (req, res) => {
                 name: req.user.name,
                 ...(req.user.department && { department: req.user.department })
             });
-        } //gets staff data based on JWT token if not student
-
-        const student = await Student.findOne({ studentId: req.user.id })
-            .populate("registeredSubjects", "creditHours")
-            .populate("completedSubjects", "creditHours");
-
-        if (!student) {
-            return res.status(404).json({ error: "Student not found" });
         }
 
-        const registeredHours = student.registeredSubjects
-            .reduce((sum, subj) => sum + subj.creditHours, 0); //sum of registered subjects credit hours
+        // Student
+        const student = await Student.findOne({ studentId: req.user.id })
+            .populate("requestedSubjects", "creditHours") // registered subjects
+            .populate("completedSubjects", "creditHours"); // completed subjects
+
+        if (!student) return res.status(404).json({ error: "Student not found" });
+
+        const registeredHours = student.requestedSubjects
+            .reduce((sum, subj) => sum + (subj.creditHours || 0), 0);
 
         const completedHours = student.completedSubjects
-            .reduce((sum, subj) => sum + subj.creditHours, 0); //sum of completed subjects credit hours
+            .reduce((sum, subj) => sum + (subj.creditHours || 0), 0);
 
         return res.json({
             id: student.studentId,
@@ -260,9 +261,10 @@ exports.getMe = async (req, res) => {
             gpa: student.gpa,
             registeredHours,
             completedHours
-        }); //student data
+        });
 
     } catch (err) {
+        console.error("getMe error:", err);
         res.status(500).json({ error: err.message });
     }
 };

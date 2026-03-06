@@ -10,6 +10,7 @@ import SupportContact from "./components/support/SupportContact.jsx";
 import Announcements from "./components/welcome/announcements.jsx";
 import AdminDashboardTable from "./components/dashboard/tables/table.tsx";
 import Groups from "./components/dashboard/Groups.tsx";
+import Home from "./components/home/home.tsx";
 
 
 function App() {
@@ -28,7 +29,7 @@ function App() {
                             }}>
                                 Sign out
                             </button>
-
+                            <Home/>
                         </ProtectedRoute>
                     }
                 />
