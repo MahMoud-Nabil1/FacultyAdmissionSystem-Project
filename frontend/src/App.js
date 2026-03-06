@@ -5,11 +5,11 @@ import GuestRoute from './components/auth/GuestRoute.jsx';
 import ResetPassword from './components/auth/ResetPassword.jsx';
 import Login from './components/auth/Login.jsx';
 import ForgotPassword from './components/auth/ForgotPassword.jsx';
-import AdminDashboard from './components/admin-dashboard/adminDashboard.jsx';
+import AdminDashboard from './components/dashboard/adminDashboard.jsx';
 import SupportContact from "./components/support/SupportContact.jsx";
-import Announcements from "./components/admin-dashboard/announcements.jsx";
-import AdminDashboardTable from "./components/admin-dashboard/tables/table.tsx";
-import Groups from "./components/admin-dashboard/Groups.tsx";
+import Announcements from "./components/welcome/announcements.jsx";
+import AdminDashboardTable from "./components/dashboard/tables/table.tsx";
+import Groups from "./components/dashboard/Groups.tsx";
 
 
 function App() {
