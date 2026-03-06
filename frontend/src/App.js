@@ -22,15 +22,13 @@ function App() {
                     path="/"
                     element={
                         <ProtectedRoute>
-                            <h1>Home</h1>
                             <button onClick={() => {
                                 localStorage.removeItem("token");
-                                localStorage.removeItem("role");
-                                localStorage.removeItem("user");
                                 window.location.href = "/login";
                             }}>
                                 Sign out
                             </button>
+
                         </ProtectedRoute>
                     }
                 />

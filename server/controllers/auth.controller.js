@@ -228,13 +228,40 @@ exports.login = async (req, res) => {
 
 exports.getMe = async (req, res) => {
     try {
-        res.json({
-            id: req.user.id,
-            role: req.user.role,
-            name: req.user.name,
-            ...(req.user.facultyEmail && { facultyEmail: req.user.facultyEmail }),
-            ...(req.user.department && { department: req.user.department }),
-        });
+
+        if (req.user.role !== "student") {
+            return res.json({
+                id: req.user.id,
+                role: req.user.role,
+                name: req.user.name,
+                ...(req.user.department && { department: req.user.department })
+            });
+        } //gets staff data based on JWT token if not student
+
+        const student = await Student.findOne({ studentId: req.user.id })
+            .populate("registeredSubjects", "creditHours")
+            .populate("completedSubjects", "creditHours");
+
+        if (!student) {
+            return res.status(404).json({ error: "Student not found" });
+        }
+
+        const registeredHours = student.registeredSubjects
+            .reduce((sum, subj) => sum + subj.creditHours, 0); //sum of registered subjects credit hours
+
+        const completedHours = student.completedSubjects
+            .reduce((sum, subj) => sum + subj.creditHours, 0); //sum of completed subjects credit hours
+
+        return res.json({
+            id: student.studentId,
+            role: "student",
+            name: student.name,
+            department: student.department,
+            gpa: student.gpa,
+            registeredHours,
+            completedHours
+        }); //student data
+
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
