@@ -5,7 +5,8 @@
     "install:all": "npm install --prefix server && npm install --prefix frontend",
     "start:backend": "npm run start --prefix server",
     "start:frontend": "npm start --prefix frontend",
-    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\""
+    "start-web": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start-mobile": "concurrently \"npm run start --prefix mobile\" \"npm run start:backend\""
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

@@ -152,7 +152,6 @@ const SubjectPanel = () => {
     };
 
     const otherSubjects = subjects.filter((s) => s._id !== editingId);
-    const slice = subjects.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
 
     const handlePrereqChange = (e) => {
         const selected = Array.from(e.target.selectedOptions, (option) => option.value).filter(
@@ -166,12 +165,12 @@ const SubjectPanel = () => {
             <h2>المقررات</h2>
 
             <div style={{ display: "flex", gap: 10 }}>
-                <button className="add-btn" onClick={openAdd}>
+                <button className="panel-btn" onClick={openAdd}>
                     إضافة مقرر جديد
                 </button>
 
                 <button
-                    className="copy-btn"
+                    className="panel-btn"
                     onClick={() =>
                         navigate(
                             "/admin-dashboard/table?type=subjects"
