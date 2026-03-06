@@ -5,11 +5,12 @@ import GuestRoute from './components/auth/GuestRoute.jsx';
 import ResetPassword from './components/auth/ResetPassword.jsx';
 import Login from './components/auth/Login.jsx';
 import ForgotPassword from './components/auth/ForgotPassword.jsx';
-import AdminDashboard from './components/admin-dashboard/adminDashboard.jsx';
+import AdminDashboard from './components/dashboard/adminDashboard.jsx';
 import SupportContact from "./components/support/SupportContact.jsx";
-import Announcements from "./components/admin-dashboard/announcements.jsx";
-import AdminDashboardTable from "./components/admin-dashboard/tables/table.tsx";
-import Groups from "./components/admin-dashboard/Groups.tsx";
+import Announcements from "./components/welcome/announcements.jsx";
+import AdminDashboardTable from "./components/dashboard/tables/table.tsx";
+import Groups from "./components/dashboard/Groups.tsx";
+import Home from "./components/home/home.tsx";
 
 
 function App() {
@@ -22,15 +23,13 @@ function App() {
                     path="/"
                     element={
                         <ProtectedRoute>
-                            <h1>Home</h1>
                             <button onClick={() => {
                                 localStorage.removeItem("token");
-                                localStorage.removeItem("role");
-                                localStorage.removeItem("user");
                                 window.location.href = "/login";
                             }}>
                                 Sign out
                             </button>
+                            <Home/>
                         </ProtectedRoute>
                     }
                 />
@@ -97,9 +96,14 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+                <Route path="/register-subjects" element={
+                    <ProtectedRoute>
+                        put register new subjects component here
+                    </ProtectedRoute>
+                }
+                />
 
-                {}
-                <Route path="*" element={<Navigate to="/announcements" replace />} />
+                <Route path="*" element={<Navigate to="/announcements" replace />}/>
             </Routes>
         </div>
     );
