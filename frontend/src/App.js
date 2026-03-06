@@ -58,8 +58,6 @@ function App() {
                                 Sign out
                             </button>
                             <div className="app-container">
-                                <h1>Admin Dashboard</h1>
-                                <hr />
                                 <AdminDashboard />
                             </div>
                         </ProtectedRoute>
