@@ -9,6 +9,7 @@ import AdminDashboard from './components/admin-dashboard/adminDashboard.jsx';
 import SupportContact from "./components/support/SupportContact.jsx";
 import Announcements from "./components/admin-dashboard/announcements.jsx";
 import AdminDashboardTable from "./components/admin-dashboard/tables/table.tsx";
+import Groups from "./components/admin-dashboard/Groups.tsx";
 
 
 function App() {
@@ -31,6 +32,12 @@ function App() {
                                 Sign out
                             </button>
                         </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/Groups"
+                    element={
+                        <Groups />
                     }
                 />
                 <Route

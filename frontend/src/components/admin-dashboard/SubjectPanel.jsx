@@ -151,10 +151,15 @@ const SubjectPanel = () => {
         }
     };
 
-    const otherSubjects = useMemo(
-        () => subjects.filter((s) => s._id !== editingId),
-        [subjects, editingId]
-    );
+    const otherSubjects = subjects.filter((s) => s._id !== editingId);
+    const slice = subjects.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+
+    const handlePrereqChange = (e) => {
+        const selected = Array.from(e.target.selectedOptions, (option) => option.value).filter(
+            (id) => id !== ""
+        );
+        setForm((f) => ({ ...f, prerequisites: selected }));
+    };
 
     return (
         <div className="dashboard-container">
