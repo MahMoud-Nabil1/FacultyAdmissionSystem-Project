@@ -10,6 +10,7 @@ const Home = () => {
     const [showReset, setShowReset] = useState(false);
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [currentPassword, setCurrentPassword] = useState("");
     const [resetMessage, setResetMessage] = useState("");
 
     useEffect(() => {
@@ -42,18 +43,20 @@ const Home = () => {
 
         try {
             const token = localStorage.getItem("token");
-            const res = await fetch("http://localhost:5000/api/auth/reset-password", {
+            const res = await fetch("http://localhost:5000/api/auth/change-password", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ token, newPassword })
+                body: JSON.stringify({ currentPassword, newPassword }) // ✅ correct keys
             });
+
             const data = await res.json();
             if (res.ok) {
                 setResetMessage("تم تحديث كلمة المرور بنجاح");
                 setShowReset(false);
+                setCurrentPassword("");
                 setNewPassword("");
                 setConfirmPassword("");
             } else {
@@ -103,6 +106,12 @@ const Home = () => {
             {showReset && (
                 <div className="reset-panel">
                     <h3>تغيير كلمة المرور</h3>
+                    <input
+                        type="password"
+                        placeholder="كلمة المرور الحالية"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                    />
                     <input
                         type="password"
                         placeholder="كلمة المرور الجديدة"
