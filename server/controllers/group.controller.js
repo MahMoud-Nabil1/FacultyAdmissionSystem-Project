@@ -11,6 +11,7 @@ exports.createGroup = async (req, res) => {
     }
 };
 
+
 // Get all groups
 exports.getAllGroups = async (req, res) => {
     try {
