@@ -1,490 +1,547 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
-import './css/announcements.css';
-
-
-interface AnnouncementForm {
-    title: string;
-    content: string;
-}
-
-interface GPASettings {
-    min: number;
-    max: number;
-}
+import React, { useState, useEffect } from 'react';
 
 interface Announcement {
-    id: number;
+    _id: string;
     title: string;
     content: string;
     author: string;
     createdAt: string;
 }
 
-const emptyForm = { title: "", content: "" };
+const API_URL = 'http://localhost:5000/api';
 
-const ANNOUNCEMENTS_PER_PAGE = 2;
-
-const AnnouncementsPanel: React.FC = () => {
+const AnnouncementsPanel = () => {
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-    const [page, setPage] = useState(0);
-    const [showForm, setShowForm] = useState(false);
-    const [editingId, setEditingId] = useState<number | null>(null);
-    const [form, setForm] = useState<AnnouncementForm>(emptyForm);
-    const [error, setError] = useState("");
-    const [gpaSettings, setGpaSettings] = useState<GPASettings>({ min: 2.5, max: 5 });
-    const [selectedLevel, setSelectedLevel] = useState<string>('level 1');
-    const [gpaError, setGpaError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [title, setTitle] = useState('');
+    const [content, setContent] = useState('');
+    const [editingId, setEditingId] = useState<string | null>(null);
 
-    const loadAnnouncements = () => {
-        const savedPosts = localStorage.getItem('announcements');
-        if (savedPosts) {
-            const posts = JSON.parse(savedPosts);
-            setAnnouncements(posts);
-            setPage(0);
+    const [gpaMin, setGpaMin] = useState(2.5);
+    const [gpaMax, setGpaMax] = useState(5);
+    const [level, setLevel] = useState('1');
+    const [gpaError, setGpaError] = useState('');
+
+    const [loading, setLoading] = useState(false);
+    const [settingsLoading, setSettingsLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [searchTerm, setSearchTerm] = useState('');
+    const itemsPerPage = 5;
+
+    const fetchAnnouncements = async () => {
+        try {
+            const res = await fetch(`${API_URL}/announcements`);
+            if (!res.ok) throw new Error('فشل في جلب الإعلانات');
+            const data = await res.json();
+            setAnnouncements(data);
+        } catch (error) {
+            console.error('Error fetching announcements:', error);
+        }
+    };
+
+    const fetchSettings = async () => {
+        try {
+            const res = await fetch(`${API_URL}/announcements/settings`);
+            if (!res.ok) throw new Error('فشل في جلب الإعدادات');
+            const data = await res.json();
+
+            const min = Math.min(data.gpaMin, data.gpaMax);
+            const max = Math.max(data.gpaMin, data.gpaMax);
+
+            setGpaMin(min);
+            setGpaMax(max);
+            setLevel(data.level);
+        } catch (error) {
+            console.error('Error fetching settings:', error);
         }
     };
 
     useEffect(() => {
-        const savedGpa = localStorage.getItem('gpaSettings');
-        if (savedGpa) {
-            const parsedGpa = JSON.parse(savedGpa);
-            setGpaSettings(parsedGpa);
-
-            if (parsedGpa.max <= parsedGpa.min) {
-                setGpaError("يجب أن يكون الحد الأقصى أكبر من الحد الأدنى");
-            }
-        }
-
-        const savedLevel = localStorage.getItem('selectedLevel');
-        if (savedLevel) {
-            setSelectedLevel(savedLevel);
-        }
-
-        loadAnnouncements();
+        fetchAnnouncements();
+        fetchSettings();
     }, []);
 
-    const openAdd = () => {
-        setEditingId(null);
-        setForm(emptyForm);
-        setShowForm(true);
-        setError("");
-    };
-
-    const openEdit = (announcement: Announcement) => {
-        setEditingId(announcement.id);
-        setForm({
-            title: announcement.title,
-            content: announcement.content
-        });
-        setShowForm(true);
-        setError("");
-    };
-
-    const closeForm = () => {
-        setShowForm(false);
-        setEditingId(null);
-        setForm(emptyForm);
-        setError("");
-    };
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleGpaChange = (e: ChangeEvent<HTMLInputElement>, type: 'min' | 'max') => {
-        let value = parseFloat(e.target.value);
-
-        if (value < 0) {
-            value = 0;
-        }
-
-        if (value > 5) {
-            value = 5;
-        }
-
-        const newSettings = { ...gpaSettings, [type]: value };
-
-        if (type === 'max' && value <= gpaSettings.min) {
-            setGpaError("يجب أن يكون الحد الأقصى أكبر من الحد الأدنى");
-        } else if (type === 'min' && gpaSettings.max <= value) {
-            setGpaError("يجب أن يكون الحد الأدنى أصغر من الحد الأقصى");
+    useEffect(() => {
+        if (gpaMin >= gpaMax) {
+            setGpaError('⚠️ خطأ: الحد الأدنى أكبر من أو يساوي الحد الأقصى');
+        } else if (gpaMin < 0 || gpaMin > 5 || gpaMax < 0 || gpaMax > 5) {
+            setGpaError('⚠️ خطأ: القيم يجب أن تكون بين 0 و 5');
         } else {
-            setGpaError(null);
+            setGpaError('');
         }
+    }, [gpaMin, gpaMax]);
 
-        setGpaSettings(newSettings);
-        localStorage.setItem('gpaSettings', JSON.stringify(newSettings));
-
-        if (newSettings.max > newSettings.min) {
-            setSuccessMessage("تم حفظ إعدادات المعدل التراكمي بنجاح");
-            setTimeout(() => setSuccessMessage(null), 3000);
-        }
-    };
-
-    const handleLevelChange = (e: ChangeEvent<HTMLSelectElement>) => {
-        const value = e.target.value;
-        setSelectedLevel(value);
-        localStorage.setItem('selectedLevel', value);
-        setSuccessMessage(`تم تعيين المستوى إلى ${value} بنجاح`);
-        setTimeout(() => setSuccessMessage(null), 3000);
-    };
-
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    const handleSettingsSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (gpaSettings.max <= gpaSettings.min) {
-            setError("لا يمكن نشر الإعلان: يجب أن يكون الحد الأقصى أكبر من الحد الأدنى");
+        if (gpaMin >= gpaMax) {
+            setGpaError('⚠️ يجب أن يكون الحد الأدنى أصغر من الحد الأقصى');
+            return;
+        }
+
+        if (gpaMin < 0 || gpaMin > 5 || gpaMax < 0 || gpaMax > 5) {
+            setGpaError('⚠️ القيم يجب أن تكون بين 0 و 5');
+            return;
+        }
+
+        setSettingsLoading(true);
+
+        try {
+            const res = await fetch(`${API_URL}/announcements/settings`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    gpaMin,
+                    gpaMax,
+                    level,
+                    updatedBy: 'Admin'
+                })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                alert('✅ تم حفظ الإعدادات بنجاح');
+                fetchSettings();
+                window.dispatchEvent(new Event('settingsUpdated'));
+            } else {
+                alert(`❌ ${data.message || 'حدث خطأ'}`);
+            }
+        } catch (error) {
+            console.error('Error saving settings:', error);
+            alert('❌ حدث خطأ في الاتصال');
+        } finally {
+            setSettingsLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!title.trim() || !content.trim()) {
+            alert('❌ الرجاء إدخال العنوان والمحتوى');
             return;
         }
 
         setLoading(true);
-        setError("");
 
         try {
-            let updatedAnnouncements;
+            const url = editingId ? `${API_URL}/announcements/${editingId}` : `${API_URL}/announcements`;
+            const method = editingId ? 'PUT' : 'POST';
 
-            if (editingId) {
-                updatedAnnouncements = announcements.map(announcement =>
-                    announcement.id === editingId
-                        ? {
-                            ...announcement,
-                            title: form.title,
-                            content: form.content
-                        }
-                        : announcement
-                );
-                setSuccessMessage("تم تحديث الإعلان بنجاح");
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: title.trim(),
+                    content: content.trim(),
+                    author: 'Admin'
+                })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                setTitle('');
+                setContent('');
+                setEditingId(null);
+                fetchAnnouncements();
+                alert(editingId ? '✅ تم تعديل الإعلان' : '✅ تم نشر الإعلان');
             } else {
-                const userData = localStorage.getItem('user');
-                let author = 'Admin';
-                if (userData) {
-                    try {
-                        const user = JSON.parse(userData);
-                        author = user.name || 'Admin';
-                    } catch {
-                        author = 'Admin';
-                    }
-                }
-
-                const newPost = {
-                    id: Date.now(),
-                    title: form.title,
-                    content: form.content,
-                    author: author,
-                    createdAt: new Date().toISOString()
-                };
-                updatedAnnouncements = [newPost, ...announcements];
-                setSuccessMessage("تم نشر الإعلان بنجاح");
+                alert(`❌ ${data.message || 'حدث خطأ'}`);
             }
-
-            localStorage.setItem('announcements', JSON.stringify(updatedAnnouncements));
-            setAnnouncements(updatedAnnouncements);
-
-            closeForm();
-            setPage(0);
-            setTimeout(() => setSuccessMessage(null), 3000);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "حدث خطأ");
+        } catch (error) {
+            console.error('Error submitting:', error);
+            alert('❌ حدث خطأ في الاتصال');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleDelete = (id: number) => {
-        if (window.confirm('هل أنت متأكد من حذف هذا الإعلان؟')) {
-            const updatedAnnouncements = announcements.filter(a => a.id !== id);
-            localStorage.setItem('announcements', JSON.stringify(updatedAnnouncements));
-            setAnnouncements(updatedAnnouncements);
-            setSuccessMessage("تم حذف الإعلان بنجاح");
-            setPage(0);
-            setTimeout(() => setSuccessMessage(null), 3000);
+    const handleDelete = async (id: string) => {
+        if (!window.confirm('⚠️ هل أنت متأكد من حذف هذا الإعلان؟')) return;
+
+        try {
+            const res = await fetch(`${API_URL}/announcements/${id}`, {
+                method: 'DELETE'
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                fetchAnnouncements();
+                alert('✅ تم حذف الإعلان');
+            } else {
+                alert(`❌ ${data.message || 'حدث خطأ'}`);
+            }
+        } catch (error) {
+            console.error('Error deleting:', error);
+            alert('❌ حدث خطأ في الاتصال');
         }
     };
 
-    const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
-        setPage(0);
+    const handleEdit = (item: Announcement) => {
+        setTitle(item.title);
+        setContent(item.content);
+        setEditingId(item._id);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const isGpaValid = gpaSettings.max > gpaSettings.min;
+    const handleCancel = () => {
+        setTitle('');
+        setContent('');
+        setEditingId(null);
+    };
 
-    const filteredAnnouncements = announcements.filter(a =>
-        a.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        a.content.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = announcements.filter(a =>
+        a.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        a.content?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const startIndex = page * ANNOUNCEMENTS_PER_PAGE;
-    const endIndex = startIndex + ANNOUNCEMENTS_PER_PAGE;
-    const slice = filteredAnnouncements.slice(startIndex, endIndex);
-    const totalPages = Math.ceil(filteredAnnouncements.length / ANNOUNCEMENTS_PER_PAGE);
-    const currentPageInfo = `${page + 1}/${totalPages || 1}`;
-
-    const hasNextPage = page < totalPages - 1;
-    const hasPrevPage = page > 0;
+    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    const start = (page - 1) * itemsPerPage;
+    const current = filtered.slice(start, start + itemsPerPage);
 
     return (
-        <div className="dashboard-container">
-            <h2>لوحة تحكم الإعلانات والإعدادات</h2>
+        <div dir="rtl" style={{
+            padding: '20px',
+            fontFamily: 'Arial',
+            maxWidth: '1200px',
+            margin: '0 auto'
+        }}>
+            <h2 style={{ color: '#333', marginBottom: '30px' }}>لوحة تحكم الإعلانات</h2>
 
-            {successMessage && (
-                <div style={{
-                    backgroundColor: '#d4edda',
-                    color: '#155724',
-                    padding: '12px',
-                    borderRadius: '4px',
-                    marginBottom: '15px',
-                    border: '1px solid #c3e6cb',
-                    fontWeight: 'bold'
-                }}>
-                    ✅ {successMessage}
-                </div>
-            )}
-
-            <div style={{ display: "flex", gap: "15px", flexWrap: "wrap", marginBottom: "20px" }}>
-                <button className="add-btn" onClick={openAdd}>
-                    إنشاء إعلان جديد
-                </button>
-                <button className="panel-btn" onClick={() => window.location.href = '/announcements'}>
-                    عرض صفحة الإعلانات
-                </button>
-            </div>
-
-            {showForm && (
-                <form className="form" onSubmit={handleSubmit}>
-                    <h3>{editingId ? 'تعديل الإعلان' : 'إنشاء إعلان جديد'}</h3>
-                    {error && <p style={{ color: "var(--error, #dc2626)" }}>{error}</p>}
-
-                    <input
-                        name="title"
-                        placeholder="عنوان الإعلان"
-                        value={form.title}
-                        onChange={handleChange}
-                        required
-                    />
-
-                    <textarea
-                        name="content"
-                        placeholder="محتوى الإعلان"
-                        value={form.content}
-                        onChange={handleChange}
-                        rows={5}
-                        required
-                        style={{ width: '100%', padding: '8px', marginBottom: '10px' }}
-                    />
-
-                    <div style={{ display: "flex", gap: 8 }}>
-                        <button type="submit" className="submit-btn" disabled={loading || !isGpaValid}>
-                            {loading ? "جاري المعالجة..." : (editingId ? "تحديث الإعلان" : "نشر الإعلان")}
-                        </button>
-                        <button type="button" onClick={closeForm} className="copy-btn">
-                            إلغاء
-                        </button>
-                    </div>
-
-                    {!isGpaValid && (
-                        <p style={{ color: 'red', fontSize: '0.9em', marginTop: '5px' }}>
-                            ⚠️ قم بإصلاح إعدادات المعدل التراكمي قبل النشر
-                        </p>
-                    )}
-                </form>
-            )}
-
-            <div className="form" style={{ marginTop: '20px', padding: '15px' }}>
-                <h3>إعدادات المعدل التراكمي (من 0 إلى 5)</h3>
+            {/* Settings Section */}
+            <div style={{
+                background: '#f8f9fa',
+                padding: '20px',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                border: '1px solid #dee2e6'
+            }}>
+                <h3 style={{ marginTop: 0, marginBottom: '15px' }}>إعدادات المعدل التراكمي والمستوى</h3>
 
                 {gpaError && (
-                    <p style={{ color: 'red', fontWeight: 'bold', backgroundColor: '#ffeeee', padding: '10px', borderRadius: '4px' }}>
-                        ⚠️ {gpaError}
-                    </p>
+                    <div style={{
+                        color: '#dc3545',
+                        background: '#f8d7da',
+                        padding: '10px',
+                        borderRadius: '4px',
+                        marginBottom: '15px'
+                    }}>
+                        {gpaError}
+                    </div>
                 )}
 
-                <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                    <div>
-                        <label>الحد الأدنى للمعدل (0 - 5)</label>
-                        <input
-                            type="number"
-                            min="0"
-                            max="5"
-                            step="0.1"
-                            value={gpaSettings.min}
-                            onChange={(e) => handleGpaChange(e, 'min')}
-                            style={{
-                                borderColor: gpaError ? 'red' : undefined,
-                                width: '100px'
-                            }}
-                        />
+                <form onSubmit={handleSettingsSubmit}>
+                    <div style={{
+                        display: 'flex',
+                        gap: '20px',
+                        flexWrap: 'wrap',
+                        marginBottom: '15px'
+                    }}>
+                        <div style={{ flex: 1, minWidth: '200px' }}>
+                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                                الحد الأدنى للمعدل (0-5)
+                            </label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                min="0"
+                                max="5"
+                                value={gpaMin}
+                                onChange={(e) => setGpaMin(parseFloat(e.target.value))}
+                                required
+                                style={{
+                                    width: '100%',
+                                    padding: '8px',
+                                    border: '1px solid #ced4da',
+                                    borderRadius: '4px'
+                                }}
+                            />
+                        </div>
+                        <div style={{ flex: 1, minWidth: '200px' }}>
+                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                                الحد الأقصى للمعدل (0-5)
+                            </label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                min="0"
+                                max="5"
+                                value={gpaMax}
+                                onChange={(e) => setGpaMax(parseFloat(e.target.value))}
+                                required
+                                style={{
+                                    width: '100%',
+                                    padding: '8px',
+                                    border: '1px solid #ced4da',
+                                    borderRadius: '4px'
+                                }}
+                            />
+                        </div>
+                        <div style={{ flex: 1, minWidth: '200px' }}>
+                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                                المستوى
+                            </label>
+                            <select
+                                value={level}
+                                onChange={(e) => setLevel(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '8px',
+                                    border: '1px solid #ced4da',
+                                    borderRadius: '4px',
+                                    background: 'white'
+                                }}
+                            >
+                                <option value="1">المستوى الأول</option>
+                                <option value="2">المستوى الثاني</option>
+                                <option value="3">المستوى الثالث</option>
+                                <option value="4">المستوى الرابع</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label>الحد الأقصى للمعدل (0 - 5)</label>
-                        <input
-                            type="number"
-                            min="0"
-                            max="5"
-                            step="0.1"
-                            value={gpaSettings.max}
-                            onChange={(e) => handleGpaChange(e, 'max')}
-                            style={{
-                                borderColor: gpaError ? 'red' : undefined,
-                                width: '100px'
-                            }}
-                        />
-                    </div>
-                </div>
+                    <button
+                        type="submit"
+                        disabled={settingsLoading || gpaError !== ''}
+                        style={{
+                            background: settingsLoading || gpaError ? '#6c757d' : '#28a745',
+                            color: 'white',
+                            border: 'none',
+                            padding: '10px 20px',
+                            borderRadius: '4px',
+                            cursor: settingsLoading || gpaError ? 'not-allowed' : 'pointer',
+                            fontSize: '16px',
+                            opacity: settingsLoading || gpaError ? 0.5 : 1
+                        }}
+                    >
+                        {settingsLoading ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
+                    </button>
+                </form>
+            </div>
 
-                <div style={{ marginTop: '10px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '4px' }}>
-                    <strong>الإعدادات الحالية:</strong> الأدنى = {gpaSettings.min}, الأقصى = {gpaSettings.max}
-                    {isGpaValid ? (
-                        <span style={{ color: 'green', marginLeft: '10px' }}>✅ صحيح</span>
-                    ) : (
-                        <span style={{ color: 'red', marginLeft: '10px' }}>❌ خطأ (الأقصى يجب أن يكون أكبر من الأدنى)</span>
+            {/* Add/Edit Form */}
+            <div style={{
+                background: '#f8f9fa',
+                padding: '20px',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                border: '1px solid #dee2e6'
+            }}>
+                <h3 style={{ marginTop: 0, marginBottom: '15px' }}>
+                    {editingId ? 'تعديل إعلان' : 'إعلان جديد'}
+                </h3>
+                <form onSubmit={handleSubmit}>
+                    <input
+                        type="text"
+                        placeholder="العنوان"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        required
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            marginBottom: '10px',
+                            border: '1px solid #ced4da',
+                            borderRadius: '4px',
+                            fontSize: '16px'
+                        }}
+                    />
+                    <textarea
+                        placeholder="المحتوى"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        required
+                        rows={4}
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            marginBottom: '10px',
+                            border: '1px solid #ced4da',
+                            borderRadius: '4px',
+                            fontSize: '16px',
+                            resize: 'vertical'
+                        }}
+                    />
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            style={{
+                                background: loading ? '#6c757d' : (editingId ? '#ffc107' : '#007bff'),
+                                color: loading ? 'white' : (editingId ? '#000' : 'white'),
+                                border: 'none',
+                                padding: '10px 20px',
+                                borderRadius: '4px',
+                                cursor: loading ? 'not-allowed' : 'pointer',
+                                fontSize: '16px',
+                                opacity: loading ? 0.5 : 1
+                            }}
+                        >
+                            {loading ? 'جاري...' : (editingId ? 'تحديث الإعلان' : 'نشر الإعلان')}
+                        </button>
+                        {editingId && (
+                            <button
+                                type="button"
+                                onClick={handleCancel}
+                                style={{
+                                    background: '#6c757d',
+                                    color: 'white',
+                                    border: 'none',
+                                    padding: '10px 20px',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '16px'
+                                }}
+                            >
+                                إلغاء
+                            </button>
+                        )}
+                    </div>
+                </form>
+            </div>
+
+            {/* Search */}
+            <input
+                type="text"
+                placeholder="🔍 بحث بالعنوان أو المحتوى..."
+                value={searchTerm}
+                onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setPage(1);
+                }}
+                style={{
+                    width: '100%',
+                    padding: '10px',
+                    marginBottom: '20px',
+                    border: '1px solid #ced4da',
+                    borderRadius: '4px',
+                    fontSize: '16px'
+                }}
+            />
+
+            {/* Table */}
+            <div style={{
+                background: 'white',
+                borderRadius: '8px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                overflow: 'hidden'
+            }}>
+                <div style={{
+                    padding: '15px 20px',
+                    background: '#f8f9fa',
+                    borderBottom: '1px solid #dee2e6',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <h3 style={{ margin: 0 }}>قائمة الإعلانات ({filtered.length})</h3>
+                    {filtered.length > 0 && (
+                        <span style={{
+                            background: '#e9ecef',
+                            padding: '5px 10px',
+                            borderRadius: '4px'
+                        }}>
+                            صفحة {page} من {totalPages}
+                        </span>
                     )}
                 </div>
-            </div>
-
-            <div className="form" style={{ marginTop: '20px', padding: '15px' }}>
-                <h3>إعدادات المستوى</h3>
-                <select value={selectedLevel} onChange={handleLevelChange} style={{ padding: '8px', width: '200px' }}>
-                    <option value="">اختر المستوى</option>
-                    <option value="1">المستوى الأول</option>
-                    <option value="2">المستوى الثاني</option>
-                    <option value="3">المستوى الثالث</option>
-                    <option value="4">المستوى الرابع</option>
-                </select>
-            </div>
-
-            <div style={{ marginTop: '30px', marginBottom: '20px' }}>
-                <input
-                    type="text"
-                    placeholder="🔍 بحث بالعنوان أو المحتوى..."
-                    value={searchTerm}
-                    onChange={handleSearch}
-                    style={{
-                        width: '100%',
-                        padding: '10px',
-                        fontSize: '16px',
-                        border: '1px solid #ddd',
-                        borderRadius: '4px'
-                    }}
-                />
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <h3>إدارة الإعلانات ({filteredAnnouncements.length} إجمالي)</h3>
-                {filteredAnnouncements.length > 0 && (
-                    <span style={{
-                        backgroundColor: '#e0e0e0',
-                        padding: '5px 10px',
-                        borderRadius: '4px',
-                        fontWeight: 'bold'
-                    }}>
-                        {currentPageInfo}
-                    </span>
-                )}
-            </div>
-
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                <tr style={{ backgroundColor: '#f5f5f5' }}>
-                    <th style={{ padding: '10px', textAlign: 'right' }}>العنوان</th>
-                    <th style={{ padding: '10px', textAlign: 'right' }}>المحتوى</th>
-                    <th style={{ padding: '10px', textAlign: 'right' }}>الناشر</th>
-                    <th style={{ padding: '10px', textAlign: 'right' }}>التاريخ</th>
-                    <th style={{ padding: '10px', textAlign: 'right' }}>الإجراءات</th>
-                </tr>
-                </thead>
-                <tbody>
-                {slice.map((announcement) => (
-                    <tr key={announcement.id} style={{ borderBottom: '1px solid #ddd' }}>
-                        <td style={{ padding: '10px' }}>{announcement.title}</td>
-                        <td style={{ padding: '10px' }}>{announcement.content.substring(0, 50)}...</td>
-                        <td style={{ padding: '10px' }}>{announcement.author}</td>
-                        <td style={{ padding: '10px' }}>{new Date(announcement.createdAt).toLocaleDateString('ar-EG')}</td>
-                        <td style={{ padding: '10px' }}>
-                            <div style={{ display: 'flex', gap: '8px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                    <tr style={{ background: '#f8f9fa' }}>
+                        <th style={{ padding: '12px', textAlign: 'right' }}>العنوان</th>
+                        <th style={{ padding: '12px', textAlign: 'right' }}>المحتوى</th>
+                        <th style={{ padding: '12px', textAlign: 'right' }}>الناشر</th>
+                        <th style={{ padding: '12px', textAlign: 'right' }}>التاريخ</th>
+                        <th style={{ padding: '12px', textAlign: 'right' }}>الإجراءات</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {current.map(item => (
+                        <tr key={item._id} style={{ borderBottom: '1px solid #e9ecef' }}>
+                            <td style={{ padding: '12px' }}>{item.title}</td>
+                            <td style={{ padding: '12px' }}>{item.content.substring(0, 30)}...</td>
+                            <td style={{ padding: '12px' }}>{item.author}</td>
+                            <td style={{ padding: '12px' }}>{new Date(item.createdAt).toLocaleDateString('ar-EG')}</td>
+                            <td style={{ padding: '12px' }}>
                                 <button
-                                    onClick={() => openEdit(announcement)}
+                                    onClick={() => handleEdit(item)}
                                     style={{
-                                        backgroundColor: '#FFC107',
+                                        background: '#ffc107',
                                         color: '#000',
                                         border: 'none',
-                                        padding: '5px 10px',
+                                        padding: '6px 12px',
                                         borderRadius: '4px',
+                                        marginLeft: '8px',
                                         cursor: 'pointer',
-                                        fontWeight: 'bold'
+                                        fontSize: '14px'
                                     }}
                                 >
                                     تعديل
                                 </button>
                                 <button
+                                    onClick={() => handleDelete(item._id)}
                                     style={{
-                                        backgroundColor: '#DC3545',
-                                        color: '#fff',
+                                        background: '#dc3545',
+                                        color: 'white',
                                         border: 'none',
-                                        padding: '5px 10px',
+                                        padding: '6px 12px',
                                         borderRadius: '4px',
                                         cursor: 'pointer',
-                                        fontWeight: 'bold'
+                                        fontSize: '14px'
                                     }}
-                                    onClick={() => handleDelete(announcement.id)}
                                 >
                                     حذف
                                 </button>
-                            </div>
-                        </td>
-                    </tr>
-                ))}
-                {slice.length === 0 && (
-                    <tr>
-                        <td colSpan={5} style={{ padding: '20px', textAlign: 'center' }}>
-                            لا توجد إعلانات
-                        </td>
-                    </tr>
-                )}
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                    ))}
+                    {current.length === 0 && (
+                        <tr>
+                            <td colSpan={5} style={{ padding: '40px', textAlign: 'center', color: '#999' }}>
+                                لا توجد إعلانات
+                            </td>
+                        </tr>
+                    )}
+                    </tbody>
+                </table>
+            </div>
 
-            {filteredAnnouncements.length > ANNOUNCEMENTS_PER_PAGE && (
+            {/* Pagination */}
+            {filtered.length > itemsPerPage && (
                 <div style={{
                     display: 'flex',
                     justifyContent: 'center',
-                    alignItems: 'center',
-                    gap: '20px',
-                    marginTop: '20px',
-                    padding: '10px'
+                    gap: '15px',
+                    marginTop: '20px'
                 }}>
                     <button
-                        onClick={() => setPage(prev => Math.max(0, prev - 1))}
-                        disabled={!hasPrevPage}
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        disabled={page === 1}
                         style={{
                             padding: '8px 16px',
-                            backgroundColor: hasPrevPage ? '#007bff' : '#ccc',
-                            color: 'white',
                             border: 'none',
                             borderRadius: '4px',
-                            cursor: hasPrevPage ? 'pointer' : 'not-allowed'
+                            cursor: page === 1 ? 'not-allowed' : 'pointer',
+                            background: page === 1 ? '#ccc' : '#007bff',
+                            color: 'white',
+                            fontSize: '14px'
                         }}
                     >
                         → السابق
                     </button>
-
-                    <span style={{ fontWeight: 'bold' }}>
-                        صفحة {page + 1} من {totalPages}
-                    </span>
-
+                    <span style={{ fontWeight: 'bold' }}>{page} / {totalPages}</span>
                     <button
-                        onClick={() => setPage(prev => Math.min(totalPages - 1, prev + 1))}
-                        disabled={!hasNextPage}
+                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                        disabled={page === totalPages}
                         style={{
                             padding: '8px 16px',
-                            backgroundColor: hasNextPage ? '#007bff' : '#ccc',
-                            color: 'white',
                             border: 'none',
                             borderRadius: '4px',
-                            cursor: hasNextPage ? 'pointer' : 'not-allowed'
+                            cursor: page === totalPages ? 'not-allowed' : 'pointer',
+                            background: page === totalPages ? '#ccc' : '#007bff',
+                            color: 'white',
+                            fontSize: '14px'
                         }}
                     >
                         التالي ←
