@@ -125,14 +125,74 @@ export async function getAllStudents() {
     return data;
 }
 
+export async function createStudent(form: Record<string, unknown>) {
+    const { res, data } = await apiPost('/students', form);
+    if (!res.ok) throw Object.assign(new Error((data as any).error || 'Failed to create student'), { status: res.status });
+    return data;
+}
+
+export async function deleteStudent(id: string) {
+    const { res, data } = await apiDelete(`/students/${id}`);
+    if (!res.ok) throw new Error((data as any).error || 'Failed to delete student');
+    return data;
+}
+
 export async function getAllStaff() {
     const { res, data } = await apiGet('/staff');
     if (!res.ok) throw new Error((data as { error?: string }).error || 'Failed to fetch staff');
     return data;
 }
 
+export async function createStaff(form: Record<string, unknown>) {
+    const { res, data } = await apiPost('/staff', form);
+    if (!res.ok) throw Object.assign(new Error((data as any).error || 'Failed to create staff'), { status: res.status });
+    return data;
+}
+
+export async function deleteStaff(id: string) {
+    const { res, data } = await apiDelete(`/staff/${id}`);
+    if (!res.ok) throw new Error((data as any).error || 'Failed to delete staff');
+    return data;
+}
+
 export async function getAllSubjects() {
     const { res, data } = await apiGet('/subjects');
     if (!res.ok) throw new Error((data as { error?: string }).error || 'Failed to fetch subjects');
+    return data;
+}
+
+export async function createSubject(form: Record<string, unknown>) {
+    const { res, data } = await apiPost('/subjects', form);
+    if (!res.ok) throw new Error((data as any).error || 'Failed to create subject');
+    return data;
+}
+
+export async function updateSubject(id: string, form: Record<string, unknown>) {
+    const { res, data } = await apiPut(`/subjects/${id}`, form);
+    if (!res.ok) throw new Error((data as any).error || 'Failed to update subject');
+    return data;
+}
+
+export async function deleteSubject(id: string) {
+    const { res, data } = await apiDelete(`/subjects/${id}`);
+    if (!res.ok) throw new Error((data as any).error || 'Failed to delete subject');
+    return data;
+}
+
+export async function getAllGroups() {
+    const { res, data } = await apiGet('/groups');
+    if (!res.ok) throw new Error((data as any).error || 'Failed to fetch groups');
+    return data;
+}
+
+export async function createGroup(form: Record<string, unknown>) {
+    const { res, data } = await apiPost('/groups', form);
+    if (!res.ok) throw new Error((data as any).error || 'Failed to create group');
+    return data;
+}
+
+export async function deleteGroup(id: string) {
+    const { res, data } = await apiDelete(`/groups/${id}`);
+    if (!res.ok) throw new Error((data as any).error || 'Failed to delete group');
     return data;
 }
