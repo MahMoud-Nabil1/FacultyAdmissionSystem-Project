@@ -57,19 +57,23 @@ const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
     }, [search]);
 
     return (
-        <div>
+        <div className="dashboard-container">
+            <h2>جدول المقررات</h2>
+
             {/* ===== Search Bar ===== */}
-            <div style={{ marginBottom: 15 }}>
+            <div style={{ display: "flex", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
                 <input
                     type="text"
-                    placeholder="ابحث باسم المقرر..."
+                    placeholder="ابحث باسم المقرر أو الرمز..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    style={{ width: "100%", padding: "8px 10px" }}
+                    /* 2. Style matches the other tables' search bars */
+                    style={{ padding: "8px", flex: "1 1 200px" }}
                 />
             </div>
 
-            <table>
+            {/* 3. Added the staff-table class to fix the alignment and width */}
+            <table className="staff-table">
                 <thead>
                 <tr>
                     <th>رمز المقرر</th>
@@ -93,10 +97,10 @@ const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
                                 )
                                 .join(", ") || "—"}
                         </td>
-                        <td style={{ display: "flex", gap: 4 }}>
+                        <td>
+                            {/* 4. Using the delete-btn class we styled in CSS */}
                             <button
-                                className="copy-btn"
-                                style={{ color: "var(--error, #dc2626)" }}
+                                className="delete-btn"
                                 onClick={() => handleDelete(s._id)}
                             >
                                 حذف

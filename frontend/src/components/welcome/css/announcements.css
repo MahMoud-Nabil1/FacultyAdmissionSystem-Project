@@ -1,78 +1,134 @@
+/* Announcements Header */
 .announcements-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
+    padding: 15px 0;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border-color);
 }
 
 .announcements-logo {
-    height: 50px;
+    height: 60px;
+    object-fit: contain;
 }
 
-.announcement-form {
-    border: 1px solid var(--border-color, #ccc);
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: var(--border-radius, 8px);
-    background: var(--bg-white, #fff);
+/* Unified Form Container (Used for both Announcement & Settings) */
+.announcement-form,
+.gpa-range-section,
+.level-section {
+    background: var(--white);
+    padding: 25px;
+    margin: 20px 0;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
 }
 
-.announcement-input {
+.announcement-form:hover,
+.gpa-range-section:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-blue);
+}
+
+/* Inputs & Textareas */
+.announcement-input,
+.announcement-textarea,
+.level-select,
+.gpa-input {
     width: 100%;
-    margin-bottom: 10px;
-    padding: 10px;
-    border: 1px solid var(--border-color, #ccc);
-    border-radius: var(--border-radius, 8px);
+    margin-bottom: 15px;
+    padding: 12px 15px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    font-family: 'Alexandria', sans-serif;
+    background-color: #f8fafc;
+    color: var(--text-dark);
+    transition: all 0.2s ease;
+}
+
+.announcement-input:focus,
+.announcement-textarea:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    background-color: var(--white);
+    box-shadow: 0 0 0 3px rgba(0, 74, 153, 0.1);
 }
 
 .announcement-textarea {
-    width: 100%;
-    margin-bottom: 10px;
-    padding: 10px;
-    border: 1px solid var(--border-color, #ccc);
-    border-radius: var(--border-radius, 8px);
-    font-family: inherit;
+    min-height: 120px;
+    resize: vertical;
 }
 
-.gpa-range-section {
-    margin: 20px 0;
-    padding: 15px;
-    border: 1px solid var(--border-color, #eee);
-    border-radius: var(--border-radius, 8px);
-    background: var(--bg-white, #fff);
-}
-
+/* GPA Settings Row */
 .gpa-row {
-    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+    padding: 10px;
+    background: #edf2f7;
+    border-radius: 8px;
 }
 
 .gpa-input {
-    width: 60px;
-    margin: 0 10px;
-    padding: 5px;
-    border: 1px solid var(--border-color, #ccc);
-    border-radius: 4px;
+    width: 80px; /* Slightly wider for better touch/click targets */
+    margin: 0;
+    text-align: center;
+    font-weight: 600;
 }
 
-.level-section {
-    margin: 20px 0;
-    padding: 15px;
-    border: 1px solid var(--border-color, #eee);
-    border-radius: var(--border-radius, 8px);
-    background: var(--bg-white, #fff);
-}
-
+/* Level Section dropdown fix */
 .level-select {
-    padding: 8px;
-    width: 200px;
-    border: 1px solid var(--border-color, #ccc);
-    border-radius: 4px;
+    width: auto;
+    min-width: 250px;
+    cursor: pointer;
 }
 
+/* Buttons */
 .sign-btn {
-    margin-left: 10px;
+    background-color: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-right: 10px; /* Adjusted for RTL */
+    transition: var(--transition);
 }
 
+.sign-btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+/* Announcements List (Feed) */
 .announcements-list {
-    margin-top: 30px;
+    margin-top: 40px;
+    display: grid;
+    gap: 20px;
+}
+
+/* Individual Announcement Item (The Card) */
+.announcement-item {
+    background: var(--white);
+    padding: 20px;
+    border-radius: var(--radius);
+    border-right: 6px solid var(--primary-blue); /* Visual indicator for RTL */
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    border-left: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.announcement-item h3 {
+    margin: 0 0 10px 0;
+    color: var(--primary-blue);
+    font-size: 1.3rem;
+}
+
+.announcement-item p {
+    color: var(--text-muted);
+    line-height: 1.6;
 }

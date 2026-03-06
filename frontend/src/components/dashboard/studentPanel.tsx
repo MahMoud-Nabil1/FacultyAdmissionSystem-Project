@@ -92,7 +92,7 @@ const StudentPanel: React.FC = () => {
 
             {/* Navigate to students table */}
             <button
-                className="view-table-btn"
+                className="panel-btn"
                 onClick={() => navigate("/admin-dashboard/table?type=students")}
             >
                 عرض جميع الطلاب
