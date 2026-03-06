@@ -98,9 +98,14 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+                <Route path="/register-subjects" element={
+                    <ProtectedRoute>
+                        put register new subjects component here
+                    </ProtectedRoute>
+                }
+                />
 
-                {}
-                <Route path="*" element={<Navigate to="/announcements" replace />} />
+                <Route path="*" element={<Navigate to="/announcements" replace />}/>
             </Routes>
         </div>
     );

@@ -1,53 +1,159 @@
+/* Import a professional Arabic/Latin font combo */
+@import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;600&display=swap');
+
+:root {
+    --primary-blue: #004a99;      /* Classic Academic Blue */
+    --accent-blue: #eef6ff;       /* Very light blue for backgrounds */
+    --text-dark: #1a1a1a;         /* Near black for headers */
+    --text-muted: #4a5568;        /* Soft gray for body text */
+    --border-color: #e2e8f0;      /* Thin, subtle borders */
+    --white: #ffffff;
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Container & Typography */
 .home-container {
-    max-width: 700px;
-    margin: 40px auto;
-    padding: 30px;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    font-family: 'Alexandria', 'Segoe UI', sans-serif;
     text-align: right;
-    font-family: "Tajawal", "Cairo", sans-serif;
+    direction: rtl;
+    background-color: #fafbfc;
+    min-height: 100vh;
 }
 
 .home-title {
-    margin-bottom: 20px;
-    font-size: 28px;
+    font-size: 2.2rem; /* Scaled down for elegance */
+    font-weight: 600;
+    margin-bottom: 3rem;
+    text-align: center;
+    color: var(--primary-blue);
+    position: relative;
+    padding-bottom: 15px;
 }
 
+/* Elegant underline for the title */
+.home-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: var(--primary-blue);
+    border-radius: 2px;
+}
+
+/* Info Card - Minimalist & Clean */
 .info-card {
-    background: #f7f7f7;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 25px;
-    line-height: 1.9;
-    font-size: 16px;
+    width: 100%;
+    background-color: var(--white);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2.5rem;
+    font-size: 1.15rem; /* Perfect balance for Arabic readability */
+    line-height: 1.8;
+    transition: var(--transition);
 }
 
-.buttons {
+.info-card:hover {
+    border-color: var(--primary-blue);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+}
+
+.info-card p {
+    margin: 10px 0;
+    color: var(--text-muted);
+}
+
+/* Buttons Section */
+.buttons-vertical {
     display: flex;
+    flex-direction: column;
     gap: 15px;
-    justify-content: flex-start;
+    max-width: 350px;
+    margin: 0 auto;
 }
 
 .btn {
-    padding: 10px 18px;
-    border: none;
-    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--white);
+    color: var(--primary-blue);
+    border: 2px solid var(--primary-blue);
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
     cursor: pointer;
-    font-size: 15px;
-    background: #1976d2;
-    color: white;
-    transition: background 0.2s ease;
+    transition: var(--transition);
+}
+
+/* Primary Action - Subject Registration */
+.btn.register {
+    background-color: var(--primary-blue);
+    color: var(--white);
+    border: 2px solid var(--primary-blue);
 }
 
 .btn:hover {
-    background: #145ea8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 74, 153, 0.15);
 }
 
-.btn.admin {
-    background: #2e7d32;
+.btn.register:hover {
+    background-color: #003d80;
 }
 
-.btn.admin:hover {
-    background: #1f5c24;
+/* Admin & Reset Buttons - Subtle treatment */
+.btn.admin, .btn.reset {
+    background-color: var(--accent-blue);
+    border-color: transparent;
+    color: var(--primary-blue);
+}
+
+.btn.admin:hover, .btn.reset:hover {
+    background-color: #dbeafe;
+}
+
+/* Reset Panel / Form Inputs */
+.reset-panel {
+    background-color: var(--white);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    max-width: 350px;
+    margin: 2rem auto;
+}
+
+.reset-panel input {
+    width: 100%;
+    padding: 12px 16px;
+    margin: 8px 0 16px 0;
+    border-radius: 8px;
+    border: 1.5px solid var(--border-color);
+    font-size: 1rem;
+    background-color: #f8fafc;
+    transition: var(--transition);
+}
+
+.reset-panel input:focus {
+    border-color: var(--primary-blue);
+    background-color: var(--white);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+}
+
+/* Loading State */
+.loading {
+    font-size: 1.2rem;
+    font-weight: 400;
+    text-align: center;
+    margin-top: 5rem;
+    color: var(--text-muted);
 }
