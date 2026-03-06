@@ -268,3 +268,35 @@ exports.getMe = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+exports.changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const userId = req.user.id;
+        const role = req.user.role;
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ error: "الرجاء إدخال كلمة المرور الحالية والجديدة" });
+        }
+
+        let user;
+        if (role === "student") {
+            user = await Student.findOne({ studentId: userId }).select("+hash +salt");
+        } else {
+            user = await Staff.findOne({ _id: userId }).select("+hash +salt");
+        }
+
+        if (!user) return res.status(404).json({ error: "المستخدم غير موجود" });
+
+        const ok = await user.verifyPassword(currentPassword);
+        if (!ok) return res.status(401).json({ error: "كلمة المرور الحالية غير صحيحة" });
+
+        user.password = newPassword;
+        await user.save();
+
+        res.json({ message: "تم تحديث كلمة المرور بنجاح" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "حدث خطأ أثناء تغيير كلمة المرور" });
+    }
+};
