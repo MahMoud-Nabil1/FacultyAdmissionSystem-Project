@@ -13,6 +13,7 @@ import {
 import { router } from 'expo-router';
 import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '../../context/AuthContext';
+import { API_BASE } from '../../services/api';
 
 interface LoginPayload {
     id: string;
@@ -37,7 +38,7 @@ export default function Login() {
         setLoading(true);
         try {
             const res = await fetch(
-                `${process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://10.0.2.2:5000/api'}/auth/login`,
+                `${API_BASE}/auth/login`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
