@@ -1,12 +1,12 @@
 import * as SecureStore from 'expo-secure-store';
 import { jwtDecode } from 'jwt-decode';
 import Constants from 'expo-constants';
-
+import { Platform } from 'react-native';
 
 const API_BASE: string =
     (Constants.expoConfig?.extra?.apiBaseUrl as string) ||
     process.env.EXPO_PUBLIC_API_BASE_URL ||
-    'http://10.0.2.2:5000/api';
+    (Platform.OS === 'web' ? 'http://localhost:5000/api' : 'http://10.0.2.2:5000/api');
 
 export { API_BASE };
 async function fetchWithTimeout(url: string, options: RequestInit, ms = 10000): Promise<Response> {
