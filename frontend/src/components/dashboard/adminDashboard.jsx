@@ -4,7 +4,9 @@ import StaffPanel from "./staffPanel.tsx";
 import SubjectPanel from "./SubjectPanel";
 import AnnouncementsPanel from "./createAnnouncementsPanel.tsx";
 import SettingsPanel from "./settingsPanel.tsx";
+import GroupPanel from "./groupPanel.tsx";
 import "./css/adminDashboard.css";
+
 
 const AdminDashboard = () => {
     const [userName, setUserName] = useState("");
@@ -46,6 +48,7 @@ const AdminDashboard = () => {
                 <div className="dashboard-column">
                     <StudentPanel />
                     <SettingsPanel />
+                    <GroupPanel />
                 </div>
             </div>
         </div>
