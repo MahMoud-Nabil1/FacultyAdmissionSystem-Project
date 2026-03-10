@@ -55,7 +55,7 @@ export default function Login() {
 
             const payload = jwtDecode(data.token) as LoginPayload;
             if (payload.role) {
-                router.replace('/(tabs)/dashboard');
+                router.replace('/(tabs)/home');
             } else {
                 router.replace('/');
             }

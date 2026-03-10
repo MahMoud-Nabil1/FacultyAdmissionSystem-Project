@@ -13,7 +13,7 @@ export default function Index() {
         if (!isAuthenticated) {
             router.replace('/(auth)/login');
         } else if (user?.role) {
-            router.replace('/(tabs)/dashboard');
+            router.replace('/(tabs)/home');
         }
     }, [loading, isAuthenticated, user]);
 }
