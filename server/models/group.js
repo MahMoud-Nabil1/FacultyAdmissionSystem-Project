@@ -6,9 +6,14 @@ const groupSchema = new Schema({
         type: Number,
         required: true,
     },
+    subject: {              // Course code (e.g., "math110", "cs101", "phys201")
+        type: String,
+        required: true,
+    },
     type: {
         type: String,
         required: true,
+        enum: ['lecture', 'lab', 'tutorial', 'seminar']
     },
     from: {
         type: Number,
@@ -21,6 +26,7 @@ const groupSchema = new Schema({
     day: {
         type: String,
         required: true,
+        enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
     },
     students: [
         {
@@ -31,7 +37,10 @@ const groupSchema = new Schema({
     capacity: {
         type: Number,
         required: true,
+        min: 1
     }
+}, {
+    timestamps: true
 });
 
 const Group = mongoose.model('Group', groupSchema);
