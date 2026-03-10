@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
 import {
-    StyleSheet,
-    View,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    ScrollView,
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
+    StyleSheet, View, Text, TextInput, TouchableOpacity,
+    ScrollView, ActivityIndicator, Alert, KeyboardAvoidingView, Platform
 } from 'react-native';
-
+import { useAuth } from '../../context/AuthContext';
 
 interface FormData {
     studentCode: string;
@@ -20,244 +12,98 @@ interface FormData {
     replyEmail: string;
 }
 
-interface Status {
-    type: 'success' | 'error' | '';
-    text: string;
-}
-
-interface Props {
-    target?: 'it' | 'admin';
-}
-
-
-const BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
-
-const Support: React.FC<Props> = ({ target = 'it' }) => {
+export default function SupportContact() {
+    const { user } = useAuth();
+    const [loading, setLoading] = useState(false);
+    const [selectedTarget, setSelectedTarget] = useState<'it' | 'admin'>('it');
     const [formData, setFormData] = useState<FormData>({
-        studentCode: '',
+        studentCode: user?.id || '',
         subjectName: '',
         message: '',
         replyEmail: '',
     });
 
-    const [status, setStatus] = useState<Status>({ type: '', text: '' });
-    const [loading, setLoading] = useState(false);
-    const [selectedTarget, setSelectedTarget] = useState<'it' | 'admin'>(target);
-
     const isIT = selectedTarget === 'it';
-
-    const handleChange = (name: keyof FormData, value: string) => {
-        setFormData((prev) => ({ ...prev, [name]: value }));
-        if (status.text) setStatus({ type: '', text: '' });
-    };
-
-    const validate = () => {
-        const { studentCode, subjectName, message, replyEmail } = formData;
-
-        if (!/^\d{7}$/.test(studentCode.trim()))
-            return 'يجب أن يتكون كود الطالب من 7 أرقام.';
-
-        if (!subjectName.trim()) {
-            return isIT ? 'يرجى إدخال موضوع المشكلة.' : 'الرجاء إدخال كود المقرر الدراسي.';
-        }
-
-        if (!message.trim()) return 'يرجى وصف مشكلتك بالتفصيل.';
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(replyEmail)) return 'يرجى إدخال بريد إلكتروني صحيح للرد.';
-
-        return null;
-    };
+    const API_BASE = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://10.0.2.2:5000/api';
 
     const handleSubmit = async () => {
-        const error = validate();
-        if (error) {
-            setStatus({ type: 'error', text: error });
-            Alert.alert('تنبيه', error);
-            return;
-        }
+        if (!formData.studentCode || !formData.message) return Alert.alert('خطأ', 'يرجى ملء البيانات الأساسية');
 
         setLoading(true);
-        setStatus({ type: '', text: '' });
-
-        const endpoint = isIT
-            ? `${BASE_URL}/api/students/contact-it`
-            : `${BASE_URL}/api/students/contact-admin`;
-
         try {
-            const response = await fetch(endpoint, {
+            const endpoint = `${API_BASE}/students/${isIT ? 'contact-it' : 'contact-admin'}`;
+            const res = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                const successMsg = isIT ? 'تم إرسال طلب الدعم الفني بنجاح.' : 'تم إرسال طلبك للإدارة بنجاح.';
-                setStatus({ type: 'success', text: successMsg });
-                Alert.alert('تم بنجاح', successMsg);
-                setFormData({ studentCode: '', subjectName: '', message: '', replyEmail: '' });
+            if (res.ok) {
+                Alert.alert('تم الإرسال', 'سيتواصل معك القسم المختص قريباً');
+                setFormData({ ...formData, subjectName: '', message: '' });
             } else {
-                setStatus({ type: 'error', text: data.error || 'حدث خطأ ما.' });
-                Alert.alert('خطأ', data.error || 'حدث خطأ ما.');
+                Alert.alert('خطأ', 'حدثت مشكلة أثناء الإرسال');
             }
-        } catch (error) {
-            setStatus({ type: 'error', text: 'فشل الاتصال بالسيرفر.' });
-            Alert.alert('خطأ', 'فشل الاتصال بالسيرفر. تأكد من تشغيل الـ Backend وعنوان الـ IP.');
+        } catch {
+            Alert.alert('خطأ', 'تعذر الاتصال بالسيرفر');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.container}
-        >
-            <ScrollView contentContainerStyle={styles.scrollContent}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
+            <ScrollView contentContainerStyle={styles.scroll}>
                 <View style={styles.card}>
+                    <Text style={styles.headerIcon}>{isIT ? '👨‍💻' : '🏛️'}</Text>
+                    <Text style={styles.title}>{isIT ? 'الدعم الفني' : 'شؤون الطلاب'}</Text>
 
-                    <View style={styles.header}>
-                        <Text style={styles.icon}>{isIT ? '💻' : '🛡️'}</Text>
-                        <Text style={styles.title}>{isIT ? 'الدعم الفني' : 'شؤون الطلاب والادارة'}</Text>
-                    </View>
-
-
-                    <View style={styles.toggleContainer}>
-                        <TouchableOpacity
-                            style={[styles.toggleBtn, isIT && styles.activeIT]}
-                            onPress={() => setSelectedTarget('it')}
-                        >
-                            <Text style={[styles.toggleText, isIT && styles.activeText]}>💻 IT</Text>
+                    <View style={styles.toggleRow}>
+                        <TouchableOpacity style={[styles.toggleBtn, isIT && styles.activeIt]} onPress={() => setSelectedTarget('it')}>
+                            <Text style={[styles.toggleText, isIT && styles.whiteText]}>IT Support</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.toggleBtn, !isIT && styles.activeAdmin]}
-                            onPress={() => setSelectedTarget('admin')}
-                        >
-                            <Text style={[styles.toggleText, !isIT && styles.activeText]}>🛡️ الإدارة</Text>
+                        <TouchableOpacity style={[styles.toggleBtn, !isIT && styles.activeAdmin]} onPress={() => setSelectedTarget('admin')}>
+                            <Text style={[styles.toggleText, !isIT && styles.whiteText]}>إدارة الكلية</Text>
                         </TouchableOpacity>
                     </View>
-
 
                     <View style={styles.form}>
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.label}>كود الطالب <Text style={styles.required}>*</Text></Text>
-                            <TextInput
-                                style={styles.input}
-                                value={formData.studentCode}
-                                onChangeText={(val) => handleChange('studentCode', val)}
-                                placeholder="7 أرقام"
-                                keyboardType="numeric"
-                                maxLength={7}
-                            />
-                        </View>
+                        <Text style={styles.label}>الكود الشخصي</Text>
+                        <TextInput style={styles.input} value={formData.studentCode} onChangeText={t => setFormData({...formData, studentCode: t})} textAlign="right" keyboardType="numeric" />
 
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.label}>
-                                {isIT ? 'موضوع المشكلة' : 'كود المقرر الدراسي'} <Text style={styles.required}>*</Text>
-                            </Text>
-                            <TextInput
-                                style={styles.input}
-                                value={formData.subjectName}
-                                onChangeText={(val) => handleChange('subjectName', val)}
-                                placeholder={isIT ? "الموضوع" : "مثال: CS306"}
-                            />
-                        </View>
+                        <Text style={styles.label}>{isIT ? 'الموضوع' : 'كود المقرر (إن وجد)'}</Text>
+                        <TextInput style={styles.input} value={formData.subjectName} onChangeText={t => setFormData({...formData, subjectName: t})} textAlign="right" />
 
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.label}>تفاصيل الرسالة <Text style={styles.required}>*</Text></Text>
-                            <TextInput
-                                style={[styles.input, styles.textArea]}
-                                value={formData.message}
-                                onChangeText={(val) => handleChange('message', val)}
-                                placeholder="اشرح لنا المشكلة..."
-                                multiline
-                                numberOfLines={4}
-                            />
-                        </View>
+                        <Text style={styles.label}>نص الرسالة</Text>
+                        <TextInput style={[styles.input, styles.textArea]} value={formData.message} onChangeText={t => setFormData({...formData, message: t})} multiline numberOfLines={4} textAlign="right" />
 
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.label}>بريد الرد <Text style={styles.required}>*</Text></Text>
-                            <TextInput
-                                style={styles.input}
-                                value={formData.replyEmail}
-                                onChangeText={(val) => handleChange('replyEmail', val)}
-                                placeholder="email@example.com"
-                                keyboardType="email-address"
-                                autoCapitalize="none"
-                            />
-                        </View>
-
-                        {status.text ? (
-                            <Text style={[styles.statusMsg, status.type === 'error' ? styles.errorText : styles.successText]}>
-                                {status.text}
-                            </Text>
-                        ) : null}
-
-                        <TouchableOpacity
-                            style={[styles.submitBtn, isIT ? styles.itBtn : styles.adminBtn, loading && styles.disabledBtn]}
-                            onPress={handleSubmit}
-                            disabled={loading}
-                        >
-                            {loading ? (
-                                <ActivityIndicator color="#fff" />
-                            ) : (
-                                <Text style={styles.submitBtnText}>إرسال الطلب</Text>
-                            )}
+                        <TouchableOpacity style={[styles.submitBtn, isIT ? styles.itBtn : styles.adminBtn]} onPress={handleSubmit} disabled={loading}>
+                            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>إرسال الآن</Text>}
                         </TouchableOpacity>
                     </View>
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
     );
-};
+}
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f5f5f5' },
-    scrollContent: { padding: 20, alignItems: 'center' },
-    card: {
-        backgroundColor: '#fff',
-        borderRadius: 15,
-        padding: 20,
-        width: '100%',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 5,
-    },
-    header: { alignItems: 'center', marginBottom: 20 },
-    icon: { fontSize: 40, marginBottom: 10 },
-    title: { fontSize: 20, fontWeight: 'bold', color: '#333' },
-    toggleContainer: { flexDirection: 'row', marginBottom: 25, borderRadius: 10, backgroundColor: '#eee', padding: 4 },
-    toggleBtn: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 8 },
-    activeIT: { backgroundColor: '#007bff' },
-    activeAdmin: { backgroundColor: '#6c757d' },
-    toggleText: { color: '#666', fontWeight: '600' },
-    activeText: { color: '#fff' },
+    container: { flex: 1, backgroundColor: '#f0f4ff' },
+    scroll: { padding: 20 },
+    card: { backgroundColor: '#fff', borderRadius: 20, padding: 20, alignItems: 'center', elevation: 4 },
+    headerIcon: { fontSize: 50, marginBottom: 10 },
+    title: { fontSize: 22, fontWeight: 'bold', color: '#1a73e8', marginBottom: 20 },
+    toggleRow: { flexDirection: 'row', backgroundColor: '#f0f0f0', borderRadius: 12, padding: 5, marginBottom: 25 },
+    toggleBtn: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
+    activeIt: { backgroundColor: '#1a73e8' },
+    activeAdmin: { backgroundColor: '#4b5563' },
+    toggleText: { fontWeight: 'bold', color: '#666' },
+    whiteText: { color: '#fff' },
     form: { width: '100%' },
-    inputGroup: { marginBottom: 15 },
-    label: { fontSize: 14, color: '#444', marginBottom: 5, textAlign: 'right' },
-    required: { color: 'red' },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
-        padding: 12,
-        textAlign: 'right',
-        fontSize: 16,
-        backgroundColor: '#fafafa',
-    },
+    label: { textAlign: 'right', marginBottom: 8, fontSize: 14, color: '#374151', fontWeight: '600' },
+    input: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 10, padding: 12, marginBottom: 15, backgroundColor: '#fff' },
     textArea: { height: 100, textAlignVertical: 'top' },
-    statusMsg: { textAlign: 'center', marginVertical: 10, padding: 10, borderRadius: 5 },
-    errorText: { backgroundColor: '#ffebee', color: '#c62828' },
-    successText: { backgroundColor: '#e8f5e9', color: '#2e7d32' },
-    submitBtn: { padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 10 },
-    itBtn: { backgroundColor: '#007bff' },
-    adminBtn: { backgroundColor: '#6c757d' },
-    disabledBtn: { opacity: 0.7 },
-    submitBtnText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+    submitBtn: { padding: 16, borderRadius: 10, alignItems: 'center' },
+    itBtn: { backgroundColor: '#1a73e8' },
+    adminBtn: { backgroundColor: '#4b5563' },
+    submitText: { color: '#fff', fontWeight: 'bold', fontSize: 16 }
 });
-
-export default Support;
