@@ -19,7 +19,7 @@ export default function GuestRoute({ children }: GuestRouteProps) {
     }
 
     if (isAuthenticated && user) {
-        if (user.role) return <Redirect href="/(tabs)/dashboard" />;
+        if (user.role) return <Redirect href="/(tabs)/home" />;
         return <Redirect href="/" />;
     }
 

@@ -39,12 +39,12 @@ export default function TabsLayout() {
                 },
             }}
         >
-            {/* ── Dashboard — visible to everyone ── */}
+            {/* ── Home — visible to everyone ── */}
             <Tabs.Screen
-                name="dashboard"
+                name="home"
                 options={{
-                    title: 'Dashboard',
-                    tabBarLabel: 'Dashboard',
+                    title: 'الرئيسية',
+                    tabBarLabel: 'الرئيسية',
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="home" size={size} color={color} />
                     ),
