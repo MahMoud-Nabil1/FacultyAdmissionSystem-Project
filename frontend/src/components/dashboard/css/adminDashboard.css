@@ -4,27 +4,325 @@
 :root {
     --primary-blue: #004a99;
     --primary-hover: #003d80;
+    --sidebar-blue: #1a2a4b;
+    --sidebar-active: #4a7afe;
     --success-green: #28a745;
     --error-red: #dc3545;
-    --bg-light: #f4f7f9;
+    --warning-orange: #ffc107;
+    --bg-light: #f5f7fa;
     --white: #ffffff;
     --text-dark: #1a202c;
-    --text-muted: #4a5568;
+    --text-muted: #6b7280;
     --border-color: #e2e8f0;
-    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-    --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.1);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
     --radius: 12px;
+}
+
+/* ========== EduAdmin Layout ========== */
+.eduadmin-layout {
+    display: flex;
+    min-height: 100vh;
+    font-family: 'Alexandria', sans-serif;
+}
+
+/* When dashboard is inside app-container, remove padding so sidebar is full height */
+.app-container:has(.eduadmin-layout) {
+    padding: 0;
+    max-width: none;
+}
+
+/* Sidebar */
+.eduadmin-sidebar {
+    width: 260px;
+    min-width: 260px;
+    background: var(--white);
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 0;
+    border-right: 1px solid var(--border-color);
+}
+
+.eduadmin-sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 24px 28px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 24px;
+}
+
+.eduadmin-logo-img {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.eduadmin-logo-img-topbar {
+    height: 42px;
+}
+
+.eduadmin-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    padding: 0 12px;
+}
+
+.eduadmin-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.eduadmin-nav-item:hover {
+    color: var(--text-dark);
+    background: var(--bg-light);
+}
+
+.eduadmin-nav-item.active {
+    background: var(--sidebar-active);
+    color: var(--white);
+}
+
+.eduadmin-nav-item.active svg {
+    stroke: var(--white);
+}
+
+.eduadmin-sidebar-footer {
+    margin-top: auto;
+    padding: 16px 24px 0;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.eduadmin-sidebar-footer .eduadmin-btn-signout {
+    width: 100%;
+    justify-content: center;
+}
+
+.eduadmin-sidebar-user {
+    padding: 0;
+    border-top: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 0;
+}
+
+.eduadmin-user-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--sidebar-active);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.eduadmin-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.eduadmin-user-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-dark);
+}
+
+.eduadmin-user-role {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Main area */
+.eduadmin-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    min-width: 0;
+}
+
+/* Top bar */
+.eduadmin-topbar {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 16px 32px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.eduadmin-topbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--sidebar-blue);
+}
+
+.eduadmin-topbar-logo .eduadmin-logo-img {
+    color: var(--sidebar-blue);
+}
+
+.eduadmin-search-wrap {
+    flex: 1;
+    max-width: 480px;
+    position: relative;
+}
+
+.eduadmin-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.eduadmin-search-input {
+    width: 100%;
+    padding: 12px 16px 12px 44px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: #f5f7fa;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+}
+
+.eduadmin-search-input::placeholder {
+    color: var(--text-muted);
+}
+
+.eduadmin-search-input:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    background: var(--white);
+}
+
+.eduadmin-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+}
+
+.eduadmin-icon-btn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: background 0.2s, color 0.2s;
+}
+
+.eduadmin-icon-btn:hover {
+    background: #f5f7fa;
+    color: var(--text-dark);
+}
+
+.eduadmin-bell-dot {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 8px;
+    height: 8px;
+    background: var(--error-red);
+    border-radius: 50%;
+    border: 2px solid var(--white);
+}
+
+.eduadmin-btn-new {
+    padding: 10px 20px;
+    background: var(--primary-blue);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.eduadmin-btn-new:hover {
+    background: var(--primary-hover);
+}
+
+.eduadmin-btn-signout {
+    padding: 10px 18px;
+    background: transparent;
+    color: var(--error-red);
+    border: none;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    margin-left: auto;
+}
+
+.eduadmin-btn-signout:hover {
+    background: #fff5f5;
+    color: #b91c1c;
+}
+
+/* Page content */
+.eduadmin-content {
+    flex: 1;
+    padding: 32px;
+    background: var(--bg-light);
+    overflow: auto;
+}
+
+.eduadmin-page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 8px 0;
+}
+
+.eduadmin-welcome {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin: 0 0 28px 0;
 }
 
 .dashboard-grid {
     display: flex;
     flex-direction: row;
-    gap: 30px;           /* Gap between the columns */
-    padding: 32px;
+    gap: 30px;
     max-width: 1400px;
-    margin: 0 auto;
-    background: var(--bg-light);
-    align-items: flex-start; /* Crucial: prevents items from stretching to match height */
+    margin: 0;
+    background: transparent;
+    align-items: flex-start;
+    padding: 0;
 }
 
 /* Create two columns that distribute the panels */
@@ -45,6 +343,52 @@
     }
 }
 
+/* EduAdmin layout responsive */
+@media (max-width: 1024px) {
+    .eduadmin-layout {
+        flex-direction: column;
+    }
+    .eduadmin-sidebar {
+        width: 100%;
+        min-width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 16px;
+        gap: 12px;
+    }
+    .eduadmin-sidebar-logo {
+        margin-bottom: 0;
+        padding-bottom: 12px;
+        border-bottom: none;
+    }
+    .eduadmin-nav {
+        flex-direction: row;
+        flex: 0 1 auto;
+        order: 3;
+        width: 100%;
+        padding: 12px 0 0;
+        border-top: 1px solid var(--border-color);
+    }
+    .eduadmin-sidebar-user {
+        margin-top: 0;
+        border-top: none;
+        padding-top: 0;
+        margin-left: auto;
+    }
+    .eduadmin-topbar {
+        flex-wrap: wrap;
+        padding: 12px 20px;
+    }
+    .eduadmin-search-wrap {
+        order: 3;
+        max-width: 100%;
+        width: 100%;
+    }
+    .eduadmin-content {
+        padding: 20px;
+    }
+}
+
 /* Dashboard Cards */
 .dashboard-container {
     background: var(--white);
@@ -61,12 +405,12 @@
 }
 
 .dashboard-container h2 {
-    color: var(--primary-blue);
-    margin-bottom: 25px;
-    font-weight: 600;
-    font-size: 1.6rem;
-    border-right: 5px solid var(--primary-blue);
-    padding-right: 15px;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    font-weight: 700;
+    font-size: 1.25rem;
+    border: none;
+    padding: 0;
 }
 
 /* Buttons Styling */
@@ -431,4 +775,53 @@ select {
 
 select::-ms-expand {
     display: none;
+}
+
+/* Settings panel form rows (moved from inline styles) */
+.settings-form-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.settings-level-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.settings-level-label {
+    margin-inline-start: 8px;
+}
+
+.settings-level-option {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+
+/* Group panel (moved from inline styles) */
+.group-panel {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-height: 200px;
+}
+
+.group-panel-title {
+    margin: 0 0 20px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Panel action buttons row (staff panel, etc.) */
+.panel-actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
 }

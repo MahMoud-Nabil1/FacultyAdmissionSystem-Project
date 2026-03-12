@@ -1,16 +1,23 @@
-import React, { useState, useEffect, FormEvent } from "react";
+import React, { useState, useEffect } from "react";
 
 const API_URL = "http://localhost:5000/api";
 
 interface GPASettings {
     gpaMin: number;
     gpaMax: number;
-    level: string;
+    level: string[];
 }
 
-const SettingsPanel: React.FC = () => {
-    const [settings, setSettings] = useState<GPASettings>({ gpaMin: 2.5, gpaMax: 5, level: "1" });
-    const [error, setError] = useState<string | null>(null);
+const LEVEL_OPTIONS: { value: string; label: string }[] = [
+    { value: "1", label: "المستوى الأول" },
+    { value: "2", label: "المستوى الثاني" },
+    { value: "3", label: "المستوى الثالث" },
+    { value: "4", label: "المستوى الرابع" },
+];
+
+const SettingsPanel = () => {
+    const [settings, setSettings] = useState({ gpaMin: 2.5, gpaMax: 5, level: ["1"] } as GPASettings);
+    const [error, setError] = useState(null as string | null);
     const [settingsLoading, setSettingsLoading] = useState(false);
 
     const fetchSettings = async () => {
@@ -22,7 +29,7 @@ const SettingsPanel: React.FC = () => {
             setSettings({
                 gpaMin: Math.min(data.gpaMin, data.gpaMax),
                 gpaMax: Math.max(data.gpaMin, data.gpaMax),
-                level: data.level,
+                level: Array.isArray(data.level) ? data.level : (data.level ? [String(data.level)] : ["1"]),
             });
         } catch (err) {
             console.error(err);
@@ -44,16 +51,25 @@ const SettingsPanel: React.FC = () => {
         }
     }, [settings]);
 
-    const handleSubmit = async (e: FormEvent) => {
+    const toggleLevel = (value: string) => {
+        setSettings((prev) => {
+            const next = prev.level.includes(value)
+                ? prev.level.filter((l) => l !== value)
+                : [...prev.level, value];
+            return { ...prev, level: next.length ? next : ["1"] };
+        });
+    };
+
+    const handleSubmit = async (e: { preventDefault: () => void }) => {
         e.preventDefault();
         if (error) return;
-
+        const payload = { ...settings, level: settings.level.length ? settings.level : ["1"], updatedBy: "Admin" };
         setSettingsLoading(true);
         try {
             const res = await fetch(`${API_URL}/announcements/settings`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...settings, updatedBy: "Admin" }),
+                body: JSON.stringify(payload),
             });
 
             const data = await res.json();
@@ -77,7 +93,7 @@ const SettingsPanel: React.FC = () => {
             {error && <p className="error">{error}</p>}
 
             <form className="form" onSubmit={handleSubmit}>
-                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                <div className="settings-form-row">
                     <input
                         type="number"
                         step="0.1"
@@ -96,15 +112,19 @@ const SettingsPanel: React.FC = () => {
                         value={settings.gpaMax}
                         onChange={(e) => setSettings({ ...settings, gpaMax: parseFloat(e.target.value) })}
                     />
-                    <select
-                        value={settings.level}
-                        onChange={(e) => setSettings({ ...settings, level: e.target.value })}
-                    >
-                        <option value="1">المستوى الأول</option>
-                        <option value="2">المستوى الثاني</option>
-                        <option value="3">المستوى الثالث</option>
-                        <option value="4">المستوى الرابع</option>
-                    </select>
+                    <div className="settings-level-row">
+                        <span className="settings-level-label">المستوى:</span>
+                        {LEVEL_OPTIONS.map((opt) => (
+                            <label key={opt.value} className="settings-level-option">
+                                <input
+                                    type="checkbox"
+                                    checked={settings.level.includes(opt.value)}
+                                    onChange={() => toggleLevel(opt.value)}
+                                />
+                                {opt.label}
+                            </label>
+                        ))}
+                    </div>
                 </div>
                 <button className="submit-btn" disabled={settingsLoading || !!error}>
                     {settingsLoading ? "جاري الحفظ..." : "حفظ الإعدادات"}

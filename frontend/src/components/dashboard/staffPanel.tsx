@@ -1,4 +1,4 @@
-import React, {ChangeEvent, FormEvent, useState} from "react";
+import React, { useState } from "react";
 import {createStaff} from "../../services/api";
 import {useNavigate} from "react-router-dom";
 import {ROLES} from "./constants";
@@ -10,27 +10,27 @@ interface StaffForm {
     password: string;
 }
 
-const StaffPanel: React.FC = () => {
+const StaffPanel = () => {
     const [showForm, setShowForm] = useState(false);
-    const [form, setForm] = useState<StaffForm>({
+    const [form, setForm] = useState({
         name: "",
         email: "",
         role: "admin",
         password: "",
-    });
-    const [error, setError] = useState<string | null>(null);
+    } as StaffForm);
+    const [error, setError] = useState(null as string | null);
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
     const handleChange = (
-        e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+        e: { target: { name: string; value: string } }
     ) => {
         const {name, value} = e.target;
         setForm((prev) => ({...prev, [name]: value}));
     };
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleSubmit = async (e: { preventDefault: () => void }) => {
         e.preventDefault();
         setError(null);
         setLoading(true);
@@ -55,7 +55,7 @@ const StaffPanel: React.FC = () => {
             <h2>الموظفين</h2>
 
             {/* Buttons */}
-            <div style={{display: "flex", gap: "15px", flexWrap: "wrap", marginBottom: "20px"}}>
+            <div className="panel-actions">
                 <button
                     className="panel-btn"
                     onClick={() => setShowForm((prev) => !prev)}

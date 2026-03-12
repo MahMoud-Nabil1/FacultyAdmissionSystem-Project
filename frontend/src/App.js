@@ -5,6 +5,7 @@ import GuestRoute from './components/auth/GuestRoute.jsx';
 import ResetPassword from './components/auth/ResetPassword.jsx';
 import Login from './components/auth/Login.jsx';
 import ForgotPassword from './components/auth/ForgotPassword.jsx';
+import AdminDashboardLayout from './components/dashboard/AdminDashboardLayout.jsx';
 import AdminDashboard from './components/dashboard/adminDashboard.jsx';
 import SupportContact from "./components/support/SupportContact.jsx";
 import Announcements from "./components/welcome/announcements.jsx";
@@ -50,19 +51,15 @@ function App() {
                     path="/admin-dashboard"
                     element={
                         <ProtectedRoute allowedRoles={['admin', 'academic_guide', 'academic_guide_coordinator', 'reporter']}>
-                            <button onClick={() => {
-                                localStorage.removeItem("token");
-                                window.location.href = "/login";
-                            }}>
-                                Sign out
-                            </button>
                             <div className="app-container">
-                                <AdminDashboard />
+                                <AdminDashboardLayout />
                             </div>
                         </ProtectedRoute>
                     }
-                />
-                {}
+                >
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="table" element={<AdminDashboardTable />} />
+                </Route>
                 <Route path="/login" element={
                     <GuestRoute>
                         <Login />
@@ -88,14 +85,6 @@ function App() {
                         <SupportContact target="admin" />
                     </GuestRoute>
                 } />
-                <Route
-                    path="/admin-dashboard/table"
-                    element={
-                        <ProtectedRoute allowedRoles={['admin', 'academic_guide', 'academic_guide_coordinator', 'reporter']}>
-                            <AdminDashboardTable />
-                        </ProtectedRoute>
-                    }
-                />
                 <Route path="/register-subjects" element={
                     <ProtectedRoute>
                         put register new subjects component here
