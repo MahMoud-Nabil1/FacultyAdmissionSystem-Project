@@ -17,7 +17,7 @@ const RegisterSubjects = () => {
             <View style={styles.centerContent}>
                 <Ionicons name="construct-outline" size={80} color="#ccc" />
                 <Text style={styles.mainText}>Working on the component</Text>
-                <Text style={styles.subText}>قريباً سيتم تفعيل نظام تسجيل المواد</Text>
+                <Text style={styles.subText}>قريباً سيتم تفعيل نظام تسجيل المواد مياو </Text>
             </View>
         </View>
     );
