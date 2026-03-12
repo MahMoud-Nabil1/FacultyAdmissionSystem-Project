@@ -52,22 +52,13 @@ const StaffPanel = () => {
 
     return (
         <div className="dashboard-container">
-            <h2>الموظفين</h2>
-
             {/* Buttons */}
             <div className="panel-actions">
                 <button
                     className="panel-btn"
                     onClick={() => setShowForm((prev) => !prev)}
                 >
-                    {showForm ? "إلغاء" : "اضف موظف جديد"}
-                </button>
-
-                <button
-                    className="panel-btn"
-                    onClick={() => navigate("/admin-dashboard/table?type=staff")}
-                >
-                    عرض جميع الموظفين
+                    {showForm ? "إلغاء" : "اضافة موظف جديد"}
                 </button>
             </div>
 

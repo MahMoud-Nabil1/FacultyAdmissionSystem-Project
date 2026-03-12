@@ -18,16 +18,12 @@ const AdminDashboard = () => {
             </p>
             <div className="dashboard-grid">
                 <div className="dashboard-column">
-                    <StaffPanel />
-                    <SubjectPanel />
                     <AnnouncementsPanel />
                 </div>
                 <div className="dashboard-column">
-                    <StudentPanel />
                     <SettingsPanel />
                 </div>
             </div>
-            <GroupPanel />
         </>
     );
 };

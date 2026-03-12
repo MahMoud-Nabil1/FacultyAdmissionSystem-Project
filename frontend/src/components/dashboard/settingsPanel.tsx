@@ -9,10 +9,10 @@ interface GPASettings {
 }
 
 const LEVEL_OPTIONS: { value: string; label: string }[] = [
-    { value: "1", label: "المستوى الأول" },
-    { value: "2", label: "المستوى الثاني" },
-    { value: "3", label: "المستوى الثالث" },
-    { value: "4", label: "المستوى الرابع" },
+    { value: "1", label: "الأول" },
+    { value: "2", label: "الثاني" },
+    { value: "3", label: "الثالث" },
+    { value: "4", label: "الرابع" },
 ];
 
 const SettingsPanel = () => {
@@ -42,8 +42,8 @@ const SettingsPanel = () => {
 
     useEffect(() => {
         const { gpaMin, gpaMax } = settings;
-        if (gpaMin >= gpaMax) {
-            setError("⚠️ الحد الأدنى أكبر من أو يساوي الحد الأقصى");
+        if (gpaMin > gpaMax) {
+            setError("الحد الأدنى يجب أن يكون أصغر من أو يساوي الحد الأقصى");
         } else if (gpaMin < 0 || gpaMin > 5 || gpaMax < 0 || gpaMax > 5) {
             setError("⚠️ القيم يجب أن تكون بين 0 و 5");
         } else {

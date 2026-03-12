@@ -27,6 +27,16 @@
     <title>React App</title>
   </head>
   <body>
+    <script>
+      (function() {
+        try {
+          var id = localStorage.getItem('app-theme-id');
+          if (id && ['light','dark'].indexOf(id) !== -1) {
+            document.documentElement.setAttribute('data-theme', id);
+          }
+        } catch (e) {}
+      })();
+    </script>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <!--

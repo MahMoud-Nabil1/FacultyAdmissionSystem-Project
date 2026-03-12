@@ -35,7 +35,6 @@ const AdminDashboardLayout = () => {
             <div className="eduadmin-layout">
                 <SidePanel userName={userName} onSignOut={handleSignOut} />
                 <div className="eduadmin-main">
-                    <header className="eduadmin-topbar" />
                     <div className="eduadmin-content">
                         <Outlet />
                     </div>

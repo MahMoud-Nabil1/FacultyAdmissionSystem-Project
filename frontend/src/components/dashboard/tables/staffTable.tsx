@@ -12,7 +12,11 @@ interface Staff {
     role: keyof typeof ROLES;
 }
 
-export const StaffTable: React.FC = () => {
+interface StaffTableProps {
+    footerContent?: unknown;
+}
+
+export const StaffTable = ({ footerContent }: StaffTableProps) => {
     const [staff, setStaff] = useState<Staff[]>([]);
     const [filteredStaff, setFilteredStaff] = useState<Staff[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -73,7 +77,9 @@ export const StaffTable: React.FC = () => {
 
     return (
         <div className="dashboard-container">
-            <h2>جدول الموظفين</h2>
+            <div className="students-table-header">
+                <h2 className="students-table-title">جدول الموظفين</h2>
+            </div>
             {error && <p className="error">{error}</p>}
 
             {/* Top filter/search bar */}
@@ -132,6 +138,12 @@ export const StaffTable: React.FC = () => {
 
             {/* Pagination */}
             <Pagination page={page} setPage={setPage} total={filteredStaff.length} />
+
+            {footerContent && (
+                <div className="students-table-footer">
+                    {footerContent}
+                </div>
+            )}
         </div>
     );
 };
