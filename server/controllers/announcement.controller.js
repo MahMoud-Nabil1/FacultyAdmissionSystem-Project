@@ -101,7 +101,11 @@ const updateSettings = async (req, res) => {
 
         if (gpaMin !== undefined) settings.gpaMin = gpaMin;
         if (gpaMax !== undefined) settings.gpaMax = gpaMax;
-        if (level !== undefined) settings.level = level;
+        if (level !== undefined) {
+            const levelArr = Array.isArray(level) ? level : (level != null ? [String(level)] : ['1']);
+            settings.level = levelArr.filter(l => ['1', '2', '3', '4'].includes(String(l)));
+            if (settings.level.length === 0) settings.level = ['1'];
+        }
         if (updatedBy) settings.updatedBy = updatedBy;
 
         const updatedSettings = await settings.save();
