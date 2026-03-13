@@ -12,7 +12,11 @@ interface Student {
     gpa: string;
 }
 
-const StudentsTable: React.FC = () => {
+interface StudentsTableProps {
+    footerContent?: unknown;
+}
+
+const StudentsTable = ({ footerContent }: StudentsTableProps) => {
     const [students, setStudents] = useState<Student[]>([]);
     const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -66,7 +70,9 @@ const StudentsTable: React.FC = () => {
 
     return (
         <div className="dashboard-container">
-            <h2>جدول الطلاب</h2>
+            <div className="students-table-header">
+                <h2 className="students-table-title">جدول الطلاب</h2>
+            </div>
             {error && <p className="error">{error}</p>}
 
             {/* Search by ID */}
@@ -121,6 +127,12 @@ const StudentsTable: React.FC = () => {
 
             {/* Pagination */}
             <Pagination page={page} setPage={setPage} total={filteredStudents.length} />
+
+            {footerContent && (
+                <div className="students-table-footer">
+                    {footerContent}
+                </div>
+            )}
         </div>
     );
 };

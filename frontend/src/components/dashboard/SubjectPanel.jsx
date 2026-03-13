@@ -162,22 +162,10 @@ const SubjectPanel = () => {
 
     return (
         <div className="dashboard-container">
-            <h2>المقررات</h2>
-
-            <div style={{ display: "flex", gap: 10 }}>
+            
+            <div className="panel-actions">
                 <button className="panel-btn" onClick={openAdd}>
                     إضافة مقرر جديد
-                </button>
-
-                <button
-                    className="panel-btn"
-                    onClick={() =>
-                        navigate(
-                            "/admin-dashboard/table?type=subjects"
-                        )
-                    }
-                >
-                    عرض جدول المقررات
                 </button>
             </div>
 
