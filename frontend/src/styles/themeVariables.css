@@ -1,0 +1,10 @@
+/* ============================================================
+   DEPRECATED — All theme variables have moved to:
+   ./design-system.css
+
+   This file is kept only for backwards compatibility.
+   It re-exports the design system so any existing imports
+   of this file still work.
+   ============================================================ */
+@import './design-system.css';
+

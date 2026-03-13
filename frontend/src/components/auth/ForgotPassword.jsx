@@ -2,31 +2,39 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiPost } from '../../services/api';
 import './css/Login.css';
+import { useTranslation } from 'react-i18next';
 
 const ForgotPassword = () => {
+    const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [status, setStatus] = useState(null); // 'sent' | 'not_found'
+    const [status, setStatus] = useState(null); // 'sent'
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         const trimmed = email.trim().toLowerCase();
         if (!trimmed) {
-            setError('البريد الإلكتروني مطلوب.');
+            setError(t('forgotPassword.errorRequired'));
             return;
         }
         setLoading(true);
         try {
             const { res, data } = await apiPost('/auth/forgot-password', { email: trimmed });
+            // Security: do not reveal whether the email exists.
+            // Treat "not found" responses as success and always show the same message.
             if (!res.ok) {
-                setError(data.error || 'حدث خطأ ما.');
+                if (res.status === 404) {
+                    setStatus('sent');
+                    return;
+                }
+                setError(data?.error || t('forgotPassword.errorGeneric'));
                 return;
             }
-            setStatus(data.message === 'message sent to the email' ? 'sent' : 'not_found');
+            setStatus('sent');
         } catch {
-            setError('تعذر التواصل مع السيرفر.');
+            setError(t('forgotPassword.errorServer'));
         } finally {
             setLoading(false);
         }
@@ -34,12 +42,9 @@ const ForgotPassword = () => {
 
     const renderMessage = () => {
         if (status === 'sent') {
-            return <p className="text-success">تم إرسال الرابط بنجاح إلى بريدك الإلكتروني.</p>;
+            return <p className="text-success">{t('forgotPassword.descriptionSent')}</p>;
         }
-        if (status === 'not_found') {
-            return <p className="text-error">لا يوجد حساب مرتبط بهذا البريد الإلكتروني.</p>;
-        }
-        return <p>ادخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور.</p>;
+        return <p>{t('forgotPassword.descriptionDefault')}</p>;
     };
 
     return (
@@ -52,7 +57,7 @@ const ForgotPassword = () => {
                         <path d="M6 12v5c0 0 3 3 6 3s6-3 6-3v-5" />
                         <line x1="22" y1="10" x2="22" y2="16" />
                     </svg>
-                    جامعة القاهرة - كلية العلوم
+                    {t('forgotPassword.brandName')}
                 </div>
             </div>
 
@@ -60,7 +65,7 @@ const ForgotPassword = () => {
             <div className="login-form-side">
                 <div className="login-card">
                     <div className="login-header">
-                        <h1>نسيت كلمة المرور</h1>
+                        <h1>{t('forgotPassword.title')}</h1>
                         {renderMessage()}
                     </div>
 
@@ -77,7 +82,7 @@ const ForgotPassword = () => {
                                 </div>
                             )}
                             <div className="form-group">
-                                <label htmlFor="email">البريد الإلكتروني</label>
+                                <label htmlFor="email">{t('forgotPassword.emailLabel')}</label>
                                 <div className="input-wrapper">
                                     <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -86,7 +91,7 @@ const ForgotPassword = () => {
                                     <input
                                         id="email"
                                         type="email"
-                                        placeholder="أدخل بريدك الإلكتروني"
+                                        placeholder={t('forgotPassword.emailPlaceholder')}
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         autoComplete="email"
@@ -96,14 +101,14 @@ const ForgotPassword = () => {
                                 </div>
                             </div>
                             <button type="submit" className="login-btn" disabled={loading}>
-                                {'إرسال رابط إعادة التعيين'}
+                                {t('forgotPassword.submitBtn')}
                             </button>
                         </form>
                     )}
 
                     {status && (
                         <p className="text-left mt-1">
-                            <Link to="/login" className="forgot-link">← العودة لتسجيل الدخول</Link>
+                            <Link to="/login" className="forgot-link">{t('forgotPassword.backToLogin')}</Link>
                         </p>
                     )}
                 </div>

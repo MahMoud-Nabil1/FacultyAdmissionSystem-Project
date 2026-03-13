@@ -3,6 +3,10 @@
 .login-page {
     min-height: 100vh;
     display: flex;
+    /* Keep image side on "end" of inline direction:
+       - LTR: image on the right
+       - RTL: image on the left */
+    flex-direction: row-reverse;
     background-color: var(--bg-white);
 }
 
