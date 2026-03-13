@@ -36,7 +36,7 @@ const Home = () => {
         fetchUser();
     }, [navigate]);
 
-    const roleLabel: string = user?.role ? ROLES[user.role] || t("home.defaultRole") : "";
+    const roleLabel: string = user?.role ? t(ROLES[user.role as keyof typeof ROLES]) || t("home.defaultRole") : "";
 
     const handleResetPassword = async () => {
         if (newPassword !== confirmPassword) {

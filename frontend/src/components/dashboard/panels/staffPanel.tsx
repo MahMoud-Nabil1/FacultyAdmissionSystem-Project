@@ -1,7 +1,7 @@
 import React, {ChangeEvent, FormEvent, useState} from "react";
-import {createStaff} from "../../services/api";
+import {createStaff} from "../../../services/api";
 import {useNavigate} from "react-router-dom";
-import {ROLES} from "../../services/constants";
+import {ROLES} from "../../../services/constants";
 import { useTranslation } from "react-i18next";
 
 interface StaffForm {

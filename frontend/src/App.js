@@ -1,5 +1,6 @@
 import './App.css';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ThemeProvider } from './context/ThemeContext';
 import './styles/themeVariables.css';
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
@@ -11,13 +12,14 @@ import AdminDashboardLayout from './components/dashboard/AdminDashboardLayout.js
 import AdminDashboard from './components/dashboard/adminDashboard.jsx';
 import LanguageFloatingButton from "./components/common/LanguageFloatingButton.jsx";
 import SupportContact from "./components/support/SupportContact.jsx";
-import Announcements from "./components/welcome/announcements.jsx";
+import Announcements from "./components/common/announcements.jsx";
 import AdminDashboardTable from "./components/dashboard/tables/table.tsx";
-import Groups from "./components/dashboard/Groups.tsx";
-import Home from "./components/home/home.tsx";
+import Groups from "./components/groups/Groups.tsx";
+import Home from "./components/common/home.tsx";
 
 
 function App() {
+    const { t } = useTranslation();
     return (
         <ThemeProvider>
         <div className="App">
@@ -33,7 +35,7 @@ function App() {
                                 localStorage.removeItem("token");
                                 window.location.href = "/login";
                             }}>
-                                Sign out
+                                {t('sidePanel.signOut')}
                             </button>
                             <Home/>
                         </ProtectedRoute>

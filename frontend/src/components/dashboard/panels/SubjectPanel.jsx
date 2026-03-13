@@ -11,8 +11,8 @@ import {
     getAllSubjects,
     createSubject,
     updateSubject, deleteSubject,
-} from "../../services/api";
-import SubjectsTable from "./tables/subjectsTable.tsx";
+} from "../../../services/api";
+import SubjectsTable from "../tables/subjectsTable.tsx";
 
 
 const emptyForm = {

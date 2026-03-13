@@ -1,5 +1,5 @@
 import React, { useState, FormEvent } from "react";
-import { createStudent } from "../../services/api";
+import { createStudent } from "../../../services/api";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 

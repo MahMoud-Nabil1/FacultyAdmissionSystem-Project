@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
 import { AdminDashboardContext } from "./AdminDashboardLayout";
-import StudentPanel from "./studentPanel.tsx";
-import StaffPanel from "./staffPanel.tsx";
-import SubjectPanel from "./SubjectPanel";
-import AnnouncementsPanel from "./createAnnouncementsPanel.tsx";
-import SettingsPanel from "./settingsPanel.tsx";
-import GroupPanel from "./groupPanel.tsx";
+import StudentPanel from "./panels/studentPanel.tsx";
+import StaffPanel from "./panels/staffPanel.tsx";
+import SubjectPanel from "./panels/SubjectPanel";
+import AnnouncementsPanel from "./panels/createAnnouncementsPanel.tsx";
+import SettingsPanel from "./panels/settingsPanel.tsx";
+import GroupPanel from "./panels/groupPanel.tsx";
 import "./css/adminDashboard.css";
 import { useTranslation } from "react-i18next";
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import SidePanel from "./SidePanel";
+import SidePanel from "./panels/SidePanel";
 import "./css/adminDashboard.css";
 
 export const AdminDashboardContext = React.createContext({ userName: "" });
