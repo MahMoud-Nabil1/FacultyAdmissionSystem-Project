@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { apiGet, apiPost } from '../../services/api';
 import './css/Login.css';
+import { useTranslation } from 'react-i18next';
 
 const ResetPassword = () => {
+    const { t } = useTranslation();
     const [searchParams] = useSearchParams();
     const token = searchParams.get('token');
 
@@ -20,7 +22,7 @@ const ResetPassword = () => {
     useEffect(() => {
         if (!token) {
             setStatus('invalid');
-            setVerifyError('رابط إعادة التعيين غير صالح. لم يتم العثور على الرمز.');
+            setVerifyError(t('resetPassword.invalidTokenError'));
             return;
         }
 
@@ -34,18 +36,18 @@ const ResetPassword = () => {
                     setStatus('valid');
                 } else {
                     setStatus('invalid');
-                    setVerifyError(data.error || 'الرابط منتهي الصلاحية أو غير صالح.');
+                    setVerifyError(data?.error || t('resetPassword.invalidLinkError'));
                 }
             } catch {
                 if (cancelled) return;
                 setStatus('invalid');
-                setVerifyError('تعذر التحقق من الرابط. حاول مرة أخرى.');
+                setVerifyError(t('resetPassword.invalidServerError'));
             }
         };
 
         verify();
         return () => { cancelled = true; };
-    }, [token]);
+    }, [token, t]);
 
     
     const handleSubmit = async (e) => {
@@ -53,11 +55,11 @@ const ResetPassword = () => {
         setError('');
 
         if (newPassword.length < 6) {
-            setError('كلمة السر يجب أن تكون على الأقل 6 أحرف.');
+            setError(t('resetPassword.errorMinLength'));
             return;
         }
         if (newPassword !== confirmPassword) {
-            setError('كلمتا السر غير متطابقتين.');
+            setError(t('resetPassword.errorMismatch'));
             return;
         }
 
@@ -65,13 +67,13 @@ const ResetPassword = () => {
         try {
             const { res, data } = await apiPost('/auth/reset-password', { token, newPassword });
             if (!res.ok) {
-                setError(data.error || 'فشلت عملية إعادة تعيين كلمة السر.');
+                setError(data?.error || t('resetPassword.errorGeneric'));
                 return;
             }
             setSuccess(true);
             setTimeout(() => navigate('/login'), 2000);
         } catch {
-            setError('تعذر التواصل مع السيرفر.');
+            setError(t('resetPassword.errorServer'));
         } finally {
             setLoading(false);
         }
@@ -86,7 +88,7 @@ const ResetPassword = () => {
                     <path d="M6 12v5c0 0 3 3 6 3s6-3 6-3v-5" />
                     <line x1="22" y1="10" x2="22" y2="16" />
                 </svg>
-                جامعة القاهرة - كلية العلوم
+                {t('resetPassword.brandName')}
             </div>
         </div>
     );
@@ -112,7 +114,7 @@ const ResetPassword = () => {
     if (status === 'loading') return (
         <div className="login-page">
             {renderLeftSide()}
-            {renderMessageCard('جار التحقق...', 'يرجى الانتظار')}
+            {renderMessageCard(t('resetPassword.verifyingTitle'), t('resetPassword.verifyingMessage'))}
         </div>
     );
 
@@ -120,7 +122,7 @@ const ResetPassword = () => {
     if (status === 'invalid') return (
         <div className="login-page">
             {renderLeftSide()}
-            {renderMessageCard('رابط غير صالح', verifyError, 'طلب رابط إعادة تعيين جديد', '/forgot-password')}
+            {renderMessageCard(t('resetPassword.invalidTitle'), verifyError, t('resetPassword.requestNewLink'), '/forgot-password')}
         </div>
     );
 
@@ -128,7 +130,7 @@ const ResetPassword = () => {
     if (success) return (
         <div className="login-page">
             {renderLeftSide()}
-            {renderMessageCard('نجاح العملية', 'تم تحديث كلمة السر بنجاح! يتم التحويل إلى صفحة تسجيل الدخول', 'اذهب إلى تسجيل الدخول', '/login')}
+            {renderMessageCard(t('resetPassword.successTitle'), t('resetPassword.successMessage'), t('resetPassword.goToLogin'), '/login')}
         </div>
     );
 
@@ -139,8 +141,8 @@ const ResetPassword = () => {
             <div className="login-form-side">
                 <div className="login-card">
                     <div className="login-header">
-                        <h1>إعادة تعيين كلمة السر</h1>
-                        <p>اكتب كلمة السر الجديدة الخاصة بك</p>
+                        <h1>{t('resetPassword.title')}</h1>
+                        <p>{t('resetPassword.subtitle')}</p>
                     </div>
                     <form className="login-form" onSubmit={handleSubmit}>
                         {error && (
@@ -155,7 +157,9 @@ const ResetPassword = () => {
                         )}
                         {['newPassword', 'confirmPassword'].map((id, idx) => (
                             <div className="form-group" key={id}>
-                                <label htmlFor={id}>{idx === 0 ? 'كلمة السر الجديدة' : 'اعد كتابة كلمة السر'}</label>
+                                <label htmlFor={id}>
+                                    {idx === 0 ? t('resetPassword.newPasswordLabel') : t('resetPassword.confirmPasswordLabel')}
+                                </label>
                                 <div className="input-wrapper">
                                     <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -168,17 +172,17 @@ const ResetPassword = () => {
                                         onChange={(e) => idx === 0 ? setNewPassword(e.target.value) : setConfirmPassword(e.target.value)}
                                         minLength={6}
                                         required
-                                        placeholder={idx === 0 ? 'ادخل كلمة السر الجديدة' : 'اعد كتابة كلمة السر الجديدة'}
+                                        placeholder={idx === 0 ? t('resetPassword.newPasswordPlaceholder') : t('resetPassword.confirmPasswordPlaceholder')}
                                     />
                                 </div>
                             </div>
                         ))}
                         <button type="submit" className="login-btn" disabled={loading}>
-                            {loading ? <span className="spinner"></span> : 'تحديث كلمة السر'}
+                            {loading ? <span className="spinner"></span> : t('resetPassword.submitBtn')}
                         </button>
                     </form>
                     <div className="form-footer mt-1-25">
-                        <Link to="/login" className="forgot-link">← ارجع إلى تسجيل الدخول</Link>
+                        <Link to="/login" className="forgot-link">{t('resetPassword.backToLogin')}</Link>
                     </div>
                 </div>
             </div>

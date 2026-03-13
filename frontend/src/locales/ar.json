@@ -46,6 +46,62 @@
     "noAnnouncements": "لا توجد إعلانات حتى الآن",
     "postedBy": "نشر بواسطة {{author}} في {{date}}",
     "fetchError": "فشل في تحميل البيانات"
+  },
+  "login": {
+    "brandName": "جامعة القاهرة - كلية العلوم",
+    "title": "تسجيل الدخول",
+    "subtitle": "يرجى إدخال بيانات الاعتماد الخاصة بك للوصول.",
+    "userIdLabel": "كود الطالب او الإيميل",
+    "userIdPlaceholder": "ادخل كود الطالب او الإيميل الخاص بك",
+    "passwordLabel": "كلمة السر",
+    "passwordPlaceholder": "ادخل كلمة السر الخاصة بك",
+    "forgotPassword": "نسيت كلمة السر؟",
+    "contactSupport": "تواصل مع الدعم",
+    "submitBtn": "سجل الدخول",
+    "errorGeneric": "فشل تسجيل الدخول",
+    "errorServer": "لم يمكن التواصل مع السيرفر"
+  },
+
+
+  "forgotPassword": {
+    "brandName": "جامعة القاهرة - كلية العلوم",
+    "title": "نسيت كلمة المرور",
+    "descriptionDefault": "ادخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور.",
+    "descriptionSent": "إذا كان هناك حساب مرتبط بهذا البريد الإلكتروني، فسنقوم بإرسال رابط إعادة تعيين كلمة المرور. يرجى فحص البريد الوارد (والبريد غير الهام).",
+    "descriptionNotFound": "إذا كان هناك حساب مرتبط بهذا البريد الإلكتروني، فسنقوم بإرسال رابط إعادة تعيين كلمة المرور.",
+    "emailLabel": "البريد الإلكتروني",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "submitBtn": "إرسال رابط إعادة التعيين",
+    "backToLogin": "← العودة لتسجيل الدخول",
+    "errorRequired": "البريد الإلكتروني مطلوب.",
+    "errorGeneric": "حدث خطأ ما.",
+    "errorServer": "تعذر التواصل مع السيرفر."
+  },
+
+  "resetPassword": {
+    "brandName": "جامعة القاهرة - كلية العلوم",
+    "title": "إعادة تعيين كلمة السر",
+    "subtitle": "اكتب كلمة السر الجديدة الخاصة بك",
+    "newPasswordLabel": "كلمة السر الجديدة",
+    "newPasswordPlaceholder": "ادخل كلمة السر الجديدة",
+    "confirmPasswordLabel": "اعد كتابة كلمة السر",
+    "confirmPasswordPlaceholder": "اعد كتابة كلمة السر الجديدة",
+    "submitBtn": "تحديث كلمة السر",
+    "backToLogin": "← ارجع إلى تسجيل الدخول",
+    "verifyingTitle": "جار التحقق...",
+    "verifyingMessage": "يرجى الانتظار",
+    "invalidTitle": "رابط غير صالح",
+    "invalidTokenError": "رابط إعادة التعيين غير صالح. لم يتم العثور على الرمز.",
+    "invalidLinkError": "الرابط منتهي الصلاحية أو غير صالح.",
+    "invalidServerError": "تعذر التحقق من الرابط. حاول مرة أخرى.",
+    "requestNewLink": "طلب رابط إعادة تعيين جديد",
+    "successTitle": "نجاح العملية",
+    "successMessage": "تم تحديث كلمة السر بنجاح! يتم التحويل إلى صفحة تسجيل الدخول",
+    "goToLogin": "اذهب إلى تسجيل الدخول",
+    "errorMinLength": "كلمة السر يجب أن تكون على الأقل 6 أحرف.",
+    "errorMismatch": "كلمتا السر غير متطابقتين.",
+    "errorGeneric": "فشلت عملية إعادة تعيين كلمة السر.",
+    "errorServer": "تعذر التواصل مع السيرفر."
   }
 
 

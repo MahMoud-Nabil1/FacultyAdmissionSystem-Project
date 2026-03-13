@@ -10,12 +10,21 @@ const Announcements = () => {
     const [loading, setLoading] = useState(true);
     const [gpaMin, setGpaMin] = useState(2.5);
     const [gpaMax, setGpaMax] = useState(5);
-    const [level, setLevel] = useState('1');
+    const [levelCode, setLevelCode] = useState('1');
     const [posts, setPosts] = useState([]);
     const [logoError, setLogoError] = useState(false);
     const [hasInvalidGpaSettings, setHasInvalidGpaSettings] = useState(false);
 
     const dateLocale = useMemo(() => (i18n.language === 'ar' ? 'ar-EG' : 'en-US'), [i18n.language]);
+    const levelLabel = useMemo(() => {
+        const keyByLevel = {
+            '1': 'announcements.level1',
+            '2': 'announcements.level2',
+            '3': 'announcements.level3',
+            '4': 'announcements.level4',
+        };
+        return t(keyByLevel[levelCode] || 'announcements.level1');
+    }, [levelCode, t]);
 
     const fetchData = async () => {
         try {
@@ -55,13 +64,7 @@ const Announcements = () => {
                 setHasInvalidGpaSettings(false);
             }
 
-            const levelMap = {
-                '1': t('announcements.level1'),
-                '2': t('announcements.level2'),
-                '3': t('announcements.level3'),
-                '4': t('announcements.level4')
-            };
-            setLevel(levelMap[settings.level] || t('announcements.level1'));
+            setLevelCode(String(settings.level || '1'));
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -141,7 +144,7 @@ const Announcements = () => {
             <div className="section-box">
                 <h4 className="section-title">{t('announcements.levelSectionTitle')}</h4>
                 <div className="gpa-card" style={{ maxWidth: '300px', margin: '0 auto' }}>
-                    <span className="card-value" style={{ color: 'var(--primary)' }}>{level}</span>
+                    <span className="card-value" style={{ color: 'var(--primary)' }}>{levelLabel}</span>
                 </div>
             </div>
 

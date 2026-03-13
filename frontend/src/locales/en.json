@@ -48,5 +48,62 @@
     "noAnnouncements": "No announcements yet",
     "postedBy": "Posted by {{author}} on {{date}}",
     "fetchError": "Failed to load data"
+  },
+
+  "login": {
+    "brandName": "Cairo University - Faculty of Science",
+    "title": "Login",
+    "subtitle": "Please enter your credentials to access.",
+    "userIdLabel": "Student Code or Email",
+    "userIdPlaceholder": "Enter your student code or email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "forgotPassword": "Forgot your password?",
+    "contactSupport": "Contact Support",
+    "submitBtn": "Login",
+    "errorGeneric": "Login failed",
+    "errorServer": "Could not connect to the server"
+  },
+
+
+  "forgotPassword": {
+    "brandName": "Cairo University - Faculty of Science",
+    "title": "Forgot Password",
+    "descriptionDefault": "Enter your email and we will send you a password reset link.",
+  "descriptionSent": "If an account exists for this email, we’ve sent a password reset link. Please check your inbox (and spam/junk).",
+  "descriptionNotFound": "If an account exists for this email, we’ve sent a password reset link.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your email",
+    "submitBtn": "Send Reset Link",
+    "backToLogin": "← Back to Login",
+    "errorRequired": "Email is required.",
+    "errorGeneric": "Something went wrong.",
+    "errorServer": "Could not connect to the server."
+  },
+
+  "resetPassword": {
+    "brandName": "Cairo University - Faculty of Science",
+    "title": "Reset Password",
+    "subtitle": "Write your new password",
+    "newPasswordLabel": "New Password",
+    "newPasswordPlaceholder": "Enter your new password",
+    "confirmPasswordLabel": "Confirm Password",
+    "confirmPasswordPlaceholder": "Re-enter your new password",
+    "submitBtn": "Update Password",
+    "backToLogin": "← Back to Login",
+    "verifyingTitle": "Verifying...",
+    "verifyingMessage": "Please wait",
+    "invalidTitle": "Invalid Link",
+    "invalidTokenError": "Reset link is invalid. No token was found.",
+    "invalidLinkError": "The link has expired or is invalid.",
+    "invalidServerError": "Could not verify the link. Please try again.",
+    "requestNewLink": "Request a new reset link",
+    "successTitle": "Success",
+    "successMessage": "Password updated successfully! Redirecting to login page...",
+    "goToLogin": "Go to Login",
+    "errorMinLength": "Password must be at least 6 characters.",
+    "errorMismatch": "Passwords do not match.",
+    "errorGeneric": "Failed to reset password.",
+    "errorServer": "Could not connect to the server."
   }
 }
