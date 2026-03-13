@@ -12,11 +12,10 @@ interface Subject {
 }
 
 interface SubjectsTableProps {
-    onEdit?: (subject: Subject) => void;
-    footerContent?: unknown;
+    onEdit: (subject: Subject) => void;
 }
 
-const SubjectsTable = ({ onEdit, footerContent }: SubjectsTableProps) => {
+const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [page, setPage] = useState<number>(0);
     const [search, setSearch] = useState<string>("");
@@ -59,9 +58,7 @@ const SubjectsTable = ({ onEdit, footerContent }: SubjectsTableProps) => {
 
     return (
         <div className="dashboard-container">
-            <div className="students-table-header">
-                <h2 className="students-table-title">جدول المقررات</h2>
-            </div>
+            <h2>جدول المقررات</h2>
 
             {/* ===== Search Bar ===== */}
             <div style={{ display: "flex", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
@@ -127,12 +124,6 @@ const SubjectsTable = ({ onEdit, footerContent }: SubjectsTableProps) => {
                 setPage={setPage}
                 total={filteredSubjects.length}
             />
-
-            {footerContent && (
-                <div className="students-table-footer">
-                    {footerContent}
-                </div>
-            )}
         </div>
     );
 };

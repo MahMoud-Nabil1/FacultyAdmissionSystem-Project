@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {ChangeEvent, FormEvent, useState} from "react";
 import {createStaff} from "../../services/api";
 import {useNavigate} from "react-router-dom";
 import {ROLES} from "./constants";
@@ -10,27 +10,27 @@ interface StaffForm {
     password: string;
 }
 
-const StaffPanel = () => {
+const StaffPanel: React.FC = () => {
     const [showForm, setShowForm] = useState(false);
-    const [form, setForm] = useState({
+    const [form, setForm] = useState<StaffForm>({
         name: "",
         email: "",
         role: "admin",
         password: "",
-    } as StaffForm);
-    const [error, setError] = useState(null as string | null);
+    });
+    const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
     const handleChange = (
-        e: { target: { name: string; value: string } }
+        e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
         const {name, value} = e.target;
         setForm((prev) => ({...prev, [name]: value}));
     };
 
-    const handleSubmit = async (e: { preventDefault: () => void }) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setError(null);
         setLoading(true);
@@ -52,13 +52,22 @@ const StaffPanel = () => {
 
     return (
         <div className="dashboard-container">
+            <h2>الموظفين</h2>
+
             {/* Buttons */}
-            <div className="panel-actions">
+            <div style={{display: "flex", gap: "15px", flexWrap: "wrap", marginBottom: "20px"}}>
                 <button
                     className="panel-btn"
                     onClick={() => setShowForm((prev) => !prev)}
                 >
-                    {showForm ? "إلغاء" : "اضافة موظف جديد"}
+                    {showForm ? "إلغاء" : "اضف موظف جديد"}
+                </button>
+
+                <button
+                    className="panel-btn"
+                    onClick={() => navigate("/admin-dashboard/table?type=staff")}
+                >
+                    عرض جميع الموظفين
                 </button>
             </div>
 
