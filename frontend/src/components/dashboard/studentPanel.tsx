@@ -1,6 +1,7 @@
 import React, { useState, FormEvent } from "react";
 import { createStudent } from "../../services/api";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 interface StudentForm {
     studentId: string;
@@ -11,6 +12,7 @@ interface StudentForm {
 }
 
 const StudentPanel: React.FC = () => {
+    const { t } = useTranslation();
     const [form, setForm] = useState<StudentForm>({
         studentId: "",
         name: "",
@@ -35,9 +37,9 @@ const StudentPanel: React.FC = () => {
             setShowForm(false);
         } catch (err: any) {
             if (err.status === 409) {
-                setError("طالب بنفس الكود موجود بالفعل");
+                setError(t("studentPanel.errorDuplicate"));
             } else {
-                setError(err.data?.error || err.message || "حدث خطأ غير متوقع");
+                setError(err.data?.error || err.message || t("studentPanel.errorGeneric"));
             }
         } finally {
             setLoading(false);
@@ -46,11 +48,11 @@ const StudentPanel: React.FC = () => {
 
     return (
         <div className="dashboard-container">
-            <h2>الطلاب</h2>
+            <h2>{t("studentPanel.title")}</h2>
 
             {/* Toggle form */}
             <button className="panel-btn" onClick={() => setShowForm(prev => !prev)}>
-                {showForm ? "الغاء" : "اضف طالب جديد"}
+                {showForm ? t("studentPanel.cancelBtn") : t("studentPanel.addBtn")}
             </button>
 
             {showForm && (
@@ -58,34 +60,34 @@ const StudentPanel: React.FC = () => {
                     {error && <p className="error">{error}</p>}
 
                     <input
-                        placeholder="كود الطالب"
+                        placeholder={t("studentPanel.studentIdPlaceholder")}
                         value={form.studentId}
                         onChange={(e) => setForm({ ...form, studentId: e.target.value })}
                     />
                     <input
-                        placeholder="الإسم"
+                        placeholder={t("studentPanel.namePlaceholder")}
                         value={form.name}
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                     />
                     <input
-                        placeholder="الإيميل"
+                        placeholder={t("studentPanel.emailPlaceholder")}
                         value={form.email}
                         onChange={(e) => setForm({ ...form, email: e.target.value })}
                     />
                     <input
-                        placeholder="المعدل التراكمى"
+                        placeholder={t("studentPanel.gpaPlaceholder")}
                         value={form.gpa}
                         onChange={(e) => setForm({ ...form, gpa: e.target.value })}
                     />
                     <input
                         type="password"
-                        placeholder="كلمة السر"
+                        placeholder={t("studentPanel.passwordPlaceholder")}
                         value={form.password}
                         onChange={(e) => setForm({ ...form, password: e.target.value })}
                     />
 
                     <button className="submit-btn" disabled={loading}>
-                        {loading ? "جارٍ التسجيل..." : "سجل طالب جديد"}
+                        {loading ? t("studentPanel.loadingBtn") : t("studentPanel.submitBtn")}
                     </button>
                 </form>
             )}
@@ -95,7 +97,7 @@ const StudentPanel: React.FC = () => {
                 className="panel-btn"
                 onClick={() => navigate("/admin-dashboard/table?type=students")}
             >
-                عرض جميع الطلاب
+                {t("studentPanel.viewAllBtn")}
             </button>
         </div>
     );

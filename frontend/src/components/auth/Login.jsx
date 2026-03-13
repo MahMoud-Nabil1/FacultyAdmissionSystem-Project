@@ -4,9 +4,11 @@ import { useAuth } from '../../context/AuthContext';
 import './css/Login.css';
 import { useNavigate } from 'react-router-dom';
 import {jwtDecode} from "jwt-decode";
+import { useTranslation } from 'react-i18next';
 
 const Login = () => {
     const { login } = useAuth();
+    const { t } = useTranslation();
     const [userId, setUserId] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -32,7 +34,7 @@ const Login = () => {
             const data = await res.json();
 
             if (!res.ok) {
-                setError(data.error || 'فشل تسجيل الدخول');
+                setError(data?.error || t('login.errorGeneric'));
                 return;
             }
 
@@ -44,7 +46,7 @@ const Login = () => {
             else navigate("/");
 
         } catch (err) {
-            setError('لم يمكن التواصل مع السيرفر');
+            setError(t('login.errorServer'));
         } finally {
             setLoading(false);
         }
@@ -60,7 +62,7 @@ const Login = () => {
                         <path d="M6 12v5c0 0 3 3 6 3s6-3 6-3v-5" />
                         <line x1="22" y1="10" x2="22" y2="16" />
                     </svg>
-                    جامعة القاهرة - كلية العلوم
+                    {t('login.brandName')}
                 </div>
             </div>
 
@@ -68,8 +70,8 @@ const Login = () => {
             <div className="login-form-side">
                 <div className="login-card">
                     <div className="login-header">
-                        <h1>{'تسجيل الدخول'}</h1>
-                        <p>يرجى إدخال بيانات الاعتماد الخاصة بك للوصول.</p>
+                        <h1>{t('login.title')}</h1>
+                        <p>{t('login.subtitle')}</p>
                     </div>
 
                     {error && (
@@ -86,7 +88,7 @@ const Login = () => {
                     <form onSubmit={handleSubmit} className="login-form">
                         <div className="form-group">
                             <label htmlFor="userId">
-                                كود الطالب او الإيميل
+                                {t('login.userIdLabel')}
                             </label>
                             <div className="input-wrapper">
                                 <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -96,7 +98,7 @@ const Login = () => {
                                 <input
                                     id="userId"
                                     type="text"
-                                    placeholder='ادخل كود الطالب او الإيميل الخاص بك'
+                                    placeholder={t('login.userIdPlaceholder')}
                                     value={userId}
                                     onChange={(e) => setUserId(e.target.value)}
                                     required
@@ -106,7 +108,7 @@ const Login = () => {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="password">كلمة السر</label>
+                            <label htmlFor="password">{t('login.passwordLabel')}</label>
                             <div className="input-wrapper">
                                 <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -115,7 +117,7 @@ const Login = () => {
                                 <input
                                     id="password"
                                     type={showPassword ? 'text' : 'password'}
-                                    placeholder="ادخل كلمة السر الخاصة بك"
+                                    placeholder={t('login.passwordPlaceholder')}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
@@ -145,7 +147,7 @@ const Login = () => {
 
                         <div className="form-footer">
                             <Link to="/forgot-password" className="forgot-link">
-                                نسيت كلمة السر؟
+                                {t('login.forgotPassword')}
                             </Link>
                         </div>
 
@@ -159,7 +161,7 @@ const Login = () => {
                                     <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
                                     <line x1="12" y1="17" x2="12.01" y2="17" />
                                 </svg>
-                                تواصل مع الدعم
+                                {t('login.contactSupport')}
                             </Link>
                         </div>
 
@@ -167,7 +169,7 @@ const Login = () => {
                             {loading ? (
                                 <span className="spinner"></span>
                             ) : (
-                                `سجل الدخول`
+                                t('login.submitBtn')
                             )}
                         </button>
                     </form>

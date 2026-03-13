@@ -1,4 +1,5 @@
 import React, { useState, useEffect, FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -9,6 +10,7 @@ interface GPASettings {
 }
 
 const SettingsPanel: React.FC = () => {
+    const { t } = useTranslation();
     const [settings, setSettings] = useState<GPASettings>({ gpaMin: 2.5, gpaMax: 5, level: "1" });
     const [error, setError] = useState<string | null>(null);
     const [settingsLoading, setSettingsLoading] = useState(false);
@@ -16,7 +18,7 @@ const SettingsPanel: React.FC = () => {
     const fetchSettings = async () => {
         try {
             const res = await fetch(`${API_URL}/announcements/settings`);
-            if (!res.ok) throw new Error("فشل في جلب الإعدادات");
+            if (!res.ok) throw new Error(t("settingsPanel.fetchError"));
             const data = await res.json();
 
             setSettings({
@@ -36,13 +38,13 @@ const SettingsPanel: React.FC = () => {
     useEffect(() => {
         const { gpaMin, gpaMax } = settings;
         if (gpaMin >= gpaMax) {
-            setError("⚠️ الحد الأدنى أكبر من أو يساوي الحد الأقصى");
+            setError(t("settingsPanel.errorMinMax"));
         } else if (gpaMin < 0 || gpaMin > 5 || gpaMax < 0 || gpaMax > 5) {
-            setError("⚠️ القيم يجب أن تكون بين 0 و 5");
+            setError(t("settingsPanel.errorRange"));
         } else {
             setError(null);
         }
-    }, [settings]);
+    }, [settings, t]);
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -58,14 +60,14 @@ const SettingsPanel: React.FC = () => {
 
             const data = await res.json();
             if (!res.ok) {
-                alert(data.message || "حدث خطأ");
+                alert(data.message || t("settingsPanel.saveError"));
                 return;
             }
 
-            alert("✅ تم حفظ الإعدادات بنجاح");
+            alert(t("settingsPanel.saveSuccess"));
         } catch (err) {
             console.error(err);
-            alert("❌ حدث خطأ في الاتصال");
+            alert(t("settingsPanel.saveError"));
         } finally {
             setSettingsLoading(false);
         }
@@ -73,7 +75,7 @@ const SettingsPanel: React.FC = () => {
 
     return (
         <div className="dashboard-container">
-            <h2>إعدادات المعدل التراكمي والمستوى</h2>
+            <h2>{t("settingsPanel.title")}</h2>
             {error && <p className="error">{error}</p>}
 
             <form className="form" onSubmit={handleSubmit}>
@@ -83,7 +85,7 @@ const SettingsPanel: React.FC = () => {
                         step="0.1"
                         min={0}
                         max={5}
-                        placeholder="الحد الأدنى للمعدل"
+                        placeholder={t("settingsPanel.minPlaceholder")}
                         value={settings.gpaMin}
                         onChange={(e) => setSettings({ ...settings, gpaMin: parseFloat(e.target.value) })}
                     />
@@ -92,7 +94,7 @@ const SettingsPanel: React.FC = () => {
                         step="0.1"
                         min={0}
                         max={5}
-                        placeholder="الحد الأقصى للمعدل"
+                        placeholder={t("settingsPanel.maxPlaceholder")}
                         value={settings.gpaMax}
                         onChange={(e) => setSettings({ ...settings, gpaMax: parseFloat(e.target.value) })}
                     />
@@ -100,14 +102,14 @@ const SettingsPanel: React.FC = () => {
                         value={settings.level}
                         onChange={(e) => setSettings({ ...settings, level: e.target.value })}
                     >
-                        <option value="1">المستوى الأول</option>
-                        <option value="2">المستوى الثاني</option>
-                        <option value="3">المستوى الثالث</option>
-                        <option value="4">المستوى الرابع</option>
+                        <option value="1">{t("announcements.level1")}</option>
+                        <option value="2">{t("announcements.level2")}</option>
+                        <option value="3">{t("announcements.level3")}</option>
+                        <option value="4">{t("announcements.level4")}</option>
                     </select>
                 </div>
                 <button className="submit-btn" disabled={settingsLoading || !!error}>
-                    {settingsLoading ? "جاري الحفظ..." : "حفظ الإعدادات"}
+                    {settingsLoading ? t("settingsPanel.savingBtn") : t("settingsPanel.saveBtn")}
                 </button>
             </form>
         </div>

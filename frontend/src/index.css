@@ -1,55 +1,73 @@
+/* ============================================================
+   GLOBAL STYLES
+   ============================================================
+   Import the design system first, then define global resets
+   and base styles using its tokens.
+   ============================================================ */
+@import './styles/design-system.css';
+
+/* ── Legacy aliases ──
+   These map old token names → new design-system tokens so that
+   existing component CSS files keep working without changes.
+   Remove these gradually as you migrate each component.        */
 :root {
-  --primary-color: #1877F2;
-  --primary-hover: #166fe5;
-  --text-dark: #1a1a1a;
-  --text-gray: #6b7280;
-  --bg-light: #f9fafb;
-  --bg-white: #ffffff;
-  --border-color: #e5e7eb;
-  --input-bg: #f9fafb;
-  --error-color: #ef4444;
-  --success-color: #10b981;
-  --border-radius: 8px;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  --primary-color:  var(--color-primary);
+  --primary-hover:  var(--color-primary-hover);
+  --primary-blue:   var(--color-primary);
+  --text-dark:      var(--color-text);
+  --text-gray:      var(--color-text-muted);
+  --text-muted:     var(--color-text-muted);
+  --bg-light:       var(--color-bg);
+  --bg-white:       var(--color-surface);
+  --border-color:   var(--color-border);
+  --input-bg:       var(--color-input-bg);
+  --error-color:    var(--color-error);
+  --error-red:      var(--color-error);
+  --success-color:  var(--color-success);
+  --success-green:  var(--color-success);
+  --border-radius:  var(--radius-md);
+  --shadow-sm:      var(--shadow-sm);
+  --shadow-md:      var(--shadow-md);
+  --shadow-lg:      var(--shadow-lg);
+  --font-family:    var(--font-primary);
+  --white:          var(--color-surface);
+  --accent-blue:    var(--color-primary-light);
+  --radius:         var(--radius-lg);
+  --transition:     var(--transition-smooth);
+}
+
+/* ── Global Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: var(--font-family), serif;
+  font-family: var(--font-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg-light);
-  color: var(--text-dark);
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
-* {
-  box-sizing: border-box;
+  font-family: var(--font-mono);
 }
 
 h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
-  font-weight: 600;
-  color: var(--text-dark);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
 }
 
 p {
-  color: var(--text-gray);
+  color: var(--color-text-muted);
 }
 
 a {
-  color: var(--primary-color);
+  color: var(--color-primary);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: var(--transition-fast);
 }
 
 a:hover {
