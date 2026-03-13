@@ -12,6 +12,7 @@ interface GPASettings {
 const SettingsPanel: React.FC = () => {
     const { t } = useTranslation();
     const [settings, setSettings] = useState<GPASettings>({ gpaMin: 2.5, gpaMax: 5, level: "1" });
+    const [selectedLevels, setSelectedLevels] = useState<string[]>(["1"]);
     const [error, setError] = useState<string | null>(null);
     const [settingsLoading, setSettingsLoading] = useState(false);
 
@@ -26,6 +27,12 @@ const SettingsPanel: React.FC = () => {
                 gpaMax: Math.max(data.gpaMin, data.gpaMax),
                 level: data.level,
             });
+            
+            // Parse level as array if it contains commas, otherwise single value
+            const levels = data.level.includes(',') 
+                ? data.level.split(',').map((l: string) => l.trim())
+                : [data.level];
+            setSelectedLevels(levels);
         } catch (err) {
             console.error(err);
         }
@@ -46,16 +53,34 @@ const SettingsPanel: React.FC = () => {
         }
     }, [settings, t]);
 
+    const handleLevelToggle = (level: string) => {
+        setSelectedLevels(prev => {
+            if (prev.includes(level)) {
+                // Don't allow deselecting all levels
+                if (prev.length === 1) return prev;
+                return prev.filter(l => l !== level);
+            } else {
+                return [...prev, level].sort();
+            }
+        });
+    };
+
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        if (error) return;
+        if (error || selectedLevels.length === 0) return;
 
         setSettingsLoading(true);
         try {
+            const levelString = selectedLevels.join(',');
             const res = await fetch(`${API_URL}/announcements/settings`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...settings, updatedBy: "Admin" }),
+                body: JSON.stringify({ 
+                    gpaMin: settings.gpaMin,
+                    gpaMax: settings.gpaMax,
+                    level: levelString,
+                    updatedBy: "Admin" 
+                }),
             });
 
             const data = await res.json();
@@ -79,36 +104,55 @@ const SettingsPanel: React.FC = () => {
             {error && <p className="error">{error}</p>}
 
             <form className="form" onSubmit={handleSubmit}>
-                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                    <input
-                        type="number"
-                        step="0.1"
-                        min={0}
-                        max={5}
-                        placeholder={t("settingsPanel.minPlaceholder")}
-                        value={settings.gpaMin}
-                        onChange={(e) => setSettings({ ...settings, gpaMin: parseFloat(e.target.value) })}
-                    />
-                    <input
-                        type="number"
-                        step="0.1"
-                        min={0}
-                        max={5}
-                        placeholder={t("settingsPanel.maxPlaceholder")}
-                        value={settings.gpaMax}
-                        onChange={(e) => setSettings({ ...settings, gpaMax: parseFloat(e.target.value) })}
-                    />
-                    <select
-                        value={settings.level}
-                        onChange={(e) => setSettings({ ...settings, level: e.target.value })}
-                    >
-                        <option value="1">{t("announcements.level1")}</option>
-                        <option value="2">{t("announcements.level2")}</option>
-                        <option value="3">{t("announcements.level3")}</option>
-                        <option value="4">{t("announcements.level4")}</option>
-                    </select>
+                <div className="form-group">
+                    <label>{t("settingsPanel.gpaRangeLabel")}</label>
+                    <div className="settings-form-row">
+                        <div className="form-group" style={{ flex: 1 }}>
+                            <label>{t("settingsPanel.minLabel")}</label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                min={0}
+                                max={5}
+                                placeholder={t("settingsPanel.minPlaceholder")}
+                                value={settings.gpaMin}
+                                onChange={(e) => setSettings({ ...settings, gpaMin: parseFloat(e.target.value) })}
+                            />
+                        </div>
+                        <div className="form-group" style={{ flex: 1 }}>
+                            <label>{t("settingsPanel.maxLabel")}</label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                min={0}
+                                max={5}
+                                placeholder={t("settingsPanel.maxPlaceholder")}
+                                value={settings.gpaMax}
+                                onChange={(e) => setSettings({ ...settings, gpaMax: parseFloat(e.target.value) })}
+                            />
+                        </div>
+                    </div>
                 </div>
-                <button className="submit-btn" disabled={settingsLoading || !!error}>
+
+                <div className="form-group">
+                    <label>{t("announcements.levelSectionTitle")}</label>
+                    <div className="settings-level-row">
+                        {["1", "2", "3", "4"].map(level => (
+                            <label key={level} className="settings-level-option">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedLevels.includes(level)}
+                                    onChange={() => handleLevelToggle(level)}
+                                />
+                                <span className="settings-level-label">
+                                    {t(`announcements.level${level}`)}
+                                </span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                <button className="submit-btn" disabled={settingsLoading || !!error || selectedLevels.length === 0}>
                     {settingsLoading ? t("settingsPanel.savingBtn") : t("settingsPanel.saveBtn")}
                 </button>
             </form>

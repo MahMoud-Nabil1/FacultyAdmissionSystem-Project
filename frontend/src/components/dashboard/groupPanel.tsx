@@ -208,21 +208,21 @@ const GroupPanel: React.FC = () => {
     const getTypeStyle = (type: string) => {
         switch(type.toLowerCase()) {
             case 'lecture':
-                return { backgroundColor: "#e3f2fd", color: "#1976d2" };
+                return { backgroundColor: "var(--color-info-bg)", color: "var(--color-info)" };
             case 'lab':
                 return { backgroundColor: "#f3e5f5", color: "#7b1fa2" };
             case 'tutorial':
-                return { backgroundColor: "#fff3e0", color: "#f57c00" };
+                return { backgroundColor: "var(--color-warning-bg)", color: "var(--color-warning)" };
             case 'seminar':
-                return { backgroundColor: "#e8f5e8", color: "#2e7d32" };
+                return { backgroundColor: "var(--color-success-bg)", color: "var(--color-success)" };
             default:
-                return { backgroundColor: "#e0e0e0", color: "#616161" };
+                return { backgroundColor: "var(--color-border)", color: "var(--color-text-muted)" };
         }
     };
 
     return (
         <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", maxWidth: "1200px", margin: "0 auto" }}>
-            <h2 style={{ color: "#333", borderBottom: "2px solid #4CAF50", paddingBottom: "10px" }}>
+            <h2 style={{ color: "var(--color-text-secondary)", borderBottom: "2px solid var(--color-success)", paddingBottom: "10px" }}>
                 {editingId ? "✏️ Update Group" : "➕ Add New Group"}
             </h2>
 
@@ -233,7 +233,7 @@ const GroupPanel: React.FC = () => {
                 gap: "15px",
                 marginBottom: "30px",
                 padding: "25px",
-                backgroundColor: "#f8f9fa",
+                backgroundColor: "var(--color-bg)",
                 borderRadius: "10px",
                 boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
             }}>
@@ -241,12 +241,12 @@ const GroupPanel: React.FC = () => {
                 {(subject || number || type || day || from || to) && (
                     <div style={{
                         padding: "15px",
-                        backgroundColor: "#e3f2fd",
+                        backgroundColor: "var(--color-info-bg)",
                         borderRadius: "6px",
                         marginBottom: "10px",
                         border: "1px solid #90caf9"
                     }}>
-                        <strong style={{ color: "#1976d2" }}>Current Selection:</strong>
+                        <strong style={{ color: "var(--color-info)" }}>Current Selection:</strong>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: "15px", marginTop: "8px" }}>
                             {subject && <span><strong>Subject:</strong> {subject.toUpperCase()}</span>}
                             {number && <span><strong>Group:</strong> {number}</span>}
@@ -267,7 +267,7 @@ const GroupPanel: React.FC = () => {
                     alignItems: "flex-start"
                 }}>
                     <div style={{ flex: "1", minWidth: "150px" }}>
-                        <label style={{ fontSize: "12px", color: "#666", display: "block", marginBottom: "4px" }}>
+                        <label style={{ fontSize: "12px", color: "var(--color-text-muted)", display: "block", marginBottom: "4px" }}>
                             Subject *
                         </label>
                         <input
@@ -280,18 +280,18 @@ const GroupPanel: React.FC = () => {
                             style={{
                                 padding: "10px",
                                 borderRadius: "6px",
-                                border: formErrors.subject ? "2px solid #f44336" : "1px solid #ddd",
+                                border: formErrors.subject ? "2px solid var(--color-error)" : "1px solid var(--color-border)",
                                 width: "100%",
                                 fontSize: "14px"
                             }}
                         />
                         {formErrors.subject && (
-                            <span style={{ color: "#f44336", fontSize: "11px" }}>{formErrors.subject}</span>
+                            <span style={{ color: "var(--color-error)", fontSize: "11px" }}>{formErrors.subject}</span>
                         )}
                     </div>
 
                     <div style={{ width: "100px" }}>
-                        <label style={{ fontSize: "12px", color: "#666", display: "block", marginBottom: "4px" }}>
+                        <label style={{ fontSize: "12px", color: "var(--color-text-muted)", display: "block", marginBottom: "4px" }}>
                             Group # *
                         </label>
                         <input
@@ -305,7 +305,7 @@ const GroupPanel: React.FC = () => {
                             style={{
                                 padding: "10px",
                                 borderRadius: "6px",
-                                border: formErrors.number ? "2px solid #f44336" : "1px solid #ddd",
+                                border: formErrors.number ? "2px solid var(--color-error)" : "1px solid var(--color-border)",
                                 width: "100%",
                                 fontSize: "14px"
                             }}
@@ -313,7 +313,7 @@ const GroupPanel: React.FC = () => {
                     </div>
 
                     <div style={{ width: "120px" }}>
-                        <label style={{ fontSize: "12px", color: "#666", display: "block", marginBottom: "4px" }}>
+                        <label style={{ fontSize: "12px", color: "var(--color-text-muted)", display: "block", marginBottom: "4px" }}>
                             Type *
                         </label>
                         <select
@@ -325,7 +325,7 @@ const GroupPanel: React.FC = () => {
                             style={{
                                 padding: "10px",
                                 borderRadius: "6px",
-                                border: formErrors.type ? "2px solid #f44336" : "1px solid #ddd",
+                                border: formErrors.type ? "2px solid var(--color-error)" : "1px solid var(--color-border)",
                                 width: "100%",
                                 fontSize: "14px",
                                 backgroundColor: "white"
@@ -340,7 +340,7 @@ const GroupPanel: React.FC = () => {
                     </div>
 
                     <div style={{ width: "120px" }}>
-                        <label style={{ fontSize: "12px", color: "#666", display: "block", marginBottom: "4px" }}>
+                        <label style={{ fontSize: "12px", color: "var(--color-text-muted)", display: "block", marginBottom: "4px" }}>
                             Day *
                         </label>
                         <select
@@ -352,7 +352,7 @@ const GroupPanel: React.FC = () => {
                             style={{
                                 padding: "10px",
                                 borderRadius: "6px",
-                                border: formErrors.day ? "2px solid #f44336" : "1px solid #ddd",
+                                border: formErrors.day ? "2px solid var(--color-error)" : "1px solid var(--color-border)",
                                 width: "100%",
                                 fontSize: "14px",
                                 backgroundColor: "white"
@@ -370,7 +370,7 @@ const GroupPanel: React.FC = () => {
                     </div>
 
                     <div style={{ width: "100px" }}>
-                        <label style={{ fontSize: "12px", color: "#666", display: "block", marginBottom: "4px" }}>
+                        <label style={{ fontSize: "12px", color: "var(--color-text-muted)", display: "block", marginBottom: "4px" }}>
                             From *
                         </label>
                         <select
@@ -382,7 +382,7 @@ const GroupPanel: React.FC = () => {
                             style={{
                                 padding: "10px",
                                 borderRadius: "6px",
-                                border: formErrors.from || formErrors.time ? "2px solid #f44336" : "1px solid #ddd",
+                                border: formErrors.from || formErrors.time ? "2px solid var(--color-error)" : "1px solid var(--color-border)",
                                 width: "100%",
                                 fontSize: "14px",
                                 backgroundColor: "white"
@@ -396,7 +396,7 @@ const GroupPanel: React.FC = () => {
                     </div>
 
                     <div style={{ width: "100px" }}>
-                        <label style={{ fontSize: "12px", color: "#666", display: "block", marginBottom: "4px" }}>
+                        <label style={{ fontSize: "12px", color: "var(--color-text-muted)", display: "block", marginBottom: "4px" }}>
                             To *
                         </label>
                         <select
@@ -408,7 +408,7 @@ const GroupPanel: React.FC = () => {
                             style={{
                                 padding: "10px",
                                 borderRadius: "6px",
-                                border: formErrors.to || formErrors.time ? "2px solid #f44336" : "1px solid #ddd",
+                                border: formErrors.to || formErrors.time ? "2px solid var(--color-error)" : "1px solid var(--color-border)",
                                 width: "100%",
                                 fontSize: "14px",
                                 backgroundColor: "white"
@@ -422,7 +422,7 @@ const GroupPanel: React.FC = () => {
                     </div>
 
                     <div style={{ width: "90px" }}>
-                        <label style={{ fontSize: "12px", color: "#666", display: "block", marginBottom: "4px" }}>
+                        <label style={{ fontSize: "12px", color: "var(--color-text-muted)", display: "block", marginBottom: "4px" }}>
                             Capacity *
                         </label>
                         <input
@@ -437,7 +437,7 @@ const GroupPanel: React.FC = () => {
                             style={{
                                 padding: "10px",
                                 borderRadius: "6px",
-                                border: formErrors.capacity ? "2px solid #f44336" : "1px solid #ddd",
+                                border: formErrors.capacity ? "2px solid var(--color-error)" : "1px solid var(--color-border)",
                                 width: "100%",
                                 fontSize: "14px"
                             }}
@@ -449,7 +449,7 @@ const GroupPanel: React.FC = () => {
                             onClick={handleSubmit}
                             style={{
                                 padding: "10px 20px",
-                                backgroundColor: editingId ? "#2196F3" : "#4CAF50",
+                                backgroundColor: editingId ? "var(--color-info)" : "var(--color-success)",
                                 color: "white",
                                 border: "none",
                                 borderRadius: "6px",
@@ -470,7 +470,7 @@ const GroupPanel: React.FC = () => {
                                 onClick={handleCancel}
                                 style={{
                                     padding: "10px 20px",
-                                    backgroundColor: "#f44336",
+                                    backgroundColor: "var(--color-error)",
                                     color: "white",
                                     border: "none",
                                     borderRadius: "6px",
@@ -487,11 +487,11 @@ const GroupPanel: React.FC = () => {
 
                 {formErrors.time && (
                     <div style={{
-                        color: "#f44336",
+                        color: "var(--color-error)",
                         fontSize: "13px",
                         marginTop: "5px",
                         padding: "8px",
-                        backgroundColor: "#ffebee",
+                        backgroundColor: "var(--color-error-bg)",
                         borderRadius: "4px"
                     }}>
                         ⚠️ {formErrors.time}
@@ -500,7 +500,7 @@ const GroupPanel: React.FC = () => {
             </div>
 
             {/* Groups Dashboard */}
-            <h2 style={{ color: "#333", borderBottom: "2px solid #4CAF50", paddingBottom: "10px" }}>
+            <h2 style={{ color: "var(--color-text-secondary)", borderBottom: "2px solid var(--color-success)", paddingBottom: "10px" }}>
                 📊 Groups Dashboard ({groups.length})
             </h2>
 
@@ -508,9 +508,9 @@ const GroupPanel: React.FC = () => {
                 <div style={{
                     textAlign: "center",
                     padding: "60px",
-                    backgroundColor: "#f9f9f9",
+                    backgroundColor: "var(--color-bg)",
                     borderRadius: "8px",
-                    color: "#666",
+                    color: "var(--color-text-muted)",
                     fontSize: "16px"
                 }}>
                     📭 No groups found. Add your first group above!
@@ -525,7 +525,7 @@ const GroupPanel: React.FC = () => {
                         overflow: "hidden"
                     }}>
                         <thead>
-                        <tr style={{ backgroundColor: "#4CAF50", color: "white" }}>
+                        <tr style={{ backgroundColor: "var(--color-success)", color: "white" }}>
                             <th style={{ padding: "14px", textAlign: "left" }}>Subject</th>
                             <th style={{ padding: "14px", textAlign: "left" }}>Group #</th>
                             <th style={{ padding: "14px", textAlign: "left" }}>Type</th>
@@ -542,12 +542,12 @@ const GroupPanel: React.FC = () => {
                             <tr
                                 key={group._id}
                                 style={{
-                                    backgroundColor: index % 2 === 0 ? "#f9f9f9" : "white",
-                                    borderBottom: "1px solid #ddd",
+                                    backgroundColor: index % 2 === 0 ? "var(--color-bg)" : "white",
+                                    borderBottom: "1px solid var(--color-border)",
                                     transition: "background-color 0.3s"
                                 }}
                                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f1f8e9")}
-                                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = index % 2 === 0 ? "#f9f9f9" : "white")}
+                                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = index % 2 === 0 ? "var(--color-bg)" : "white")}
                             >
                                 <td style={{ padding: "14px", fontWeight: "bold" }}>
                                     {group.subject.toUpperCase()}
@@ -570,10 +570,10 @@ const GroupPanel: React.FC = () => {
                                 <td style={{ padding: "14px", fontWeight: "500" }}>{numberToTime(group.to)}</td>
                                 <td style={{ padding: "14px" }}>
                                         <span style={{
-                                            backgroundColor: "#e8f5e8",
+                                            backgroundColor: "var(--color-success-bg)",
                                             padding: "4px 8px",
                                             borderRadius: "4px",
-                                            color: "#2e7d32",
+                                            color: "var(--color-success)",
                                             fontWeight: "500"
                                         }}>
                                             {group.capacity}
@@ -581,10 +581,10 @@ const GroupPanel: React.FC = () => {
                                 </td>
                                 <td style={{ padding: "14px" }}>
                                         <span style={{
-                                            backgroundColor: "#fff3e0",
+                                            backgroundColor: "var(--color-warning-bg)",
                                             padding: "4px 8px",
                                             borderRadius: "4px",
-                                            color: "#f57c00",
+                                            color: "var(--color-warning)",
                                             fontWeight: "500"
                                         }}>
                                             {group.students?.length || 0}
@@ -596,7 +596,7 @@ const GroupPanel: React.FC = () => {
                                         style={{
                                             padding: "6px 12px",
                                             marginRight: "6px",
-                                            backgroundColor: "#2196F3",
+                                            backgroundColor: "var(--color-info)",
                                             color: "white",
                                             border: "none",
                                             borderRadius: "4px",
@@ -614,7 +614,7 @@ const GroupPanel: React.FC = () => {
                                         onClick={() => handleDelete(group._id!)}
                                         style={{
                                             padding: "6px 12px",
-                                            backgroundColor: "#f44336",
+                                            backgroundColor: "var(--color-error)",
                                             color: "white",
                                             border: "none",
                                             borderRadius: "4px",

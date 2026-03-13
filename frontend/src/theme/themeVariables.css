@@ -1,0 +1,35 @@
+/**
+ * Global theme variables.
+ * Applied to <html data-theme="..."> so all pages use the same tokens.
+ * Dashboard, auth, and other components should use var(--token-name).
+ */
+
+/* Light (default) */
+:root,
+[data-theme="light"] {
+    --primary: #004a99;
+    --primary-hover: #003d80;
+    --sidebar-bg: #1a2a4b;
+    --sidebar-active: #4a7afe;
+    --success: #10b981;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --bg-light: #f9fafb;
+    --surface: #ffffff;
+    --text-primary: #111827;
+    --text-muted: #6b7280;
+    --border: #e2e8f0;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --radius: 12px;
+    --radius-sm: 8px;
+    /* Aliases for existing dashboard/auth CSS */
+    --primary-blue: var(--color-primary);
+    --success-green: var(--color-success);
+    --error-red: var(--color-error);
+    --warning-orange: var(--color-warning);
+    --white: var(--color-surface);
+    --text-dark: var(--color-text);
+    --border-color: var(--color-border);
+    --sidebar-blue: var(--color-surface);
+}

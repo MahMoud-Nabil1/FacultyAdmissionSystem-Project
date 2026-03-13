@@ -2,11 +2,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;600&display=swap');
 
 :root {
-    --primary-blue: #004a99;      /* Classic Academic Blue */
-    --accent-blue: #eef6ff;       /* Very light blue for backgrounds */
-    --text-dark: #1a1a1a;         /* Near black for headers */
-    --text-muted: #4a5568;        /* Soft gray for body text */
-    --border-color: #e2e8f0;      /* Thin, subtle borders */
+    --primary-blue: var(--color-primary);      /* Classic Academic Blue */
+    --accent-blue: var(--color-primary-light);       /* Very light blue for backgrounds */
+    --text-dark: var(--color-text);         /* Near black for headers */
+    --text-muted: var(--color-text-secondary);        /* Soft gray for body text */
+    --border-color: var(--color-border);      /* Thin, subtle borders */
     --white: #ffffff;
     --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -17,7 +17,7 @@
     margin: 0 auto;
     padding: 3rem 1.5rem;
     font-family: 'Alexandria', 'Segoe UI', sans-serif;
-    background-color: #fafbfc;
+    background-color: var(--color-bg);
     min-height: 100vh;
 }
 
@@ -26,7 +26,7 @@
     font-weight: 600;
     margin-bottom: 3rem;
     text-align: center;
-    color: var(--primary-blue);
+    color: var(--color-primary);
     position: relative;
     padding-bottom: 15px;
 }
@@ -40,17 +40,17 @@
     transform: translateX(-50%);
     width: 60px;
     height: 4px;
-    background: var(--primary-blue);
+    background: var(--color-primary);
     border-radius: 2px;
 }
 
 /* Info Card - Minimalist & Clean */
 .info-card {
     width: 100%;
-    background-color: var(--white);
+    background-color: var(--color-text-inverse);
     padding: 2rem;
     border-radius: 16px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--color-border);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     margin-bottom: 2.5rem;
     font-size: 1.15rem; /* Perfect balance for Arabic readability */
@@ -59,13 +59,13 @@
 }
 
 .info-card:hover {
-    border-color: var(--primary-blue);
+    border-color: var(--color-primary);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
 }
 
 .info-card p {
     margin: 10px 0;
-    color: var(--text-muted);
+    color: var(--color-text-muted);
 }
 
 /* Buttons Section */
@@ -81,9 +81,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--white);
-    color: var(--primary-blue);
-    border: 2px solid var(--primary-blue);
+    background-color: var(--color-text-inverse);
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
     padding: 12px 24px;
     border-radius: 10px;
     font-size: 1.1rem;
@@ -94,25 +94,25 @@
 
 /* Primary Action - Subject Registration */
 .btn.register {
-    background-color: var(--primary-blue);
-    color: var(--white);
-    border: 2px solid var(--primary-blue);
+    background-color: var(--color-primary);
+    color: var(--color-text-inverse);
+    border: 2px solid var(--color-primary);
 }
 
 .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 74, 153, 0.15);
+    box-shadow: 0 4px 12px var(--color-primary-alpha-15);
 }
 
 .btn.register:hover {
-    background-color: #003d80;
+    background-color: var(--color-primary-hover);
 }
 
 /* Admin & Reset Buttons - Subtle treatment */
 .btn.admin, .btn.reset {
     background-color: var(--accent-blue);
     border-color: transparent;
-    color: var(--primary-blue);
+    color: var(--color-primary);
 }
 
 .btn.admin:hover, .btn.reset:hover {
@@ -121,10 +121,10 @@
 
 /* Reset Panel / Form Inputs */
 .reset-panel {
-    background-color: var(--white);
+    background-color: var(--color-text-inverse);
     padding: 2rem;
     border-radius: 16px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--color-border);
     max-width: 350px;
     margin: 2rem auto;
 }
@@ -134,15 +134,15 @@
     padding: 12px 16px;
     margin: 8px 0 16px 0;
     border-radius: 8px;
-    border: 1.5px solid var(--border-color);
+    border: 1.5px solid var(--color-border);
     font-size: 1rem;
     background-color: #f8fafc;
     transition: var(--transition);
 }
 
 .reset-panel input:focus {
-    border-color: var(--primary-blue);
-    background-color: var(--white);
+    border-color: var(--color-primary);
+    background-color: var(--color-text-inverse);
     outline: none;
     box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
 }
@@ -153,5 +153,5 @@
     font-weight: 400;
     text-align: center;
     margin-top: 5rem;
-    color: var(--text-muted);
+    color: var(--color-text-muted);
 }

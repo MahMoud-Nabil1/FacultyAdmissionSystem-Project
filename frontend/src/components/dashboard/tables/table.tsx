@@ -18,14 +18,7 @@ const AdminDashboardTable: React.FC = () => {
     const navigate = useNavigate();
 
     return (
-        <div>
-            {/* Back button */}
-            <button
-                style={{ marginBottom: "16px", padding: "8px 16px", background: "#ddd" }}
-                onClick={() => navigate("/admin-dashboard")}
-            >
-                {t("dashboardTable.backToAdminDashboard")}
-            </button>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', flex: 1 }}>
             {tableType === "students" && <StudentsTable />}
             {tableType === "staff" && <StaffTable />}
             {tableType === "subjects" && <SubjectsTable />}

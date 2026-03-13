@@ -179,31 +179,7 @@
 
 /* ====================
    9. DARK THEME OVERRIDES
+   ====================
+   Removed to enforce a clean white/grayish background across all components
+   regardless of the user's system theme or OS settings. 
    ==================== */
-:root[data-theme="dark"] {
-  --color-primary:           #3b82f6;
-  --color-primary-hover:     #2563eb;
-  --color-primary-light:     rgba(59, 130, 246, 0.12);
-  --color-primary-alpha-10:  rgba(59, 130, 246, 0.10);
-  --color-primary-alpha-15:  rgba(59, 130, 246, 0.15);
-
-  --color-text:              #e5e7eb;
-  --color-text-secondary:    #d1d5db;
-  --color-text-muted:        #9ca3af;
-  --color-text-placeholder:  #6b7280;
-  --color-text-disabled:     #4b5563;
-
-  --color-bg:                #0b1220;
-  --color-bg-alt:            #111827;
-  --color-surface:           #0f172a;
-  --color-surface-hover:     #1e293b;
-  --color-surface-active:    #334155;
-  --color-input-bg:          #1e293b;
-
-  --color-border:            rgba(229, 231, 235, 0.12);
-  --color-border-light:      rgba(229, 231, 235, 0.06);
-
-  --shadow-sm:  0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md:  0 4px 6px rgba(0, 0, 0, 0.3);
-  --shadow-lg:  0 10px 15px rgba(0, 0, 0, 0.3);
-}
