@@ -1,6 +1,8 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 const GroupPanel: React.FC = () => {
+    const { t } = useTranslation();
     return (
         <div style={{
             backgroundColor: "white",
@@ -15,7 +17,7 @@ const GroupPanel: React.FC = () => {
                 fontWeight: "600",
                 color: "#333"
             }}>
-                اضافة مجموعات
+                {t("groupPanel.title")}
             </h1>
         </div>
     );

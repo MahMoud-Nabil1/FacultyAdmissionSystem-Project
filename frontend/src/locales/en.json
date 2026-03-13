@@ -105,5 +105,184 @@
     "errorMismatch": "Passwords do not match.",
     "errorGeneric": "Failed to reset password.",
     "errorServer": "Could not connect to the server."
+  },
+  "adminDashboard": {
+    "welcome": "Welcome {{name}}"
+  },
+  "groupPanel": {
+    "title": "Add Groups"
+  },
+  "staffPanel": {
+    "title": "Staff",
+    "addBtn": "Add New Staff",
+    "cancelBtn": "Cancel",
+    "viewAllBtn": "View All Staff",
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter full name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter email address",
+    "roleLabel": "Role",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter password",
+    "submitBtn": "Register New Staff",
+    "loadingBtn": "Registering...",
+    "errorDuplicate": "A staff member with this email already exists",
+    "errorGeneric": "An unexpected error occurred"
+  },
+  "studentPanel": {
+    "title": "Students",
+    "addBtn": "Add New Student",
+    "cancelBtn": "Cancel",
+    "viewAllBtn": "View All Students",
+    "studentIdPlaceholder": "Student Code",
+    "namePlaceholder": "Name",
+    "emailPlaceholder": "Email",
+    "gpaPlaceholder": "GPA",
+    "passwordPlaceholder": "Password",
+    "submitBtn": "Register New Student",
+    "loadingBtn": "Registering...",
+    "errorDuplicate": "A student with this code already exists",
+    "errorGeneric": "An unexpected error occurred"
+  },
+  "subjectPanel": {
+    "title": "Subjects",
+    "addBtn": "Add New Subject",
+    "viewTableBtn": "View Subjects Table",
+    "codePlaceholder": "Subject Code (e.g. CS202)",
+    "namePlaceholder": "Subject Name (e.g. Data Structures and Algorithms)",
+    "creditHoursPlaceholder": "Credit Hours",
+    "prerequisitesLabel": "Prerequisites",
+    "prerequisitesEmpty": "Select Prerequisites",
+    "prerequisitesSelected": "{{count}} selected",
+    "saveBtn": "Save",
+    "errorCode": "Subject code is required",
+    "errorName": "Subject name is required",
+    "errorCreditHours": "Invalid credit hours",
+    "errorGeneric": "An error occurred"
+  },
+  "roles": {
+    "admin": "Admin",
+    "academic_guide": "Academic Guide",
+    "academic_guide_coordinator": "Academic Guide Coordinator",
+    "reporter": "Reporter"
+  },
+  "dashboardCommon": {
+    "all": "All",
+    "delete": "Delete",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "copied": "Copied!",
+    "copy": "Copy",
+    "actions": "Actions",
+    "date": "Date",
+    "publisher": "Publisher",
+    "title": "Title",
+    "content": "Content",
+    "searchById": "Search by ID",
+    "noResults": "No results",
+    "confirmDeleteStudent": "Are you sure you want to delete this student?",
+    "confirmDeleteStaff": "Are you sure you want to delete this staff member?",
+    "confirmDeleteSubject": "Do you want to delete this subject?",
+    "confirmDeleteAnnouncement": "Are you sure you want to delete this announcement?"
+  },
+  "dashboardTable": {
+    "backToAdminDashboard": "Back to Admin Dashboard"
+  },
+  "studentsTable": {
+    "title": "Students Table",
+    "studentCode": "Student Code",
+    "name": "Name",
+    "email": "Email",
+    "gpa": "GPA",
+    "copyId": "Copy ID"
+  },
+  "staffTable": {
+    "title": "Staff Table",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "copyId": "Copy ID"
+  },
+  "subjectsTable": {
+    "title": "Subjects Table",
+    "searchPlaceholder": "Search by subject name or code...",
+    "code": "Subject Code",
+    "name": "Subject Name",
+    "creditHours": "Credit Hours",
+    "prerequisites": "Prerequisites"
+  },
+  "announcementsAdminPanel": {
+    "title": "Announcements",
+    "toggleAdd": "Add new announcement",
+    "toggleEdit": "Edit announcement",
+    "toggleCancel": "Cancel",
+    "fieldTitlePlaceholder": "Title",
+    "fieldContentPlaceholder": "Content",
+    "submitCreate": "Publish announcement",
+    "submitUpdate": "Update announcement",
+    "submitting": "Submitting...",
+    "errorRequired": "Please enter a title and content.",
+    "errorGeneric": "Something went wrong.",
+    "errorServer": "Connection error.",
+    "searchPlaceholder": "Search announcements...",
+    "empty": "No announcements"
+  },
+  "settingsPanel": {
+    "title": "GPA and Level Settings",
+    "fetchError": "Failed to fetch settings",
+    "errorMinMax": "⚠️ Minimum is greater than or equal to maximum",
+    "errorRange": "⚠️ Values must be between 0 and 5",
+    "minPlaceholder": "Minimum GPA",
+    "maxPlaceholder": "Maximum GPA",
+    "saveBtn": "Save settings",
+    "savingBtn": "Saving...",
+    "saveSuccess": "✅ Settings saved successfully",
+    "saveError": "❌ Connection error"
+  },
+  "days": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
+  "groupsSchedule": {
+    "title": "Groups Schedule",
+    "loading": "Loading groups...",
+    "errorPrefix": "Error:",
+    "tryAgain": "Try Again",
+    "searchLabel": "Search:",
+    "searchPlaceholder": "Search by subject (e.g., MATH, CS, PHYS)...",
+    "clear": "Clear",
+    "filterByDay": "Filter by day:",
+    "allDays": "All Days",
+    "noGroupsFound": "📚 No groups found",
+    "contactAdmin": "📧 Please contact admin: admin@admin.com",
+    "showing": "Showing {{filtered}} of {{total}} groups",
+    "searchTag": "Search: \"{{term}}\"",
+    "dayTag": "Day: {{day}}",
+    "noMatch": "No groups match your search criteria",
+    "clearAllFilters": "Clear All Filters",
+    "subject": "Subject",
+    "group": "Group",
+    "type": "Type",
+    "day": "Day",
+    "time": "Time",
+    "groupNumber": "Group {{number}}",
+    "am": "AM",
+    "pm": "PM",
+    "typeValues": {
+      "lecture": "Lecture",
+      "lab": "Lab",
+      "tutorial": "Tutorial"
+    },
+    "errors": {
+      "cannotConnect": "Cannot connect to the backend server. Please make sure it's running on http://localhost:5000",
+      "fetchFailed": "Failed to fetch groups",
+      "endpointNotFound": "API endpoint not found. Make sure your server is running on port 5000",
+      "httpStatus": "HTTP error! status: {{status}}"
+    }
   }
 }

@@ -6,9 +6,11 @@ import AnnouncementsPanel from "./createAnnouncementsPanel.tsx";
 import SettingsPanel from "./settingsPanel.tsx";
 import GroupPanel from "./groupPanel.tsx";
 import "./css/adminDashboard.css";
+import { useTranslation } from "react-i18next";
 
 
 const AdminDashboard = () => {
+    const { t } = useTranslation();
     const [userName, setUserName] = useState("");
 
     useEffect(() => {
@@ -33,7 +35,7 @@ const AdminDashboard = () => {
     return (
         <div className="admin-dashboard-container">
             <header className="dashboard-header">
-                <h1>مرحبًا {userName}</h1>
+                <h1>{t("adminDashboard.welcome", { name: userName })}</h1>
             </header>
 
             <div className="dashboard-grid">

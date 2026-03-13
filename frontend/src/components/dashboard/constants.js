@@ -1,8 +1,8 @@
 export const PAGE_SIZE = 10;
 
 export const ROLES = {
-    admin: "ادمن",
-    academic_guide: "مرشد اكاديمى",
-    academic_guide_coordinator: "منسق للإرشاد الاكاديمى",
-    reporter: "مُراجع بيانات"
+    admin: "roles.admin",
+    academic_guide: "roles.academic_guide",
+    academic_guide_coordinator: "roles.academic_guide_coordinator",
+    reporter: "roles.reporter"
 };

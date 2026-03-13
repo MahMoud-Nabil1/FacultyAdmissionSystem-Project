@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import "./Groups.css";
 
 interface Group {
     _id: string;
@@ -12,6 +14,7 @@ interface Group {
 }
 
 const Groups: React.FC = () => {
+    const { t } = useTranslation();
     const [groups, setGroups] = useState<Group[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -36,9 +39,9 @@ const Groups: React.FC = () => {
 
             if (!res.ok) {
                 if (res.status === 404) {
-                    throw new Error('API endpoint not found. Make sure your server is running on port 5000');
+                    throw new Error(t("groupsSchedule.errors.endpointNotFound"));
                 } else {
-                    throw new Error(`HTTP error! status: ${res.status}`);
+                    throw new Error(t("groupsSchedule.errors.httpStatus", { status: res.status }));
                 }
             }
 
@@ -49,12 +52,12 @@ const Groups: React.FC = () => {
             console.error("Failed to fetch groups:", err);
             if (err instanceof Error) {
                 if (err.message.includes('Failed to fetch')) {
-                    setError('Cannot connect to the backend server. Please make sure it\'s running on http://localhost:5000');
+                    setError(t("groupsSchedule.errors.cannotConnect"));
                 } else {
                     setError(err.message);
                 }
             } else {
-                setError('Failed to fetch groups');
+                setError(t("groupsSchedule.errors.fetchFailed"));
             }
         } finally {
             setLoading(false);
@@ -87,185 +90,33 @@ const Groups: React.FC = () => {
     });
 
     // Day options for filter
-    const days = ["all", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+    const days = useMemo(
+        () => ["all", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+        []
+    );
 
-    // Styles
-    const styles = {
-        container: {
-            padding: "20px",
-            fontFamily: "Arial, sans-serif",
-            maxWidth: "1200px",
-            margin: "0 auto",
-        },
-        title: {
-            textAlign: "center" as const,
-            marginTop: "20px",
-            fontSize: "28px",
-            color: "#333",
-        },
-        controlsContainer: {
-            margin: "20px 0",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "20px",
-            flexWrap: "wrap" as const,
-        },
-        searchBox: {
-            flex: "1",
-            minWidth: "250px",
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-        },
-        searchInput: {
-            flex: "1",
-            padding: "10px 12px",
-            fontSize: "14px",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            outline: "none",
-            transition: "border 0.3s",
-        },
-        filterGroup: {
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-        },
-        select: {
-            padding: "10px 12px",
-            fontSize: "14px",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            outline: "none",
-            cursor: "pointer",
-        },
-        clearButton: {
-            padding: "10px 12px",
-            fontSize: "14px",
-            backgroundColor: "#f44336",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-            marginLeft: "8px",
-        },
-        table: {
-            width: "100%",
-            borderCollapse: "collapse" as const,
-            marginTop: "20px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-        },
-        th: {
-            backgroundColor: "#4CAF50",
-            color: "white",
-            padding: "12px 15px",
-            textAlign: "left" as const,
-            fontSize: "14px",
-            fontWeight: "600",
-        },
-        td: {
-            padding: "12px 15px",
-            borderBottom: "1px solid #ddd",
-            fontSize: "14px",
-        },
-        trEven: {
-            backgroundColor: "#f9f9f9",
-        },
-        badge: {
-            display: "inline-block",
-            padding: "4px 8px",
-            borderRadius: "4px",
-            fontSize: "12px",
-            fontWeight: "500",
-        },
-        typeLecture: {
-            backgroundColor: "#e3f2fd",
-            color: "#1976d2",
-        },
-        typeLab: {
-            backgroundColor: "#f3e5f5",
-            color: "#7b1fa2",
-        },
-        typeTutorial: {
-            backgroundColor: "#fff3e0",
-            color: "#f57c00",
-        },
-        loading: {
-            textAlign: "center" as const,
-            padding: "40px",
-            fontSize: "18px",
-            color: "#666",
-        },
-        error: {
-            textAlign: "center" as const,
-            padding: "20px",
-            fontSize: "16px",
-            color: "#d32f2f",
-            backgroundColor: "#ffebee",
-            borderRadius: "4px",
-            marginTop: "20px",
-        },
-        emptyState: {
-            textAlign: "center" as const,
-            padding: "60px 20px",
-            fontSize: "18px",
-            color: "#666",
-            backgroundColor: "#f9f9f9",
-            borderRadius: "8px",
-            marginTop: "30px",
-            border: "1px dashed #ccc",
-        },
-        adminMessage: {
-            marginTop: "15px",
-            padding: "15px",
-            backgroundColor: "#e8f4fd",
-            borderRadius: "6px",
-            color: "#0288d1",
-            fontSize: "16px",
-        },
-        adminEmail: {
-            fontWeight: "bold" as const,
-            color: "#01579b",
-        },
-        timeSlot: {
-            fontWeight: "bold" as const,
-            color: "#333",
-        },
-        subjectCell: {
-            fontWeight: "bold" as const,
-            color: "#2c3e50",
-            textTransform: "uppercase" as const,
-        },
-        resultCount: {
-            marginBottom: "10px",
-            color: "#666",
-            fontSize: "14px",
-        },
-    };
-
-    const getTypeStyle = (type: string) => {
-        const baseStyle = styles.badge;
-        switch(type.toLowerCase()) {
+    const getTypeClass = (type: string) => {
+        switch (type.toLowerCase()) {
             case "lecture":
-                return { ...baseStyle, ...styles.typeLecture };
+                return "groupsBadge groupsBadgeLecture";
             case "lab":
-                return { ...baseStyle, ...styles.typeLab };
+                return "groupsBadge groupsBadgeLab";
             case "tutorial":
-                return { ...baseStyle, ...styles.typeTutorial };
+                return "groupsBadge groupsBadgeTutorial";
             default:
-                return { ...baseStyle, backgroundColor: "#e0e0e0", color: "#616161" };
+                return "groupsBadge groupsBadgeDefault";
         }
     };
 
     const formatTime = (hour: number) => {
-        const period = hour >= 12 ? 'PM' : 'AM';
+        const period = hour >= 12 ? t("groupsSchedule.pm") : t("groupsSchedule.am");
         const displayHour = hour > 12 ? hour - 12 : hour;
         return `${displayHour}:00 ${period}`;
     };
 
     const getDayDisplay = (day: string) => {
-        return day.charAt(0).toUpperCase() + day.slice(1);
+        if (day === "all") return t("groupsSchedule.allDays");
+        return t(`days.${day}`);
     };
 
     const clearSearch = () => {
@@ -273,29 +124,17 @@ const Groups: React.FC = () => {
     };
 
     if (loading) {
-        return <div style={styles.loading}>Loading groups...</div>;
+        return <div className="groupsLoading">{t("groupsSchedule.loading")}</div>;
     }
 
     if (error) {
         return (
-            <div style={styles.container}>
-                <h1 style={styles.title}>Groups Schedule</h1>
-                <div style={styles.error}>
-                    <strong>Error:</strong> {error}
-                    <button
-                        onClick={fetchGroups}
-                        style={{
-                            display: "block",
-                            margin: "20px auto 0",
-                            padding: "8px 16px",
-                            backgroundColor: "#4CAF50",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "4px",
-                            cursor: "pointer"
-                        }}
-                    >
-                        Try Again
+            <div className="groupsContainer">
+                <h1 className="groupsTitle">{t("groupsSchedule.title")}</h1>
+                <div className="groupsError">
+                    <strong>{t("groupsSchedule.errorPrefix")}</strong> {error}
+                    <button onClick={fetchGroups} className="groupsPrimaryButton">
+                        {t("groupsSchedule.tryAgain")}
                     </button>
                 </div>
             </div>
@@ -303,43 +142,45 @@ const Groups: React.FC = () => {
     }
 
     return (
-        <div style={styles.container}>
-            <h1 style={styles.title}>Groups Schedule</h1>
+        <div className="groupsContainer">
+            <h1 className="groupsTitle">{t("groupsSchedule.title")}</h1>
 
-            <div style={styles.controlsContainer}>
+            <div className="groupsControlsContainer">
                 {/* Search Box */}
-                <div style={styles.searchBox}>
-                    <label htmlFor="search">🔍 Search:</label>
+                <div className="groupsSearchBox">
+                    <label htmlFor="search">
+                        🔍 {t("groupsSchedule.searchLabel")}
+                    </label>
                     <input
                         id="search"
                         type="text"
-                        placeholder="Search by subject (e.g., MATH, CS, PHYS)..."
+                        placeholder={t("groupsSchedule.searchPlaceholder")}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        style={styles.searchInput}
+                        className="groupsSearchInput"
                     />
                     {searchTerm && (
                         <button
-                            style={styles.clearButton}
+                            className="groupsClearButton"
                             onClick={clearSearch}
                         >
-                            ✕ Clear
+                            ✕ {t("groupsSchedule.clear")}
                         </button>
                     )}
                 </div>
 
                 {/* Day Filter */}
-                <div style={styles.filterGroup}>
-                    <label htmlFor="day-filter">Filter by day:</label>
+                <div className="groupsFilterGroup">
+                    <label htmlFor="day-filter">{t("groupsSchedule.filterByDay")}</label>
                     <select
                         id="day-filter"
-                        style={styles.select}
+                        className="groupsSelect"
                         value={filterDay}
                         onChange={(e) => setFilterDay(e.target.value)}
                     >
                         {days.map(day => (
                             <option key={day} value={day}>
-                                {day === "all" ? "All Days" : getDayDisplay(day)}
+                                {getDayDisplay(day)}
                             </option>
                         ))}
                     </select>
@@ -347,84 +188,91 @@ const Groups: React.FC = () => {
             </div>
 
             {groups.length === 0 ? (
-                <div style={styles.emptyState}>
-                    <p>📚 No groups found</p>
-                    <div style={styles.adminMessage}>
-                        <span style={styles.adminEmail}>📧 Please contact admin: admin@admin.com</span>
+                <div className="groupsEmptyState">
+                    <p>{t("groupsSchedule.noGroupsFound")}</p>
+                    <div className="groupsAdminMessage">
+                        <span className="groupsAdminEmail">{t("groupsSchedule.contactAdmin")}</span>
                     </div>
                 </div>
             ) : (
                 <>
-                    <div style={styles.resultCount}>
-                        Showing {filteredGroups.length} of {groups.length} groups
-                        {searchTerm && ` • Search: "${searchTerm}"`}
-                        {filterDay !== "all" && ` • Day: ${getDayDisplay(filterDay)}`}
+                    <div className="groupsResultCount">
+                        {t("groupsSchedule.showing", {
+                            filtered: filteredGroups.length,
+                            total: groups.length,
+                        })}
+                        {searchTerm &&
+                            ` • ${t("groupsSchedule.searchTag", {
+                                term: searchTerm,
+                            })}`}
+                        {filterDay !== "all" &&
+                            ` • ${t("groupsSchedule.dayTag", {
+                                day: getDayDisplay(filterDay),
+                            })}`}
                     </div>
 
                     {filteredGroups.length === 0 ? (
-                        <div style={styles.emptyState}>
-                            <p>No groups match your search criteria</p>
-                            <div style={styles.adminMessage}>
-                                <span style={styles.adminEmail}>📧 Please contact admin: admin@admin.com</span>
+                        <div className="groupsEmptyState">
+                            <p>{t("groupsSchedule.noMatch")}</p>
+                            <div className="groupsAdminMessage">
+                                <span className="groupsAdminEmail">{t("groupsSchedule.contactAdmin")}</span>
                             </div>
                             <button
                                 onClick={() => {
                                     setSearchTerm("");
                                     setFilterDay("all");
                                 }}
-                                style={{
-                                    marginTop: "15px",
-                                    padding: "8px 16px",
-                                    backgroundColor: "#4CAF50",
-                                    color: "white",
-                                    border: "none",
-                                    borderRadius: "4px",
-                                    cursor: "pointer"
-                                }}
+                                className="groupsPrimaryButton"
                             >
-                                Clear All Filters
+                                {t("groupsSchedule.clearAllFilters")}
                             </button>
                         </div>
                     ) : (
-                        <table style={styles.table}>
-                            <thead>
-                            <tr>
-                                <th style={styles.th}>Subject</th>
-                                <th style={styles.th}>Group</th>
-                                <th style={styles.th}>Type</th>
-                                <th style={styles.th}>Day</th>
-                                <th style={styles.th}>Time</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {filteredGroups.map((group, index) => (
-                                <tr
-                                    key={group._id}
-                                    style={index % 2 === 0 ? styles.trEven : undefined}
-                                >
-                                    <td style={{...styles.td, ...styles.subjectCell}}>
-                                        {formatSubject(group.subject)}
-                                    </td>
-                                    <td style={styles.td}>
-                                        <strong>Group {group.number}</strong>
-                                    </td>
-                                    <td style={styles.td}>
-                                            <span style={getTypeStyle(group.type)}>
-                                                {group.type}
+                        <div className="groupsTableWrapper">
+                            <table className="groupsTable">
+                                <thead>
+                                <tr>
+                                    <th className="groupsTh">{t("groupsSchedule.subject")}</th>
+                                    <th className="groupsTh">{t("groupsSchedule.group")}</th>
+                                    <th className="groupsTh">{t("groupsSchedule.type")}</th>
+                                    <th className="groupsTh">{t("groupsSchedule.day")}</th>
+                                    <th className="groupsTh">{t("groupsSchedule.time")}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {filteredGroups.map((group, index) => (
+                                    <tr
+                                        key={group._id}
+                                        className={index % 2 === 0 ? "groupsTrEven" : undefined}
+                                    >
+                                        <td className="groupsTd groupsSubjectCell">
+                                            {formatSubject(group.subject)}
+                                        </td>
+                                        <td className="groupsTd">
+                                            <strong>
+                                                {t("groupsSchedule.groupNumber", { number: group.number })}
+                                            </strong>
+                                        </td>
+                                        <td className="groupsTd">
+                                            <span className={getTypeClass(group.type)}>
+                                                {t(`groupsSchedule.typeValues.${group.type.toLowerCase()}`, {
+                                                    defaultValue: group.type,
+                                                })}
                                             </span>
-                                    </td>
-                                    <td style={styles.td}>
-                                        {getDayDisplay(group.day)}
-                                    </td>
-                                    <td style={styles.td}>
-                                            <span style={styles.timeSlot}>
+                                        </td>
+                                        <td className="groupsTd">
+                                            {getDayDisplay(group.day)}
+                                        </td>
+                                        <td className="groupsTd">
+                                            <span className="groupsTimeSlot">
                                                 {formatTime(group.from)} - {formatTime(group.to)}
                                             </span>
-                                    </td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </table>
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                        </div>
                     )}
                 </>
             )}
