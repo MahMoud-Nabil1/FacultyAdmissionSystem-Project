@@ -45,29 +45,31 @@ const Groups: React.FC = () => {
             setLoading(true);
             setError(null);
 
-            console.log('Fetching groups from:', `${API_URL}/api/groups`);
+            const token = localStorage.getItem("token"); // get JWT
+            if (!token) throw new Error("No token found. Please login.");
 
-            const res = await fetch(`${API_URL}/api/groups`);
+            const res = await fetch(`${API_URL}/api/groups`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
 
             if (!res.ok) {
                 if (res.status === 404) {
                     throw new Error(t("groupsSchedule.errors.endpointNotFound"));
+                } else if (res.status === 401) {
+                    throw new Error(t("groupsSchedule.errors.unauthorized"));
                 } else {
                     throw new Error(t("groupsSchedule.errors.httpStatus", { status: res.status }));
                 }
             }
 
             const data: Group[] = await res.json();
-            console.log("Groups fetched:", data);
             setGroups(data);
         } catch (err) {
             console.error("Failed to fetch groups:", err);
             if (err instanceof Error) {
-                if (err.message.includes('Failed to fetch')) {
-                    setError(t("groupsSchedule.errors.cannotConnect"));
-                } else {
-                    setError(err.message);
-                }
+                setError(err.message);
             } else {
                 setError(t("groupsSchedule.errors.fetchFailed"));
             }

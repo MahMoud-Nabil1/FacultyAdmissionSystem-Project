@@ -36,6 +36,10 @@ exports.getAllStudents = async (req, res) => {
 
 exports.getStudentById = async (req, res) => {
     try {
+        if (req.user.role === 'student' && req.user.id !== req.params.id) {
+            return res.status(403).json({ error: "Forbidden" });
+        } //students can get information about themselves
+
         const student = await Student
             .findOne({_id: req.params.id})
             .populate('department');

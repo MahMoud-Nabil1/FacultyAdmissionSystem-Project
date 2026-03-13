@@ -17,7 +17,7 @@ exports.createStaff = async (req, res) => {
             });
         }
 
-        res.status(400).json({ error: err.message });
+        res.status(400).json({error: err.message});
     }
 };
 
@@ -26,25 +26,25 @@ exports.getAllStaff = async (req, res) => {
         const staffList = await Staff.find().populate('departments students');
         res.json(staffList);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({error: err.message});
     }
 };
 
 exports.getStaffById = async (req, res) => {
     try {
-        const staff = await Staff.findOne({ _id: req.params.id })
+        const staff = await Staff.findOne({_id: req.params.id})
             .populate('departments students');
-        if (!staff) return res.status(404).json({ error: "Staff not found" });
+        if (!staff) return res.status(404).json({error: "Staff not found"});
         res.json(staff);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({error: err.message});
     }
 };
 
 exports.updateStaff = async (req, res) => {
     try {
-        const staff = await Staff.findOne({ id: req.params.id });
-        if (!staff) return res.status(404).json({ error: "Staff not found" });
+        const staff = await Staff.findOne({id: req.params.id});
+        if (!staff) return res.status(404).json({error: "Staff not found"});
 
         Object.assign(staff, req.body);
         if (req.body.password) staff.password = req.body.password;
@@ -52,16 +52,24 @@ exports.updateStaff = async (req, res) => {
         await staff.save();
         res.json(staff);
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        res.status(400).json({error: err.message});
     }
 };
 
 exports.deleteStaff = async (req, res) => {
     try {
-        const staff = await Staff.findOneAndDelete({ _id: req.params.id });
-        if (!staff) return res.status(404).json({ error: "Staff not found" });
-        res.json({ message: "Deleted successfully" });
+        const staffIdToDelete = req.params.id;
+
+        // Cannot delete self
+        if (req.user.id === staffIdToDelete) {
+            return res.status(400).json({error: "You cannot delete yourself"});
+        }
+
+        const staff = await Staff.findOneAndDelete({_id: staffIdToDelete});
+        if (!staff) return res.status(404).json({error: "Staff not found"});
+
+        res.json({message: "Deleted successfully"});
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({error: err.message});
     }
 };

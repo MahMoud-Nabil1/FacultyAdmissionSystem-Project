@@ -300,3 +300,18 @@ exports.changePassword = async (req, res) => {
         res.status(500).json({ error: "حدث خطأ أثناء تغيير كلمة المرور" });
     }
 };
+
+exports.requireRole = (roles = []) => {
+    if (typeof roles === 'string') roles = [roles];
+
+    return (req, res, next) => {
+        const user = req.user;
+        if (!user) return res.status(401).json({ error: "Unauthorized" });
+
+        if (!roles.includes(user.role)) {
+            return res.status(403).json({ error: "Forbidden" });
+        }
+
+        next();
+    };
+};

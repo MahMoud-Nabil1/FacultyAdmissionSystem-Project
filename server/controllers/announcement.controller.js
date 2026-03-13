@@ -1,5 +1,6 @@
 const { Announcement, Settings } = require('../models/announcementSchema');
 
+// Get all announcements
 const getAnnouncements = async (req, res) => {
     try {
         const announcements = await Announcement.find().sort({ createdAt: -1 });
@@ -9,6 +10,7 @@ const getAnnouncements = async (req, res) => {
     }
 };
 
+// Get announcement by ID
 const getAnnouncementById = async (req, res) => {
     try {
         const announcement = await Announcement.findById(req.params.id);
@@ -19,17 +21,23 @@ const getAnnouncementById = async (req, res) => {
     }
 };
 
+// Create a new announcement using JWT info
 const createAnnouncement = async (req, res) => {
     try {
-        const { title, content, author } = req.body;
+        const { title, content } = req.body;
+
         if (!title || !content) {
             return res.status(400).json({ message: 'Please provide title and content' });
+        }
+
+        if (!req.user || !req.user.name || !req.user.role) {
+            return res.status(401).json({ message: 'Unauthorized: missing user info' });
         }
 
         const announcement = new Announcement({
             title,
             content,
-            author: author || 'Admin'
+            author: `${req.user.name}`
         });
 
         const savedAnnouncement = await announcement.save();
@@ -39,16 +47,20 @@ const createAnnouncement = async (req, res) => {
     }
 };
 
+// Update announcement using JWT info
 const updateAnnouncement = async (req, res) => {
     try {
-        const { title, content, author } = req.body;
-        const announcement = await Announcement.findById(req.params.id);
+        const { title, content } = req.body;
 
+        const announcement = await Announcement.findById(req.params.id);
         if (!announcement) return res.status(404).json({ message: 'Announcement not found' });
 
         if (title) announcement.title = title;
         if (content) announcement.content = content;
-        if (author) announcement.author = author;
+
+        if (req.user && req.user.name && req.user.role) {
+            announcement.author = `${req.user.name}`;
+        }
 
         const updatedAnnouncement = await announcement.save();
         res.status(200).json(updatedAnnouncement);
@@ -57,6 +69,7 @@ const updateAnnouncement = async (req, res) => {
     }
 };
 
+// Delete announcement
 const deleteAnnouncement = async (req, res) => {
     try {
         const announcement = await Announcement.findById(req.params.id);
@@ -82,31 +95,30 @@ const getSettings = async (req, res) => {
     }
 };
 
+// Update settings with JWT info
 const updateSettings = async (req, res) => {
     try {
-        const { gpaMin, gpaMax, level, updatedBy } = req.body;
+        const { gpaMin, gpaMax, level } = req.body;
 
-        if (gpaMin >= gpaMax) {
+        if (gpaMin !== undefined && gpaMax !== undefined && gpaMin >= gpaMax) {
             return res.status(400).json({ message: 'الحد الأدنى يجب أن يكون أصغر من الحد الأقصى' });
         }
 
-        if (gpaMin < 0 || gpaMin > 5 || gpaMax < 0 || gpaMax > 5) {
+        if ((gpaMin !== undefined && (gpaMin < 0 || gpaMin > 5)) ||
+            (gpaMax !== undefined && (gpaMax < 0 || gpaMax > 5))) {
             return res.status(400).json({ message: 'القيم يجب أن تكون بين 0 و 5' });
         }
 
         let settings = await Settings.findOne();
-        if (!settings) {
-            settings = new Settings();
-        }
+        if (!settings) settings = new Settings();
 
         if (gpaMin !== undefined) settings.gpaMin = gpaMin;
         if (gpaMax !== undefined) settings.gpaMax = gpaMax;
-        if (level !== undefined) {
-            const levelArr = Array.isArray(level) ? level : (level != null ? [String(level)] : ['1']);
-            settings.level = levelArr.filter(l => ['1', '2', '3', '4'].includes(String(l)));
-            if (settings.level.length === 0) settings.level = ['1'];
+        if (level !== undefined) settings.level = level;
+
+        if (req.user && req.user.name && req.user.role) {
+            settings.updatedBy = `${req.user.name}`;
         }
-        if (updatedBy) settings.updatedBy = updatedBy;
 
         const updatedSettings = await settings.save();
         res.status(200).json(updatedSettings);

@@ -64,10 +64,16 @@ exports.addStudentToGroup = async (req, res) => {
         const {studentId} = req.body;
         const group = await Group.findById(req.params.id);
 
+        if (req.user.role !== 'admin') {
+            const staff = await Staff.findById(req.user.id);
+            const allowed = await canManageStudent(staff, studentId);
+            if (!allowed) return res.status(403).json({ error: "Forbidden: cannot manage this student" });
+        }
+
         if (!group) return res.status(404).json({error: 'Group not found'});
 
         // Check if group is at capacity
-        if (group.students.length >= group.capacity) {
+        if (group.students.length >= group.capacity && (req.user.role !== 'admin' || req.user.role !== 'academic_guide_coordinator')) {
             return res.status(400).json({error: 'Group has reached maximum capacity'});
         }
 
@@ -104,6 +110,60 @@ exports.removeStudentFromGroup = async (req, res) => {
     }
 };
 
+// Add self to group
+exports.addSelfToGroup = async (req, res) => {
+    try {
+        if (req.user.role !== 'student') {
+            return res.status(403).json({ error: "Forbidden: Only students can enroll themselves" });
+        }
+
+        const group = await Group.findById(req.params.id);
+        if (!group) return res.status(404).json({ error: "Group not found" });
+
+        const studentId = req.user.id; // JWT contains studentId
+
+        if (group.students.includes(studentId)) {
+            return res.status(400).json({ error: "You are already in this group" });
+        }
+
+        if (group.students.length >= group.capacity) {
+            return res.status(400).json({ error: "Group has reached maximum capacity" });
+        }
+
+        group.students.push(studentId);
+        await group.save();
+
+        const updatedGroup = await Group.findById(req.params.id).populate('students');
+        res.json(updatedGroup);
+
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
+// Remove self from group
+exports.removeSelfFromGroup = async (req, res) => {
+    try {
+        if (req.user.role !== 'student') {
+            return res.status(403).json({ error: "Forbidden: Only students can remove themselves" });
+        }
+
+        const group = await Group.findById(req.params.id);
+        if (!group) return res.status(404).json({ error: "Group not found" });
+
+        const studentId = req.user.id;
+
+        group.students = group.students.filter(id => id.toString() !== studentId);
+        await group.save();
+
+        const updatedGroup = await Group.findById(req.params.id).populate('students');
+        res.json(updatedGroup);
+
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
 // Get groups by day
 exports.getGroupsByDay = async (req, res) => {
     try {
@@ -123,3 +183,23 @@ exports.getGroupsByType = async (req, res) => {
         res.status(500).json({error: err.message});
     }
 };
+
+
+//canManageStudent is true when staff has write permissions for a specific student
+async function canManageStudent(staff, studentId) {
+    // Admins can manage anyone
+    if (staff.role === 'admin') return true;
+
+    // Academic guide: only assigned students
+    if (staff.role === 'academic_guide') {
+        return staff.students.some(sId => sId.toString() === studentId.toString());
+    }
+
+    // Academic guide coordinator: all students in coordinator's departments
+    if (staff.role === 'academic_guide_coordinator') {
+        const student = await Student.findById(studentId).populate('department');
+        return student.departments.some(depId => staff.departments.includes(depId));
+    }
+
+    return false;
+}

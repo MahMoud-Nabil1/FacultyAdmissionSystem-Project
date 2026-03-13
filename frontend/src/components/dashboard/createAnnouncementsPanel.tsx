@@ -1,5 +1,5 @@
-import React, { useState, useEffect, FormEvent } from "react";
-import { useTranslation } from "react-i18next";
+import React, {FormEvent, useEffect, useState} from "react";
+import {useTranslation} from "react-i18next";
 
 interface Announcement {
     _id: string;
@@ -12,9 +12,9 @@ interface Announcement {
 const API_URL = 'http://localhost:5000/api';
 
 const AnnouncementsPanel: React.FC = () => {
-    const { t, i18n } = useTranslation();
+    const {t, i18n} = useTranslation();
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-    const [form, setForm] = useState({ title: "", content: "" });
+    const [form, setForm] = useState({title: "", content: ""});
     const [editingId, setEditingId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
@@ -22,6 +22,7 @@ const AnnouncementsPanel: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const itemsPerPage = 5;
     const [page, setPage] = useState(1);
+    const token = localStorage.getItem("token");
 
     const fetchAnnouncements = async () => {
         try {
@@ -54,8 +55,8 @@ const AnnouncementsPanel: React.FC = () => {
 
             const res = await fetch(url, {
                 method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...form, author: "Admin" }),
+                headers: {"Content-Type": "application/json", "Authorization": `Bearer ${token}`,},
+                body: JSON.stringify({...form, author: "Admin"}),
             });
 
             const data = await res.json();
@@ -65,7 +66,7 @@ const AnnouncementsPanel: React.FC = () => {
                 return;
             }
 
-            setForm({ title: "", content: "" });
+            setForm({title: "", content: ""});
             setEditingId(null);
             setShowForm(false);
             fetchAnnouncements();
@@ -78,14 +79,14 @@ const AnnouncementsPanel: React.FC = () => {
     };
 
     const handleEdit = (item: Announcement) => {
-        setForm({ title: item.title, content: item.content });
+        setForm({title: item.title, content: item.content});
         setEditingId(item._id);
         setShowForm(true);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({top: 0, behavior: "smooth"});
     };
 
     const handleCancel = () => {
-        setForm({ title: "", content: "" });
+        setForm({title: "", content: ""});
         setEditingId(null);
         setShowForm(false);
         setError(null);
@@ -94,17 +95,28 @@ const AnnouncementsPanel: React.FC = () => {
     const handleDelete = async (id: string) => {
         if (!window.confirm(t("dashboardCommon.confirmDeleteAnnouncement"))) return;
 
+        setLoading(true);
         try {
-            const res = await fetch(`${API_URL}/announcements/${id}`, { method: "DELETE" });
+            const res = await fetch(`${API_URL}/announcements/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+
             const data = await res.json();
+
             if (!res.ok) {
                 alert(data.message || t("announcementsAdminPanel.errorGeneric"));
                 return;
             }
+
             fetchAnnouncements();
         } catch (err) {
             console.error(err);
             alert(t("announcementsAdminPanel.errorServer"));
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -138,12 +150,12 @@ const AnnouncementsPanel: React.FC = () => {
                     <input
                         placeholder={t("announcementsAdminPanel.fieldTitlePlaceholder")}
                         value={form.title}
-                        onChange={e => setForm({ ...form, title: e.target.value })}
+                        onChange={e => setForm({...form, title: e.target.value})}
                     />
                     <textarea
                         placeholder={t("announcementsAdminPanel.fieldContentPlaceholder")}
                         value={form.content}
-                        onChange={e => setForm({ ...form, content: e.target.value })}
+                        onChange={e => setForm({...form, content: e.target.value})}
                         rows={4}
                     />
 
@@ -191,14 +203,16 @@ const AnnouncementsPanel: React.FC = () => {
                         <td>{a.author}</td>
                         <td>{new Date(a.createdAt).toLocaleDateString(dateLocale)}</td>
                         <td>
-                            <button className="edit-btn" onClick={() => handleEdit(a)}>{t("dashboardCommon.edit")}</button>
-                            <button className="delete-btn" onClick={() => handleDelete(a._id)}>{t("dashboardCommon.delete")}</button>
+                            <button className="edit-btn"
+                                    onClick={() => handleEdit(a)}>{t("dashboardCommon.edit")}</button>
+                            <button className="delete-btn"
+                                    onClick={() => handleDelete(a._id)}>{t("dashboardCommon.delete")}</button>
                         </td>
                     </tr>
                 ))}
                 {current.length === 0 && (
                     <tr>
-                        <td colSpan={5} style={{ textAlign: "center", padding: "20px" }}>
+                        <td colSpan={5} style={{textAlign: "center", padding: "20px"}}>
                             {t("announcementsAdminPanel.empty")}
                         </td>
                     </tr>
@@ -211,7 +225,8 @@ const AnnouncementsPanel: React.FC = () => {
                 <div className="pagination">
                     <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>←</button>
                     <span>{page} / {totalPages}</span>
-                    <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>→</button>
+                    <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>→
+                    </button>
                 </div>
             )}
         </div>

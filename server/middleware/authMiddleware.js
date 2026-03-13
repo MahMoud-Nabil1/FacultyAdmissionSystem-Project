@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const JWT_SECRET = process.env.JWT_SECRET || "faculty-admission-secret-key";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 async function authenticate(req, res, next) {
     try {
