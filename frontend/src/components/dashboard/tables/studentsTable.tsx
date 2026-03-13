@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllStudents, deleteStudent } from "../../../services/api";
 import Pagination from "../pagination";
-import { PAGE_SIZE } from "../constants";
+import { PAGE_SIZE } from "../../../services/constants";
 import { useTranslation } from "react-i18next";
 
 interface Student {

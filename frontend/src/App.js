@@ -1,7 +1,7 @@
 import './App.css';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { ThemeProvider } from './theme/ThemeContext';
-import './theme/themeVariables.css';
+import { ThemeProvider } from './context/ThemeContext';
+import './styles/themeVariables.css';
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 import GuestRoute from './components/auth/GuestRoute.jsx';
 import ResetPassword from './components/auth/ResetPassword.jsx';

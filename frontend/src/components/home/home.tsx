@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import "./css/home.css";
-import { ROLES } from "../dashboard/constants";
+import { ROLES } from "../../services/constants";
 
 const Home = () => {
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
+    const isRTL = i18n.language === "ar";
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [showReset, setShowReset] = useState(false);
@@ -33,11 +36,11 @@ const Home = () => {
         fetchUser();
     }, [navigate]);
 
-    const roleLabel: string = user?.role ? ROLES[user.role] || "طالب" : "";
+    const roleLabel: string = user?.role ? ROLES[user.role] || t("home.defaultRole") : "";
 
     const handleResetPassword = async () => {
         if (newPassword !== confirmPassword) {
-            setResetMessage("كلمة المرور الجديدة وتأكيدها غير متطابقين");
+            setResetMessage(t("home.passwordMismatch"));
             return;
         }
 
@@ -49,83 +52,83 @@ const Home = () => {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ currentPassword, newPassword }) // ✅ correct keys
+                body: JSON.stringify({ currentPassword, newPassword })
             });
 
             const data = await res.json();
             if (res.ok) {
-                setResetMessage("تم تحديث كلمة المرور بنجاح");
+                setResetMessage(t("home.passwordUpdateSuccess"));
                 setShowReset(false);
                 setCurrentPassword("");
                 setNewPassword("");
                 setConfirmPassword("");
             } else {
-                setResetMessage(data.error || "حدث خطأ أثناء تحديث كلمة المرور");
+                setResetMessage(data.error || t("home.passwordUpdateError"));
             }
         } catch (err) {
-            setResetMessage("حدث خطأ أثناء تحديث كلمة المرور");
+            setResetMessage(t("home.passwordUpdateError"));
             console.error(err);
         }
     };
 
-    if (loading) return <p className="loading">جاري التحميل...</p>;
+    if (loading) return <p className="loading">{t("home.loading")}</p>;
 
     return (
-        <div className="home-container">
-            <h1 className="home-title">الصفحة الرئيسية</h1>
+        <div className="home-container" dir={isRTL ? "rtl" : "ltr"}>
+            <h1 className="home-title">{t("home.title")}</h1>
 
             <div className="info-card">
-                <p><strong>الاسم:</strong> {user?.name}</p>
-                <p><strong>الدور:</strong> {roleLabel}</p>
-                {user?.department && <p><strong>القسم:</strong> {user.department}</p>}
-                {user?.gpa !== undefined && <p><strong>المعدل التراكمي:</strong> {user.gpa}</p>}
-                {user?.registeredHours !== undefined && <p><strong>الساعات المسجلة:</strong> {user.registeredHours}</p>}
-                {user?.completedHours !== undefined && <p><strong>الساعات المكتملة:</strong> {user.completedHours}</p>}
+                <p><strong>{t("home.name")}</strong> {user?.name}</p>
+                <p><strong>{t("home.role")}</strong> {roleLabel}</p>
+                {user?.department && <p><strong>{t("home.department")}</strong> {user.department}</p>}
+                {user?.gpa !== undefined && <p><strong>{t("home.gpa")}</strong> {user.gpa}</p>}
+                {user?.registeredHours !== undefined && <p><strong>{t("home.registeredHours")}</strong> {user.registeredHours}</p>}
+                {user?.completedHours !== undefined && <p><strong>{t("home.completedHours")}</strong> {user.completedHours}</p>}
             </div>
 
             <div className="buttons-vertical">
                 <button className="btn" onClick={() => navigate("/groups")}>
-                    عرض كل المجموعات
+                    {t("home.viewAllGroups")}
                 </button>
 
                 {user?.role && user.role !== "student" && (
                     <button className="btn admin" onClick={() => navigate("/admin-dashboard")}>
-                        لوحة تحكم الادمن
+                        {t("home.adminDashboard")}
                     </button>
                 )}
 
                 <button className="btn reset" onClick={() => setShowReset(!showReset)}>
-                    تغيير كلمة المرور
+                    {t("home.changePassword")}
                 </button>
 
                 <button className="btn register" onClick={() => navigate("/register-subjects")}>
-                    تسجيل المواد
+                    {t("home.registerSubjects")}
                 </button>
             </div>
 
             {showReset && (
                 <div className="reset-panel">
-                    <h3>تغيير كلمة المرور</h3>
+                    <h3>{t("home.changePasswordTitle")}</h3>
                     <input
                         type="password"
-                        placeholder="كلمة المرور الحالية"
+                        placeholder={t("home.currentPasswordPlaceholder")}
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
                     />
                     <input
                         type="password"
-                        placeholder="كلمة المرور الجديدة"
+                        placeholder={t("home.newPasswordPlaceholder")}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                     />
                     <input
                         type="password"
-                        placeholder="تأكيد كلمة المرور"
+                        placeholder={t("home.confirmPasswordPlaceholder")}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                     />
                     <button className="btn submit" onClick={handleResetPassword}>
-                        حفظ
+                        {t("home.save")}
                     </button>
                     {resetMessage && <p className="reset-message">{resetMessage}</p>}
                 </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { getAllSubjects, deleteSubject } from "../../../services/api";
 import Pagination from "../pagination";
-import { PAGE_SIZE } from "../constants";
+import { PAGE_SIZE } from "../../../services/constants";
 import { useTranslation } from "react-i18next";
 
 interface Subject {

@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import './i18n';
+import './services/i18n';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

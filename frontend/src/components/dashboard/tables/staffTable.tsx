@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllStaff, deleteStaff } from "../../../services/api";
-import { ROLES } from "../constants";
+import { ROLES } from "../../../services/constants";
 import Pagination from "../pagination";
-import { PAGE_SIZE } from "../constants";
+import { PAGE_SIZE } from "../../../services/constants";
 import { useTranslation } from "react-i18next";
 
 interface Staff {
