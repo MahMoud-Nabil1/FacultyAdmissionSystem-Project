@@ -45,7 +45,9 @@ const StudentPanel: React.FC = () => {
     };
 
     return (
-        <div >
+        <div className="dashboard-container">
+            <h2>الطلاب</h2>
+
             {/* Toggle form */}
             <button className="panel-btn" onClick={() => setShowForm(prev => !prev)}>
                 {showForm ? "الغاء" : "اضف طالب جديد"}
@@ -89,7 +91,12 @@ const StudentPanel: React.FC = () => {
             )}
 
             {/* Navigate to students table */}
-            
+            <button
+                className="panel-btn"
+                onClick={() => navigate("/admin-dashboard/table?type=students")}
+            >
+                عرض جميع الطلاب
+            </button>
         </div>
     );
 };

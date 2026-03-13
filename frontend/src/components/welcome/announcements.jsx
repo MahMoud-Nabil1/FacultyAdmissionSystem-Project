@@ -57,8 +57,7 @@ const Announcements = () => {
                 '3': 'المستوى الثالث',
                 '4': 'المستوى الرابع'
             };
-            const levels = Array.isArray(settings.level) ? settings.level : (settings.level ? [settings.level] : ['1']);
-            setLevel(levels.map(l => levelMap[String(l)] || l).join('، ') || 'المستوى الأول');
+            setLevel(levelMap[settings.level] || 'المستوى الأول');
 
         } catch (error) {
             console.error('Error fetching data:', error);
