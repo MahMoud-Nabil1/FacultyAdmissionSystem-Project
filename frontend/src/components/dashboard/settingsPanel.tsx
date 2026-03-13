@@ -14,6 +14,7 @@ const SettingsPanel: React.FC = () => {
     const [settings, setSettings] = useState<GPASettings>({ gpaMin: 2.5, gpaMax: 5, level: "1" });
     const [error, setError] = useState<string | null>(null);
     const [settingsLoading, setSettingsLoading] = useState(false);
+    const token = localStorage.getItem("token");
 
     const fetchSettings = async () => {
         try {
@@ -54,8 +55,11 @@ const SettingsPanel: React.FC = () => {
         try {
             const res = await fetch(`${API_URL}/announcements/settings`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...settings, updatedBy: "Admin" }),
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify({ ...settings }),
             });
 
             const data = await res.json();
