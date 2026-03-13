@@ -37,9 +37,9 @@ const settingsSchema = new Schema({
         max: 5
     },
     level: {
-        type: String,
+        type: [String],
         required: true,
-        default: '1',
+        default: ['1'],
         enum: ['1', '2', '3', '4']
     },
     updatedBy: {
