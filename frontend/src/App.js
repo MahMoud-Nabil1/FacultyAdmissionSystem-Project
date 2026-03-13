@@ -9,7 +9,6 @@ import Login from './components/auth/Login.jsx';
 import ForgotPassword from './components/auth/ForgotPassword.jsx';
 import AdminDashboardLayout from './components/dashboard/AdminDashboardLayout.jsx';
 import AdminDashboard from './components/dashboard/adminDashboard.jsx';
-import ThemePage from './components/dashboard/theme/ThemePage.jsx';
 import LanguageFloatingButton from "./components/common/LanguageFloatingButton.jsx";
 import SupportContact from "./components/support/SupportContact.jsx";
 import Announcements from "./components/welcome/announcements.jsx";
@@ -65,7 +64,7 @@ function App() {
                 >
                     <Route index element={<AdminDashboard />} />
                     <Route path="table" element={<AdminDashboardTable />} />
-                    <Route path="theme" element={<ThemePage />} />
+                    <Route path="groups" element={<Groups />} />
                 </Route>
                 <Route path="/login" element={
                     <GuestRoute>

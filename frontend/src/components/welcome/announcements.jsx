@@ -144,7 +144,7 @@ const Announcements = () => {
             <div className="section-box">
                 <h4 className="section-title">{t('announcements.levelSectionTitle')}</h4>
                 <div className="gpa-card" style={{ maxWidth: '300px', margin: '0 auto' }}>
-                    <span className="card-value" style={{ color: 'var(--primary)' }}>{levelLabel}</span>
+                    <span className="card-value" style={{ color: 'var(--color-primary)' }}>{levelLabel}</span>
                 </div>
             </div>
 
@@ -167,7 +167,7 @@ const Announcements = () => {
                         </div>
                     ))
                 ) : (
-                    <p style={{ textAlign: 'center', color: '#9ca3af', padding: '40px' }}>
+                    <p style={{ textAlign: 'center', color: 'var(--color-text-placeholder)', padding: '40px' }}>
                         {t('announcements.noAnnouncements')}
                     </p>
                 )}

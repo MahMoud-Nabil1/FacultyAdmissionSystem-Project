@@ -24,13 +24,13 @@ function applyCustomTokens(tokens) {
     Object.entries(tokens || {}).forEach(([key, value]) => {
         if (value != null && value !== "") root.style.setProperty(`--${key}`, value);
     });
-    root.style.setProperty("--primary-blue", "var(--primary)");
-    root.style.setProperty("--success-green", "var(--success)");
-    root.style.setProperty("--error-red", "var(--error)");
-    root.style.setProperty("--warning-orange", "var(--warning)");
-    root.style.setProperty("--white", "var(--surface)");
-    root.style.setProperty("--text-dark", "var(--text-primary)");
-    root.style.setProperty("--border-color", "var(--border)");
+    root.style.setProperty("--primary-blue", "var(--color-primary)");
+    root.style.setProperty("--success-green", "var(--color-success)");
+    root.style.setProperty("--error-red", "var(--color-error)");
+    root.style.setProperty("--warning-orange", "var(--color-warning)");
+    root.style.setProperty("--white", "var(--color-surface)");
+    root.style.setProperty("--text-dark", "var(--color-text)");
+    root.style.setProperty("--border-color", "var(--color-border)");
     root.style.setProperty("--sidebar-blue", "var(--sidebar-bg)");
 }
 

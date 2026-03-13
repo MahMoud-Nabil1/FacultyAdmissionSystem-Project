@@ -186,7 +186,7 @@ const SubjectPanel = () => {
             {showForm && (
                 <form className="form" onSubmit={submit}>
                     {error && (
-                        <p style={{ color: "var(--error, #dc2626)" }}>
+                        <p style={{ color: "var(--error, var(--color-error-hover))" }}>
                             {error}
                         </p>
                     )}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllStudents, deleteStudent } from "../../../services/api";
+import { getAllStudents, deleteStudent, createStudent } from "../../../services/api";
 import Pagination from "../pagination";
 import { PAGE_SIZE } from "../../../services/constants";
 import { useTranslation } from "react-i18next";
@@ -13,6 +13,14 @@ interface Student {
     gpa: string;
 }
 
+interface StudentForm {
+    studentId: string;
+    name: string;
+    email: string;
+    password: string;
+    gpa: string;
+}
+
 const StudentsTable: React.FC = () => {
     const { t } = useTranslation();
     const [students, setStudents] = useState<Student[]>([]);
@@ -21,6 +29,15 @@ const StudentsTable: React.FC = () => {
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const [searchId, setSearchId] = useState("");
     const [page, setPage] = useState(0);
+    const [showModal, setShowModal] = useState(false);
+    const [form, setForm] = useState<StudentForm>({
+        studentId: "",
+        name: "",
+        email: "",
+        password: "",
+        gpa: "",
+    });
+    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
@@ -63,12 +80,44 @@ const StudentsTable: React.FC = () => {
         }
     };
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+        setLoading(true);
+
+        try {
+            await createStudent(form);
+            setForm({ studentId: "", name: "", email: "", password: "", gpa: "" });
+            setShowModal(false);
+            await loadStudents(); // Reload the list
+        } catch (err: any) {
+            if (err.status === 409) {
+                setError(t("studentPanel.errorDuplicate"));
+            } else {
+                setError(err.data?.error || err.message || t("studentPanel.errorGeneric"));
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+        setForm({ studentId: "", name: "", email: "", password: "", gpa: "" });
+        setError(null);
+    };
+
     // Pagination slice
     const pagedStudents = filteredStudents.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
     return (
         <div className="dashboard-container">
-            <h2>{t("studentsTable.title")}</h2>
+            <div className="table-header">
+                <h2>{t("studentsTable.title")}</h2>
+                <button className="add-btn" onClick={() => setShowModal(true)}>
+                    + {t("studentsTable.addNew")}
+                </button>
+            </div>
             {error && <p className="error">{error}</p>}
 
             {/* Search by ID */}
@@ -123,6 +172,81 @@ const StudentsTable: React.FC = () => {
 
             {/* Pagination */}
             <Pagination page={page} setPage={setPage} total={filteredStudents.length} />
+
+            {/* Add Student Modal */}
+            {showModal && (
+                <div className="modal-overlay" onMouseDown={(e) => {
+                    if (e.target === e.currentTarget) closeModal();
+                }}>
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h3>{t("studentsTable.addNew")}</h3>
+                            <button className="modal-close" onClick={closeModal} type="button">×</button>
+                        </div>
+                        <div className="modal-body">
+                            <form onSubmit={handleSubmit}>
+                                {error && <p className="error">{error}</p>}
+
+                                <div className="form-group">
+                                    <input
+                                        placeholder={t("studentPanel.studentIdPlaceholder")}
+                                        value={form.studentId}
+                                        onChange={(e) => setForm({ ...form, studentId: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <input
+                                        placeholder={t("studentPanel.namePlaceholder")}
+                                        value={form.name}
+                                        onChange={(e) => setForm({ ...form, name: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <input
+                                        type="email"
+                                        placeholder={t("studentPanel.emailPlaceholder")}
+                                        value={form.email}
+                                        onChange={(e) => setForm({ ...form, email: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        max="5"
+                                        placeholder={t("studentPanel.gpaPlaceholder")}
+                                        value={form.gpa}
+                                        onChange={(e) => setForm({ ...form, gpa: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <input
+                                        type="password"
+                                        placeholder={t("studentPanel.passwordPlaceholder")}
+                                        value={form.password}
+                                        onChange={(e) => setForm({ ...form, password: e.target.value })}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="modal-footer">
+                                    <button type="button" className="cancel-btn" onClick={closeModal}>
+                                        {t("dashboardCommon.cancel")}
+                                    </button>
+                                    <button type="submit" className="submit-btn" disabled={loading}>
+                                        {loading ? t("studentPanel.loadingBtn") : t("studentPanel.submitBtn")}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
