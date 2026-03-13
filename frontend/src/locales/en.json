@@ -177,13 +177,17 @@
     "confirmDeleteStudent": "Are you sure you want to delete this student?",
     "confirmDeleteStaff": "Are you sure you want to delete this staff member?",
     "confirmDeleteSubject": "Do you want to delete this subject?",
-    "confirmDeleteAnnouncement": "Are you sure you want to delete this announcement?"
+    "confirmDeleteAnnouncement": "Are you sure you want to delete this announcement?",
+    "select": "Select",
+    "submit": "Submit",
+    "submitting": "Submitting..."
   },
   "dashboardTable": {
     "backToAdminDashboard": "Back to Admin Dashboard"
   },
   "studentsTable": {
     "title": "Students Table",
+    "addNew": "Add New Student",
     "studentCode": "Student Code",
     "name": "Name",
     "email": "Email",
@@ -192,6 +196,7 @@
   },
   "staffTable": {
     "title": "Staff Table",
+    "addNew": "Add New Staff",
     "name": "Name",
     "email": "Email",
     "role": "Role",
@@ -199,6 +204,7 @@
   },
   "subjectsTable": {
     "title": "Subjects Table",
+    "addNew": "Add New Subject",
     "searchPlaceholder": "Search by subject name or code...",
     "code": "Subject Code",
     "name": "Subject Name",
@@ -226,6 +232,9 @@
     "fetchError": "Failed to fetch settings",
     "errorMinMax": "Minimum is greater than or equal to maximum",
     "errorRange": "Values must be between 0 and 5",
+    "gpaRangeLabel": "GPA Range",
+    "minLabel": "Minimum GPA",
+    "maxLabel": "Maximum GPA",
     "minPlaceholder": "Minimum GPA",
     "maxPlaceholder": "Maximum GPA",
     "saveBtn": "Save settings",
@@ -267,6 +276,7 @@
   },
   "groupsSchedule": {
     "title": "Groups Schedule",
+    "addNew": "Add New Group",
     "loading": "Loading groups...",
     "errorPrefix": "Error:",
     "tryAgain": "Try Again",
@@ -287,6 +297,9 @@
     "type": "Type",
     "day": "Day",
     "time": "Time",
+    "from": "From",
+    "to": "To",
+    "capacity": "Capacity",
     "groupNumber": "Group {{number}}",
     "am": "AM",
     "pm": "PM",
@@ -299,7 +312,38 @@
       "cannotConnect": "Cannot connect to the backend server. Please make sure it's running on http://localhost:5000",
       "fetchFailed": "Failed to fetch groups",
       "endpointNotFound": "API endpoint not found. Make sure your server is running on port 5000",
-      "httpStatus": "HTTP error! status: {{status}}"
+      "httpStatus": "HTTP error! status: {{status}}",
+      "subjectRequired": "Subject is required",
+      "numberRequired": "Group number is required",
+      "typeRequired": "Type is required",
+      "dayRequired": "Day is required",
+      "fromRequired": "Start time is required",
+      "toRequired": "End time is required",
+      "capacityRequired": "Capacity is required",
+      "timeInvalid": "End time must be after start time",
+      "createFailed": "Failed to create group"
     }
+  },
+  "sidePanel": {
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar",
+    "dashboard": "Dashboard",
+    "students": "Students",
+    "staff": "Staff",
+    "subjects": "Subjects",
+    "groups": "Groups",
+    "signOut": "Sign out",
+    "user": "User",
+    "deanRole": "Dean of Admissions"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {{current}} of {{total}}"
+  },
+  "themePage": {
+    "title": "Theme",
+    "current": "Current:",
+    "toggleButton": "Toggle theme"
   }
 }

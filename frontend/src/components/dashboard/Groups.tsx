@@ -20,6 +20,18 @@ const Groups: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [filterDay, setFilterDay] = useState<string>("all");
     const [searchTerm, setSearchTerm] = useState<string>("");
+    const [showModal, setShowModal] = useState(false);
+    
+    // Form states
+    const [formSubject, setFormSubject] = useState("");
+    const [formNumber, setFormNumber] = useState<number | "">("");
+    const [formType, setFormType] = useState("");
+    const [formDay, setFormDay] = useState("");
+    const [formFrom, setFormFrom] = useState<number | "">("");
+    const [formTo, setFormTo] = useState<number | "">("");
+    const [formCapacity, setFormCapacity] = useState<number | "">(30);
+    const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
+    const [submitting, setSubmitting] = useState(false);
 
     // API URL
     const API_URL = 'http://localhost:5000';
@@ -125,14 +137,94 @@ const Groups: React.FC = () => {
         setSearchTerm("");
     };
 
+    const resetForm = () => {
+        setFormSubject("");
+        setFormNumber("");
+        setFormType("");
+        setFormDay("");
+        setFormFrom("");
+        setFormTo("");
+        setFormCapacity(30);
+        setFormErrors({});
+    };
+
+    const validateForm = () => {
+        const errors: {[key: string]: string} = {};
+
+        if (!formSubject) errors.subject = t("groupsSchedule.errors.subjectRequired");
+        if (!formNumber) errors.number = t("groupsSchedule.errors.numberRequired");
+        if (!formType) errors.type = t("groupsSchedule.errors.typeRequired");
+        if (!formDay) errors.day = t("groupsSchedule.errors.dayRequired");
+        if (!formFrom) errors.from = t("groupsSchedule.errors.fromRequired");
+        if (!formTo) errors.to = t("groupsSchedule.errors.toRequired");
+        if (!formCapacity) errors.capacity = t("groupsSchedule.errors.capacityRequired");
+
+        if (formFrom && formTo && Number(formFrom) >= Number(formTo)) {
+            errors.time = t("groupsSchedule.errors.timeInvalid");
+        }
+
+        setFormErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+
+        setSubmitting(true);
+
+        const groupData = {
+            subject: formSubject.toLowerCase(),
+            number: Number(formNumber),
+            type: formType.toLowerCase(),
+            day: formDay.toLowerCase(),
+            from: Number(formFrom),
+            to: Number(formTo),
+            capacity: Number(formCapacity)
+        };
+
+        try {
+            const response = await fetch(`${API_URL}/api/groups`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(groupData)
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || t("groupsSchedule.errors.createFailed"));
+            }
+
+            await fetchGroups();
+            setShowModal(false);
+            resetForm();
+        } catch (err: any) {
+            console.error("Error creating group:", err);
+            setFormErrors({ submit: err.message || t("groupsSchedule.errors.createFailed") });
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+
     if (loading) {
-        return <div className="groupsLoading">{t("groupsSchedule.loading")}</div>;
+        return (
+            <div className="dashboard-container">
+                <div className="groupsLoading">{t("groupsSchedule.loading")}</div>
+            </div>
+        );
     }
 
     if (error) {
         return (
-            <div className="groupsContainer">
-                <h1 className="groupsTitle">{t("groupsSchedule.title")}</h1>
+            <div className="dashboard-container">
+                <h2>{t("groupsSchedule.title")}</h2>
                 <div className="groupsError">
                     <strong>{t("groupsSchedule.errorPrefix")}</strong> {error}
                     <button onClick={fetchGroups} className="groupsPrimaryButton">
@@ -144,8 +236,13 @@ const Groups: React.FC = () => {
     }
 
     return (
-        <div className="groupsContainer">
-            <h1 className="groupsTitle">{t("groupsSchedule.title")}</h1>
+        <div className="dashboard-container groupsContainer">
+            <div className="table-header">
+                <h2>{t("groupsSchedule.title")}</h2>
+                <button className="add-btn" onClick={() => setShowModal(true)}>
+                    + {t("groupsSchedule.addNew")}
+                </button>
+            </div>
 
             <div className="groupsControlsContainer">
                 {/* Search Box */}
@@ -277,6 +374,152 @@ const Groups: React.FC = () => {
                         </div>
                     )}
                 </>
+            )}
+
+            {/* Add Group Modal */}
+            {showModal && (
+                <div className="modal-overlay" onMouseDown={(e) => {
+                    if (e.target === e.currentTarget) {
+                        setShowModal(false);
+                        resetForm();
+                    }
+                }}>
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h3>{t("groupsSchedule.addNew")}</h3>
+                            <button className="modal-close" onClick={() => {
+                                setShowModal(false);
+                                resetForm();
+                            }} type="button">×</button>
+                        </div>
+                        <div className="modal-body">
+                            <form onSubmit={handleSubmit}>
+                                {formErrors.submit && <p className="error">{formErrors.submit}</p>}
+                                {formErrors.time && <p className="error">{formErrors.time}</p>}
+
+                                <div className="form-group">
+                                    <input
+                                        type="text"
+                                        placeholder={t("groupsSchedule.subject") + " (e.g., math101, cs201)"}
+                                        value={formSubject}
+                                        onChange={(e) => {
+                                            setFormSubject(e.target.value);
+                                            setFormErrors({...formErrors, subject: ""});
+                                        }}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <input
+                                        type="number"
+                                        placeholder={t("groupsSchedule.group") + " #"}
+                                        value={formNumber}
+                                        onChange={(e) => {
+                                            setFormNumber(Number(e.target.value));
+                                            setFormErrors({...formErrors, number: ""});
+                                        }}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <select
+                                        value={formType}
+                                        onChange={(e) => {
+                                            setFormType(e.target.value);
+                                            setFormErrors({...formErrors, type: ""});
+                                        }}
+                                        required
+                                    >
+                                        <option value="">{t("groupsSchedule.type")} - {t("dashboardCommon.select")}</option>
+                                        <option value="lecture">{t("groupsSchedule.typeValues.lecture")}</option>
+                                        <option value="lab">{t("groupsSchedule.typeValues.lab")}</option>
+                                        <option value="tutorial">{t("groupsSchedule.typeValues.tutorial")}</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <select
+                                        value={formDay}
+                                        onChange={(e) => {
+                                            setFormDay(e.target.value);
+                                            setFormErrors({...formErrors, day: ""});
+                                        }}
+                                        required
+                                    >
+                                        <option value="">{t("groupsSchedule.day")} - {t("dashboardCommon.select")}</option>
+                                        <option value="monday">{t("days.monday")}</option>
+                                        <option value="tuesday">{t("days.tuesday")}</option>
+                                        <option value="wednesday">{t("days.wednesday")}</option>
+                                        <option value="thursday">{t("days.thursday")}</option>
+                                        <option value="friday">{t("days.friday")}</option>
+                                        <option value="saturday">{t("days.saturday")}</option>
+                                        <option value="sunday">{t("days.sunday")}</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <select
+                                        value={formFrom}
+                                        onChange={(e) => {
+                                            setFormFrom(Number(e.target.value));
+                                            setFormErrors({...formErrors, from: "", time: ""});
+                                        }}
+                                        required
+                                    >
+                                        <option value="">{t("groupsSchedule.from")} - {t("dashboardCommon.select")}</option>
+                                        {hours.map(h => (
+                                            <option key={h} value={h}>{formatTime(h)}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <select
+                                        value={formTo}
+                                        onChange={(e) => {
+                                            setFormTo(Number(e.target.value));
+                                            setFormErrors({...formErrors, to: "", time: ""});
+                                        }}
+                                        required
+                                    >
+                                        <option value="">{t("groupsSchedule.to")} - {t("dashboardCommon.select")}</option>
+                                        {hours.map(h => (
+                                            <option key={h} value={h}>{formatTime(h)}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <input
+                                        type="number"
+                                        placeholder={t("groupsSchedule.capacity")}
+                                        value={formCapacity}
+                                        onChange={(e) => {
+                                            setFormCapacity(Number(e.target.value));
+                                            setFormErrors({...formErrors, capacity: ""});
+                                        }}
+                                        min="1"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="modal-footer">
+                                    <button type="button" className="cancel-btn" onClick={() => {
+                                        setShowModal(false);
+                                        resetForm();
+                                    }}>
+                                        {t("dashboardCommon.cancel")}
+                                    </button>
+                                    <button type="submit" className="submit-btn" disabled={submitting}>
+                                        {submitting ? t("dashboardCommon.submitting") : t("dashboardCommon.submit")}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

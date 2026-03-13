@@ -177,13 +177,17 @@
     "confirmDeleteStudent": "هل أنت متأكد من حذف هذا الطالب؟",
     "confirmDeleteStaff": "هل أنت متأكد من حذف هذا الموظف؟",
     "confirmDeleteSubject": "هل تريد حذف هذا المقرر؟",
-    "confirmDeleteAnnouncement": "هل أنت متأكد من حذف هذا الإعلان؟"
+    "confirmDeleteAnnouncement": "هل أنت متأكد من حذف هذا الإعلان؟",
+    "select": "اختر",
+    "submit": "إرسال",
+    "submitting": "جاري الإرسال..."
   },
   "dashboardTable": {
     "backToAdminDashboard": "العودة إلى لوحة الإدارة"
   },
   "studentsTable": {
     "title": "جدول الطلاب",
+    "addNew": "إضافة طالب جديد",
     "studentCode": "كود الطالب",
     "name": "الإسم",
     "email": "الإيميل",
@@ -192,6 +196,7 @@
   },
   "staffTable": {
     "title": "جدول الموظفين",
+    "addNew": "إضافة موظف جديد",
     "name": "الإسم",
     "email": "الإيميل",
     "role": "الرتبة",
@@ -199,6 +204,7 @@
   },
   "subjectsTable": {
     "title": "جدول المقررات",
+    "addNew": "إضافة مقرر جديد",
     "searchPlaceholder": "ابحث باسم المقرر أو الرمز...",
     "code": "رمز المقرر",
     "name": "اسم المقرر",
@@ -226,6 +232,9 @@
     "fetchError": "فشل في جلب الإعدادات",
     "errorMinMax": "الحد الأدنى أكبر من أو يساوي الحد الأقصى",
     "errorRange": "القيم يجب أن تكون بين 0 و 5",
+    "gpaRangeLabel": "نطاق المعدل التراكمي",
+    "minLabel": "الحد الأدنى للمعدل",
+    "maxLabel": "الحد الأقصى للمعدل",
     "minPlaceholder": "الحد الأدنى للمعدل",
     "maxPlaceholder": "الحد الأقصى للمعدل",
     "saveBtn": "حفظ الإعدادات",
@@ -267,6 +276,7 @@
   },
   "groupsSchedule": {
     "title": "جدول المجموعات",
+    "addNew": "إضافة مجموعة جديدة",
     "loading": "جاري تحميل المجموعات...",
     "errorPrefix": "خطأ:",
     "tryAgain": "حاول مرة أخرى",
@@ -287,6 +297,9 @@
     "type": "النوع",
     "day": "اليوم",
     "time": "الوقت",
+    "from": "من",
+    "to": "إلى",
+    "capacity": "السعة",
     "groupNumber": "مجموعة {{number}}",
     "am": "ص",
     "pm": "م",
@@ -299,7 +312,38 @@
       "cannotConnect": "تعذر الاتصال بسيرفر الخلفية. تأكد أنه يعمل على http://localhost:5000",
       "fetchFailed": "فشل في جلب المجموعات",
       "endpointNotFound": "لم يتم العثور على مسار الـ API. تأكد أن السيرفر يعمل على المنفذ 5000",
-      "httpStatus": "خطأ HTTP! الحالة: {{status}}"
+      "httpStatus": "خطأ HTTP! الحالة: {{status}}",
+      "subjectRequired": "المقرر مطلوب",
+      "numberRequired": "رقم المجموعة مطلوب",
+      "typeRequired": "النوع مطلوب",
+      "dayRequired": "اليوم مطلوب",
+      "fromRequired": "وقت البداية مطلوب",
+      "toRequired": "وقت النهاية مطلوب",
+      "capacityRequired": "السعة مطلوبة",
+      "timeInvalid": "وقت النهاية يجب أن يكون بعد وقت البداية",
+      "createFailed": "فشل في إنشاء المجموعة"
     }
+  },
+  "sidePanel": {
+    "expandSidebar": "توسيع الشريط الجانبي",
+    "collapseSidebar": "طي الشريط الجانبي",
+    "dashboard": "لوحة التحكم",
+    "students": "الطلاب",
+    "staff": "الموظفين",
+    "subjects": "المقررات",
+    "groups": "المجموعات",
+    "signOut": "تسجيل الخروج",
+    "user": "مستخدم",
+    "deanRole": "عميد القبول"
+  },
+  "pagination": {
+    "previous": "السابق",
+    "next": "التالي",
+    "page": "صفحة {{current}} من {{total}}"
+  },
+  "themePage": {
+    "title": "المظهر",
+    "current": "الحالي:",
+    "toggleButton": "تبديل المظهر"
   }
 }

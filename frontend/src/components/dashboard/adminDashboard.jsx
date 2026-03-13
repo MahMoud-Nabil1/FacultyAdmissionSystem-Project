@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext } from "react";
+import { AdminDashboardContext } from "./AdminDashboardLayout";
 import StudentPanel from "./studentPanel.tsx";
 import StaffPanel from "./staffPanel.tsx";
 import SubjectPanel from "./SubjectPanel";
@@ -8,52 +9,22 @@ import GroupPanel from "./groupPanel.tsx";
 import "./css/adminDashboard.css";
 import { useTranslation } from "react-i18next";
 
-
 const AdminDashboard = () => {
+    const { userName } = useContext(AdminDashboardContext);
     const { t } = useTranslation();
-    const [userName, setUserName] = useState("");
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const token = localStorage.getItem("token");
-                const res = await fetch("http://localhost:5000/api/auth/me", {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                if (!res.ok) throw new Error("Unauthorized");
-                const data = await res.json();
-                setUserName(data.name);
-            } catch (err) {
-                console.error(err);
-            }
-        };
-        fetchUser();
-    }, []);
 
     return (
-        <div className="admin-dashboard-container">
-            <header className="dashboard-header">
-                <h1>{t("adminDashboard.welcome", { name: userName })}</h1>
-            </header>
-
+        <>
+            <h1 className="eduadmin-page-title">{t("adminDashboard.welcome", { name: userName || "Admin" })}</h1>
             <div className="dashboard-grid">
-                {/* Right Column */}
                 <div className="dashboard-column">
-                    <StaffPanel />
-                    <SubjectPanel />
                     <AnnouncementsPanel />
                 </div>
-
-                {/* Left Column */}
                 <div className="dashboard-column">
-                    <StudentPanel />
                     <SettingsPanel />
-                    <GroupPanel />
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
