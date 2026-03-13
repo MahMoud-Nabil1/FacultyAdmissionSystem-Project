@@ -11,11 +11,13 @@ import Announcements from "./components/welcome/announcements.jsx";
 import AdminDashboardTable from "./components/dashboard/tables/table.tsx";
 import Groups from "./components/dashboard/Groups.tsx";
 import Home from "./components/home/home.tsx";
+import LanguageFloatingButton from "./components/common/LanguageFloatingButton.jsx";
 
 
 function App() {
     return (
         <div className="App">
+            <LanguageFloatingButton />
 
             <Routes>
                 {}

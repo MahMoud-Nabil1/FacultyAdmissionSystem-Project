@@ -1,0 +1,55 @@
+{
+  "supportContact": {
+    "itTitle": "الدعم الفني",
+    "adminTitle": "شؤون الطلاب والادارة",
+    "toggleIT": "IT",
+    "toggleAdmin": "الإدارة",
+    "studentCodeLabel": "كود الطالب",
+    "studentCodePlaceholder": "7 أرقام",
+    "subjectLabelIT": "موضوع المشكلة",
+    "subjectLabelAdmin": "كود المقرر الدراسي",
+    "subjectPlaceholderIT": "الموضوع",
+    "subjectPlaceholderAdmin": "مثال: CS306",
+    "messageLabel": "تفاصيل الرسالة",
+    "messagePlaceholder": "اشرح لنا المشكلة...",
+    "replyEmailLabel": "بريد الرد",
+    "submitBtn": "إرسال الطلب",
+    "loadingBtn": "جاري الإرسال...",
+    "validateStudentCode": "يجب أن يتكون كود الطالب من 7 أرقام.",
+    "validateSubjectIT": "يرجى إدخال موضوع المشكلة.",
+    "validateSubjectAdmin": "الرجاء إدخال كود المقرر الدراسي.",
+    "validateMessage": "يرجى وصف مشكلتك بالتفصيل.",
+    "validateEmail": "يرجى إدخال بريد إلكتروني صحيح للرد.",
+    "successIT": "تم إرسال طلب الدعم الفني بنجاح.",
+    "successAdmin": "تم إرسال طلبك للإدارة بنجاح.",
+    "errorGeneric": "حدث خطأ ما.",
+    "errorServer": "فشل الاتصال بالسيرفر."
+  },
+  "announcements": {
+    "loading": "جاري التحميل...",
+    "logoAlt": "الشعار",
+    "loginBtn": "تسجيل الدخول",
+    "welcome": "مرحباً, {{name}} ({{role}})",
+    "roleAdmin": "مدير",
+    "roleStudent": "طالب",
+    "gpaErrorText": "يرجى التواصل مع المسؤول لإصلاح الإعدادات.",
+    "gpaWarning": " تحذير: الإعدادات غير صحيحة (الحد الأدنى أكبر من الحد الأقصى)",
+    "gpaSectionTitle": "المعدل التراكمي المطلوب للتسجيل في الجدول",
+    "gpaFrom": "من",
+    "gpaTo": "إلى",
+    "levelSectionTitle": "المستوى المطلوب للتسجيل في الجدول",
+    "level1": "المستوى الأول",
+    "level2": "المستوى الثاني",
+    "level3": "المستوى الثالث",
+    "level4": "المستوى الرابع",
+    "announcementsTitle": "الإعلانات",
+    "noAnnouncements": "لا توجد إعلانات حتى الآن",
+    "postedBy": "نشر بواسطة {{author}} في {{date}}",
+    "fetchError": "فشل في تحميل البيانات"
+  }
+
+
+
+
+
+}

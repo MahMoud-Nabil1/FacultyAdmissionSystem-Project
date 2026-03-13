@@ -1,0 +1,52 @@
+{
+  "supportContact": {
+    "itTitle": "Technical Support",
+    "adminTitle": "Student Affairs & Administration",
+    "toggleIT": "IT",
+    "toggleAdmin": "Administration",
+    "studentCodeLabel": "Student Code",
+    "studentCodePlaceholder": "7 digits",
+    "subjectLabelIT": "Issue Subject",
+    "subjectLabelAdmin": "Course Code",
+    "subjectPlaceholderIT": "Subject",
+    "subjectPlaceholderAdmin": "Example: CS306",
+    "messageLabel": "Message Details",
+    "messagePlaceholder": "Describe your issue...",
+    "replyEmailLabel": "Reply Email",
+    "submitBtn": "Submit Request",
+    "loadingBtn": "Sending...",
+    "validateStudentCode": "Student code must be exactly 7 digits.",
+    "validateSubjectIT": "Please enter the issue subject.",
+    "validateSubjectAdmin": "Please enter the course code.",
+    "validateMessage": "Please describe your issue in detail.",
+    "validateEmail": "Please enter a valid reply email.",
+    "successIT": "Technical support request sent successfully.",
+    "successAdmin": "Your request was sent to the administration successfully.",
+    "errorGeneric": "Something went wrong.",
+    "errorServer": "Failed to connect to the server."
+  },
+
+
+  "announcements": {
+    "loading": "Loading...",
+    "logoAlt": "Logo",
+    "loginBtn": "Login",
+    "welcome": "Welcome, {{name}} ({{role}})",
+    "roleAdmin": "Admin",
+    "roleStudent": "Student",
+    "gpaErrorText": "Please contact the administrator to fix the settings.",
+    "gpaWarning": " Warning: Invalid settings (minimum is greater than maximum)",
+    "gpaSectionTitle": "Required GPA to register in the schedule",
+    "gpaFrom": "From",
+    "gpaTo": "To",
+    "levelSectionTitle": "Required level to register in the schedule",
+    "level1": "Level 1",
+    "level2": "Level 2",
+    "level3": "Level 3",
+    "level4": "Level 4",
+    "announcementsTitle": "Announcements",
+    "noAnnouncements": "No announcements yet",
+    "postedBy": "Posted by {{author}} on {{date}}",
+    "fetchError": "Failed to load data"
+  }
+}
