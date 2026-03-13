@@ -1,13 +1,18 @@
 import {jwtDecode} from 'jwt-decode';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
-export { API_BASE };
+export {API_BASE};
 
 
 function getToken() {
     return localStorage.getItem("token");
 }
 
+function getAuthHeader() {
+    const token = getToken();
+    if (!token) throw new Error("No token found. Please login.");
+    return {Authorization: `Bearer ${token}`};
+}
 
 export function decodeToken() {
     const token = getToken();
@@ -22,7 +27,7 @@ export function decodeToken() {
 
 
 export async function apiPost(path, body, auth = true) {
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = {'Content-Type': 'application/json'};
     if (auth) {
         const token = getToken();
         if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -35,24 +40,19 @@ export async function apiPost(path, body, auth = true) {
     });
 
     const data = await res.json().catch(() => ({}));
-    return { res, data };
+    return {res, data};
 }
 
 
 export async function apiGet(path, auth = true) {
-    const headers = {};
-    if (auth) {
-        const token = getToken();
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const res = await fetch(`${API_BASE}${path}`, { headers });
+    const headers = auth ? getAuthHeader() : {};
+    const res = await fetch(`${API_BASE}${path}`, {headers});
     const data = await res.json().catch(() => ({}));
-    return { res, data };
+    return {res, data};
 }
 
 export async function apiPut(path, body, auth = true) {
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = {'Content-Type': 'application/json'};
     if (auth) {
         const token = getToken();
         if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -63,7 +63,7 @@ export async function apiPut(path, body, auth = true) {
         body: JSON.stringify(body),
     });
     const data = await res.json().catch(() => ({}));
-    return { res, data };
+    return {res, data};
 }
 
 
@@ -73,14 +73,14 @@ export async function apiDelete(path, auth = true) {
         const token = getToken();
         if (token) headers['Authorization'] = `Bearer ${token}`;
     }
-    const res = await fetch(`${API_BASE}${path}`, { method: 'DELETE', headers });
+    const res = await fetch(`${API_BASE}${path}`, {method: 'DELETE', headers});
     const data = await res.json().catch(() => ({}));
-    return { res, data };
+    return {res, data};
 }
 
 
 export async function createStudent(data) {
-    const { res, data: body } = await apiPost("/students", data);
+    const {res, data: body} = await apiPost("/students", data);
     if (!res.ok) {
         // eslint-disable-next-line no-throw-literal
         throw {
@@ -92,19 +92,19 @@ export async function createStudent(data) {
 }
 
 export async function getAllStudents() {
-    const { res, data } = await apiGet("/students");
+    const {res, data} = await apiGet("/students");
     if (!res.ok) throw new Error(data.error || "Failed to fetch students");
     return data;
 }
 
 export async function deleteStudent(id) {
-    const { res, data } = await apiDelete(`/students/${id}`);
+    const {res, data} = await apiDelete(`/students/${id}`);
     if (!res.ok) throw new Error(data.error || "Failed to delete student");
     return data;
 }
 
 export async function createStaff(data) {
-    const { res, data: body } = await apiPost("/staff", data);
+    const {res, data: body} = await apiPost("/staff", data);
     if (!res.ok) {
         // eslint-disable-next-line no-throw-literal
         throw {
@@ -116,13 +116,13 @@ export async function createStaff(data) {
 }
 
 export async function getAllStaff() {
-    const { res, data } = await apiGet("/staff");
+    const {res, data} = await apiGet("/staff");
     if (!res.ok) throw new Error(data.error || "Failed to fetch staff");
     return data;
 }
 
 export async function deleteStaff(id) {
-    const { res, data } = await apiDelete(`/staff/${id}`);
+    const {res, data} = await apiDelete(`/staff/${id}`);
     if (!res.ok) throw new Error(data.error || "Failed to delete staff");
     return data;
 }
@@ -140,31 +140,31 @@ export async function getMe() {
 
 
 export async function getAllSubjects() {
-    const { res, data } = await apiGet("/subjects");
+    const {res, data} = await apiGet("/subjects");
     if (!res.ok) throw new Error(data.error || "Failed to fetch subjects");
     return data;
 }
 
 export async function getSubjectById(id) {
-    const { res, data } = await apiGet(`/subjects/${id}`);
+    const {res, data} = await apiGet(`/subjects/${id}`);
     if (!res.ok) throw new Error(data.error || "Failed to fetch subject");
     return data;
 }
 
 export async function createSubject(data) {
-    const { res, data: body } = await apiPost("/subjects", data);
+    const {res, data: body} = await apiPost("/subjects", data);
     if (!res.ok) throw new Error(body.error || "Failed to create subject");
     return body;
 }
 
 export async function updateSubject(id, data) {
-    const { res, data: body } = await apiPut(`/subjects/${id}`, data);
+    const {res, data: body} = await apiPut(`/subjects/${id}`, data);
     if (!res.ok) throw new Error(body.error || "Failed to update subject");
     return body;
 }
 
 export async function deleteSubject(id) {
-    const { res, data } = await apiDelete(`/subjects/${id}`);
+    const {res, data} = await apiDelete(`/subjects/${id}`);
     if (!res.ok) throw new Error(data.error || "Failed to delete subject");
     return data;
 }
