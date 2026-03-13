@@ -61,8 +61,6 @@
     "errorGeneric": "فشل تسجيل الدخول",
     "errorServer": "لم يمكن التواصل مع السيرفر"
   },
-
-
   "forgotPassword": {
     "brandName": "جامعة القاهرة - كلية العلوم",
     "title": "نسيت كلمة المرور",
@@ -77,7 +75,6 @@
     "errorGeneric": "حدث خطأ ما.",
     "errorServer": "تعذر التواصل مع السيرفر."
   },
-
   "resetPassword": {
     "brandName": "جامعة القاهرة - كلية العلوم",
     "title": "إعادة تعيين كلمة السر",
@@ -227,14 +224,14 @@
   "settingsPanel": {
     "title": "إعدادات المعدل التراكمي والمستوى",
     "fetchError": "فشل في جلب الإعدادات",
-    "errorMinMax": "⚠️ الحد الأدنى أكبر من أو يساوي الحد الأقصى",
-    "errorRange": "⚠️ القيم يجب أن تكون بين 0 و 5",
+    "errorMinMax": "الحد الأدنى أكبر من أو يساوي الحد الأقصى",
+    "errorRange": "القيم يجب أن تكون بين 0 و 5",
     "minPlaceholder": "الحد الأدنى للمعدل",
     "maxPlaceholder": "الحد الأقصى للمعدل",
     "saveBtn": "حفظ الإعدادات",
     "savingBtn": "جاري الحفظ...",
-    "saveSuccess": "✅ تم حفظ الإعدادات بنجاح",
-    "saveError": "❌ حدث خطأ في الاتصال"
+    "saveSuccess": "تم حفظ الإعدادات بنجاح",
+    "saveError": "حدث خطأ في الاتصال"
   },
   "days": {
     "monday": "الاثنين",
@@ -244,6 +241,29 @@
     "friday": "الجمعة",
     "saturday": "السبت",
     "sunday": "الأحد"
+  },
+  "home": {
+    "loading": "جاري التحميل...",
+    "title": "الصفحة الرئيسية",
+    "name": "الاسم: ",
+    "role": "الدور: ",
+    "defaultRole": "مستخدم",
+    "department": "القسم: ",
+    "gpa": "المعدل التراكمي: ",
+    "registeredHours": "الساعات المسجلة: ",
+    "completedHours": "الساعات المكتملة: ",
+    "viewAllGroups": "عرض كل المجموعات",
+    "adminDashboard": "لوحة الإدارة",
+    "changePassword": "تغيير كلمة السر",
+    "registerSubjects": "تسجيل المواد",
+    "changePasswordTitle": "تغيير كلمة السر",
+    "currentPasswordPlaceholder": "كلمة السر الحالية",
+    "newPasswordPlaceholder": "كلمة السر الجديدة",
+    "confirmPasswordPlaceholder": "تأكيد كلمة السر",
+    "save": "حفظ",
+    "passwordMismatch": "كلمتا السر غير متطابقتين.",
+    "passwordUpdateSuccess": "تم تحديث كلمة السر بنجاح!",
+    "passwordUpdateError": "فشل تحديث كلمة السر."
   },
   "groupsSchedule": {
     "title": "جدول المجموعات",
@@ -255,8 +275,8 @@
     "clear": "مسح",
     "filterByDay": "فلترة حسب اليوم:",
     "allDays": "كل الأيام",
-    "noGroupsFound": "📚 لا توجد مجموعات",
-    "contactAdmin": "📧 يرجى التواصل مع المسؤول: admin@admin.com",
+    "noGroupsFound": "لا توجد مجموعات",
+    "contactAdmin": "يرجى التواصل مع المسؤول: admin@admin.com",
     "showing": "عرض {{filtered}} من أصل {{total}} مجموعة",
     "searchTag": "بحث: \"{{term}}\"",
     "dayTag": "اليوم: {{day}}",
@@ -282,6 +302,4 @@
       "httpStatus": "خطأ HTTP! الحالة: {{status}}"
     }
   }
-
-
 }

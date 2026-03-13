@@ -1,0 +1,209 @@
+/* ============================================================
+   DESIGN SYSTEM — FacultyAdmissionSystem
+   ============================================================
+   Single source of truth for all design tokens.
+   Import this file ONCE in index.css (or index.js) and use
+   var(--token) everywhere. Never hardcode colors again.
+   ============================================================ */
+
+/* ------- Fonts ------- */
+@import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap');
+
+/* ====================
+   1. COLOR TOKENS
+   ==================== */
+:root {
+  /* ── Primary ── */
+  --color-primary:           #004a99;
+  --color-primary-hover:     #003d80;
+  --color-primary-light:     #eef6ff;
+  --color-primary-alpha-10:  rgba(0, 74, 153, 0.10);
+  --color-primary-alpha-15:  rgba(0, 74, 153, 0.15);
+
+  /* ── Semantic / Status ── */
+  --color-success:           #10b981;
+  --color-success-hover:     #059669;
+  --color-success-bg:        #ecfdf5;
+  --color-success-border:    #a7f3d0;
+
+  --color-error:             #ef4444;
+  --color-error-hover:       #dc2626;
+  --color-error-bg:          #fef2f2;
+  --color-error-border:      #fecaca;
+
+  --color-warning:           #f59e0b;
+  --color-warning-hover:     #d97706;
+  --color-warning-bg:        #fffbeb;
+  --color-warning-border:    #fde68a;
+
+  --color-info:              #3b82f6;
+  --color-info-bg:           #eff6ff;
+  --color-info-border:       #bfdbfe;
+
+  /* ── Neutrals / Text ── */
+  --color-text:              #111827;
+  --color-text-secondary:    #374151;
+  --color-text-muted:        #6b7280;
+  --color-text-placeholder:  #9ca3af;
+  --color-text-disabled:     #d1d5db;
+  --color-text-inverse:      #ffffff;
+
+  /* ── Backgrounds & Surfaces ── */
+  --color-bg:                #f9fafb;
+  --color-bg-alt:            #f4f7f9;
+  --color-surface:           #ffffff;
+  --color-surface-hover:     #f1f5f9;
+  --color-surface-active:    #e2e8f0;
+  --color-input-bg:          #f8fafc;
+
+  /* ── Borders ── */
+  --color-border:            #e2e8f0;
+  --color-border-light:      #f3f4f6;
+  --color-border-focus:      var(--color-primary);
+
+  /* ── Badge Colors (for Groups / Tags) ── */
+  --color-badge-lecture-bg:    #e3f2fd;
+  --color-badge-lecture-text:  #1565c0;
+  --color-badge-lab-bg:        #f3e5f5;
+  --color-badge-lab-text:      #7b1fa2;
+  --color-badge-tutorial-bg:   #fff3e0;
+  --color-badge-tutorial-text: #e65100;
+  --color-badge-default-bg:    #f3f4f6;
+  --color-badge-default-text:  #4b5563;
+
+  /* ── Contact Icon Gradients ── */
+  --gradient-primary:        linear-gradient(135deg, #667eea, #764ba2);
+  --gradient-info:           linear-gradient(135deg, #38bdf8, #0ea5e9);
+  --gradient-warning:        linear-gradient(135deg, #f97316, #ea580c);
+
+
+  /* ====================
+     2. TYPOGRAPHY
+     ==================== */
+  --font-primary:      'Alexandria', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono:         'Source Code Pro', Menlo, Monaco, Consolas, 'Courier New', monospace;
+
+  --font-size-xs:      0.75rem;   /* 12px */
+  --font-size-sm:      0.875rem;  /* 14px */
+  --font-size-base:    1rem;      /* 16px */
+  --font-size-lg:      1.125rem;  /* 18px */
+  --font-size-xl:      1.25rem;   /* 20px */
+  --font-size-2xl:     1.5rem;    /* 24px */
+  --font-size-3xl:     1.875rem;  /* 30px */
+  --font-size-4xl:     2.25rem;   /* 36px */
+
+  --font-weight-light:    300;
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  --line-height-tight:    1.25;
+  --line-height-normal:   1.5;
+  --line-height-relaxed:  1.75;
+
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide:  0.04em;
+
+
+  /* ====================
+     3. SPACING
+     ==================== */
+  --space-1:   0.25rem;  /* 4px  */
+  --space-2:   0.5rem;   /* 8px  */
+  --space-3:   0.75rem;  /* 12px */
+  --space-4:   1rem;     /* 16px */
+  --space-5:   1.25rem;  /* 20px */
+  --space-6:   1.5rem;   /* 24px */
+  --space-8:   2rem;     /* 32px */
+  --space-10:  2.5rem;   /* 40px */
+  --space-12:  3rem;     /* 48px */
+  --space-16:  4rem;     /* 64px */
+
+
+  /* ====================
+     4. BORDER RADIUS
+     ==================== */
+  --radius-sm:    6px;
+  --radius-md:    8px;
+  --radius-lg:    12px;
+  --radius-xl:    16px;
+  --radius-full:  999px;
+
+
+  /* ====================
+     5. SHADOWS
+     ==================== */
+  --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm:  0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md:  0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg:  0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-xl:  0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+  --shadow-focus: 0 0 0 3px var(--color-primary-alpha-10);
+
+
+  /* ====================
+     6. TRANSITIONS
+     ==================== */
+  --transition-fast:    all 0.15s ease;
+  --transition-base:    all 0.2s ease;
+  --transition-smooth:  all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow:    all 0.3s ease;
+
+
+  /* ====================
+     7. Z-INDEX SCALE
+     ==================== */
+  --z-dropdown:  10;
+  --z-sticky:    20;
+  --z-overlay:   30;
+  --z-modal:     40;
+  --z-toast:     50;
+  --z-tooltip:   60;
+
+
+  /* ====================
+     8. LAYOUT
+     ==================== */
+  --max-width-sm:    640px;
+  --max-width-md:    768px;
+  --max-width-lg:    1024px;
+  --max-width-xl:    1200px;
+  --max-width-2xl:   1400px;
+
+  --sidebar-width:   260px;
+  --header-height:   64px;
+}
+
+
+/* ====================
+   9. DARK THEME OVERRIDES
+   ==================== */
+:root[data-theme="dark"] {
+  --color-primary:           #3b82f6;
+  --color-primary-hover:     #2563eb;
+  --color-primary-light:     rgba(59, 130, 246, 0.12);
+  --color-primary-alpha-10:  rgba(59, 130, 246, 0.10);
+  --color-primary-alpha-15:  rgba(59, 130, 246, 0.15);
+
+  --color-text:              #e5e7eb;
+  --color-text-secondary:    #d1d5db;
+  --color-text-muted:        #9ca3af;
+  --color-text-placeholder:  #6b7280;
+  --color-text-disabled:     #4b5563;
+
+  --color-bg:                #0b1220;
+  --color-bg-alt:            #111827;
+  --color-surface:           #0f172a;
+  --color-surface-hover:     #1e293b;
+  --color-surface-active:    #334155;
+  --color-input-bg:          #1e293b;
+
+  --color-border:            rgba(229, 231, 235, 0.12);
+  --color-border-light:      rgba(229, 231, 235, 0.06);
+
+  --shadow-sm:  0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md:  0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg:  0 10px 15px rgba(0, 0, 0, 0.3);
+}

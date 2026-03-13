@@ -25,8 +25,6 @@
     "errorGeneric": "Something went wrong.",
     "errorServer": "Failed to connect to the server."
   },
-
-
   "announcements": {
     "loading": "Loading...",
     "logoAlt": "Logo",
@@ -49,7 +47,6 @@
     "postedBy": "Posted by {{author}} on {{date}}",
     "fetchError": "Failed to load data"
   },
-
   "login": {
     "brandName": "Cairo University - Faculty of Science",
     "title": "Login",
@@ -64,14 +61,12 @@
     "errorGeneric": "Login failed",
     "errorServer": "Could not connect to the server"
   },
-
-
   "forgotPassword": {
     "brandName": "Cairo University - Faculty of Science",
     "title": "Forgot Password",
     "descriptionDefault": "Enter your email and we will send you a password reset link.",
-  "descriptionSent": "If an account exists for this email, we’ve sent a password reset link. Please check your inbox (and spam/junk).",
-  "descriptionNotFound": "If an account exists for this email, we’ve sent a password reset link.",
+    "descriptionSent": "If an account exists for this email, we’ve sent a password reset link. Please check your inbox (and spam/junk).",
+    "descriptionNotFound": "If an account exists for this email, we’ve sent a password reset link.",
     "emailLabel": "Email",
     "emailPlaceholder": "Enter your email",
     "submitBtn": "Send Reset Link",
@@ -80,7 +75,6 @@
     "errorGeneric": "Something went wrong.",
     "errorServer": "Could not connect to the server."
   },
-
   "resetPassword": {
     "brandName": "Cairo University - Faculty of Science",
     "title": "Reset Password",
@@ -230,14 +224,14 @@
   "settingsPanel": {
     "title": "GPA and Level Settings",
     "fetchError": "Failed to fetch settings",
-    "errorMinMax": "⚠️ Minimum is greater than or equal to maximum",
-    "errorRange": "⚠️ Values must be between 0 and 5",
+    "errorMinMax": "Minimum is greater than or equal to maximum",
+    "errorRange": "Values must be between 0 and 5",
     "minPlaceholder": "Minimum GPA",
     "maxPlaceholder": "Maximum GPA",
     "saveBtn": "Save settings",
     "savingBtn": "Saving...",
-    "saveSuccess": "✅ Settings saved successfully",
-    "saveError": "❌ Connection error"
+    "saveSuccess": "Settings saved successfully",
+    "saveError": "Connection error"
   },
   "days": {
     "monday": "Monday",
@@ -247,6 +241,29 @@
     "friday": "Friday",
     "saturday": "Saturday",
     "sunday": "Sunday"
+  },
+  "home": {
+    "loading": "Loading...",
+    "title": "Home",
+    "name": "Name: ",
+    "role": "Role: ",
+    "defaultRole": "User",
+    "department": "Department: ",
+    "gpa": "GPA: ",
+    "registeredHours": "Registered Hours: ",
+    "completedHours": "Completed Hours: ",
+    "viewAllGroups": "View All Groups",
+    "adminDashboard": "Admin Dashboard",
+    "changePassword": "Change Password",
+    "registerSubjects": "Register Subjects",
+    "changePasswordTitle": "Change Password",
+    "currentPasswordPlaceholder": "Current Password",
+    "newPasswordPlaceholder": "New Password",
+    "confirmPasswordPlaceholder": "Confirm Password",
+    "save": "Save",
+    "passwordMismatch": "Passwords do not match.",
+    "passwordUpdateSuccess": "Password updated successfully!",
+    "passwordUpdateError": "Failed to update password."
   },
   "groupsSchedule": {
     "title": "Groups Schedule",
@@ -258,8 +275,8 @@
     "clear": "Clear",
     "filterByDay": "Filter by day:",
     "allDays": "All Days",
-    "noGroupsFound": "📚 No groups found",
-    "contactAdmin": "📧 Please contact admin: admin@admin.com",
+    "noGroupsFound": "No groups found",
+    "contactAdmin": "Please contact admin: admin@admin.com",
     "showing": "Showing {{filtered}} of {{total}} groups",
     "searchTag": "Search: \"{{term}}\"",
     "dayTag": "Day: {{day}}",
