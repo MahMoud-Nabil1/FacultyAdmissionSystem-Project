@@ -3,75 +3,58 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
-const jwt = require("jsonwebtoken");
 
-// Import routes
-const subjectRoutes = require('./routes/subject.routes');
 const authRoutes = require('./routes/auth.routes');
 const studentRoutes = require('./routes/student.routes');
 const staffRoutes = require('./routes/staff.routes');
+const subjectRoutes = require('./routes/subject.routes');
 const announcementRoutes = require('./routes/announcement.routes');
+const groupRoutes = require('./routes/group.routes');
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
-// Import models
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 require('./models/department');
 require('./models/subject');
 require('./models/student');
 require('./models/staff');
 require('./models/passwordResetToken');
 require('./models/announcementSchema');
+require('./models/group');
 
-// Register routes
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/subjects', subjectRoutes);
 app.use('/api/announcements', announcementRoutes);
+app.use('/api/groups', groupRoutes);
 
-app.get('/', (req, res) => {
-    res.json({ message: 'Faculty Admission System API is running' });
+app.use((req, res) => {
+    res.status(404).json({ message: 'Route not found' });
 });
 
-const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI;
+app.use((err, req, res, next) => {
+    res.status(err.status || 500).json({ message: err.message || 'Something went wrong' });
+});
 
-// Check if MONGO_URI exists
-if (!MONGO_URI) {
-    console.error('❌ MONGO_URI is not defined in .env file');
-    process.exit(1);
-}
-
-mongoose.connect(MONGO_URI)
+mongoose.connect(process.env.MONGO_URI)
     .then(() => {
-        console.log('✅ Connected to MongoDB Atlas');
-        app.listen(PORT, () => {
-            console.log(`🚀 Server running on http://localhost:${PORT}`);
+        app.listen(process.env.PORT || 5000, () => {
+            console.log(`Server running on port ${process.env.PORT || 5000}`);
         });
     })
-    .catch((err) => {
-        console.error('❌ MongoDB connection error:', err.message);
+    .catch(err => {
+        console.error(err.message);
+        process.exit(1);
     });
 
-function requireRole(...allowedRoles) {
-    return (req, res, next) => {
-        const token = req.headers.authorization?.split(" ")[1];
-        if (!token) return res.status(401).json({ message: "Unauthorized" });
-
-        try {
-            const payload = jwt.verify(token, process.env.JWT_SECRET);
-
-            if (!allowedRoles.includes(payload.role)) {
-                return res.status(403).json({ message: "Forbidden" });
-            }
-
-            req.user = payload;
-            next();
-        } catch {
-            res.status(401).json({ message: "Invalid token" });
-        }
-    };
-}
+module.exports = app;

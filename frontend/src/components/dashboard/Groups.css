@@ -1,0 +1,226 @@
+.groupsContainer {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.groupsTitle {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 28px;
+  color: #333;
+}
+
+.groupsControlsContainer {
+  margin: 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.groupsSearchBox {
+  flex: 1;
+  min-width: 250px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.groupsSearchInput {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  outline: none;
+  transition: border 0.3s;
+}
+
+.groupsSearchInput:focus {
+  border-color: #4caf50;
+}
+
+.groupsFilterGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.groupsSelect {
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  background: #fff;
+}
+
+.groupsClearButton {
+  padding: 10px 12px;
+  font-size: 14px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.groupsPrimaryButton {
+  display: block;
+  margin: 20px auto 0;
+  padding: 8px 16px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.groupsTableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 18px;
+  border-radius: 12px;
+  border: 1px solid #e7e7e7;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.groupsTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 720px;
+}
+
+.groupsTh {
+  background-color: #3da845;
+  color: white;
+  padding: 14px 16px;
+  text-align: start;
+  font-size: 13px;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  letter-spacing: 0.2px;
+}
+
+.groupsTd {
+  padding: 14px 16px;
+  border-bottom: 1px solid #efefef;
+  font-size: 14px;
+  text-align: start;
+  color: #1f2937;
+}
+
+.groupsTrEven {
+  background-color: #fafafa;
+}
+
+.groupsTable tbody tr:hover {
+  background-color: #f1f8f2;
+}
+
+.groupsBadge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.groupsBadgeLecture {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.groupsBadgeLab {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.groupsBadgeTutorial {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.groupsBadgeDefault {
+  background-color: #e0e0e0;
+  color: #616161;
+}
+
+.groupsLoading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
+}
+
+.groupsError {
+  text-align: center;
+  padding: 20px;
+  font-size: 16px;
+  color: #d32f2f;
+  background-color: #ffebee;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+
+.groupsEmptyState {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 18px;
+  color: #666;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-top: 30px;
+  border: 1px dashed #ccc;
+}
+
+.groupsAdminMessage {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #e8f4fd;
+  border-radius: 6px;
+  color: #0288d1;
+  font-size: 16px;
+}
+
+.groupsAdminEmail {
+  font-weight: bold;
+  color: #01579b;
+}
+
+.groupsTimeSlot {
+  font-weight: bold;
+  color: #111827;
+}
+
+.groupsSubjectCell {
+  font-weight: bold;
+  color: #2c3e50;
+  text-transform: uppercase;
+}
+
+/* RTL tweaks (when your app sets dir="rtl" for Arabic) */
+:dir(rtl) .groupsTh,
+:dir(rtl) .groupsTd {
+  text-align: right;
+}
+
+:dir(rtl) .groupsSearchBox,
+:dir(rtl) .groupsFilterGroup {
+  flex-direction: row-reverse;
+}
+
+.groupsResultCount {
+  margin-bottom: 10px;
+  color: #666;
+  font-size: 14px;
+}

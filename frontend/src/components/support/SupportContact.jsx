@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import './css/SupportContact.css';
+import { useTranslation } from 'react-i18next';
 
 const SupportContact = ({ target = 'it' }) => {
+    const { t, i18n } = useTranslation();
     const [formData, setFormData] = useState({
         studentCode: '',
         subjectName: '',
@@ -14,6 +16,7 @@ const SupportContact = ({ target = 'it' }) => {
     const [selectedTarget, setSelectedTarget] = useState(target);
 
     const isIT = selectedTarget === 'it';
+    const dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -26,17 +29,17 @@ const SupportContact = ({ target = 'it' }) => {
 
 
         if (!/^\d{7}$/.test(studentCode.trim()))
-            return 'يجب أن يتكون كود الطالب من 7 أرقام.';
+            return t('supportContact.validateStudentCode');
 
 
         if (!subjectName.trim()) {
-            return isIT ? 'يرجى إدخال موضوع المشكلة.' : 'الرجاء إدخال كود المقرر الدراسي.';
+            return isIT ? t('supportContact.validateSubjectIT') : t('supportContact.validateSubjectAdmin');
         }
 
-        if (!message.trim()) return 'يرجى وصف مشكلتك بالتفصيل.';
+        if (!message.trim()) return t('supportContact.validateMessage');
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(replyEmail)) return 'يرجى إدخال بريد إلكتروني صحيح للرد.';
+        if (!emailRegex.test(replyEmail)) return t('supportContact.validateEmail');
 
         return null;
     };
@@ -68,69 +71,69 @@ const SupportContact = ({ target = 'it' }) => {
             if (response.ok) {
                 setStatus({
                     type: 'success',
-                    text: isIT ? 'تم إرسال طلب الدعم الفني بنجاح.' : 'تم إرسال طلبك للإدارة بنجاح.',
+                    text: isIT ? t('supportContact.successIT') : t('supportContact.successAdmin'),
                 });
                 setFormData({ studentCode: '', subjectName: '', message: '', replyEmail: '' });
             } else {
-                setStatus({ type: 'error', text: data.error || 'حدث خطأ ما.' });
+                setStatus({ type: 'error', text: data.error || t('supportContact.errorGeneric') });
             }
         } catch (error) {
-            setStatus({ type: 'error', text: 'فشل الاتصال بالسيرفر.' });
+            setStatus({ type: 'error', text: t('supportContact.errorServer') });
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className={`contact-page ${isIT ? 'it-theme' : ''}`} dir="rtl">
+        <div className={`contact-page ${isIT ? 'it-theme' : ''}`} dir={dir}>
             <div className="contact-card">
                 <div className="contact-header">
                     <div className={`contact-icon ${isIT ? 'it' : 'admin'}`}>
                         {isIT ? '💻' : '🛡️'}
                     </div>
-                    <h1>{isIT ? 'الدعم الفني' : 'شؤون الطلاب والادارة'}</h1>
+                    <h1>{isIT ? t('supportContact.itTitle') : t('supportContact.adminTitle')}</h1>
                 </div>
 
                 <div className="role-toggle">
-                    <button type="button" className={`role-toggle-btn ${isIT ? 'active' : ''}`} onClick={() => setSelectedTarget('it')}> 💻 IT </button>
-                    <button type="button" className={`role-toggle-btn ${!isIT ? 'active' : ''}`} onClick={() => setSelectedTarget('admin')}> 🛡️ الإدارة </button>
+                    <button type="button" className={`role-toggle-btn ${isIT ? 'active' : ''}`} onClick={() => setSelectedTarget('it')}> 💻 {t('supportContact.toggleIT')} </button>
+                    <button type="button" className={`role-toggle-btn ${!isIT ? 'active' : ''}`} onClick={() => setSelectedTarget('admin')}> 🛡️ {t('supportContact.toggleAdmin')} </button>
                 </div>
 
                 <form className="contact-form" onSubmit={handleSubmit} noValidate>
 
                     <div className="form-group">
-                        <label>كود الطالب <span className="required">*</span></label>
-                        <input name="studentCode" value={formData.studentCode} onChange={handleChange} placeholder="7 أرقام" maxLength={7} />
+                        <label>{t('supportContact.studentCodeLabel')} <span className="required">*</span></label>
+                        <input name="studentCode" value={formData.studentCode} onChange={handleChange} placeholder={t('supportContact.studentCodePlaceholder')} maxLength={7} />
                     </div>
 
 
                     <div className="form-group">
                         <label>
-                            {isIT ? 'موضوع المشكلة' : 'كود المقرر الدراسي'}
+                            {isIT ? t('supportContact.subjectLabelIT') : t('supportContact.subjectLabelAdmin')}
                             <span className="required"> *</span>
                         </label>
                         <input
                             name="subjectName"
                             value={formData.subjectName}
                             onChange={handleChange}
-                            placeholder={isIT ? "الموضوع" : "مثال: CS306"}
+                            placeholder={isIT ? t('supportContact.subjectPlaceholderIT') : t('supportContact.subjectPlaceholderAdmin')}
                         />
                     </div>
 
                     <div className="form-group">
-                        <label>تفاصيل الرسالة <span className="required">*</span></label>
-                        <textarea name="message" value={formData.message} onChange={handleChange} placeholder="اشرح لنا المشكلة..." />
+                        <label>{t('supportContact.messageLabel')} <span className="required">*</span></label>
+                        <textarea name="message" value={formData.message} onChange={handleChange} placeholder={t('supportContact.messagePlaceholder')} />
                     </div>
 
                     <div className="form-group">
-                        <label>بريد الرد <span className="required">*</span></label>
+                        <label>{t('supportContact.replyEmailLabel')} <span className="required">*</span></label>
                         <input type="email" name="replyEmail" value={formData.replyEmail} onChange={handleChange} placeholder="email@example.com" />
                     </div>
 
                     {status.text && <div className={`status-msg ${status.type}`}>{status.text}</div>}
 
                     <button type="submit" className={`submit-btn ${isIT ? 'it-btn' : 'admin-btn'}`} disabled={loading}>
-                        {loading ? 'جاري الإرسال...' : 'إرسال الطلب'}
+                        {loading ? t('supportContact.loadingBtn') : t('supportContact.submitBtn')}
                     </button>
                 </form>
             </div>

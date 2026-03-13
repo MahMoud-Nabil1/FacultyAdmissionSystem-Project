@@ -1,9 +1,32 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+const setStorageItemAsync = async (key: string, value: string) => {
+    if (Platform.OS === 'web') {
+        await AsyncStorage.setItem(key, value);
+    } else {
+        await SecureStore.setItemAsync(key, value);
+    }
+};
 
+const getStorageItemAsync = async (key: string) => {
+    if (Platform.OS === 'web') {
+        return await AsyncStorage.getItem(key);
+    } else {
+        return await SecureStore.getItemAsync(key);
+    }
+};
+
+const deleteStorageItemAsync = async (key: string) => {
+    if (Platform.OS === 'web') {
+        await AsyncStorage.removeItem(key);
+    } else {
+        await SecureStore.deleteItemAsync(key);
+    }
+};
 export interface AuthUser {
     id: string;
     role: string;
@@ -19,8 +42,6 @@ interface AuthContextValue {
     logout: () => Promise<void>;
 }
 
-// ─── Context ──────────────────────────────────────────────────────────────────
-
 const AuthContext = createContext<AuthContextValue>({
     user: null,
     token: null,
@@ -32,24 +53,20 @@ const AuthContext = createContext<AuthContextValue>({
 
 export const useAuth = (): AuthContextValue => useContext(AuthContext);
 
-// ─── Provider ─────────────────────────────────────────────────────────────────
-
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
-
-    // Load persisted token on app start (replaces localStorage)
     useEffect(() => {
         (async () => {
             try {
-                const savedToken = await SecureStore.getItemAsync('token');
+                const savedToken = await getStorageItemAsync('token');
                 if (!savedToken) return;
                 setToken(savedToken);
                 const payload = jwtDecode(savedToken) as AuthUser;
                 setUser(payload);
             } catch {
-                await SecureStore.deleteItemAsync('token');
+                await deleteStorageItemAsync('token');
             } finally {
                 setLoading(false);
             }
@@ -57,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const login = async (tokenValue: string): Promise<void> => {
-        await SecureStore.setItemAsync('token', tokenValue);
+        await setStorageItemAsync('token', tokenValue);
         setToken(tokenValue);
         try {
             const payload = jwtDecode(tokenValue) as AuthUser;
@@ -68,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const logout = async (): Promise<void> => {
-        await SecureStore.deleteItemAsync('token');
+        await deleteStorageItemAsync('token');
         setToken(null);
         setUser(null);
     };

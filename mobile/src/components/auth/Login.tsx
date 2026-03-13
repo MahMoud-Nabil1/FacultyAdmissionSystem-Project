@@ -13,6 +13,7 @@ import {
 import { router } from 'expo-router';
 import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '../../context/AuthContext';
+import { API_BASE } from '../../services/api';
 
 interface LoginPayload {
     id: string;
@@ -37,7 +38,7 @@ export default function Login() {
         setLoading(true);
         try {
             const res = await fetch(
-                `${process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://10.0.2.2:5000/api'}/auth/login`,
+                `${API_BASE}/auth/login`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -55,7 +56,7 @@ export default function Login() {
 
             const payload = jwtDecode(data.token) as LoginPayload;
             if (payload.role) {
-                router.replace('/(tabs)/dashboard');
+                router.replace('/(tabs)/home');
             } else {
                 router.replace('/');
             }
@@ -141,6 +142,19 @@ export default function Login() {
                         <Text style={styles.btnText}>سجل الدخول</Text>
                     )}
                 </TouchableOpacity>
+
+                {/* Contact Support Button (pre-login, for guests / prospective students) */}
+                <View style={styles.supportDivider}>
+                    <View style={styles.dividerLine} />
+                    <Text style={styles.dividerText}>أو</Text>
+                    <View style={styles.dividerLine} />
+                </View>
+                <TouchableOpacity
+                    style={styles.supportBtn}
+                    onPress={() => router.push('/(auth)/support')}
+                >
+                    <Text style={styles.supportBtnText}>🎧  تواصل مع الدعم</Text>
+                </TouchableOpacity>
             </ScrollView>
         </KeyboardAvoidingView>
     );
@@ -200,4 +214,16 @@ const styles = StyleSheet.create({
     btn: { backgroundColor: '#1a73e8', borderRadius: 10, paddingVertical: 14, alignItems: 'center' },
     btnDisabled: { opacity: 0.6 },
     btnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+    supportDivider: { flexDirection: 'row', alignItems: 'center', marginVertical: 20 },
+    dividerLine: { flex: 1, height: 1, backgroundColor: '#d1d5db' },
+    dividerText: { marginHorizontal: 12, color: '#9ca3af', fontSize: 13 },
+    supportBtn: {
+        borderWidth: 1.5,
+        borderColor: '#1a73e8',
+        borderRadius: 10,
+        paddingVertical: 13,
+        alignItems: 'center',
+        backgroundColor: '#eff6ff',
+    },
+    supportBtnText: { color: '#1a73e8', fontSize: 15, fontWeight: '700' },
 });
