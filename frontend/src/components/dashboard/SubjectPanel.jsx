@@ -6,6 +6,7 @@ import React, {
     useRef,
 } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
     getAllSubjects,
     createSubject,
@@ -23,6 +24,7 @@ const emptyForm = {
 
 const SubjectPanel = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const [subjects, setSubjects] = useState([]);
     const [showForm, setShowForm] = useState(false);
@@ -125,10 +127,10 @@ const SubjectPanel = () => {
         const name = form.name.trim();
         const credit = Number(form.creditHours);
 
-        if (!code) return setError("رمز المقرر مطلوب");
-        if (!name) return setError("اسم المقرر مطلوب");
+        if (!code) return setError(t("subjectPanel.errorCode"));
+        if (!name) return setError(t("subjectPanel.errorName"));
         if (!Number.isInteger(credit) || credit < 0)
-            return setError("عدد الساعات غير صحيح");
+            return setError(t("subjectPanel.errorCreditHours"));
 
         const payload = {
             code,
@@ -147,7 +149,7 @@ const SubjectPanel = () => {
             closeForm();
             await load();
         } catch (err) {
-            setError(err?.message || "حدث خطأ");
+            setError(err?.message || t("subjectPanel.errorGeneric"));
         }
     };
 
@@ -162,10 +164,22 @@ const SubjectPanel = () => {
 
     return (
         <div className="dashboard-container">
-            
-            <div className="panel-actions">
+            <h2>{t("subjectPanel.title")}</h2>
+
+            <div style={{ display: "flex", gap: 10 }}>
                 <button className="panel-btn" onClick={openAdd}>
-                    إضافة مقرر جديد
+                    {t("subjectPanel.addBtn")}
+                </button>
+
+                <button
+                    className="panel-btn"
+                    onClick={() =>
+                        navigate(
+                            "/admin-dashboard/table?type=subjects"
+                        )
+                    }
+                >
+                    {t("subjectPanel.viewTableBtn")}
                 </button>
             </div>
 
@@ -178,7 +192,7 @@ const SubjectPanel = () => {
                     )}
 
                     <input
-                        placeholder="رمز المقرر (مثال: س202)"
+                        placeholder={t("subjectPanel.codePlaceholder")}
                         value={form.code}
                         onChange={(e) =>
                             setForm({ ...form, code: e.target.value })
@@ -186,7 +200,7 @@ const SubjectPanel = () => {
                     />
 
                     <input
-                        placeholder="اسم المقرر (مثال: هياكل البيانات والخوارزميات)"
+                        placeholder={t("subjectPanel.namePlaceholder")}
                         value={form.name}
                         onChange={(e) =>
                             setForm({ ...form, name: e.target.value })
@@ -197,7 +211,7 @@ const SubjectPanel = () => {
                         type="number"
                         min="0"
                         step="1"
-                        placeholder="عدد الساعات المعتمدة"
+                        placeholder={t("subjectPanel.creditHoursPlaceholder")}
                         value={form.creditHours}
                         onChange={(e) =>
                             setForm({
@@ -212,7 +226,7 @@ const SubjectPanel = () => {
                         style={{ position: "relative" }}
                         ref={dropdownRef}
                     >
-                        <label>المتطلبات السابقة</label>
+                        <label>{t("subjectPanel.prerequisitesLabel")}</label>
 
                         <button
                             type="button"
@@ -222,8 +236,8 @@ const SubjectPanel = () => {
                             }
                         >
                             {form.prerequisites.length === 0
-                                ? "اختر المتطلبات"
-                                : `تم اختيار ${form.prerequisites.length}`}
+                                ? t("subjectPanel.prerequisitesEmpty")
+                                : t("subjectPanel.prerequisitesSelected", { count: form.prerequisites.length })}
                         </button>
 
                         {showPrereqDropdown && (
@@ -249,7 +263,7 @@ const SubjectPanel = () => {
                     </div>
 
                     <button type="submit" className="submit-btn">
-                        حفظ
+                        {t("subjectPanel.saveBtn")}
                     </button>
                 </form>
             )}

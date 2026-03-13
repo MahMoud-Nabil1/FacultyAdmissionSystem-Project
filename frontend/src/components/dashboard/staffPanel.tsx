@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, {ChangeEvent, FormEvent, useState} from "react";
 import {createStaff} from "../../services/api";
 import {useNavigate} from "react-router-dom";
-import {ROLES} from "./constants";
+import {ROLES} from "../../services/constants";
+import { useTranslation } from "react-i18next";
 
 interface StaffForm {
     name: string;
@@ -10,27 +11,28 @@ interface StaffForm {
     password: string;
 }
 
-const StaffPanel = () => {
+const StaffPanel: React.FC = () => {
+    const { t } = useTranslation();
     const [showForm, setShowForm] = useState(false);
-    const [form, setForm] = useState({
+    const [form, setForm] = useState<StaffForm>({
         name: "",
         email: "",
         role: "admin",
         password: "",
-    } as StaffForm);
-    const [error, setError] = useState(null as string | null);
+    });
+    const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
     const handleChange = (
-        e: { target: { name: string; value: string } }
+        e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
         const {name, value} = e.target;
         setForm((prev) => ({...prev, [name]: value}));
     };
 
-    const handleSubmit = async (e: { preventDefault: () => void }) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setError(null);
         setLoading(true);
@@ -41,9 +43,9 @@ const StaffPanel = () => {
             setShowForm(false);
         } catch (err: any) {
             if (err.status === 409) {
-                setError("يوجد موظف بنفس الإيميل بالفعل");
+                setError(t("staffPanel.errorDuplicate"));
             } else {
-                setError(err.message || "حدث خطأ غير متوقع");
+                setError(err.message || t("staffPanel.errorGeneric"));
             }
         } finally {
             setLoading(false);
@@ -52,13 +54,22 @@ const StaffPanel = () => {
 
     return (
         <div className="dashboard-container">
+            <h2>{t("staffPanel.title")}</h2>
+
             {/* Buttons */}
-            <div className="panel-actions">
+            <div style={{display: "flex", gap: "15px", flexWrap: "wrap", marginBottom: "20px"}}>
                 <button
                     className="panel-btn"
                     onClick={() => setShowForm((prev) => !prev)}
                 >
-                    {showForm ? "إلغاء" : "اضافة موظف جديد"}
+                    {showForm ? t("staffPanel.cancelBtn") : t("staffPanel.addBtn")}
+                </button>
+
+                <button
+                    className="panel-btn"
+                    onClick={() => navigate("/admin-dashboard/table?type=staff")}
+                >
+                    {t("staffPanel.viewAllBtn")}
                 </button>
             </div>
 
@@ -68,10 +79,10 @@ const StaffPanel = () => {
                     {error && <p className="error">{error}</p>}
 
                     <div className="form-group">
-                        <label>الإسم</label>
+                        <label>{t("staffPanel.nameLabel")}</label>
                         <input
                             name="name"
-                            placeholder="أدخل الاسم الكامل"
+                            placeholder={t("staffPanel.namePlaceholder")}
                             value={form.name}
                             onChange={handleChange}
                             required
@@ -79,11 +90,11 @@ const StaffPanel = () => {
                     </div>
 
                     <div className="form-group">
-                        <label>الإيميل</label>
+                        <label>{t("staffPanel.emailLabel")}</label>
                         <input
                             name="email"
                             type="email"
-                            placeholder="أدخل البريد الإلكتروني"
+                            placeholder={t("staffPanel.emailPlaceholder")}
                             value={form.email}
                             onChange={handleChange}
                             required
@@ -91,7 +102,7 @@ const StaffPanel = () => {
                     </div>
 
                     <div className="form-group">
-                        <label>الرتبة</label>
+                        <label>{t("staffPanel.roleLabel")}</label>
                         <select
                             name="role"
                             value={form.role}
@@ -100,18 +111,18 @@ const StaffPanel = () => {
                         >
                             {Object.entries(ROLES).map(([v, l]) => (
                                 <option key={v} value={v}>
-                                    {l}
+                                    {t(l)}
                                 </option>
                             ))}
                         </select>
                     </div>
 
                     <div className="form-group">
-                        <label>كلمة السر</label>
+                        <label>{t("staffPanel.passwordLabel")}</label>
                         <input
                             name="password"
                             type="password"
-                            placeholder="أدخل كلمة السر"
+                            placeholder={t("staffPanel.passwordPlaceholder")}
                             value={form.password}
                             onChange={handleChange}
                             required
@@ -119,7 +130,7 @@ const StaffPanel = () => {
                     </div>
 
                     <button className="submit-btn" disabled={loading}>
-                        {loading ? "جارٍ التسجيل..." : "سجل موظف جديد"}
+                        {loading ? t("staffPanel.loadingBtn") : t("staffPanel.submitBtn")}
                     </button>
                 </form>
             )}

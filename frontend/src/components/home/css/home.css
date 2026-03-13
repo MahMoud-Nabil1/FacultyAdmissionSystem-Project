@@ -17,8 +17,6 @@
     margin: 0 auto;
     padding: 3rem 1.5rem;
     font-family: 'Alexandria', 'Segoe UI', sans-serif;
-    text-align: right;
-    direction: rtl;
     background-color: #fafbfc;
     min-height: 100vh;
 }

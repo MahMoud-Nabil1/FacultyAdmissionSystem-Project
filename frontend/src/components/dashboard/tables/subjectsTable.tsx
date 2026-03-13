@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { getAllSubjects, deleteSubject } from "../../../services/api";
 import Pagination from "../pagination";
-import { PAGE_SIZE } from "../constants";
+import { PAGE_SIZE } from "../../../services/constants";
+import { useTranslation } from "react-i18next";
 
 interface Subject {
     _id: string;
@@ -12,11 +13,11 @@ interface Subject {
 }
 
 interface SubjectsTableProps {
-    onEdit?: (subject: Subject) => void;
-    footerContent?: unknown;
+    onEdit: (subject: Subject) => void;
 }
 
-const SubjectsTable = ({ onEdit, footerContent }: SubjectsTableProps) => {
+const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
+    const { t } = useTranslation();
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [page, setPage] = useState<number>(0);
     const [search, setSearch] = useState<string>("");
@@ -31,7 +32,7 @@ const SubjectsTable = ({ onEdit, footerContent }: SubjectsTableProps) => {
     }, []);
 
     const handleDelete = async (id: string) => {
-        if (!window.confirm("هل تريد حذف هذا المقرر؟")) return;
+        if (!window.confirm(t("dashboardCommon.confirmDeleteSubject"))) return;
         await deleteSubject(id);
         await load();
     };
@@ -59,15 +60,13 @@ const SubjectsTable = ({ onEdit, footerContent }: SubjectsTableProps) => {
 
     return (
         <div className="dashboard-container">
-            <div className="students-table-header">
-                <h2 className="students-table-title">جدول المقررات</h2>
-            </div>
+            <h2>{t("subjectsTable.title")}</h2>
 
             {/* ===== Search Bar ===== */}
             <div style={{ display: "flex", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
                 <input
                     type="text"
-                    placeholder="ابحث باسم المقرر أو الرمز..."
+                    placeholder={t("subjectsTable.searchPlaceholder")}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     /* 2. Style matches the other tables' search bars */
@@ -79,11 +78,11 @@ const SubjectsTable = ({ onEdit, footerContent }: SubjectsTableProps) => {
             <table className="staff-table">
                 <thead>
                 <tr>
-                    <th>رمز المقرر</th>
-                    <th>اسم المقرر</th>
-                    <th>عدد الساعات</th>
-                    <th>المتطلبات السابقة</th>
-                    <th>إجراءات</th>
+                    <th>{t("subjectsTable.code")}</th>
+                    <th>{t("subjectsTable.name")}</th>
+                    <th>{t("subjectsTable.creditHours")}</th>
+                    <th>{t("subjectsTable.prerequisites")}</th>
+                    <th>{t("dashboardCommon.actions")}</th>
                 </tr>
                 </thead>
 
@@ -106,7 +105,7 @@ const SubjectsTable = ({ onEdit, footerContent }: SubjectsTableProps) => {
                                 className="delete-btn"
                                 onClick={() => handleDelete(s._id)}
                             >
-                                حذف
+                                {t("dashboardCommon.delete")}
                             </button>
                         </td>
                     </tr>
@@ -115,7 +114,7 @@ const SubjectsTable = ({ onEdit, footerContent }: SubjectsTableProps) => {
                 {slice.length === 0 && (
                     <tr>
                         <td colSpan={5} style={{ textAlign: "center" }}>
-                            لا توجد نتائج
+                            {t("dashboardCommon.noResults")}
                         </td>
                     </tr>
                 )}
@@ -127,12 +126,6 @@ const SubjectsTable = ({ onEdit, footerContent }: SubjectsTableProps) => {
                 setPage={setPage}
                 total={filteredSubjects.length}
             />
-
-            {footerContent && (
-                <div className="students-table-footer">
-                    {footerContent}
-                </div>
-            )}
         </div>
     );
 };

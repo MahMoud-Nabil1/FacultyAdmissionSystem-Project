@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllStaff, deleteStaff } from "../../../services/api";
-import { ROLES } from "../constants";
+import { ROLES } from "../../../services/constants";
 import Pagination from "../pagination";
-import { PAGE_SIZE } from "../constants";
+import { PAGE_SIZE } from "../../../services/constants";
+import { useTranslation } from "react-i18next";
 
 interface Staff {
     _id: string;
@@ -12,11 +13,8 @@ interface Staff {
     role: keyof typeof ROLES;
 }
 
-interface StaffTableProps {
-    footerContent?: unknown;
-}
-
-export const StaffTable = ({ footerContent }: StaffTableProps) => {
+export const StaffTable: React.FC = () => {
+    const { t } = useTranslation();
     const [staff, setStaff] = useState<Staff[]>([]);
     const [filteredStaff, setFilteredStaff] = useState<Staff[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -32,7 +30,7 @@ export const StaffTable = ({ footerContent }: StaffTableProps) => {
             const data = await getAllStaff();
             setStaff(data);
         } catch {
-            setError("فشل تحميل قائمة الموظفين");
+            setError(t("staffPanel.errorGeneric"));
         }
     };
 
@@ -59,12 +57,12 @@ export const StaffTable = ({ footerContent }: StaffTableProps) => {
     };
 
     const handleDelete = async (id: string) => {
-        if (!window.confirm("هل أنت متأكد من حذف هذا الموظف؟")) return;
+        if (!window.confirm(t("dashboardCommon.confirmDeleteStaff"))) return;
         try {
             await deleteStaff(id);
             setStaff((prev) => prev.filter((x) => x._id !== id));
         } catch {
-            setError("فشل حذف الموظف");
+            setError(t("staffPanel.errorGeneric"));
         }
     };
 
@@ -77,16 +75,14 @@ export const StaffTable = ({ footerContent }: StaffTableProps) => {
 
     return (
         <div className="dashboard-container">
-            <div className="students-table-header">
-                <h2 className="students-table-title">جدول الموظفين</h2>
-            </div>
+            <h2>{t("staffTable.title")}</h2>
             {error && <p className="error">{error}</p>}
 
             {/* Top filter/search bar */}
             <div style={{ display: "flex", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
                 <input
                     type="text"
-                    placeholder="بحث بالـ ID"
+                    placeholder={t("dashboardCommon.searchById")}
                     value={searchId}
                     onChange={(e) => setSearchId(e.target.value)}
                     style={{ padding: "8px", flex: "1 1 200px" }}
@@ -96,10 +92,10 @@ export const StaffTable = ({ footerContent }: StaffTableProps) => {
                     onChange={(e) => setFilterRole(e.target.value as keyof typeof ROLES | "all")}
                     style={{ padding: "8px", flex: "0 0 150px" }}
                 >
-                    <option value="all">الكل</option>
+                    <option value="all">{t("dashboardCommon.all")}</option>
                     {Object.entries(ROLES).map(([v, l]) => (
                         <option key={v} value={v}>
-                            {l}
+                            {t(l)}
                         </option>
                     ))}
                 </select>
@@ -108,11 +104,11 @@ export const StaffTable = ({ footerContent }: StaffTableProps) => {
             <table className="staff-table">
                 <thead>
                 <tr>
-                    <th>الإسم</th>
-                    <th>الإيميل</th>
-                    <th>الرتبة</th>
-                    <th>نسخ ID</th>
-                    <th>حذف</th>
+                    <th>{t("staffTable.name")}</th>
+                    <th>{t("staffTable.email")}</th>
+                    <th>{t("staffTable.role")}</th>
+                    <th>{t("staffTable.copyId")}</th>
+                    <th>{t("dashboardCommon.delete")}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -120,15 +116,15 @@ export const StaffTable = ({ footerContent }: StaffTableProps) => {
                     <tr key={s._id}>
                         <td>{s.name}</td>
                         <td>{s.email}</td>
-                        <td>{ROLES[s.role]}</td>
+                        <td>{t(ROLES[s.role])}</td>
                         <td>
                             <button className="copy-btn" onClick={() => handleCopy(s._id)}>
-                                {copiedId === s._id ? "تم!" : "نسخ"}
+                                {copiedId === s._id ? t("dashboardCommon.copied") : t("dashboardCommon.copy")}
                             </button>
                         </td>
                         <td>
                             <button className="delete-btn" onClick={() => handleDelete(s._id)}>
-                                حذف
+                                {t("dashboardCommon.delete")}
                             </button>
                         </td>
                     </tr>
@@ -138,12 +134,6 @@ export const StaffTable = ({ footerContent }: StaffTableProps) => {
 
             {/* Pagination */}
             <Pagination page={page} setPage={setPage} total={filteredStaff.length} />
-
-            {footerContent && (
-                <div className="students-table-footer">
-                    {footerContent}
-                </div>
-            )}
         </div>
     );
 };

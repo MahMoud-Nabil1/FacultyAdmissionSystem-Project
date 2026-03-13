@@ -1,35 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 const API_URL = "http://localhost:5000/api";
 
 interface GPASettings {
     gpaMin: number;
     gpaMax: number;
-    level: string[];
+    level: string;
 }
 
-const LEVEL_OPTIONS: { value: string; label: string }[] = [
-    { value: "1", label: "الأول" },
-    { value: "2", label: "الثاني" },
-    { value: "3", label: "الثالث" },
-    { value: "4", label: "الرابع" },
-];
-
-const SettingsPanel = () => {
-    const [settings, setSettings] = useState({ gpaMin: 2.5, gpaMax: 5, level: ["1"] } as GPASettings);
-    const [error, setError] = useState(null as string | null);
+const SettingsPanel: React.FC = () => {
+    const { t } = useTranslation();
+    const [settings, setSettings] = useState<GPASettings>({ gpaMin: 2.5, gpaMax: 5, level: "1" });
+    const [error, setError] = useState<string | null>(null);
     const [settingsLoading, setSettingsLoading] = useState(false);
 
     const fetchSettings = async () => {
         try {
             const res = await fetch(`${API_URL}/announcements/settings`);
-            if (!res.ok) throw new Error("فشل في جلب الإعدادات");
+            if (!res.ok) throw new Error(t("settingsPanel.fetchError"));
             const data = await res.json();
 
             setSettings({
                 gpaMin: Math.min(data.gpaMin, data.gpaMax),
                 gpaMax: Math.max(data.gpaMin, data.gpaMax),
-                level: Array.isArray(data.level) ? data.level : (data.level ? [String(data.level)] : ["1"]),
+                level: data.level,
             });
         } catch (err) {
             console.error(err);
@@ -42,46 +37,37 @@ const SettingsPanel = () => {
 
     useEffect(() => {
         const { gpaMin, gpaMax } = settings;
-        if (gpaMin > gpaMax) {
-            setError("الحد الأدنى يجب أن يكون أصغر من أو يساوي الحد الأقصى");
+        if (gpaMin >= gpaMax) {
+            setError(t("settingsPanel.errorMinMax"));
         } else if (gpaMin < 0 || gpaMin > 5 || gpaMax < 0 || gpaMax > 5) {
-            setError("⚠️ القيم يجب أن تكون بين 0 و 5");
+            setError(t("settingsPanel.errorRange"));
         } else {
             setError(null);
         }
-    }, [settings]);
+    }, [settings, t]);
 
-    const toggleLevel = (value: string) => {
-        setSettings((prev) => {
-            const next = prev.level.includes(value)
-                ? prev.level.filter((l) => l !== value)
-                : [...prev.level, value];
-            return { ...prev, level: next.length ? next : ["1"] };
-        });
-    };
-
-    const handleSubmit = async (e: { preventDefault: () => void }) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         if (error) return;
-        const payload = { ...settings, level: settings.level.length ? settings.level : ["1"], updatedBy: "Admin" };
+
         setSettingsLoading(true);
         try {
             const res = await fetch(`${API_URL}/announcements/settings`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
+                body: JSON.stringify({ ...settings, updatedBy: "Admin" }),
             });
 
             const data = await res.json();
             if (!res.ok) {
-                alert(data.message || "حدث خطأ");
+                alert(data.message || t("settingsPanel.saveError"));
                 return;
             }
 
-            alert("✅ تم حفظ الإعدادات بنجاح");
+            alert(t("settingsPanel.saveSuccess"));
         } catch (err) {
             console.error(err);
-            alert("❌ حدث خطأ في الاتصال");
+            alert(t("settingsPanel.saveError"));
         } finally {
             setSettingsLoading(false);
         }
@@ -89,17 +75,17 @@ const SettingsPanel = () => {
 
     return (
         <div className="dashboard-container">
-            <h2>إعدادات المعدل التراكمي والمستوى</h2>
+            <h2>{t("settingsPanel.title")}</h2>
             {error && <p className="error">{error}</p>}
 
             <form className="form" onSubmit={handleSubmit}>
-                <div className="settings-form-row">
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
                     <input
                         type="number"
                         step="0.1"
                         min={0}
                         max={5}
-                        placeholder="الحد الأدنى للمعدل"
+                        placeholder={t("settingsPanel.minPlaceholder")}
                         value={settings.gpaMin}
                         onChange={(e) => setSettings({ ...settings, gpaMin: parseFloat(e.target.value) })}
                     />
@@ -108,26 +94,22 @@ const SettingsPanel = () => {
                         step="0.1"
                         min={0}
                         max={5}
-                        placeholder="الحد الأقصى للمعدل"
+                        placeholder={t("settingsPanel.maxPlaceholder")}
                         value={settings.gpaMax}
                         onChange={(e) => setSettings({ ...settings, gpaMax: parseFloat(e.target.value) })}
                     />
-                    <div className="settings-level-row">
-                        <span className="settings-level-label">المستوى:</span>
-                        {LEVEL_OPTIONS.map((opt) => (
-                            <label key={opt.value} className="settings-level-option">
-                                <input
-                                    type="checkbox"
-                                    checked={settings.level.includes(opt.value)}
-                                    onChange={() => toggleLevel(opt.value)}
-                                />
-                                {opt.label}
-                            </label>
-                        ))}
-                    </div>
+                    <select
+                        value={settings.level}
+                        onChange={(e) => setSettings({ ...settings, level: e.target.value })}
+                    >
+                        <option value="1">{t("announcements.level1")}</option>
+                        <option value="2">{t("announcements.level2")}</option>
+                        <option value="3">{t("announcements.level3")}</option>
+                        <option value="4">{t("announcements.level4")}</option>
+                    </select>
                 </div>
                 <button className="submit-btn" disabled={settingsLoading || !!error}>
-                    {settingsLoading ? "جاري الحفظ..." : "حفظ الإعدادات"}
+                    {settingsLoading ? t("settingsPanel.savingBtn") : t("settingsPanel.saveBtn")}
                 </button>
             </form>
         </div>

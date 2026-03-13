@@ -1,8 +1,32 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 
+const setStorageItemAsync = async (key: string, value: string) => {
+    if (Platform.OS === 'web') {
+        await AsyncStorage.setItem(key, value);
+    } else {
+        await SecureStore.setItemAsync(key, value);
+    }
+};
+
+const getStorageItemAsync = async (key: string) => {
+    if (Platform.OS === 'web') {
+        return await AsyncStorage.getItem(key);
+    } else {
+        return await SecureStore.getItemAsync(key);
+    }
+};
+
+const deleteStorageItemAsync = async (key: string) => {
+    if (Platform.OS === 'web') {
+        await AsyncStorage.removeItem(key);
+    } else {
+        await SecureStore.deleteItemAsync(key);
+    }
+};
 export interface AuthUser {
     id: string;
     role: string;
@@ -28,30 +52,6 @@ const AuthContext = createContext<AuthContextValue>({
 });
 
 export const useAuth = (): AuthContextValue => useContext(AuthContext);
-
-const setStorageItemAsync = async (key: string, value: string) => {
-    if (Platform.OS === 'web') {
-        try { return localStorage.setItem(key, value); } catch (e) { console.error('Local storage is unavailable:', e); }
-    } else {
-        await SecureStore.setItemAsync(key, value);
-    }
-};
-
-const getStorageItemAsync = async (key: string) => {
-    if (Platform.OS === 'web') {
-        try { return localStorage.getItem(key); } catch (e) { console.error('Local storage is unavailable:', e); return null; }
-    } else {
-        return await SecureStore.getItemAsync(key);
-    }
-};
-
-const deleteStorageItemAsync = async (key: string) => {
-    if (Platform.OS === 'web') {
-        try { return localStorage.removeItem(key); } catch (e) { console.error('Local storage is unavailable:', e); }
-    } else {
-        await SecureStore.deleteItemAsync(key);
-    }
-};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null);

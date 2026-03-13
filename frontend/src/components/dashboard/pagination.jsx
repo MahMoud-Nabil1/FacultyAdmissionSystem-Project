@@ -1,5 +1,5 @@
 import React from "react";
-import { PAGE_SIZE } from "./constants";
+import { PAGE_SIZE } from "../../services/constants";
 
 const Pagination = ({ page, setPage, total }) => (
     <div className="pagination">

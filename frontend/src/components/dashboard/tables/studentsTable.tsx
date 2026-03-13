@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllStudents, deleteStudent } from "../../../services/api";
 import Pagination from "../pagination";
-import { PAGE_SIZE } from "../constants";
+import { PAGE_SIZE } from "../../../services/constants";
+import { useTranslation } from "react-i18next";
 
 interface Student {
     _id: string;
@@ -12,11 +13,8 @@ interface Student {
     gpa: string;
 }
 
-interface StudentsTableProps {
-    footerContent?: unknown;
-}
-
-const StudentsTable = ({ footerContent }: StudentsTableProps) => {
+const StudentsTable: React.FC = () => {
+    const { t } = useTranslation();
     const [students, setStudents] = useState<Student[]>([]);
     const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -31,7 +29,7 @@ const StudentsTable = ({ footerContent }: StudentsTableProps) => {
             const data = await getAllStudents();
             setStudents(data);
         } catch {
-            setError("فشل تحميل قائمة الطلاب");
+            setError(t("studentPanel.errorGeneric"));
         }
     };
 
@@ -56,12 +54,12 @@ const StudentsTable = ({ footerContent }: StudentsTableProps) => {
     };
 
     const handleDelete = async (id: string) => {
-        if (!window.confirm("هل أنت متأكد من حذف هذا الطالب؟")) return;
+        if (!window.confirm(t("dashboardCommon.confirmDeleteStudent"))) return;
         try {
             await deleteStudent(id);
             setStudents((prev) => prev.filter((s) => s._id !== id));
         } catch {
-            setError("فشل حذف الطالب");
+            setError(t("studentPanel.errorGeneric"));
         }
     };
 
@@ -70,16 +68,14 @@ const StudentsTable = ({ footerContent }: StudentsTableProps) => {
 
     return (
         <div className="dashboard-container">
-            <div className="students-table-header">
-                <h2 className="students-table-title">جدول الطلاب</h2>
-            </div>
+            <h2>{t("studentsTable.title")}</h2>
             {error && <p className="error">{error}</p>}
 
             {/* Search by ID */}
             <div style={{ display: "flex", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
                 <input
                     type="text"
-                    placeholder="بحث بالـ ID"
+                    placeholder={t("dashboardCommon.searchById")}
                     value={searchId}
                     onChange={(e) => setSearchId(e.target.value)}
                     style={{ padding: "8px", flex: "1 1 200px" }}
@@ -89,12 +85,12 @@ const StudentsTable = ({ footerContent }: StudentsTableProps) => {
             <table className="staff-table">
                 <thead>
                 <tr>
-                    <th>كود الطالب</th>
-                    <th>الإسم</th>
-                    <th>الإيميل</th>
-                    <th>المعدل التراكمى</th>
-                    <th>نسخ ID</th>
-                    <th>حذف</th>
+                    <th>{t("studentsTable.studentCode")}</th>
+                    <th>{t("studentsTable.name")}</th>
+                    <th>{t("studentsTable.email")}</th>
+                    <th>{t("studentsTable.gpa")}</th>
+                    <th>{t("studentsTable.copyId")}</th>
+                    <th>{t("dashboardCommon.delete")}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -109,7 +105,7 @@ const StudentsTable = ({ footerContent }: StudentsTableProps) => {
                                 className="copy-btn"
                                 onClick={() => handleCopy(s._id)}
                             >
-                                {copiedId === s._id ? "تم!" : "نسخ"}
+                                {copiedId === s._id ? t("dashboardCommon.copied") : t("dashboardCommon.copy")}
                             </button>
                         </td>
                         <td>
@@ -117,7 +113,7 @@ const StudentsTable = ({ footerContent }: StudentsTableProps) => {
                                 className="delete-btn"
                                 onClick={() => handleDelete(s._id)}
                             >
-                                حذف
+                                {t("dashboardCommon.delete")}
                             </button>
                         </td>
                     </tr>
@@ -127,12 +123,6 @@ const StudentsTable = ({ footerContent }: StudentsTableProps) => {
 
             {/* Pagination */}
             <Pagination page={page} setPage={setPage} total={filteredStudents.length} />
-
-            {footerContent && (
-                <div className="students-table-footer">
-                    {footerContent}
-                </div>
-            )}
         </div>
     );
 };
