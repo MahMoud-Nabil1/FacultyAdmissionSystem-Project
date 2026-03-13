@@ -58,8 +58,16 @@ exports.updateStaff = async (req, res) => {
 
 exports.deleteStaff = async (req, res) => {
     try {
-        const staff = await Staff.findOneAndDelete({ _id: req.params.id });
+        const staffIdToDelete = req.params.id;
+
+        // Cannot delete self
+        if (req.user.id === staffIdToDelete) {
+            return res.status(400).json({ error: "You cannot delete yourself" });
+        }
+
+        const staff = await Staff.findOneAndDelete({ _id: staffIdToDelete });
         if (!staff) return res.status(404).json({ error: "Staff not found" });
+
         res.json({ message: "Deleted successfully" });
     } catch (err) {
         res.status(500).json({ error: err.message });
