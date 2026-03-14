@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const Student = require('../models/student');
+const { Student } = require('../models/student');
 const Staff = require('../models/staff');
 const PasswordResetToken = require('../models/passwordResetToken');
 const {sendPasswordResetEmail} = require('../middleware/email');
