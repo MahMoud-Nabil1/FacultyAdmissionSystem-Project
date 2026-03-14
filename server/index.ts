@@ -37,7 +37,7 @@ import "./models/subject";
 import "./models/student";
 import "./models/staff";
 import "./models/passwordResetToken";
-import "./models/announcementSchema";
+import "./models/announcement";
 import "./models/group";
 
 app.use("/api/auth", authRoutes);
