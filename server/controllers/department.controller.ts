@@ -1,81 +1,80 @@
-const Department = require('../models/department');
+import { Request, Response } from 'express';
+import Department from '../models/department';
 
-
-exports.createDepartment = async (req, res) => {
+export const createDepartment = async (req: Request, res: Response): Promise<void> => {
     try {
         const department = new Department(req.body);
         await department.save();
         res.status(201).json(department);
-
-    } catch (err) {
-
+    } catch (err: any) {
         if (err.code === 11000) {
-            return res.status(409).json({
+            res.status(409).json({
                 error: "قسم بنفس الكود موجود بالفعل"
             });
+            return;
         }
         res.status(400).json({ error: err.message });
     }
 };
 
-
-exports.getAllDepartments = async (req, res) => {
+export const getAllDepartments = async (_req: Request, res: Response): Promise<void> => {
     try {
         const departments = await Department
             .find()
             .populate('subjects');
 
         res.json(departments);
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ error: err.message });
     }
 };
 
-
-exports.getDepartmentById = async (req, res) => {
+export const getDepartmentById = async (req: Request, res: Response): Promise<void> => {
     try {
-
         const department = await Department
             .findOne({ id: req.params.id })
             .populate('subjects');
 
-        if (!department)
-            return res.status(404).json({ error: "القسم غير موجود" });
+        if (!department) {
+            res.status(404).json({ error: "القسم غير موجود" });
+            return;
+        }
 
         res.json(department);
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ error: err.message });
     }
 };
 
-
-exports.updateDepartment = async (req, res) => {
+export const updateDepartment = async (req: Request, res: Response): Promise<void> => {
     try {
         const department = await Department.findById(req.params.id);
 
-        if (!department)
-            return res.status(404).json({ error: "القسم غير موجود" });
-
+        if (!department) {
+            res.status(404).json({ error: "القسم غير موجود" });
+            return;
+        }
 
         Object.assign(department, req.body);
 
         await department.save();
         res.json(department);
-    } catch (err) {
+    } catch (err: any) {
         res.status(400).json({ error: err.message });
     }
 };
 
-
-exports.deleteDepartment = async (req, res) => {
+export const deleteDepartment = async (req: Request, res: Response): Promise<void> => {
     try {
         const department = await Department.findByIdAndDelete(req.params.id);
 
-        if (!department)
-            return res.status(404).json({ error: "القسم غير موجود" });
+        if (!department) {
+            res.status(404).json({ error: "القسم غير موجود" });
+            return;
+        }
 
         res.json({ message: "تم حذف القسم بنجاح" });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ error: err.message });
     }
 };
