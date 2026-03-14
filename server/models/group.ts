@@ -1,12 +1,27 @@
-const mongoose = require('mongoose');
-const { Schema } = mongoose;
+import mongoose, { Schema, Document } from 'mongoose';
 
-const groupSchema = new Schema({
+export type GroupType = 'lecture' | 'lab' | 'tutorial' | 'seminar';
+export type WeekDay = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+
+export interface IGroup extends Document {
+    number: number;
+    subject: string; // Course code (e.g., "math110")
+    type: GroupType;
+    from: number;    // Represents time (e.g., 8 for 8:00 AM)
+    to: number;      // Represents time (e.g., 10 for 10:00 AM)
+    day: WeekDay;
+    students: mongoose.Types.ObjectId[];
+    capacity: number;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const groupSchema = new Schema<IGroup>({
     number: {
         type: Number,
         required: true,
     },
-    subject: {              // Course code (e.g., "math110", "cs101", "phys201")
+    subject: {
         type: String,
         required: true,
     },
@@ -43,6 +58,4 @@ const groupSchema = new Schema({
     timestamps: true
 });
 
-const Group = mongoose.model('Group', groupSchema);
-
-module.exports = { Group };
+export const Group = mongoose.model<IGroup>('Group', groupSchema);

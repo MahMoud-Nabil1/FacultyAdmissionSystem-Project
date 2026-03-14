@@ -1,7 +1,14 @@
-const mongoose = require('mongoose');
-const { Schema } = mongoose;
+import mongoose, { Schema, Document } from 'mongoose';
 
-const announcementSchema = new Schema({
+export interface IAnnouncement extends Document {
+    title: string;
+    content: string;
+    author: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const announcementSchema = new Schema<IAnnouncement>({
     title: {
         type: String,
         required: true,
@@ -21,7 +28,18 @@ const announcementSchema = new Schema({
     timestamps: true
 });
 
-const settingsSchema = new Schema({
+export type LevelType = '1' | '2' | '3' | '4';
+
+export interface ISettings extends Document {
+    gpaMin: number;
+    gpaMax: number;
+    level: LevelType[];
+    updatedBy: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const settingsSchema = new Schema<ISettings>({
     gpaMin: {
         type: Number,
         required: true,
@@ -50,7 +68,5 @@ const settingsSchema = new Schema({
     timestamps: true
 });
 
-const Announcement = mongoose.model('Announcement', announcementSchema);
-const Settings = mongoose.model('Settings', settingsSchema);
-
-module.exports = { Announcement, Settings };
+export const Announcement = mongoose.model<IAnnouncement>('Announcement', announcementSchema);
+export const Settings = mongoose.model<ISettings>('Settings', settingsSchema);
