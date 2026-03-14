@@ -1,20 +1,18 @@
 import { Request, Response } from 'express';
 import { Student } from '../models/student';
 import nodemailer from 'nodemailer';
+import { UserPayload } from '../middleware/authMiddleware';
 
-// If you have a custom Request type to include 'user' from middleware
-interface AuthRequest extends Request {
-    user?: {
-        role: string;
-        id: string;
-    };
-}
+/**
+ * Helper to safely access req.user with our specific structure
+ */
+const getUser = (req: Request) => req.user as UserPayload;
 
 export const createStudent = async (req: Request, res: Response): Promise<void> => {
     try {
         const student = new Student(req.body);
-        // Note: Password hashing should ideally happen in a Mongoose pre-save hook
-        student._password = req.body.password;
+        // Using the virtual setter
+        (student as any).password = req.body.password;
 
         await student.save();
         res.status(201).json(student);
@@ -41,9 +39,13 @@ export const getAllStudents = async (_req: Request, res: Response): Promise<void
     }
 };
 
-export const getStudentById = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getStudentById = async (req: Request, res: Response): Promise<void> => {
     try {
-        if (req.user?.role === 'student' && req.user.id !== req.params.id) {
+        const user = getUser(req);
+
+        // Security check: Match the ID from token with params ID
+        // Note: user.id might be a number or string depending on your JWT payload logic
+        if (user?.role === 'student' && String(user.id) !== req.params.id) {
             res.status(403).json({ error: "Forbidden" });
             return;
         }
@@ -75,7 +77,7 @@ export const updateStudent = async (req: Request, res: Response): Promise<void> 
         Object.assign(student, req.body);
 
         if (req.body.password) {
-            student._password = req.body.password;
+            (student as any).password = req.body.password;
         }
 
         await student.save();
