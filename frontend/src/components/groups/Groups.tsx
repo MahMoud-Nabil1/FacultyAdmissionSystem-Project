@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useAuth } from '../../context/AuthContext';
 import "./Groups.css";
 
 interface Group {
@@ -15,6 +16,8 @@ interface Group {
 
 const Groups: React.FC = () => {
     const { t } = useTranslation();
+    const { user, token } = useAuth();
+    const isAdmin = user?.role === 'admin';
     const [groups, setGroups] = useState<Group[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -137,6 +140,23 @@ const Groups: React.FC = () => {
         setSearchTerm("");
     };
 
+    const handleDelete = async (id: string) => {
+        try {
+            const res = await fetch(`${API_URL}/api/groups/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+            if (!res.ok) {
+                throw new Error(`Delete failed with status ${res.status}`);
+            }
+            await fetchGroups();
+        } catch (err) {
+            console.error("Failed to delete group:", err);
+        }
+    };
+
     const resetForm = () => {
         setFormSubject("");
         setFormNumber("");
@@ -239,9 +259,11 @@ const Groups: React.FC = () => {
         <div className="dashboard-container groupsContainer">
             <div className="table-header">
                 <h2>{t("groupsSchedule.title")}</h2>
-                <button className="add-btn" onClick={() => setShowModal(true)}>
-                    + {t("groupsSchedule.addNew")}
-                </button>
+                {isAdmin && (
+                    <button className="add-btn" onClick={() => setShowModal(true)}>
+                        + {t("groupsSchedule.addNew")}
+                    </button>
+                )}
             </div>
 
             <div className="groupsControlsContainer">
@@ -336,6 +358,7 @@ const Groups: React.FC = () => {
                                     <th className="groupsTh">{t("groupsSchedule.type")}</th>
                                     <th className="groupsTh">{t("groupsSchedule.day")}</th>
                                     <th className="groupsTh">{t("groupsSchedule.time")}</th>
+                                    {isAdmin && <th className="groupsTh">{t("dashboardCommon.actions")}</th>}
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -367,6 +390,11 @@ const Groups: React.FC = () => {
                                                 {formatTime(group.from)} - {formatTime(group.to)}
                                             </span>
                                         </td>
+                                        {isAdmin && (
+                                            <td className="groupsTd">
+                                                <button onClick={() => handleDelete(group._id)}>🗑️ {t("dashboardCommon.delete")}</button>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))}
                                 </tbody>
@@ -377,7 +405,7 @@ const Groups: React.FC = () => {
             )}
 
             {/* Add Group Modal */}
-            {showModal && (
+            {isAdmin && showModal && (
                 <div className="modal-overlay" onMouseDown={(e) => {
                     if (e.target === e.currentTarget) {
                         setShowModal(false);

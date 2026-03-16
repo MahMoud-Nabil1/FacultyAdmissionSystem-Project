@@ -5,12 +5,15 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getAllGroups, createGroup, deleteGroup } from '../../../services/api';
+import { useAuth } from '../../../context/AuthContext';
 
 interface Group { _id: string; number: number; place: string; day: string; from: number; to: number; capacity: number; }
 
 const EMPTY = { number: '', place: '', day: '', from: '', to: '', capacity: '' };
 
 export default function GroupsScreen() {
+    const { user } = useAuth();
+    const isAdmin = user?.role === 'admin';
     const [groups, setGroups] = useState<Group[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -53,12 +56,14 @@ export default function GroupsScreen() {
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
             <Text style={styles.title}>🗂️ المجموعات</Text>
 
-            <TouchableOpacity style={[styles.btn, showForm && styles.btnOutline]} onPress={() => { setShowForm(p => !p); setError(''); }}>
-                <Ionicons name={showForm ? 'close' : 'add-circle-outline'} size={18} color={showForm ? '#f59e0b' : '#fff'} />
-                <Text style={[styles.btnText, showForm && styles.btnTextOutline]}>{showForm ? 'إلغاء' : 'إضافة مجموعة'}</Text>
-            </TouchableOpacity>
+            {isAdmin && (
+                <TouchableOpacity style={[styles.btn, showForm && styles.btnOutline]} onPress={() => { setShowForm(p => !p); setError(''); }}>
+                    <Ionicons name={showForm ? 'close' : 'add-circle-outline'} size={18} color={showForm ? '#f59e0b' : '#fff'} />
+                    <Text style={[styles.btnText, showForm && styles.btnTextOutline]}>{showForm ? 'إلغاء' : 'إضافة مجموعة'}</Text>
+                </TouchableOpacity>
+            )}
 
-            {showForm && (
+            {isAdmin && showForm && (
                 <View style={styles.form}>
                     {!!error && <Text style={styles.error}>{error}</Text>}
                     {[

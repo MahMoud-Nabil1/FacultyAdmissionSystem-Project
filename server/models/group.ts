@@ -14,6 +14,7 @@ export interface IGroup extends Document {
     capacity: number;
     createdAt: Date;
     updatedAt: Date;
+    place: string;
 }
 
 const groupSchema = new Schema<IGroup>({
@@ -53,6 +54,10 @@ const groupSchema = new Schema<IGroup>({
         type: Number,
         required: true,
         min: 1
+    }
+    ,
+    place: {
+        type: String,
     }
 }, {
     timestamps: true
