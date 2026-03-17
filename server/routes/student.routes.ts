@@ -15,6 +15,20 @@ router.get(
 );
 
 router.get(
+    "/stats",
+    authenticate,
+    requireRole(["admin", "academic_guide", "academic_guide_coordinator", "reporter"]),
+    studentCtrl.getStudentStats
+);
+
+router.get(
+    "/stats",
+    authenticate,
+    requireRole(["admin", "academic_guide", "academic_guide_coordinator", "reporter"]),
+    studentCtrl.getStudentStats
+);
+
+router.get(
     "/:id",
     authenticate,
     requireRole(["admin", "academic_guide", "academic_guide_coordinator", "reporter"]),

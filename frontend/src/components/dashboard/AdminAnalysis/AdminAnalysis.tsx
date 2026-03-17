@@ -1,26 +1,65 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './AdminAnalysis.css';
+import { getRegistrationStats } from '../../../services/api';
 
 export interface AdminAnalysisProps {
-    totalStudents: number;
-    finishedRegistration: number;
-    didNotFinishRegistration: number;
+    totalStudents?: number;
+    finishedRegistration?: number;
+    didNotFinishRegistration?: number;
 }
 
 export const AdminAnalysis: React.FC<AdminAnalysisProps> = ({
-                                                                totalStudents,
-                                                                finishedRegistration,
-                                                                didNotFinishRegistration,
+                                                                totalStudents: propsTotal,
+                                                                finishedRegistration: propsFinished,
+                                                                didNotFinishRegistration: propsDidNotFinish,
                                                             }) => {
+    const [stats, setStats] = useState({
+        totalStudents: 0,
+        finishedRegistration: 0,
+        didNotFinishRegistration: 0
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+
+        if (propsTotal !== undefined && propsFinished !== undefined && propsDidNotFinish !== undefined) {
+            setStats({
+                totalStudents: propsTotal,
+                finishedRegistration: propsFinished,
+                didNotFinishRegistration: propsDidNotFinish
+            });
+            setLoading(false);
+            return;
+        }
+
+
+        getRegistrationStats()
+            .then(data => {
+                setStats({
+                    totalStudents: data.totalStudents || 0,
+                    finishedRegistration: data.finishedRegistration || 0,
+                    didNotFinishRegistration: data.didNotFinishRegistration || 0
+                });
+            })
+            .catch(err => console.error("Failed to load stats", err))
+            .finally(() => setLoading(false));
+    }, [propsTotal, propsFinished, propsDidNotFinish]);
+
+    const { totalStudents, finishedRegistration, didNotFinishRegistration } = stats;
+
+    if (loading) {
+        return <div className="admin-analysis-container"><p>Loading stats...</p></div>;
+    }
+
     return (
         <div className="admin-analysis-container">
             <h2 className="admin-analysis-title">
                 Student Registration Analysis
             </h2>
 
-            {/* Grid Layout optimized for Web (Larger Screens) */}
+
             <div className="admin-analysis-grid">
-                {/* Total Students Card */}
+
                 <div className="admin-analysis-card">
                     <div className="admin-analysis-icon-wrapper icon-primary">
                         <svg className="admin-analysis-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,7 +70,7 @@ export const AdminAnalysis: React.FC<AdminAnalysisProps> = ({
                     <h3 className="admin-analysis-value">{totalStudents.toLocaleString()}</h3>
                 </div>
 
-                {/* Finished Registration Card */}
+
                 <div className="admin-analysis-card">
                     <div className="admin-analysis-icon-wrapper icon-success">
                         <svg className="admin-analysis-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,7 +81,7 @@ export const AdminAnalysis: React.FC<AdminAnalysisProps> = ({
                     <h3 className="admin-analysis-value">{finishedRegistration.toLocaleString()}</h3>
                 </div>
 
-                {/* Did Not Finish Registration Card */}
+
                 <div className="admin-analysis-card">
                     <div className="admin-analysis-icon-wrapper icon-error">
                         <svg className="admin-analysis-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">

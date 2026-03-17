@@ -1,26 +1,67 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { getRegistrationStats } from '../../../services/api';
 
 export interface AdminAnalysisProps {
-    totalStudents: number;
-    finishedRegistration: number;
-    didNotFinishRegistration: number;
+    totalStudents?: number;
+    finishedRegistration?: number;
+    didNotFinishRegistration?: number;
 }
 
 export const AdminAnalysis: React.FC<AdminAnalysisProps> = ({
-                                                                totalStudents,
-                                                                finishedRegistration,
-                                                                didNotFinishRegistration,
+                                                                totalStudents: propsTotal,
+                                                                finishedRegistration: propsFinished,
+                                                                didNotFinishRegistration: propsDidNotFinish,
                                                             }) => {
+    const [stats, setStats] = useState({
+        totalStudents: 0,
+        finishedRegistration: 0,
+        didNotFinishRegistration: 0
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (propsTotal !== undefined && propsFinished !== undefined && propsDidNotFinish !== undefined) {
+            setStats({
+                totalStudents: propsTotal,
+                finishedRegistration: propsFinished,
+                didNotFinishRegistration: propsDidNotFinish
+            });
+            setLoading(false);
+            return;
+        }
+
+        getRegistrationStats()
+            .then((data: any) => {
+                setStats({
+                    totalStudents: data.totalStudents || 0,
+                    finishedRegistration: data.finishedRegistration || 0,
+                    didNotFinishRegistration: data.didNotFinishRegistration || 0
+                });
+            })
+            .catch(err => console.error("Failed to load stats", err))
+            .finally(() => setLoading(false));
+    }, [propsTotal, propsFinished, propsDidNotFinish]);
+
+    const { totalStudents, finishedRegistration, didNotFinishRegistration } = stats;
+
+    if (loading) {
+        return (
+            <View style={styles.container}>
+                <ActivityIndicator size="large" color="#004a99" />
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
             <Text style={styles.sectionTitle}>Registration Stats</Text>
 
-            {/* Stacked Layout optimized for Mobile */}
+
             <View style={styles.grid}>
 
-                {/* Total Students Card */}
+
                 <View style={styles.card}>
                     <View style={[styles.iconWrapper, styles.iconPrimary]}>
                         <Ionicons name="people-outline" size={24} color="#004a99" />
@@ -31,7 +72,7 @@ export const AdminAnalysis: React.FC<AdminAnalysisProps> = ({
                     </View>
                 </View>
 
-                {/* Finished Registration Card */}
+
                 <View style={styles.card}>
                     <View style={[styles.iconWrapper, styles.iconSuccess]}>
                         <Ionicons name="checkmark-circle-outline" size={24} color="#10b981" />
@@ -42,7 +83,7 @@ export const AdminAnalysis: React.FC<AdminAnalysisProps> = ({
                     </View>
                 </View>
 
-                {/* Did Not Finish Registration Card */}
+
                 <View style={styles.card}>
                     <View style={[styles.iconWrapper, styles.iconError]}>
                         <Ionicons name="alert-circle-outline" size={24} color="#ef4444" />
@@ -62,13 +103,13 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         padding: 16,
-        backgroundColor: '#f9fafb', // var(--color-bg)
+        backgroundColor: '#f9fafb',
         minHeight: '100%',
     },
     sectionTitle: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#111827', // var(--color-text)
+        color: '#111827',
         marginBottom: 16,
         paddingHorizontal: 8,
     },
@@ -81,15 +122,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 16,
         borderRadius: 12,
-        backgroundColor: '#ffffff', // var(--color-surface)
+        backgroundColor: '#ffffff',
         borderWidth: 1,
-        borderColor: '#e2e8f0', // var(--color-border)
+        borderColor: '#e2e8f0',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.05,
         shadowRadius: 2,
         elevation: 2,
-        marginBottom: 16, // fallback for gap in older RN versions
+        marginBottom: 16,
     },
     iconWrapper: {
         width: 48,
@@ -100,13 +141,13 @@ const styles = StyleSheet.create({
         marginRight: 16,
     },
     iconPrimary: {
-        backgroundColor: '#eef6ff', // var(--color-primary-light)
+        backgroundColor: '#eef6ff',
     },
     iconSuccess: {
-        backgroundColor: '#ecfdf5', // var(--color-success-bg)
+        backgroundColor: '#ecfdf5',
     },
     iconError: {
-        backgroundColor: '#fef2f2', // var(--color-error-bg)
+        backgroundColor: '#fef2f2',
     },
     textContainer: {
         flex: 1,
@@ -115,13 +156,13 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 14,
         fontWeight: '500',
-        color: '#6b7280', // var(--color-text-muted)
+        color: '#6b7280',
         marginBottom: 4,
     },
     value: {
         fontSize: 24,
         fontWeight: '700',
-        color: '#111827', // var(--color-text)
+        color: '#111827',
     },
 });
 
