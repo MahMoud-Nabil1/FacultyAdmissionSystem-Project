@@ -17,7 +17,7 @@ export const createSubject = async (req: Request, res: Response): Promise<void> 
 
 export const getAllSubjects = async (req: Request, res: Response): Promise<void> => {
     try {
-        const subjects = await Subject.find().populate("prerequisites");
+        const subjects = await Subject.find().populate("prerequisites").populate("corequisites");
         res.json(subjects);
     } catch (err: unknown) {
         if (err instanceof Error) {
@@ -30,7 +30,7 @@ export const getAllSubjects = async (req: Request, res: Response): Promise<void>
 
 export const getSubjectById = async (req: Request, res: Response): Promise<void> => {
     try {
-        const subject = await Subject.findById(req.params.id).populate("prerequisites");
+        const subject = await Subject.findById(req.params.id).populate("prerequisites").populate("corequisites");
 
         if (!subject) {
             res.status(404).json({ error: "Subject not found" });
@@ -53,7 +53,7 @@ export const updateSubject = async (req: Request, res: Response): Promise<void> 
             req.params.id,
             req.body,
             { new: true, runValidators: true }
-        ).populate("prerequisites");
+        ).populate("prerequisites").populate("corequisites");
 
         if (!subject) {
             res.status(404).json({ error: "Subject not found" });

@@ -1,7 +1,15 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from '../../context/AuthContext';
+import { apiGet } from '../../services/api';
 import "./Groups.css";
+
+interface Subject {
+    _id: string;
+    code: string;
+    name: string;
+    creditHours: number;
+}
 
 interface Group {
     _id: string;
@@ -35,13 +43,31 @@ const Groups: React.FC = () => {
     const [formCapacity, setFormCapacity] = useState<number | "">(30);
     const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
     const [submitting, setSubmitting] = useState(false);
+    const [subjects, setSubjects] = useState([] as Subject[]);
+
+    // Co-requisite form states
+    const [coType, setCoType] = useState("");
+    const [coDay, setCoDay] = useState("");
+    const [coFrom, setCoFrom] = useState<number | "">("");
+    const [coTo, setCoTo] = useState<number | "">("");
+    const [coCapacity, setCoCapacity] = useState<number | "">(30);
 
     // API URL
     const API_URL = 'http://localhost:5000';
 
     useEffect(() => {
         fetchGroups();
+        fetchSubjects();
     }, []);
+
+    const fetchSubjects = async () => {
+        try {
+            const { res, data } = await apiGet('/subjects');
+            if (res.ok) setSubjects(data as Subject[]);
+        } catch (err) {
+            console.error('Failed to fetch subjects:', err);
+        }
+    };
 
     const fetchGroups = async () => {
         try {
@@ -165,6 +191,11 @@ const Groups: React.FC = () => {
         setFormFrom("");
         setFormTo("");
         setFormCapacity(30);
+        setCoType("");
+        setCoDay("");
+        setCoFrom("");
+        setCoTo("");
+        setCoCapacity(30);
         setFormErrors({});
     };
 
@@ -173,7 +204,6 @@ const Groups: React.FC = () => {
 
         if (!formSubject) errors.subject = t("groupsSchedule.errors.subjectRequired");
         if (!formNumber) errors.number = t("groupsSchedule.errors.numberRequired");
-        if (!formType) errors.type = t("groupsSchedule.errors.typeRequired");
         if (!formDay) errors.day = t("groupsSchedule.errors.dayRequired");
         if (!formFrom) errors.from = t("groupsSchedule.errors.fromRequired");
         if (!formTo) errors.to = t("groupsSchedule.errors.toRequired");
@@ -181,6 +211,17 @@ const Groups: React.FC = () => {
 
         if (formFrom && formTo && Number(formFrom) >= Number(formTo)) {
             errors.time = t("groupsSchedule.errors.timeInvalid");
+        }
+
+        // Co-requisite validation
+        if (!coType) errors.coType = t("groupsSchedule.errors.typeRequired");
+        if (!coDay) errors.coDay = t("groupsSchedule.errors.dayRequired");
+        if (!coFrom) errors.coFrom = t("groupsSchedule.errors.fromRequired");
+        if (!coTo) errors.coTo = t("groupsSchedule.errors.toRequired");
+        if (!coCapacity) errors.coCapacity = t("groupsSchedule.errors.capacityRequired");
+
+        if (coFrom && coTo && Number(coFrom) >= Number(coTo)) {
+            errors.coTime = t("groupsSchedule.errors.timeInvalid");
         }
 
         setFormErrors(errors);
@@ -196,27 +237,46 @@ const Groups: React.FC = () => {
 
         setSubmitting(true);
 
-        const groupData = {
+        const lectureData = {
             subject: formSubject.toLowerCase(),
             number: Number(formNumber),
-            type: formType.toLowerCase(),
+            type: "lecture",
             day: formDay.toLowerCase(),
             from: Number(formFrom),
             to: Number(formTo),
             capacity: Number(formCapacity)
         };
 
-        try {
-            const response = await fetch(`${API_URL}/api/groups`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(groupData)
-            });
+        const coReqData = {
+            subject: formSubject.toLowerCase(),
+            number: Number(formNumber),
+            type: coType.toLowerCase(),
+            day: coDay.toLowerCase(),
+            from: Number(coFrom),
+            to: Number(coTo),
+            capacity: Number(coCapacity)
+        };
 
-            if (!response.ok) {
-                const error = await response.json();
+        try {
+            // Create the lecture group
+            const res1 = await fetch(`${API_URL}/api/groups`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                body: JSON.stringify(lectureData)
+            });
+            if (!res1.ok) {
+                const error = await res1.json();
+                throw new Error(error.error || t("groupsSchedule.errors.createFailed"));
+            }
+
+            // Create the co-requisite group
+            const res2 = await fetch(`${API_URL}/api/groups`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                body: JSON.stringify(coReqData)
+            });
+            if (!res2.ok) {
+                const error = await res2.json();
                 throw new Error(error.error || t("groupsSchedule.errors.createFailed"));
             }
 
@@ -423,19 +483,24 @@ const Groups: React.FC = () => {
                         <div className="modal-body">
                             <form onSubmit={handleSubmit}>
                                 {formErrors.submit && <p className="error">{formErrors.submit}</p>}
-                                {formErrors.time && <p className="error">{formErrors.time}</p>}
 
+                                {/* ── Shared: Subject + Group # ── */}
                                 <div className="form-group">
-                                    <input
-                                        type="text"
-                                        placeholder={t("groupsSchedule.subject") + " (e.g., math101, cs201)"}
+                                    <select
                                         value={formSubject}
                                         onChange={(e) => {
                                             setFormSubject(e.target.value);
                                             setFormErrors({...formErrors, subject: ""});
                                         }}
                                         required
-                                    />
+                                    >
+                                        <option value="">{t("groupsSchedule.subject")} - {t("dashboardCommon.select")}</option>
+                                        {subjects.map(s => (
+                                            <option key={s._id} value={s.code.toLowerCase()}>
+                                                {s.code.toUpperCase()} — {s.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
 
                                 <div className="form-group">
@@ -451,21 +516,11 @@ const Groups: React.FC = () => {
                                     />
                                 </div>
 
-                                <div className="form-group">
-                                    <select
-                                        value={formType}
-                                        onChange={(e) => {
-                                            setFormType(e.target.value);
-                                            setFormErrors({...formErrors, type: ""});
-                                        }}
-                                        required
-                                    >
-                                        <option value="">{t("groupsSchedule.type")} - {t("dashboardCommon.select")}</option>
-                                        <option value="lecture">{t("groupsSchedule.typeValues.lecture")}</option>
-                                        <option value="lab">{t("groupsSchedule.typeValues.lab")}</option>
-                                        <option value="tutorial">{t("groupsSchedule.typeValues.tutorial")}</option>
-                                    </select>
-                                </div>
+                                {/* ── Section 1: Lecture ── */}
+                                <h4 style={{margin: '16px 0 8px', borderBottom: '1px solid var(--color-border)', paddingBottom: 8}}>
+                                    📖 {t("groupsSchedule.typeValues.lecture")}
+                                </h4>
+                                {formErrors.time && <p className="error">{formErrors.time}</p>}
 
                                 <div className="form-group">
                                     <select
@@ -527,6 +582,93 @@ const Groups: React.FC = () => {
                                         onChange={(e) => {
                                             setFormCapacity(Number(e.target.value));
                                             setFormErrors({...formErrors, capacity: ""});
+                                        }}
+                                        min="1"
+                                        required
+                                    />
+                                </div>
+
+                                {/* ── Section 2: Co-requisite ── */}
+                                <h4 style={{margin: '16px 0 8px', borderBottom: '1px solid var(--color-border)', paddingBottom: 8}}>
+                                    🔗 {t("groupsSchedule.corequisite")}
+                                </h4>
+                                {formErrors.coTime && <p className="error">{formErrors.coTime}</p>}
+
+                                <div className="form-group">
+                                    <select
+                                        value={coType}
+                                        onChange={(e) => {
+                                            setCoType(e.target.value);
+                                            setFormErrors({...formErrors, coType: ""});
+                                        }}
+                                        required
+                                    >
+                                        <option value="">{t("groupsSchedule.type")} - {t("dashboardCommon.select")}</option>
+                                        <option value="lab">{t("groupsSchedule.typeValues.lab")}</option>
+                                        <option value="tutorial">{t("groupsSchedule.typeValues.tutorial")}</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <select
+                                        value={coDay}
+                                        onChange={(e) => {
+                                            setCoDay(e.target.value);
+                                            setFormErrors({...formErrors, coDay: ""});
+                                        }}
+                                        required
+                                    >
+                                        <option value="">{t("groupsSchedule.day")} - {t("dashboardCommon.select")}</option>
+                                        <option value="monday">{t("days.monday")}</option>
+                                        <option value="tuesday">{t("days.tuesday")}</option>
+                                        <option value="wednesday">{t("days.wednesday")}</option>
+                                        <option value="thursday">{t("days.thursday")}</option>
+                                        <option value="friday">{t("days.friday")}</option>
+                                        <option value="saturday">{t("days.saturday")}</option>
+                                        <option value="sunday">{t("days.sunday")}</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <select
+                                        value={coFrom}
+                                        onChange={(e) => {
+                                            setCoFrom(Number(e.target.value));
+                                            setFormErrors({...formErrors, coFrom: "", coTime: ""});
+                                        }}
+                                        required
+                                    >
+                                        <option value="">{t("groupsSchedule.from")} - {t("dashboardCommon.select")}</option>
+                                        {hours.map(h => (
+                                            <option key={h} value={h}>{formatTime(h)}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <select
+                                        value={coTo}
+                                        onChange={(e) => {
+                                            setCoTo(Number(e.target.value));
+                                            setFormErrors({...formErrors, coTo: "", coTime: ""});
+                                        }}
+                                        required
+                                    >
+                                        <option value="">{t("groupsSchedule.to")} - {t("dashboardCommon.select")}</option>
+                                        {hours.map(h => (
+                                            <option key={h} value={h}>{formatTime(h)}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <input
+                                        type="number"
+                                        placeholder={t("groupsSchedule.capacity")}
+                                        value={coCapacity}
+                                        onChange={(e) => {
+                                            setCoCapacity(Number(e.target.value));
+                                            setFormErrors({...formErrors, coCapacity: ""});
                                         }}
                                         min="1"
                                         required
