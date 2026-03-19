@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './AdminAnalysis.css';
 import { getRegistrationStats } from '../../../services/api';
+import { useTranslation } from 'react-i18next';
 
 export interface AdminAnalysisProps {
     totalStudents?: number;
@@ -13,6 +14,7 @@ export const AdminAnalysis: React.FC<AdminAnalysisProps> = ({
                                                                 finishedRegistration: propsFinished,
                                                                 didNotFinishRegistration: propsDidNotFinish,
                                                             }) => {
+    const { t } = useTranslation();
     const [stats, setStats] = useState({
         totalStudents: 0,
         finishedRegistration: 0,
@@ -48,13 +50,13 @@ export const AdminAnalysis: React.FC<AdminAnalysisProps> = ({
     const { totalStudents, finishedRegistration, didNotFinishRegistration } = stats;
 
     if (loading) {
-        return <div className="admin-analysis-container"><p>Loading stats...</p></div>;
+        return <div className="admin-analysis-container"><p>{t('adminAnalysis.loading')}</p></div>;
     }
 
     return (
         <div className="admin-analysis-container">
             <h2 className="admin-analysis-title">
-                Student Registration Analysis
+                {t('adminAnalysis.title')}
             </h2>
 
 
@@ -66,7 +68,7 @@ export const AdminAnalysis: React.FC<AdminAnalysisProps> = ({
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                     </div>
-                    <p className="admin-analysis-label">Total Students</p>
+                    <p className="admin-analysis-label">{t('adminAnalysis.totalStudents')}</p>
                     <h3 className="admin-analysis-value">{totalStudents.toLocaleString()}</h3>
                 </div>
 
@@ -77,7 +79,7 @@ export const AdminAnalysis: React.FC<AdminAnalysisProps> = ({
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <p className="admin-analysis-label">Finished Registration</p>
+                    <p className="admin-analysis-label">{t('adminAnalysis.finishedRegistration')}</p>
                     <h3 className="admin-analysis-value">{finishedRegistration.toLocaleString()}</h3>
                 </div>
 
@@ -88,7 +90,7 @@ export const AdminAnalysis: React.FC<AdminAnalysisProps> = ({
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <p className="admin-analysis-label">Did Not Finish</p>
+                    <p className="admin-analysis-label">{t('adminAnalysis.didNotFinish')}</p>
                     <h3 className="admin-analysis-value">{didNotFinishRegistration.toLocaleString()}</h3>
                 </div>
             </div>

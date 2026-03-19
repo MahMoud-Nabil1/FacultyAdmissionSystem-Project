@@ -345,5 +345,12 @@
     "title": "Theme",
     "current": "Current:",
     "toggleButton": "Toggle theme"
+  },
+  "adminAnalysis": {
+    "title": "Student Registration Analysis",
+    "totalStudents": "Total Students",
+    "finishedRegistration": "Finished Registration",
+    "didNotFinish": "Did Not Finish",
+    "loading": "Loading stats..."
   }
 }

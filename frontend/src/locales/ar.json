@@ -345,5 +345,12 @@
     "title": "المظهر",
     "current": "الحالي:",
     "toggleButton": "تبديل المظهر"
+  },
+  "adminAnalysis": {
+    "title": "تحليل تسجيل الطلاب",
+    "totalStudents": "إجمالي الطلاب",
+    "finishedRegistration": "أتموا التسجيل",
+    "didNotFinish": "لم يتموا التسجيل",
+    "loading": "جاري تحميل الإحصائيات..."
   }
 }
