@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as groupController from '../controllers/group.controller';
+import * as enrollmentController from '../controllers/enrollment.controller';
 import { authenticate } from "../middleware/authMiddleware";
 import { requireRole } from "../controllers/auth.controller";
 
@@ -87,7 +88,7 @@ router.get(
 router.post(
     '/:id/request',
     authenticate,
-    groupController.requestJoinGroup
+    enrollmentController.requestJoinGroup
 );
 
 // Student leaves a group
@@ -120,7 +121,7 @@ router.post(
     '/requests/:requestId/process',
     authenticate,
     requireRole(['admin', 'academic_guide_coordinator']),
-    groupController.processEnrollmentRequest
+    enrollmentController.processEnrollmentRequest
 );
 
 export default router;

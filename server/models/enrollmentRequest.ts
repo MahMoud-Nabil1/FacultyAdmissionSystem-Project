@@ -1,6 +1,10 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export type RequestStatus = 'pending' | 'approved' | 'rejected';
+export type RequestStatus =
+    | 'pending'
+    | 'processing'
+    | 'approved'
+    | 'rejected';
 
 export interface IEnrollmentRequest extends Document {
     student: mongoose.Types.ObjectId;
@@ -23,7 +27,7 @@ const enrollmentRequestSchema = new Schema<IEnrollmentRequest>({
     },
     status: {
         type: String,
-        enum: ['pending', 'approved', 'rejected'],
+        enum: ['pending', 'processing', 'approved', 'rejected'],
         default: 'pending',
     },
 }, {
@@ -31,7 +35,13 @@ const enrollmentRequestSchema = new Schema<IEnrollmentRequest>({
 });
 
 // Compound index to ensure a student can only have one pending request per group
-enrollmentRequestSchema.index({ student: 1, group: 1 }, { unique: true });
+enrollmentRequestSchema.index(
+    { student: 1, group: 1 },
+    {
+        unique: true,
+        partialFilterExpression: { status: 'pending' }
+    }
+);
 
 // Index for efficient querying of pending requests in order
 enrollmentRequestSchema.index({ group: 1, status: 1, createdAt: 1 });

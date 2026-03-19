@@ -5,6 +5,8 @@ import { Subject } from '../models/subject';
 import Staff, { IStaff } from '../models/staff';
 import { EnrollmentRequest } from '../models/enrollmentRequest';
 import { UserPayload } from '../middleware/authMiddleware';
+import mongoose from "mongoose";
+import { ensureSubjectRequested, hasTimeCollision } from '../utils/enrollment.utils';
 
 /**
  * canManageStudent is true when staff has write permissions for a specific student
@@ -141,79 +143,95 @@ export const addStudentToGroup = async (req: Request, res: Response): Promise<vo
     }
 };
 
-export const removeStudentFromGroup = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { studentId } = req.body;
-        const group = await Group.findById(req.params.id);
+async function updateStudentSubjectsOnRemoval(studentId: string | mongoose.Types.ObjectId, groupId: string | mongoose.Types.ObjectId, subjectCode: string, session: mongoose.ClientSession) {
+    const otherGroupsForSubject = await Group.findOne({
+        subject: { $regex: new RegExp(`^${subjectCode}$`, 'i') },
+        students: studentId,
+        _id: { $ne: groupId }
+    }).session(session);
 
-        if (!group) {
-            res.status(404).json({ error: 'Group not found' });
-            return;
+    if (!otherGroupsForSubject) {
+        const subjectDoc = await Subject.findOne({
+            code: { $regex: new RegExp(`^${subjectCode}$`, 'i') }
+        }).session(session);
+
+        if (subjectDoc) {
+            await Student.findByIdAndUpdate(studentId, {
+                $pull: { requestedSubjects: subjectDoc._id }
+            }, { session });
         }
+    }
+}
 
-        group.students = group.students.filter(id => id.toString() !== studentId) as any;
-        await group.save();
+export const removeStudentFromGroup = async (req: Request, res: Response): Promise<void> => {
+    const session = await mongoose.startSession();
+    const groupId = req.params.id as string;
 
-        const updatedGroup = await Group.findById(req.params.id).populate('students');
-        res.json(updatedGroup);
+    try {
+        await session.withTransaction(async () => {
+            const { studentId } = req.body;
+            const group = await Group.findByIdAndUpdate(
+                groupId,
+                { $pull: { students: studentId } },
+                { session }
+            );
+
+            if (!group) throw new Error("Group not found");
+
+            await updateStudentSubjectsOnRemoval(studentId, group._id, group.subject, session);
+
+            await EnrollmentRequest.deleteMany({
+                student: studentId,
+                group: groupId,
+                status: 'pending'
+            }, { session });
+
+            await processNextInWaitlist(groupId, session);
+        });
+
+        res.json({ message: 'Student removed successfully and waitlist processed' });
     } catch (err: any) {
         res.status(400).json({ error: err.message });
+    } finally {
+        await session.endSession();
     }
 };
 
-export const requestJoinGroup = async (req: Request, res: Response): Promise<void> => {
+export const removeSelfFromGroup = async (req: Request, res: Response): Promise<void> => {
+    const session = await mongoose.startSession();
+    const groupId = req.params.id as string;
+
     try {
-        const user = req.user as UserPayload;
-        if (user.role !== 'student') {
-            res.status(403).json({ error: "Forbidden: Only students can request to join groups" });
-            return;
-        }
+        await session.withTransaction(async () => {
+            const user = req.user as UserPayload;
+            const student = await Student.findOne({ studentId: Number(user.id) }).session(session);
 
-        const group = await Group.findById(req.params.id);
-        if (!group) {
-            res.status(404).json({ error: "Group not found" });
-            return;
-        }
+            if (!student) throw new Error("Student not found");
 
-        // Look up the student's MongoDB _id from the numeric studentId in the JWT
-        const student = await Student.findOne({ studentId: Number(user.id) });
-        if (!student) {
-            res.status(404).json({ error: "Student not found" });
-            return;
-        }
-        const studentObjectId = student._id.toString();
+            const group = await Group.findByIdAndUpdate(
+                groupId,
+                { $pull: { students: student._id } },
+                { session }
+            );
 
-        // Check if already enrolled in the group
-        if (group.students.map(id => id.toString()).includes(studentObjectId)) {
-            res.status(400).json({ error: "You are already in this group" });
-            return;
-        }
+            if (!group) throw new Error("Group not found");
 
-        // Check if there's already a pending request
-        const existingRequest = await EnrollmentRequest.findOne({
-            student: student._id,
-            group: group._id,
-            status: 'pending',
+            await updateStudentSubjectsOnRemoval(student._id as mongoose.Types.ObjectId, group._id, group.subject, session);
+
+            await EnrollmentRequest.deleteMany({
+                student: student._id,
+                group: group._id,
+                status: 'pending'
+            }, { session });
+
+            await processNextInWaitlist(groupId, session);
         });
-        if (existingRequest) {
-            res.status(400).json({ error: "You already have a pending request for this group" });
-            return;
-        }
 
-        // Create the enrollment request
-        const enrollmentRequest = new EnrollmentRequest({
-            student: student._id,
-            group: group._id,
-            status: 'pending',
-        });
-        await enrollmentRequest.save();
-
-        res.status(201).json({
-            message: "Request submitted successfully",
-            request: enrollmentRequest,
-        });
+        res.json({ message: "Successfully removed and waitlist processed." });
     } catch (err: any) {
         res.status(400).json({ error: err.message });
+    } finally {
+        await session.endSession();
     }
 };
 
@@ -270,85 +288,6 @@ export const getPendingRequestsForGroup = async (req: Request, res: Response): P
     }
 };
 
-export const processEnrollmentRequest = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { requestId } = req.params;
-        const { action } = req.body; // 'approve' or 'reject'
-        const user = req.user as UserPayload;
-
-        if (!['approve', 'reject'].includes(action)) {
-            res.status(400).json({ error: "Invalid action. Use 'approve' or 'reject'" });
-            return;
-        }
-
-        const request = await EnrollmentRequest.findById(requestId).populate('group');
-        if (!request) {
-            res.status(404).json({ error: "Request not found" });
-            return;
-        }
-
-        if (request.status !== 'pending') {
-            res.status(400).json({ error: "Request has already been processed" });
-            return;
-        }
-
-        const group = await Group.findById(request.group._id);
-        if (!group) {
-            res.status(404).json({ error: "Group not found" });
-            return;
-        }
-
-        // Permission check
-        if (user.role !== 'admin' && user.role !== 'academic_guide_coordinator') {
-            const staff = await Staff.findById(user.id);
-            if (!staff || staff.role !== 'academic_guide_coordinator') {
-                res.status(403).json({ error: "Forbidden: Cannot process this request" });
-                return;
-            }
-        }
-
-        if (action === 'approve') {
-            // Check capacity
-            if (group.students.length >= group.capacity) {
-                request.status = 'rejected';
-                await request.save();
-                res.status(400).json({ error: "Group has reached maximum capacity", request });
-                return;
-            }
-
-            // Add student to group
-            group.students.push(request.student as any);
-            await group.save();
-
-            // Track subject in student.requestedSubjects
-            const student = await Student.findById(request.student);
-            if (student) {
-                const subjectDoc = await Subject.findOne({ code: new RegExp(`^${group.subject}$`, 'i') });
-                if (subjectDoc) {
-                    const alreadyRequested = student.requestedSubjects
-                        .map((id: any) => id.toString())
-                        .includes(subjectDoc._id.toString());
-                    if (!alreadyRequested) {
-                        student.requestedSubjects.push(subjectDoc._id as any);
-                        await student.save();
-                    }
-                }
-            }
-
-            request.status = 'approved';
-            await request.save();
-        } else {
-            request.status = 'rejected';
-            await request.save();
-        }
-
-        const updatedGroup = await Group.findById(group._id).populate('students');
-        res.json({ request, group: updatedGroup });
-    } catch (err: any) {
-        res.status(400).json({ error: err.message });
-    }
-};
-
 export const cancelMyRequest = async (req: Request, res: Response): Promise<void> => {
     try {
         const user = req.user as UserPayload;
@@ -378,68 +317,37 @@ export const cancelMyRequest = async (req: Request, res: Response): Promise<void
     }
 };
 
-export const removeSelfFromGroup = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const user = req.user as UserPayload;
-        if (user.role !== 'student') {
-            res.status(403).json({ error: "Forbidden: Only students can remove themselves" });
-            return;
+// Helper function to process the next person in line
+async function processNextInWaitlist(groupId: string, session: mongoose.ClientSession) {
+    const pendingRequests = await EnrollmentRequest.find({ group: groupId, status: 'pending' })
+        .sort({ createdAt: 1 })
+        .session(session);
+
+    if (pendingRequests.length === 0) return;
+
+    const group = await Group.findById(groupId).session(session);
+    if (!group) return;
+
+    for (const request of pendingRequests) {
+        if (group.students.length >= group.capacity) break;
+
+        const collision = await hasTimeCollision(request.student, group, session);
+
+        if (collision) {
+            request.status = 'rejected';
+            await request.save({ session });
+            continue; // Move to next person in waitlist
         }
 
-        const group = await Group.findById(req.params.id);
-        if (!group) {
-            res.status(404).json({ error: "Group not found" });
-            return;
-        }
+        // Enroll the student
+        await Group.findByIdAndUpdate(groupId, { $addToSet: { students: request.student } }, { session });
+        request.status = 'approved';
+        await request.save({ session });
 
-        const student = await Student.findOne({ studentId: Number(user.id) });
-        if (!student) {
-            res.status(404).json({ error: "Student not found" });
-            return;
-        }
-        const studentObjectId = student._id.toString();
-
-        group.students = group.students.filter(id => id.toString() !== studentObjectId) as any;
-        await group.save();
-
-        // Also cancel any pending requests for this group
-        await EnrollmentRequest.deleteMany({
-            student: student._id,
-            group: group._id,
-            status: 'pending',
-        });
-
-        // Try to remove subject from student.requestedSubjects if no more groups for this subject
-        try {
-            const subjectCode = group.subject.toLowerCase();
-            const otherGroups = await Group.find({
-                _id: { $ne: group._id },
-                students: student._id
-            });
-            const stillEnrolledInSubject = otherGroups.some(
-                g => g.subject.toLowerCase() === subjectCode
-            );
-            if (!stillEnrolledInSubject) {
-                const subjectDoc = await Subject.findOne({
-                    code: { $regex: new RegExp(`^${subjectCode}$`, 'i') }
-                });
-                if (subjectDoc) {
-                    student.requestedSubjects = student.requestedSubjects.filter(
-                        (id: any) => id.toString() !== subjectDoc._id.toString()
-                    ) as any;
-                    await student.save();
-                }
-            }
-        } catch (cleanupErr) {
-            console.error("Warning: failed to clean up requestedSubjects:", cleanupErr);
-        }
-
-        const updatedGroup = await Group.findById(req.params.id).populate('students');
-        res.json(updatedGroup);
-    } catch (err: any) {
-        res.status(400).json({ error: err.message });
+        // Update student's requested subjects if needed
+        await ensureSubjectRequested(request.student, group.subject, session);
     }
-};
+}
 
 export const getGroupsByDay = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -458,3 +366,4 @@ export const getGroupsByType = async (req: Request, res: Response): Promise<void
         res.status(500).json({ error: err.message });
     }
 };
+
