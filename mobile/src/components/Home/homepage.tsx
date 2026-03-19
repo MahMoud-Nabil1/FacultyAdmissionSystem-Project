@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Dimensions } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
 const Homepage = () => {
     const { token, logout, user } = useAuth();
+    const { t } = useLanguage();
     const [fullData, setFullData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -23,23 +25,23 @@ const Homepage = () => {
                 if (res.ok) setFullData(data);
                 else handleLogout();
             } catch (err) {
-                Alert.alert("خطأ", "فشل الاتصال بالسيرفر");
+                Alert.alert(t('common.error'), t('home.serverError'));
             } finally {
                 setLoading(false);
             }
         };
         if (token) fetchProfile();
-    }, [token]);
+    }, [token, t]);
 
 
     const handleLogout = async () => {
         Alert.alert(
-            "تسجيل الخروج",
-            "هل أنت متأكد أنك تريد الخروج؟",
+            t('home.logoutTitle'),
+            t('home.logoutMessage'),
             [
-                { text: "إلغاء", style: "cancel" },
+                { text: t('common.cancel'), style: "cancel" },
                 {
-                    text: "خروج",
+                    text: t('home.logoutConfirm'),
                     style: "destructive",
                     onPress: async () => {
                         await logout();
@@ -68,18 +70,18 @@ const Homepage = () => {
                     <View style={styles.statsContainer}>
                         <View style={styles.statBox}>
                             <Text style={styles.statNumber}>{fullData?.gpa || '0.0'}</Text>
-                            <Text style={styles.statLabel}>المعدل</Text>
+                            <Text style={styles.statLabel}>{t('home.gpa')}</Text>
                         </View>
                         <View style={styles.statDivider} />
                         <View style={styles.statBox}>
                             <Text style={styles.statNumber}>{fullData?.completedHours || '0'}</Text>
-                            <Text style={styles.statLabel}>ساعة</Text>
+                            <Text style={styles.statLabel}>{t('home.hours')}</Text>
                         </View>
                     </View>
                 )}
             </View>
 
-            <Text style={styles.sectionTitle}>الخدمات المتاحة</Text>
+            <Text style={styles.sectionTitle}>{t('home.servicesTitle')}</Text>
 
             <View style={styles.menuGrid}>
 
@@ -99,7 +101,7 @@ const Homepage = () => {
                         onPress={() => router.push('/students-list')}
                     >
                         <Ionicons name="people" size={32} color="#f59e0b" />
-                        <Text style={styles.menuLabel}>قائمة طلابي</Text>
+                        <Text style={styles.menuLabel}>{t('home.studentsList')}</Text>
                     </TouchableOpacity>
                 )}
 
@@ -117,7 +119,7 @@ const Homepage = () => {
 
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                 <Ionicons name="log-out-outline" size={22} color="#ef4444" style={{marginLeft: 8}} />
-                <Text style={styles.logoutButtonText}>تسجيل الخروج</Text>
+                <Text style={styles.logoutButtonText}>{t('home.logout')}</Text>
             </TouchableOpacity>
 
         </ScrollView>

@@ -5,12 +5,14 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getAllSubjects, createSubject, updateSubject, deleteSubject } from '../../../services/api';
+import { useLanguage } from '../../../context/LanguageContext';
 
 interface Subject { _id: string; code: string; name: string; creditHours: number; }
 
 const EMPTY = { code: '', name: '', creditHours: '' };
 
 export default function SubjectsScreen() {
+    const { t } = useLanguage();
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -24,9 +26,9 @@ export default function SubjectsScreen() {
             setLoading(true);
             const data = await getAllSubjects();
             setSubjects((data as any) ?? []);
-        } catch (e: any) { Alert.alert('خطأ', e.message); }
+        } catch (e: any) { Alert.alert(t('common.error'), e.message); }
         finally { setLoading(false); }
-    }, []);
+    }, [t]);
 
     useEffect(() => { load(); }, [load]);
 
@@ -46,9 +48,9 @@ export default function SubjectsScreen() {
         const code = form.code.trim().toUpperCase();
         const name = form.name.trim();
         const credit = Number(form.creditHours);
-        if (!code) { setError('رمز المقرر مطلوب'); return; }
-        if (!name) { setError('اسم المقرر مطلوب'); return; }
-        if (!Number.isInteger(credit) || credit < 0) { setError('عدد الساعات غير صحيح'); return; }
+        if (!code) { setError(t('subjects.codeRequired')); return; }
+        if (!name) { setError(t('subjects.nameRequired')); return; }
+        if (!Number.isInteger(credit) || credit < 0) { setError(t('subjects.invalidCredits')); return; }
         setSaving(true);
         try {
             if (editingId) { await updateSubject(editingId, { code, name, creditHours: credit }); }
@@ -59,32 +61,32 @@ export default function SubjectsScreen() {
     };
 
     const handleDelete = (s: Subject) => {
-        Alert.alert('حذف مقرر', `هل تريد حذف ${s.name}؟`, [
-            { text: 'إلغاء', style: 'cancel' },
-            { text: 'حذف', style: 'destructive', onPress: async () => { try { await deleteSubject(s._id); await load(); } catch (e: any) { Alert.alert('خطأ', e.message); } } },
+        Alert.alert(t('subjects.deleteTitle'), t('subjects.deleteMessage', { name: s.name }), [
+            { text: t('common.cancel'), style: 'cancel' },
+            { text: t('common.delete'), style: 'destructive', onPress: async () => { try { await deleteSubject(s._id); await load(); } catch (e: any) { Alert.alert(t('common.error'), e.message); } } },
         ]);
     };
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-            <Text style={styles.title}>📚 المقررات</Text>
+            <Text style={styles.title}>📚 {t('subjects.title')}</Text>
 
             <TouchableOpacity style={[styles.btn, showForm && !editingId && styles.btnOutline]} onPress={openAdd}>
                 <Ionicons name={showForm && !editingId ? 'close' : 'add-circle-outline'} size={18} color={showForm && !editingId ? '#10b981' : '#fff'} />
                 <Text style={[styles.btnText, showForm && !editingId && styles.btnTextOutline]}>
-                    {showForm && !editingId ? 'إلغاء' : 'إضافة مقرر جديد'}
+                    {showForm && !editingId ? t('subjects.cancel') : t('subjects.addSubject')}
                 </Text>
             </TouchableOpacity>
 
             {showForm && (
                 <View style={styles.form}>
-                    <Text style={styles.formTitle}>{editingId ? 'تعديل مقرر' : 'مقرر جديد'}</Text>
+                    <Text style={styles.formTitle}>{editingId ? t('subjects.editSubject') : t('subjects.newSubject')}</Text>
                     {!!error && <Text style={styles.error}>{error}</Text>}
-                    <TextInput style={styles.input} placeholder="رمز المقرر (مثال: CS201)" placeholderTextColor="#9ca3af" value={form.code} onChangeText={v => setForm(p => ({ ...p, code: v }))} autoCapitalize="characters" />
-                    <TextInput style={styles.input} placeholder="اسم المقرر" placeholderTextColor="#9ca3af" value={form.name} onChangeText={v => setForm(p => ({ ...p, name: v }))} textAlign="right" />
-                    <TextInput style={styles.input} placeholder="عدد الساعات المعتمدة" placeholderTextColor="#9ca3af" value={form.creditHours} onChangeText={v => setForm(p => ({ ...p, creditHours: v }))} keyboardType="number-pad" />
+                    <TextInput style={styles.input} placeholder={t('subjects.placeholders.code')} placeholderTextColor="#9ca3af" value={form.code} onChangeText={v => setForm(p => ({ ...p, code: v }))} autoCapitalize="characters" />
+                    <TextInput style={styles.input} placeholder={t('subjects.placeholders.name')} placeholderTextColor="#9ca3af" value={form.name} onChangeText={v => setForm(p => ({ ...p, name: v }))} textAlign="right" />
+                    <TextInput style={styles.input} placeholder={t('subjects.placeholders.creditHours')} placeholderTextColor="#9ca3af" value={form.creditHours} onChangeText={v => setForm(p => ({ ...p, creditHours: v }))} keyboardType="number-pad" />
                     <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} disabled={saving}>
-                        {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>حفظ</Text>}
+                        {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>{t('subjects.save')}</Text>}
                     </TouchableOpacity>
                 </View>
             )}
@@ -92,14 +94,14 @@ export default function SubjectsScreen() {
             {loading ? (
                 <ActivityIndicator color="#10b981" style={{ marginTop: 32 }} />
             ) : subjects.length === 0 ? (
-                <Text style={styles.empty}>لا توجد مقررات حتى الآن</Text>
+                <Text style={styles.empty}>{t('subjects.empty')}</Text>
             ) : (
                 subjects.map(s => (
                     <View key={s._id} style={styles.row}>
                         <View style={styles.badge}><Text style={styles.badgeText}>{s.code}</Text></View>
                         <View style={styles.rowInfo}>
                             <Text style={styles.rowName}>{s.name}</Text>
-                            <Text style={styles.rowSub}>{s.creditHours} ساعة معتمدة</Text>
+                            <Text style={styles.rowSub}>{t('subjects.creditsShort', { hours: s.creditHours })}</Text>
                         </View>
                         <TouchableOpacity onPress={() => openEdit(s)} style={styles.actionBtn}>
                             <Ionicons name="create-outline" size={20} color="#10b981" />

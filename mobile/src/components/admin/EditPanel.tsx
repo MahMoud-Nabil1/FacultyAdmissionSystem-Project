@@ -1,60 +1,57 @@
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useLanguage } from '../../context/LanguageContext';
 
 const SECTIONS = [
     {
-        label: 'Students',
-        labelAr: 'الطلاب',
+        titleKey: 'editPanel.students' as const,
         icon: 'school-outline' as const,
         color: '#3b82f6',
         bg: '#eff6ff',
         route: '/(tabs)/edit/students',
     },
     {
-        label: 'Staff',
-        labelAr: 'الموظفين',
+        titleKey: 'editPanel.staff' as const,
         icon: 'people-outline' as const,
-        color: '#8b5cf6',
-        bg: '#f5f3ff',
+        color: '#3b82f6',
+        bg: '#eff6ff',
         route: '/(tabs)/edit/staff',
     },
     {
-        label: 'Subjects',
-        labelAr: 'المقررات',
+        titleKey: 'editPanel.subjects' as const,
         icon: 'book-outline' as const,
-        color: '#10b981',
-        bg: '#ecfdf5',
+        color: '#3b82f6',
+        bg: '#eff6ff',
         route: '/(tabs)/edit/subjects',
     },
     {
-        label: 'Groups',
-        labelAr: 'المجموعات',
+        titleKey: 'editPanel.groups' as const,
         icon: 'grid-outline' as const,
-        color: '#f59e0b',
-        bg: '#fffbeb',
+        color: '#3b82f6',
+        bg: '#eff6ff',
         route: '/(tabs)/edit/groups',
     },
     {
-        label: 'Announcements',
-        labelAr: 'الإعلانات',
+        titleKey: 'editPanel.announcements' as const,
         icon: 'megaphone-outline' as const,
-        color: '#ef4444',
-        bg: '#fef2f2',
+        color: '#3b82f6',
+        bg: '#eff6ff',
         route: '/(tabs)/edit/announcements',
     },
 ] as const;
 
 export default function EditPanel() {
+    const { t } = useLanguage();
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-            <Text style={styles.heading}>Admin Panel</Text>
-            <Text style={styles.subheading}>اختر القسم الذي تريد تعديله</Text>
+            <Text style={styles.heading}>{t('editPanel.title')}</Text>
+            <Text style={styles.subheading}>{t('editPanel.subtitle')}</Text>
 
             <View style={styles.grid}>
                 {SECTIONS.map((s) => (
                     <TouchableOpacity
-                        key={s.label}
+                        key={s.titleKey}
                         style={[styles.card, { backgroundColor: s.bg, borderColor: s.color + '40' }]}
                         onPress={() => router.push(s.route as any)}
                         activeOpacity={0.75}
@@ -62,8 +59,7 @@ export default function EditPanel() {
                         <View style={[styles.iconWrap, { backgroundColor: s.color + '20' }]}>
                             <Ionicons name={s.icon} size={30} color={s.color} />
                         </View>
-                        <Text style={[styles.cardLabel, { color: s.color }]}>{s.label}</Text>
-                        <Text style={styles.cardLabelAr}>{s.labelAr}</Text>
+                        <Text style={[styles.cardLabel, { color: s.color }]}>{t(s.titleKey)}</Text>
                         <Ionicons name="chevron-forward" size={16} color={s.color} style={styles.arrow} />
                     </TouchableOpacity>
                 ))}
@@ -105,6 +101,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     cardLabel: { fontSize: 16, fontWeight: '700', flex: 1 },
-    cardLabelAr: { fontSize: 12, color: '#6b7280', position: 'absolute', bottom: 10, right: 44 },
     arrow: { marginLeft: 'auto' },
 });

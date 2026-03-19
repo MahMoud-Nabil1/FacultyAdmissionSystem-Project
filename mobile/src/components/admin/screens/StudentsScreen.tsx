@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getAllStudents, createStudent, deleteStudent } from '../../../services/api';
+import { useLanguage } from '../../../context/LanguageContext';
 
 interface Student {
     _id: string;
@@ -17,6 +18,7 @@ interface Student {
 const EMPTY = { studentId: '', name: '', email: '', password: '', gpa: '' };
 
 export default function StudentsScreen() {
+    const { t } = useLanguage();
     const [students, setStudents] = useState<Student[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -30,11 +32,11 @@ export default function StudentsScreen() {
             const data = await getAllStudents();
             setStudents((data as any) ?? []);
         } catch (e: any) {
-            Alert.alert('خطأ', e.message);
+            Alert.alert(t('common.error'), e.message);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [t]);
 
     useEffect(() => { load(); }, [load]);
 
@@ -51,7 +53,7 @@ export default function StudentsScreen() {
             setShowForm(false);
             await load();
         } catch (e: any) {
-            setError(e.status === 409 ? 'طالب بنفس الكود موجود بالفعل' : e.message);
+            setError(e.status === 409 ? t('students.duplicateCode') : e.message);
         } finally {
             setSaving(false);
         }
@@ -72,7 +74,7 @@ export default function StudentsScreen() {
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-            <Text style={styles.title}>👨‍🎓 الطلاب</Text>
+            <Text style={styles.title}>👨‍🎓 {t('students.title')}</Text>
 
             <TouchableOpacity
                 style={[styles.btn, showForm && styles.btnOutline]}
@@ -80,7 +82,7 @@ export default function StudentsScreen() {
             >
                 <Ionicons name={showForm ? 'close' : 'person-add-outline'} size={18} color={showForm ? '#1a73e8' : '#fff'} />
                 <Text style={[styles.btnText, showForm && styles.btnTextOutline]}>
-                    {showForm ? 'إلغاء' : 'إضافة طالب جديد'}
+                    {showForm ? t('students.cancel') : t('students.addStudent')}
                 </Text>
             </TouchableOpacity>
 
@@ -88,11 +90,11 @@ export default function StudentsScreen() {
                 <View style={styles.form}>
                     {!!error && <Text style={styles.error}>{error}</Text>}
                     {[
-                        { key: 'studentId', ph: 'كود الطالب' },
-                        { key: 'name', ph: 'الاسم' },
-                        { key: 'email', ph: 'الإيميل', kb: 'email-address' as const },
-                        { key: 'gpa', ph: 'المعدل التراكمي', kb: 'decimal-pad' as const },
-                        { key: 'password', ph: 'كلمة السر', secure: true },
+                        { key: 'studentId', ph: t('students.placeholders.studentId') },
+                        { key: 'name', ph: t('students.placeholders.name') },
+                        { key: 'email', ph: t('students.placeholders.email'), kb: 'email-address' as const },
+                        { key: 'gpa', ph: t('students.placeholders.gpa'), kb: 'decimal-pad' as const },
+                        { key: 'password', ph: t('students.placeholders.password'), secure: true },
                     ].map(f => (
                         <TextInput
                             key={f.key}
@@ -107,7 +109,7 @@ export default function StudentsScreen() {
                         />
                     ))}
                     <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} disabled={saving}>
-                        {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>حفظ الطالب</Text>}
+                        {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>{t('students.saveStudent')}</Text>}
                     </TouchableOpacity>
                 </View>
             )}
@@ -115,13 +117,13 @@ export default function StudentsScreen() {
             {loading ? (
                 <ActivityIndicator color="#1a73e8" style={{ marginTop: 32 }} />
             ) : students.length === 0 ? (
-                <Text style={styles.empty}>لا يوجد طلاب حتى الآن</Text>
+                <Text style={styles.empty}>{t('students.empty')}</Text>
             ) : (
                 students.map(s => (
                     <View key={s._id} style={styles.row}>
                         <View style={styles.rowInfo}>
                             <Text style={styles.rowName}>{s.name}</Text>
-                            <Text style={styles.rowSub}>{s.studentId} • GPA: {s.gpa}</Text>
+                            <Text style={styles.rowSub}>{s.studentId} • {t('students.rowGpa', { gpa: s.gpa })}</Text>
                             <Text style={styles.rowSub}>{s.email}</Text>
                         </View>
                         <TouchableOpacity onPress={() => handleDelete(s)} style={styles.deleteBtn}>
