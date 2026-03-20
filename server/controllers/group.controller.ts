@@ -7,6 +7,7 @@ import { EnrollmentRequest } from '../models/enrollmentRequest';
 import { UserPayload } from '../middleware/authMiddleware';
 import mongoose from "mongoose";
 import { ensureSubjectRequested, hasTimeCollision } from '../utils/enrollment.utils';
+import SystemSetting from '../models/systemSetting';
 
 /**
  * canManageStudent is true when staff has write permissions for a specific student
@@ -203,6 +204,11 @@ export const removeSelfFromGroup = async (req: Request, res: Response): Promise<
 
     try {
         await session.withTransaction(async () => {
+            const settings = await SystemSetting.findOne().session(session);
+            if (settings && !settings.withdrawalOpen) {
+                throw new Error("Withdrawal is currently closed");
+            }
+
             const user = req.user as UserPayload;
             const student = await Student.findOne({ studentId: Number(user.id) }).session(session);
 

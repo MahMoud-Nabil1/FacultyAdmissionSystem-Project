@@ -5,6 +5,7 @@ import {Group} from "../models/group";
 import Student from "../models/student";
 import {UserPayload} from "../middleware/authMiddleware";
 import {ensureSubjectRequested, hasTimeCollision} from "../utils/enrollment.utils";
+import SystemSetting from "../models/systemSetting";
 
 export const processEnrollmentRequest = async (req: Request, res: Response): Promise<void> => {
     const { requestId } = req.params;
@@ -94,6 +95,11 @@ export const requestJoinGroup = async (req: Request, res: Response): Promise<voi
         let resultStatus = "pending";
 
         await session.withTransaction(async () => {
+            const settings = await SystemSetting.findOne().session(session);
+            if (settings && !settings.registrationOpen) {
+                throw new Error("Registration is currently closed");
+            }
+
             const student = await Student.findOne({ studentId: Number(user.id) }).session(session);
             const group = await Group.findById(groupId).session(session);
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from '../../context/AuthContext';
-import { apiGet } from '../../services/api';
+import { apiGet, getSystemSettings } from '../../services/api';
 import "./Groups.css";
 
 // --- Constants ---
@@ -37,6 +37,7 @@ const Groups: React.FC = () => {
     const [groups, setGroups] = useState<Group[]>([]);
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [myRequests, setMyRequests] = useState<any[]>([]); // To track waitlist status
+    const [settings, setSettings] = useState({ registrationOpen: true, withdrawalOpen: true });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -49,13 +50,18 @@ const Groups: React.FC = () => {
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const [groupsRes, subjectsRes] = await Promise.all([
+            const [groupsRes, subjectsRes, settingsRes] = await Promise.all([
                 apiGet('/groups'),
-                apiGet('/subjects')
+                apiGet('/subjects'),
+                getSystemSettings()
             ]);
 
             if (groupsRes.res.ok) setGroups(groupsRes.data);
             if (subjectsRes.res.ok) setSubjects(subjectsRes.data);
+            if (settingsRes) setSettings({
+                registrationOpen: settingsRes.registrationOpen,
+                withdrawalOpen: settingsRes.withdrawalOpen
+            });
 
             if (isStudent) {
                 const requestsRes = await apiGet('/groups/my-requests');
@@ -138,7 +144,12 @@ const Groups: React.FC = () => {
 
         if (isEnrolled) {
             return (
-                <button className="leave-btn" onClick={() => handleLeave(group._id)}>
+                <button 
+                    className="leave-btn" 
+                    onClick={() => handleLeave(group._id)}
+                    disabled={!settings.withdrawalOpen}
+                    title={!settings.withdrawalOpen ? "Withdrawal is closed" : ""}
+                >
                     Leave Group
                 </button>
             );
@@ -150,7 +161,11 @@ const Groups: React.FC = () => {
                     {waitlistRequest.status === 'rejected' ? (
                         <span className="rejected-status">Rejected (Conflict/Full)</span>
                     ) : (
-                        <button className="waitlist-cancel-btn" onClick={() => handleCancelWaitlist(waitlistRequest._id)}>
+                        <button 
+                            className="waitlist-cancel-btn" 
+                            onClick={() => handleCancelWaitlist(waitlistRequest._id)}
+                            disabled={!settings.registrationOpen}
+                        >
                             Waitlisted (Cancel)
                         </button>
                     )}
@@ -162,6 +177,8 @@ const Groups: React.FC = () => {
             <button
                 className={isFull ? "waitlist-btn" : "join-btn"}
                 onClick={() => handleJoin(group._id)}
+                disabled={!settings.registrationOpen}
+                title={!settings.registrationOpen ? "Registration is closed" : ""}
             >
                 {isFull ? "Join Waitlist" : "Register"}
             </button>
@@ -170,6 +187,13 @@ const Groups: React.FC = () => {
 
     const filteredGroups = useMemo(() => {
         return groups.filter(g => {
+            const { isEnrolled } = getGroupStatus(g);
+
+            // If registration is closed, student should only see groups they are enrolled in
+            if (isStudent && !settings.registrationOpen) {
+                if (!isEnrolled) return false;
+            }
+
             const matchesDay = filterDay === "all" || g.day.toLowerCase() === filterDay.toLowerCase();
             const matchesSearch = g.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 formatSubject(g.subject).toLowerCase().includes(searchTerm.toLowerCase());

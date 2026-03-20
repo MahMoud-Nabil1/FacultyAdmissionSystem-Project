@@ -188,3 +188,15 @@ export async function deleteSubject(id) {
     if (!res.ok) throw new Error(data.error || "Failed to delete subject");
     return data;
 }
+
+export async function getSystemSettings() {
+    const {res, data} = await apiGet("/settings", false);
+    if (!res.ok) throw new Error(data.error || "Failed to fetch settings");
+    return data;
+}
+
+export async function updateSystemSettings(settings) {
+    const {res, data} = await apiPut("/settings", settings);
+    if (!res.ok) throw new Error(data.error || "Failed to update settings");
+    return data;
+}
