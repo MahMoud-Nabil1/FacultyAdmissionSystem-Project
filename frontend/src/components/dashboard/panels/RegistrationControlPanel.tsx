@@ -46,12 +46,12 @@ const RegistrationControlPanel: React.FC = () => {
 
     return (
         <div className="dashboard-container">
-            <h2>{t("adminDashboard.controlPanelTitle", "Registration Control Panel")}</h2>
+            <h2>{t("settingsPanel.controlPanelTitle")}</h2>
             <div className="control-panel-grid" style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
                 <div className="control-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: 'var(--bg-secondary)', borderRadius: '8px' }}>
-                    <span>{t("adminDashboard.registrationStatus", "Registration Status")}: 
+                    <span>{t("settingsPanel.registrationStatus")}: 
                         <strong style={{ marginLeft: '5px', color: settings.registrationOpen ? 'var(--success-color)' : 'var(--error-color)' }}>
-                            {settings.registrationOpen ? t("adminDashboard.open", "Open") : t("adminDashboard.closed", "Closed")}
+                            {settings.registrationOpen ? t("settingsPanel.open") : t("settingsPanel.closed")}
                         </strong>
                     </span>
                     <button 
@@ -60,14 +60,14 @@ const RegistrationControlPanel: React.FC = () => {
                         disabled={updating}
                         style={{ width: 'auto', padding: '5px 15px', margin: 0, backgroundColor: settings.registrationOpen ? '#dc3545' : '#28a745' }}
                     >
-                        {settings.registrationOpen ? t("adminDashboard.closeRegistration", "Close") : t("adminDashboard.openRegistration", "Open")}
+                        {settings.registrationOpen ? t("settingsPanel.closeRegistration") : t("settingsPanel.openRegistration")}
                     </button>
                 </div>
 
                 <div className="control-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: 'var(--bg-secondary)', borderRadius: '8px' }}>
-                    <span>{t("adminDashboard.withdrawalStatus", "Withdrawal Status")}: 
+                    <span>{t("settingsPanel.withdrawalStatus")}: 
                         <strong style={{ marginLeft: '5px', color: settings.withdrawalOpen ? 'var(--success-color)' : 'var(--error-color)' }}>
-                            {settings.withdrawalOpen ? t("adminDashboard.open", "Open") : t("adminDashboard.closed", "Closed")}
+                            {settings.withdrawalOpen ? t("settingsPanel.open") : t("settingsPanel.closed")}
                         </strong>
                     </span>
                     <button 
@@ -76,7 +76,7 @@ const RegistrationControlPanel: React.FC = () => {
                         disabled={updating}
                         style={{ width: 'auto', padding: '5px 15px', margin: 0, backgroundColor: settings.withdrawalOpen ? '#dc3545' : '#28a745' }}
                     >
-                        {settings.withdrawalOpen ? t("adminDashboard.closeWithdrawal", "Close") : t("adminDashboard.openWithdrawal", "Open")}
+                        {settings.withdrawalOpen ? t("settingsPanel.closeWithdrawal") : t("settingsPanel.openWithdrawal")}
                     </button>
                 </div>
             </div>

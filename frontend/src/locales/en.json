@@ -240,7 +240,16 @@
     "saveBtn": "Save settings",
     "savingBtn": "Saving...",
     "saveSuccess": "Settings saved successfully",
-    "saveError": "Connection error"
+    "saveError": "Connection error",
+    "controlPanelTitle": "Registration Control Panel",
+    "registrationStatus": "Registration Status",
+    "withdrawalStatus": "Withdrawal Status",
+    "open": "Open",
+    "closed": "Closed",
+    "openRegistration": "Open Registration",
+    "closeRegistration": "Close Registration",
+    "openWithdrawal": "Open Withdrawal",
+    "closeWithdrawal": "Close Withdrawal"
   },
   "days": {
     "monday": "Monday",
@@ -392,7 +401,11 @@
       "cancelFailed": "Failed to cancel request.",
       "removeFailed": "Failed to remove enrollment.",
       "maxHoursExceeded": "Cannot enroll — would exceed the 18 credit hour limit.",
-      "corequisitesRequired": "You must also register: {{subjects}}"
+      "corequisitesRequired": "You must also register: {{subjects}}",
+      "registrationClosed": "Registration is currently closed",
+      "alreadyInGroup": "You are already in this group",
+      "timeCollision": "You have a time collision with another group",
+      "waitlistFull": "Group is full and you are already on the waitlist"
     }
   }
 }

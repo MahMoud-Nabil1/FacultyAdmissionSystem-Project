@@ -97,7 +97,7 @@ export const requestJoinGroup = async (req: Request, res: Response): Promise<voi
         await session.withTransaction(async () => {
             const settings = await SystemSetting.findOne().session(session);
             if (settings && !settings.registrationOpen) {
-                throw new Error("Registration is currently closed");
+                throw new Error("registration.errors.registrationClosed");
             }
 
             const student = await Student.findOne({ studentId: Number(user.id) }).session(session);
@@ -107,13 +107,13 @@ export const requestJoinGroup = async (req: Request, res: Response): Promise<voi
 
             // Check if already in group
             if (group.students.some(id => id.toString() === student._id.toString())) {
-                throw new Error("You are already in this group");
+                throw new Error("registration.errors.alreadyInGroup");
             }
 
             // Check for time collision
             const collision = await hasTimeCollision(student._id as mongoose.Types.ObjectId, group, session);
             if (collision) {
-                throw new Error("You have a time collision with another group");
+                throw new Error("registration.errors.timeCollision");
             }
 
             // Auto-process logic
@@ -137,7 +137,7 @@ export const requestJoinGroup = async (req: Request, res: Response): Promise<voi
                 status: 'pending'
             }).session(session);
 
-            if (existingRequest) throw new Error("Group is full and you are already on the waitlist");
+            if (existingRequest) throw new Error("registration.errors.waitlistFull");
 
             const newRequest = new EnrollmentRequest({
                 student: student._id,

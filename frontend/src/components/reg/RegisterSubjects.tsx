@@ -355,7 +355,10 @@ const RegisterSubjects = () => {
             setActionMsg({ type: "success", text: t("registration.requestSuccess") });
             await fetchAll();
         } catch (err: any) {
-            setActionMsg({ type: "error", text: err.message || t("registration.errors.requestFailed") });
+            const msg = err.message && err.message.startsWith("registration.errors.") 
+                ? t(err.message) 
+                : err.message || t("registration.errors.requestFailed");
+            setActionMsg({ type: "error", text: msg });
             await fetchAll(); // refresh to show partial state
         } finally {
             setActionLoading(null);

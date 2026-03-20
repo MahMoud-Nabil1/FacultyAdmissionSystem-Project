@@ -240,7 +240,16 @@
     "saveBtn": "حفظ الإعدادات",
     "savingBtn": "جاري الحفظ...",
     "saveSuccess": "تم حفظ الإعدادات بنجاح",
-    "saveError": "حدث خطأ في الاتصال"
+    "saveError": "حدث خطأ في الاتصال",
+    "controlPanelTitle": "لوحة التحكم في التسجيل",
+    "registrationStatus": "حالة التسجيل",
+    "withdrawalStatus": "حالة الانسحاب",
+    "open": "مفتوح",
+    "closed": "مغلق",
+    "openRegistration": "فتح التسجيل",
+    "closeRegistration": "إغلاق التسجيل",
+    "openWithdrawal": "فتح الانسحاب",
+    "closeWithdrawal": "إغلاق الانسحاب"
   },
   "days": {
     "monday": "الاثنين",
@@ -392,7 +401,11 @@
       "cancelFailed": "فشل إلغاء الطلب.",
       "removeFailed": "فشلت إزالة التسجيل.",
       "maxHoursExceeded": "لا يمكن التسجيل — سيتجاوز الحد الأقصى 18 ساعة معتمدة.",
-      "corequisitesRequired": "يجب تسجيل أيضاً: {{subjects}}"
+      "corequisitesRequired": "يجب تسجيل أيضاً: {{subjects}}",
+      "registrationClosed": "التسجيل مغلق حالياً",
+      "alreadyInGroup": "أنت مسجل بالفعل في هذه المجموعة",
+      "timeCollision": "لديك تعارض في الوقت مع مجموعة أخرى",
+      "waitlistFull": "المجموعة ممتلئة وأنت بالفعل على قائمة الانتظار"
     }
   }
 }
