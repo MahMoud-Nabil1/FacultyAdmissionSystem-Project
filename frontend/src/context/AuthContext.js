@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const savedToken = localStorage.getItem('token');
+        const savedToken = sessionStorage.getItem('token');
 
         if (!savedToken) {
             setLoading(false);
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
             const payload = jwtDecode(savedToken);
             setUser(payload);
         } catch {
-            localStorage.removeItem('token');
+            sessionStorage.removeItem('token');
             setToken(null);
             setUser(null);
         } finally {
@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = (tokenValue) => {
-        localStorage.setItem('token', tokenValue);
+        sessionStorage.setItem('token', tokenValue);
         setToken(tokenValue);
 
         try {
@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
         setToken(null);
         setUser(null);
     };

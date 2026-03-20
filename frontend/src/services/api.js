@@ -5,7 +5,7 @@ export {API_BASE};
 
 
 function getToken() {
-    return localStorage.getItem("token");
+    return sessionStorage.getItem("token");
 }
 
 function getAuthHeader() {
