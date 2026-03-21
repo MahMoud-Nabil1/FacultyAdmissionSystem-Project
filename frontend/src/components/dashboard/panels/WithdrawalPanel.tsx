@@ -197,47 +197,45 @@ const WithdrawalPanel: React.FC = () => {
                         ))}
                     </div>
 
-                    <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px' }}>
-                        {selectedComplaint ? (
-                            <>
-                                <h3>الرد على الشكوى</h3>
-                                <div style={{ marginBottom: '15px', padding: '10px', background: '#f5f5f5', borderRadius: '8px' }}>
-                                    <p><strong>الطالب:</strong> {selectedComplaint.studentName}</p>
-                                    <p><strong>الرقم الجامعي:</strong> {selectedComplaint.studentId}</p>
-                                    <p><strong>المادة:</strong> {selectedComplaint.courseName}</p>
-                                    <p><strong>سبب الانسحاب:</strong> {getReasonText(selectedComplaint.withdrawalReason)}</p>
-                                    <p><strong>الشكوى:</strong> {selectedComplaint.complaintText}</p>
-                                </div>
-
-                                <textarea
-                                    rows={4}
-                                    placeholder="رد الإدارة..."
-                                    value={adminResponse}
-                                    onChange={(e) => setAdminResponse(e.target.value)}
-                                    style={{ width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                />
-
-                                <div style={{ display: 'flex', gap: '8px' }}>
-                                    <button onClick={() => updateComplaint(selectedComplaint._id, 'under_review')} style={{ flex: 1, padding: '10px', background: '#2196f3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                                        قيد المراجعة
-                                    </button>
-                                    <button onClick={() => updateComplaint(selectedComplaint._id, 'approved')} style={{ flex: 1, padding: '10px', background: '#4caf50', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                                        موافقة
-                                    </button>
-                                    <button onClick={() => updateComplaint(selectedComplaint._id, 'rejected')} style={{ flex: 1, padding: '10px', background: '#f44336', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                                        رفض
-                                    </button>
-                                    <button onClick={() => deleteComplaint(selectedComplaint._id)} style={{ flex: 1, padding: '10px', background: '#9e9e9e', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                                        حذف
-                                    </button>
-                                </div>
-                            </>
-                        ) : (
-                            <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                                اختر شكوى للرد عليها
+                    {selectedComplaint ? (
+                        <>
+                            <h3>الرد على الشكوى</h3>
+                            <div style={{ marginBottom: '15px', padding: '10px', background: '#f5f5f5', borderRadius: '8px' }}>
+                                <p><strong>الطالب:</strong> {selectedComplaint.studentName}</p>
+                                <p><strong>الرقم الجامعي:</strong> {selectedComplaint.studentId}</p>
+                                <p><strong>المادة:</strong> {selectedComplaint.courseName}</p>
+                                <p><strong>سبب الانسحاب:</strong> {getReasonText(selectedComplaint.withdrawalReason)}</p>
+                                <p><strong>الشكوى:</strong> {selectedComplaint.complaintText}</p>
                             </div>
-                        )}
-                    </div>
+
+                            <textarea
+                                rows={4}
+                                placeholder="رد الإدارة..."
+                                value={adminResponse}
+                                onChange={(e) => setAdminResponse(e.target.value)}
+                                style={{ width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
+                            />
+
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <button onClick={() => updateComplaint(selectedComplaint._id, 'under_review')} style={{ flex: 1, padding: '10px', background: '#2196f3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                    قيد المراجعة
+                                </button>
+                                <button onClick={() => updateComplaint(selectedComplaint._id, 'approved')} style={{ flex: 1, padding: '10px', background: '#4caf50', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                    موافقة
+                                </button>
+                                <button onClick={() => updateComplaint(selectedComplaint._id, 'rejected')} style={{ flex: 1, padding: '10px', background: '#f44336', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                    رفض
+                                </button>
+                                <button onClick={() => deleteComplaint(selectedComplaint._id)} style={{ flex: 1, padding: '10px', background: '#9e9e9e', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                    حذف
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                            اختر شكوى للرد عليها
+                        </div>
+                    )}
                 </div>
             )}
         </div>
