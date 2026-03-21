@@ -16,93 +16,103 @@ import Announcements from "./components/common/announcements.jsx";
 import AdminDashboardTable from "./components/dashboard/tables/table.tsx";
 import Groups from "./components/groups/Groups.tsx";
 import Home from "./components/common/home.tsx";
-
+import StudentsComplaints from "./components/complaints/studentsComplaints.tsx";
 
 function App() {
     const { t } = useTranslation();
     return (
         <ThemeProvider>
-        <div className="App">
-            <LanguageFloatingButton />
+            <div className="App">
+                <LanguageFloatingButton />
 
-            <Routes>
-                {}
-                <Route
-                    path="/"
-                    element={
+                <Routes>
+                    {}
+                    <Route
+                        path="/"
+                        element={
+                            <ProtectedRoute>
+                                <button onClick={() => {
+                                    localStorage.removeItem("token");
+                                    window.location.href = "/login";
+                                }}>
+                                    {t('sidePanel.signOut')}
+                                </button>
+                                <Home/>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/Groups"
+                        element={
+                            <Groups />
+                        }
+                    />
+                    <Route
+                        path="/announcements"
+                        element={
+                            <Announcements />
+                        }>
+                    </Route>
+
+                    {/* ✅ ADD COMPLAINT ROUTE */}
+                    <Route
+                        path="/complaint"
+                        element={
+                            <ProtectedRoute>
+                                <StudentsComplaints />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/admin-dashboard"
+                        element={
+                            <ProtectedRoute allowedRoles={['admin', 'academic_guide', 'academic_guide_coordinator', 'reporter']}>
+                                <div className="app-container">
+                                    <AdminDashboardLayout />
+                                </div>
+                            </ProtectedRoute>
+                        }
+                    >
+                        <Route index element={<AdminDashboard />} />
+                        <Route path="table" element={<AdminDashboardTable />} />
+                        <Route path="groups" element={<Groups />} />
+                    </Route>
+                    <Route path="/login" element={
+                        <GuestRoute>
+                            <Login />
+                        </GuestRoute>
+                    } />
+                    <Route path="/forgot-password" element={
+                        <GuestRoute>
+                            <ForgotPassword />
+                        </GuestRoute>
+                    } />
+                    <Route path="/reset-password" element={
+                        <GuestRoute>
+                            <ResetPassword />
+                        </GuestRoute>
+                    } />
+                    <Route path="/ITContact" element={
+                        <GuestRoute>
+                            <SupportContact target="it" />
+                        </GuestRoute>
+                    } />
+                    <Route path="/AdminContact" element={
+                        <GuestRoute>
+                            <SupportContact target="admin" />
+                        </GuestRoute>
+                    } />
+                    <Route path="/register-subjects" element={
                         <ProtectedRoute>
-                            <button onClick={() => {
-                                localStorage.removeItem("token");
-                                window.location.href = "/login";
-                            }}>
-                                {t('sidePanel.signOut')}
-                            </button>
-                            <Home/>
+                            put register new subjects component here
                         </ProtectedRoute>
                     }
-                />
-                <Route
-                    path="/Groups"
-                    element={
-                        <Groups />
-                    }
-                />
-                <Route
-                    path="/announcements"
-                    element={
-                        <Announcements />
-                    }>
-                </Route>
+                    />
 
-                <Route
-                    path="/admin-dashboard"
-                    element={
-                        <ProtectedRoute allowedRoles={['admin', 'academic_guide', 'academic_guide_coordinator', 'reporter']}>
-                            <div className="app-container">
-                                <AdminDashboardLayout />
-                            </div>
-                        </ProtectedRoute>
-                    }
-                >
-                    <Route index element={<AdminDashboard />} />
-                    <Route path="table" element={<AdminDashboardTable />} />
-                    <Route path="groups" element={<Groups />} />
-                </Route>
-                <Route path="/login" element={
-                    <GuestRoute>
-                        <Login />
-                    </GuestRoute>
-                } />
-                <Route path="/forgot-password" element={
-                    <GuestRoute>
-                        <ForgotPassword />
-                    </GuestRoute>
-                } />
-                <Route path="/reset-password" element={
-                    <GuestRoute>
-                        <ResetPassword />
-                    </GuestRoute>
-                } />
-                <Route path="/ITContact" element={
-                    <GuestRoute>
-                        <SupportContact target="it" />
-                    </GuestRoute>
-                } />
-                <Route path="/AdminContact" element={
-                    <GuestRoute>
-                        <SupportContact target="admin" />
-                    </GuestRoute>
-                } />
-                <Route path="/register-subjects" element={
-                    <ProtectedRoute>
-                        put register new subjects component here
-                    </ProtectedRoute>
-                }
-                />
-
-                <Route path="*" element={<Navigate to="/announcements" replace />}/>
-            </Routes>
-        </div>
+                    <Route path="*" element={<Navigate to="/announcements" replace />}/>
+                </Routes>
+            </div>
         </ThemeProvider>
     );
 }

@@ -91,6 +91,11 @@ const Home = () => {
                     {t("home.viewAllGroups")}
                 </button>
 
+                {/* Complaint Button - for all users */}
+                <button className="btn complaint" onClick={() => navigate("/complaint")}>
+                    📝 {t("الشكاوى") || "Submit Withdrawal Complaint"}
+                </button>
+
                 {user?.role && user.role !== "student" && (
                     <button className="btn admin" onClick={() => navigate("/admin-dashboard")}>
                         {t("home.adminDashboard")}
