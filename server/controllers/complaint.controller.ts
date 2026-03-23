@@ -28,8 +28,7 @@ export const updateComplaint = async (req: Request, res: Response) => {
             { new: true }
         );
         if (!complaint) {
-            res.status(404).json({ message: 'Complaint not found' });
-            return;
+            return res.status(404).json({ message: 'Complaint not found' });
         }
         res.json(complaint);
     } catch (error: any) {
@@ -41,8 +40,7 @@ export const deleteComplaint = async (req: Request, res: Response) => {
     try {
         const complaint = await Complaint.findByIdAndDelete(req.params.id);
         if (!complaint) {
-            res.status(404).json({ message: 'Complaint not found' });
-            return;
+            return res.status(404).json({ message: 'Complaint not found' });
         }
         res.json({ message: 'Complaint deleted successfully' });
     } catch (error: any) {
