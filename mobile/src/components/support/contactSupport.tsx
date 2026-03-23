@@ -150,7 +150,7 @@ export default function SupportContact() {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f0f4ff' },
-    scroll: { padding: 20, paddingBottom: 80 },
+    scroll: { padding: 20, paddingTop: 90, paddingBottom: 80 },
     card: {
         backgroundColor: '#fff',
         borderRadius: 20,

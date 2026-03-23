@@ -70,7 +70,7 @@ export default function EditPanel() {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f0f4ff' },
-    content: { padding: 20, paddingBottom: 40 },
+    content: { padding: 20, paddingTop: 90, paddingBottom: 40 },
     heading: {
         fontSize: 26,
         fontWeight: '800',

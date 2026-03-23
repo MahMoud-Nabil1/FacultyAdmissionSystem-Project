@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
     View, Text, TextInput, TouchableOpacity, StyleSheet,
-    ScrollView, ActivityIndicator, Alert,
+    ScrollView, ActivityIndicator, Alert, Modal, Pressable,
+    KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getAllSubjects, createSubject, updateSubject, deleteSubject } from '../../../services/api';
@@ -34,7 +35,8 @@ export default function SubjectsScreen() {
 
     const openAdd = () => {
         setEditingId(null); setForm(EMPTY);
-        setShowForm(p => !p); setError('');
+        setShowForm(true);
+        setError('');
     };
 
     const openEdit = (s: Subject) => {
@@ -67,29 +69,99 @@ export default function SubjectsScreen() {
         ]);
     };
 
+    const closeModal = () => {
+        setShowForm(false);
+        setError('');
+        setEditingId(null);
+        setForm(EMPTY);
+    };
+
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
             <Text style={styles.title}>📚 {t('subjects.title')}</Text>
 
-            <TouchableOpacity style={[styles.btn, showForm && !editingId && styles.btnOutline]} onPress={openAdd}>
+            <TouchableOpacity
+                style={[styles.btn, showForm && !editingId && styles.btnOutline]}
+                onPress={() => {
+                    if (showForm) return closeModal();
+                    return openAdd();
+                }}
+            >
                 <Ionicons name={showForm && !editingId ? 'close' : 'add-circle-outline'} size={18} color={showForm && !editingId ? '#10b981' : '#fff'} />
                 <Text style={[styles.btnText, showForm && !editingId && styles.btnTextOutline]}>
                     {showForm && !editingId ? t('subjects.cancel') : t('subjects.addSubject')}
                 </Text>
             </TouchableOpacity>
 
-            {showForm && (
-                <View style={styles.form}>
-                    <Text style={styles.formTitle}>{editingId ? t('subjects.editSubject') : t('subjects.newSubject')}</Text>
-                    {!!error && <Text style={styles.error}>{error}</Text>}
-                    <TextInput style={styles.input} placeholder={t('subjects.placeholders.code')} placeholderTextColor="#9ca3af" value={form.code} onChangeText={v => setForm(p => ({ ...p, code: v }))} autoCapitalize="characters" />
-                    <TextInput style={styles.input} placeholder={t('subjects.placeholders.name')} placeholderTextColor="#9ca3af" value={form.name} onChangeText={v => setForm(p => ({ ...p, name: v }))} textAlign="right" />
-                    <TextInput style={styles.input} placeholder={t('subjects.placeholders.creditHours')} placeholderTextColor="#9ca3af" value={form.creditHours} onChangeText={v => setForm(p => ({ ...p, creditHours: v }))} keyboardType="number-pad" />
-                    <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} disabled={saving}>
-                        {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>{t('subjects.save')}</Text>}
-                    </TouchableOpacity>
+            <Modal
+                visible={showForm}
+                animationType="fade"
+                transparent
+                onRequestClose={closeModal}
+            >
+                <View style={styles.modalOverlay}>
+                    <Pressable
+                        style={StyleSheet.absoluteFill}
+                        onPress={closeModal}
+                        accessibilityRole="button"
+                        accessibilityLabel={t('common.close')}
+                    />
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+                        style={styles.modalKeyboard}
+                    >
+                        <View style={styles.modalCard}>
+                            <View style={styles.modalHeader}>
+                                <Text style={styles.modalTitle}>
+                                    {editingId ? t('subjects.editSubject') : t('subjects.newSubject')}
+                                </Text>
+                                <TouchableOpacity
+                                    onPress={closeModal}
+                                    style={styles.modalClose}
+                                    hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                                >
+                                    <Ionicons name="close" size={26} color="#6b7280" />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.modalFormBody}>
+                                {!!error && <Text style={styles.error}>{error}</Text>}
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder={t('subjects.placeholders.code')}
+                                    placeholderTextColor="#9ca3af"
+                                    value={form.code}
+                                    onChangeText={v => setForm(p => ({ ...p, code: v }))}
+                                    autoCapitalize="characters"
+                                />
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder={t('subjects.placeholders.name')}
+                                    placeholderTextColor="#9ca3af"
+                                    value={form.name}
+                                    onChangeText={v => setForm(p => ({ ...p, name: v }))}
+                                    textAlign="right"
+                                />
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder={t('subjects.placeholders.creditHours')}
+                                    placeholderTextColor="#9ca3af"
+                                    value={form.creditHours}
+                                    onChangeText={v => setForm(p => ({ ...p, creditHours: v }))}
+                                    keyboardType="number-pad"
+                                />
+                                <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} disabled={saving}>
+                                    {saving ? (
+                                        <ActivityIndicator color="#fff" />
+                                    ) : (
+                                        <Text style={styles.submitText}>{t('subjects.save')}</Text>
+                                    )}
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </KeyboardAvoidingView>
                 </View>
-            )}
+            </Modal>
 
             {loading ? (
                 <ActivityIndicator color="#10b981" style={{ marginTop: 32 }} />
@@ -117,23 +189,59 @@ export default function SubjectsScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#ecfdf5' },
-    content: { padding: 20, paddingBottom: 40 },
-    title: { fontSize: 22, fontWeight: '800', color: '#10b981', marginBottom: 16, textAlign: 'center' },
-    btn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#10b981', borderRadius: 10, padding: 13, justifyContent: 'center', marginBottom: 16 },
-    btnOutline: { backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#10b981' },
+    container: { flex: 1, backgroundColor: '#f0f4ff' },
+    content: { padding: 20, paddingTop: 90, paddingBottom: 40 },
+    title: { fontSize: 22, fontWeight: '800', color: '#1a73e8', marginBottom: 16, textAlign: 'center' },
+    btn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#1a73e8', borderRadius: 10, padding: 13, justifyContent: 'center', marginBottom: 16 },
+    btnOutline: { backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#1a73e8' },
     btnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
-    btnTextOutline: { color: '#10b981' },
+    btnTextOutline: { color: '#1a73e8' },
     form: { backgroundColor: '#fff', borderRadius: 14, padding: 16, marginBottom: 20, gap: 10, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 },
-    formTitle: { fontSize: 16, fontWeight: '700', color: '#111', marginBottom: 4, textAlign: 'center' },
     input: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 10, padding: 12, fontSize: 14, color: '#111', backgroundColor: '#fafafa' },
-    submitBtn: { backgroundColor: '#10b981', borderRadius: 10, padding: 13, alignItems: 'center', marginTop: 4 },
+    submitBtn: { backgroundColor: '#1a73e8', borderRadius: 10, padding: 13, alignItems: 'center', marginTop: 4 },
     submitText: { color: '#fff', fontWeight: '700', fontSize: 15 },
     error: { color: '#ef4444', textAlign: 'center', marginBottom: 8 },
     empty: { textAlign: 'center', color: '#9ca3af', marginTop: 40, fontSize: 15 },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.45)',
+        justifyContent: 'center',
+        padding: 20,
+        position: 'relative',
+    },
+    modalKeyboard: { width: '100%', maxWidth: 420, alignSelf: 'center', flexShrink: 1 },
+    modalCard: {
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        borderWidth: 2,
+        borderColor: '#1a73e8',
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowRadius: 16,
+        elevation: 8,
+        overflow: 'hidden',
+        width: '100%',
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 18,
+        paddingVertical: 14,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f3f4f6',
+    },
+    modalTitle: { fontSize: 18, fontWeight: '800', color: '#1a73e8' },
+    modalClose: { padding: 4 },
+    modalFormBody: {
+        paddingHorizontal: 18,
+        paddingTop: 16,
+        paddingBottom: 22,
+        gap: 9,
+    },
     row: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 10, alignItems: 'center', gap: 10, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 2 },
-    badge: { backgroundColor: '#d1fae5', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
-    badgeText: { color: '#065f46', fontWeight: '700', fontSize: 12 },
+    badge: { backgroundColor: '#00A2E8', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
+    badgeText: { color: '#fff', fontWeight: '700', fontSize: 12 },
     rowInfo: { flex: 1 },
     rowName: { fontSize: 14, fontWeight: '700', color: '#111' },
     rowSub: { fontSize: 12, color: '#6b7280', marginTop: 2 },

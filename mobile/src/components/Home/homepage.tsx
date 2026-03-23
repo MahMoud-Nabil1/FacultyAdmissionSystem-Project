@@ -127,8 +127,8 @@ const Homepage = () => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f8f9ff' },
-    scroll: { padding: 20, paddingTop: 50 },
+    container: { flex: 1, backgroundColor: '#f0f4ff' },
+    scroll: { padding: 20, paddingTop: 90 },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     headerCard: { backgroundColor: '#fff', borderRadius: 25, padding: 25, alignItems: 'center', elevation: 4 },
     avatarContainer: { width: 70, height: 70, borderRadius: 35, backgroundColor: '#1a73e8', justifyContent: 'center', alignItems: 'center', marginBottom: 10 },

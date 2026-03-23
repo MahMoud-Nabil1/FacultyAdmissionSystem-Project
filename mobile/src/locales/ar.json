@@ -186,5 +186,20 @@
       "academic_guide_coordinator": "منسق الإرشاد الأكاديمى",
       "reporter": "مُراجع بيانات"
     }
+  },
+  "announcements": {
+    "title": "الإعلانات",
+    "addNew": "إضافة إعلان جديد",
+    "modalTitle": "إضافة إعلان جديد",
+    "placeholders": {
+      "title": "العنوان",
+      "content": "المحتوى"
+    },
+    "submitBtn": "نشر الإعلان",
+    "fillAll": "يرجى ملء العنوان والمحتوى",
+    "publishFailed": "فشل النشر",
+    "empty": "لا توجد إعلانات حتى الآن",
+    "deleteTitle": "حذف إعلان",
+    "deleteMessage": "هل تريد حذف \"{{title}}\"؟"
   }
 }

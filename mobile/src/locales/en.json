@@ -186,5 +186,20 @@
       "academic_guide_coordinator": "Academic guide coordinator",
       "reporter": "Data reviewer"
     }
+  },
+  "announcements": {
+    "title": "Announcements",
+    "addNew": "Add new announcement",
+    "modalTitle": "Add new announcement",
+    "placeholders": {
+      "title": "Title",
+      "content": "Content"
+    },
+    "submitBtn": "Publish announcement",
+    "fillAll": "Please fill in the title and content",
+    "publishFailed": "Failed to publish",
+    "empty": "No announcements yet",
+    "deleteTitle": "Delete announcement",
+    "deleteMessage": "Are you sure you want to delete \"{{title}}\"?"
   }
 }
