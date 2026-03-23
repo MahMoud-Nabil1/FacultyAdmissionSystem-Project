@@ -5,9 +5,10 @@ interface Complaint {
     _id: string;
     studentName: string;
     studentId: string;
+    requestType: string;
     courseName: string;
-    withdrawalReason: string;
-    complaintText: string;
+    problemDescription: string;
+    additionalDetails: string;
     status: string;
     adminResponse: string;
     reviewedBy: string;
@@ -27,7 +28,8 @@ const StudentComplaintPage: React.FC = () => {
     const [complaints, setComplaints] = useState<Complaint[]>([]);
     const [loading, setLoading] = useState(true);
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [editText, setEditText] = useState('');
+    const [editDescription, setEditDescription] = useState('');
+    const [editAdditional, setEditAdditional] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [message, setMessage] = useState('');
     const [activeTab, setActiveTab] = useState<'submit' | 'view'>('submit');
@@ -35,18 +37,11 @@ const StudentComplaintPage: React.FC = () => {
     const [formData, setFormData] = useState({
         studentName: '',
         studentId: '',
+        requestType: '',
         courseName: '',
-        withdrawalReason: '',
-        complaintText: ''
+        problemDescription: '',
+        additionalDetails: ''
     });
-
-    const reasons = [
-        { value: 'technical_issues', label: 'مشاكل تقنية' },
-        { value: 'medical_emergency', label: 'حالة طبية طارئة' },
-        { value: 'refund_issue', label: 'مشكلة استرداد الرسوم' },
-        { value: 'schedule_conflict', label: 'تضارب في الجدول' },
-        { value: 'other', label: 'أخرى' }
-    ];
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -113,12 +108,13 @@ const StudentComplaintPage: React.FC = () => {
             const data = await response.json();
 
             if (response.ok) {
-                setMessage('✅ تم تقديم الشكوى بنجاح!');
+                setMessage('✅ تم تقديم الطلب بنجاح!');
                 setFormData({
                     ...formData,
+                    requestType: '',
                     courseName: '',
-                    withdrawalReason: '',
-                    complaintText: ''
+                    problemDescription: '',
+                    additionalDetails: ''
                 });
                 if (user) {
                     fetchComplaints(user.studentId || user.id);
@@ -135,27 +131,31 @@ const StudentComplaintPage: React.FC = () => {
         }
     };
 
-    const handleUpdate = async (id: string, newText: string) => {
+    const handleUpdate = async (id: string, description: string, additional: string) => {
         try {
             const response = await fetch(`http://localhost:5000/api/complaints/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ complaintText: newText })
+                body: JSON.stringify({
+                    problemDescription: description,
+                    additionalDetails: additional
+                })
             });
 
             if (response.ok) {
-                setMessage('✅ تم تحديث الشكوى بنجاح');
+                setMessage('✅ تم تحديث الطلب بنجاح');
                 if (user) {
                     fetchComplaints(user.studentId || user.id);
                 }
                 setEditingId(null);
-                setEditText('');
+                setEditDescription('');
+                setEditAdditional('');
                 setTimeout(() => setMessage(''), 3000);
             } else {
                 alert('فشل التحديث');
             }
         } catch (err) {
-            alert('خطأ في تحديث الشكوى');
+            alert('خطأ في تحديث الطلب');
         }
     };
 
@@ -199,7 +199,7 @@ const StudentComplaintPage: React.FC = () => {
 
     return (
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px', direction: 'rtl' }}>
-            <h1 style={{ textAlign: 'center', marginBottom: '10px' }}>🎓 نظام شكاوى الطلاب</h1>
+            <h1 style={{ textAlign: 'center', marginBottom: '10px' }}>🎓 نظام الطلبات الأكاديمية</h1>
             <p style={{ textAlign: 'center', color: '#666', marginBottom: '30px' }}>
                 مرحباً, <strong>{user.name}</strong> | الرقم الجامعي: <strong>{user.studentId || user.id}</strong>
             </p>
@@ -218,7 +218,7 @@ const StudentComplaintPage: React.FC = () => {
                         fontWeight: 'bold'
                     }}
                 >
-                    📝 تقديم شكوى جديدة
+                    📝 تقديم طلب جديد
                 </button>
                 <button
                     onClick={() => { setActiveTab('view'); if (user) fetchComplaints(user.studentId || user.id); }}
@@ -233,7 +233,7 @@ const StudentComplaintPage: React.FC = () => {
                         fontWeight: 'bold'
                     }}
                 >
-                    📋 شكواي ({complaints.length})
+                    📋 طلباتي ({complaints.length})
                 </button>
             </div>
 
@@ -252,7 +252,7 @@ const StudentComplaintPage: React.FC = () => {
 
             {activeTab === 'submit' && (
                 <div style={{ maxWidth: '600px', margin: '0 auto', padding: '30px', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-                    <h2 style={{ marginBottom: '20px' }}>تقديم شكوى انسحاب</h2>
+                    <h2 style={{ marginBottom: '20px' }}>تقديم طلب أكاديمي</h2>
                     <form onSubmit={handleSubmit}>
                         <input
                             type="text"
@@ -284,6 +284,16 @@ const StudentComplaintPage: React.FC = () => {
                                 color: '#666'
                             }}
                         />
+
+                        <input
+                            type="text"
+                            placeholder="نوع الطلب (مثال: انسحاب من مادة، تسجيل مادة من سنة أعلى، تعديل جدول، ...) *"
+                            value={formData.requestType}
+                            onChange={(e) => setFormData({ ...formData, requestType: e.target.value })}
+                            required
+                            style={{ width: '100%', padding: '10px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '6px' }}
+                        />
+
                         <input
                             type="text"
                             placeholder="اسم المادة *"
@@ -292,29 +302,30 @@ const StudentComplaintPage: React.FC = () => {
                             required
                             style={{ width: '100%', padding: '10px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '6px' }}
                         />
-                        <select
-                            value={formData.withdrawalReason}
-                            onChange={(e) => setFormData({ ...formData, withdrawalReason: e.target.value })}
-                            required
-                            style={{ width: '100%', padding: '10px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '6px' }}
-                        >
-                            <option value="">اختر سبب الانسحاب *</option>
-                            {reasons.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-                        </select>
+
                         <textarea
                             rows={5}
-                            placeholder="تفاصيل الشكوى *"
-                            value={formData.complaintText}
-                            onChange={(e) => setFormData({ ...formData, complaintText: e.target.value })}
+                            placeholder="وصف المشكلة بالتفصيل *"
+                            value={formData.problemDescription}
+                            onChange={(e) => setFormData({ ...formData, problemDescription: e.target.value })}
                             required
                             style={{ width: '100%', padding: '10px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '6px' }}
                         />
+
+                        <textarea
+                            rows={3}
+                            placeholder="تفاصيل إضافية (اختياري)"
+                            value={formData.additionalDetails}
+                            onChange={(e) => setFormData({ ...formData, additionalDetails: e.target.value })}
+                            style={{ width: '100%', padding: '10px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '6px' }}
+                        />
+
                         <button
                             type="submit"
                             disabled={submitting}
                             style={{ width: '100%', padding: '12px', backgroundColor: submitting ? '#ccc' : '#4CAF50', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px' }}
                         >
-                            {submitting ? 'جاري الإرسال...' : 'إرسال الشكوى'}
+                            {submitting ? 'جاري الإرسال...' : 'إرسال الطلب'}
                         </button>
                     </form>
                 </div>
@@ -325,17 +336,20 @@ const StudentComplaintPage: React.FC = () => {
                     {complaints.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '60px', backgroundColor: '#f9f9f9', borderRadius: '12px' }}>
                             <div style={{ fontSize: '48px' }}>📭</div>
-                            <h3>لا توجد شكاوى</h3>
-                            <p>لم تقم بتقديم أي شكاوى حتى الآن.</p>
+                            <h3>لا توجد طلبات</h3>
+                            <p>لم تقم بتقديم أي طلبات حتى الآن.</p>
                             <button onClick={() => setActiveTab('submit')} style={{ padding: '10px 20px', backgroundColor: '#f39c12', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
-                                تقديم شكوى
+                                تقديم طلب
                             </button>
                         </div>
                     ) : (
                         complaints.map((complaint) => (
                             <div key={complaint._id} style={{ marginBottom: '20px', padding: '20px', border: '1px solid #e0e0e0', borderRadius: '12px', backgroundColor: 'white' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                                    <h3 style={{ margin: 0 }}>{complaint.courseName}</h3>
+                                    <div>
+                                        <h3 style={{ margin: 0 }}>{complaint.courseName}</h3>
+                                        <span style={{ fontSize: '14px', color: '#2196f3' }}>{complaint.requestType}</span>
+                                    </div>
                                     <span style={{ padding: '4px 12px', borderRadius: '20px', backgroundColor: getStatusColor(complaint.status) + '20', color: getStatusColor(complaint.status), fontWeight: 'bold' }}>
                                         {getStatusText(complaint.status)}
                                     </span>
@@ -344,21 +358,36 @@ const StudentComplaintPage: React.FC = () => {
                                 {editingId === complaint._id ? (
                                     <div>
                                         <textarea
-                                            value={editText}
-                                            onChange={(e) => setEditText(e.target.value)}
+                                            value={editDescription}
+                                            onChange={(e) => setEditDescription(e.target.value)}
                                             rows={4}
+                                            placeholder="وصف المشكلة"
+                                            style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '10px' }}
+                                        />
+                                        <textarea
+                                            value={editAdditional}
+                                            onChange={(e) => setEditAdditional(e.target.value)}
+                                            rows={3}
+                                            placeholder="تفاصيل إضافية"
                                             style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '10px' }}
                                         />
                                         <div style={{ display: 'flex', gap: '10px' }}>
-                                            <button onClick={() => handleUpdate(complaint._id, editText)} style={{ padding: '8px 16px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>حفظ</button>
-                                            <button onClick={() => { setEditingId(null); setEditText(''); }} style={{ padding: '8px 16px', backgroundColor: '#9e9e9e', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>إلغاء</button>
+                                            <button onClick={() => handleUpdate(complaint._id, editDescription, editAdditional)} style={{ padding: '8px 16px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>حفظ</button>
+                                            <button onClick={() => { setEditingId(null); setEditDescription(''); setEditAdditional(''); }} style={{ padding: '8px 16px', backgroundColor: '#9e9e9e', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>إلغاء</button>
                                         </div>
                                     </div>
                                 ) : (
                                     <div style={{ backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '8px', marginBottom: '15px' }}>
-                                        <p style={{ margin: 0 }}>{complaint.complaintText}</p>
+                                        <p><strong>وصف المشكلة:</strong> {complaint.problemDescription}</p>
+                                        {complaint.additionalDetails && (
+                                            <p><strong>تفاصيل إضافية:</strong> {complaint.additionalDetails}</p>
+                                        )}
                                         {complaint.status === 'pending' && (
-                                            <button onClick={() => { setEditingId(complaint._id); setEditText(complaint.complaintText); }} style={{ marginTop: '10px', padding: '5px 12px', backgroundColor: '#2196f3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>
+                                            <button onClick={() => {
+                                                setEditingId(complaint._id);
+                                                setEditDescription(complaint.problemDescription);
+                                                setEditAdditional(complaint.additionalDetails || '');
+                                            }} style={{ marginTop: '10px', padding: '5px 12px', backgroundColor: '#2196f3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>
                                                 ✏️ تعديل
                                             </button>
                                         )}
@@ -366,7 +395,7 @@ const StudentComplaintPage: React.FC = () => {
                                 )}
 
                                 {complaint.adminResponse && (
-                                    <div style={{ marginTop: '15px', padding: '15px', backgroundColor: '#e8f5e9', borderRadius: '8px', borderLeft: '4px solid #4CAF50' }}>
+                                    <div style={{ marginTop: '15px', padding: '15px', backgroundColor: '#e8f5e9', borderRadius: '8px', borderRight: '4px solid #4CAF50' }}>
                                         <strong>📨 رد الإدارة:</strong>
                                         <p style={{ margin: '8px 0 0 0' }}>{complaint.adminResponse}</p>
                                         {complaint.reviewedBy && (
@@ -379,7 +408,7 @@ const StudentComplaintPage: React.FC = () => {
 
                                 <div style={{ marginTop: '15px', fontSize: '12px', color: '#999', display: 'flex', justifyContent: 'space-between' }}>
                                     <span>📅 تاريخ التقديم: {formatDate(complaint.createdAt)}</span>
-                                    <span>🆔 رقم الشكوى: {complaint._id.slice(-6)}</span>
+                                    <span>🆔 رقم الطلب: {complaint._id.slice(-6)}</span>
                                 </div>
                             </div>
                         ))

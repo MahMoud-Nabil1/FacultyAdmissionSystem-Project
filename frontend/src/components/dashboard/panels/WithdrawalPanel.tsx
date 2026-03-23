@@ -4,12 +4,12 @@ interface Complaint {
     _id: string;
     studentName: string;
     studentId: string;
+    requestType: string;
     courseName: string;
-    withdrawalReason: string;
-    complaintText: string;
+    problemDescription: string;
+    additionalDetails: string;
     status: string;
     adminResponse: string;
-    adminNotes: string;
     reviewedBy: string;
     reviewedAt: string;
     createdAt: string;
@@ -27,12 +27,11 @@ const WithdrawalPanel: React.FC = () => {
             setLoading(true);
             const response = await fetch('http://localhost:5000/api/complaints');
             const data = await response.json();
-            console.log('Fetched complaints:', data);
             setComplaints(data);
             setError('');
         } catch (err) {
             console.error('Error fetching complaints:', err);
-            setError('فشل في جلب الشكاوى');
+            setError('فشل في جلب الطلبات');
         } finally {
             setLoading(false);
         }
@@ -61,7 +60,7 @@ const WithdrawalPanel: React.FC = () => {
             });
 
             if (response.ok) {
-                alert(`تم ${status === 'approved' ? 'الموافقة على' : status === 'rejected' ? 'رفض' : 'مراجعة'} الشكوى بنجاح`);
+                alert(`تم ${status === 'approved' ? 'الموافقة على' : status === 'rejected' ? 'رفض' : 'مراجعة'} الطلب بنجاح`);
                 fetchComplaints();
                 setSelectedComplaint(null);
                 setAdminResponse('');
@@ -69,19 +68,19 @@ const WithdrawalPanel: React.FC = () => {
                 alert('فشل في التحديث');
             }
         } catch (err) {
-            alert('خطأ في تحديث الشكوى');
+            alert('خطأ في تحديث الطلب');
         }
     };
 
     const deleteComplaint = async (id: string) => {
-        if (window.confirm('هل تريد حذف هذه الشكوى؟')) {
+        if (window.confirm('هل تريد حذف هذا الطلب؟')) {
             try {
                 const response = await fetch(`http://localhost:5000/api/complaints/${id}`, {
                     method: 'DELETE'
                 });
 
                 if (response.ok) {
-                    alert('تم حذف الشكوى');
+                    alert('تم حذف الطلب');
                     fetchComplaints();
                     if (selectedComplaint?._id === id) {
                         setSelectedComplaint(null);
@@ -113,27 +112,16 @@ const WithdrawalPanel: React.FC = () => {
         }
     };
 
-    const getReasonText = (reason: string) => {
-        switch(reason) {
-            case 'technical_issues': return 'مشاكل تقنية';
-            case 'medical_emergency': return 'حالة طبية طارئة';
-            case 'refund_issue': return 'مشكلة استرداد الرسوم';
-            case 'schedule_conflict': return 'تضارب في الجدول';
-            case 'other': return 'أخرى';
-            default: return reason;
-        }
-    };
-
     const formatDate = (date: string) => {
         return new Date(date).toLocaleDateString('ar-EG');
     };
 
-    if (loading) return <div style={{ padding: '20px', textAlign: 'center' }}>جاري تحميل الشكاوى...</div>;
+    if (loading) return <div style={{ padding: '20px', textAlign: 'center' }}>جاري تحميل الطلبات...</div>;
     if (error) return <div style={{ padding: '20px', textAlign: 'center', color: 'red' }}>{error}</div>;
 
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial', direction: 'rtl' }}>
-            <h2>🎓 إدارة شكاوى الانسحاب</h2>
+            <h2>🎓 إدارة الطلبات الأكاديمية</h2>
 
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
                 <div style={{ background: '#f0f0f0', padding: '10px 20px', borderRadius: '8px' }}>
@@ -155,13 +143,13 @@ const WithdrawalPanel: React.FC = () => {
 
             {complaints.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px', background: '#f9f9f9', borderRadius: '8px' }}>
-                    <h3>لا توجد شكاوى</h3>
-                    <p>لم يتم تقديم أي شكاوى انسحاب حتى الآن.</p>
+                    <h3>لا توجد طلبات</h3>
+                    <p>لم يتم تقديم أي طلبات حتى الآن.</p>
                 </div>
             ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                     <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', maxHeight: '500px', overflowY: 'auto' }}>
-                        <h3>الشكاوى ({complaints.length})</h3>
+                        <h3>الطلبات ({complaints.length})</h3>
                         {complaints.map(c => (
                             <div
                                 key={c._id}
@@ -191,51 +179,57 @@ const WithdrawalPanel: React.FC = () => {
                                     </span>
                                 </div>
                                 <div style={{ fontSize: '12px', color: '#666' }}>{c.studentId} - {c.courseName}</div>
-                                <div style={{ fontSize: '12px', marginTop: '8px' }}>{c.complaintText.substring(0, 80)}...</div>
+                                <div style={{ fontSize: '12px', color: '#2196f3' }}>{c.requestType}</div>
+                                <div style={{ fontSize: '12px', marginTop: '8px' }}>{c.problemDescription.substring(0, 80)}...</div>
                                 <div style={{ fontSize: '10px', color: '#999', marginTop: '8px' }}>{formatDate(c.createdAt)}</div>
                             </div>
                         ))}
                     </div>
 
-                    {selectedComplaint ? (
-                        <>
-                            <h3>الرد على الشكوى</h3>
-                            <div style={{ marginBottom: '15px', padding: '10px', background: '#f5f5f5', borderRadius: '8px' }}>
-                                <p><strong>الطالب:</strong> {selectedComplaint.studentName}</p>
-                                <p><strong>الرقم الجامعي:</strong> {selectedComplaint.studentId}</p>
-                                <p><strong>المادة:</strong> {selectedComplaint.courseName}</p>
-                                <p><strong>سبب الانسحاب:</strong> {getReasonText(selectedComplaint.withdrawalReason)}</p>
-                                <p><strong>الشكوى:</strong> {selectedComplaint.complaintText}</p>
-                            </div>
+                    <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px' }}>
+                        {selectedComplaint ? (
+                            <>
+                                <h3>الرد على الطلب</h3>
+                                <div style={{ marginBottom: '15px', padding: '10px', background: '#f5f5f5', borderRadius: '8px' }}>
+                                    <p><strong>الطالب:</strong> {selectedComplaint.studentName}</p>
+                                    <p><strong>الرقم الجامعي:</strong> {selectedComplaint.studentId}</p>
+                                    <p><strong>نوع الطلب:</strong> {selectedComplaint.requestType}</p>
+                                    <p><strong>المادة:</strong> {selectedComplaint.courseName}</p>
+                                    <p><strong>وصف المشكلة:</strong> {selectedComplaint.problemDescription}</p>
+                                    {selectedComplaint.additionalDetails && (
+                                        <p><strong>تفاصيل إضافية:</strong> {selectedComplaint.additionalDetails}</p>
+                                    )}
+                                </div>
 
-                            <textarea
-                                rows={4}
-                                placeholder="رد الإدارة..."
-                                value={adminResponse}
-                                onChange={(e) => setAdminResponse(e.target.value)}
-                                style={{ width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
-                            />
+                                <textarea
+                                    rows={4}
+                                    placeholder="رد الإدارة..."
+                                    value={adminResponse}
+                                    onChange={(e) => setAdminResponse(e.target.value)}
+                                    style={{ width: '100%', padding: '8px', marginBottom: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
+                                />
 
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                                <button onClick={() => updateComplaint(selectedComplaint._id, 'under_review')} style={{ flex: 1, padding: '10px', background: '#2196f3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                                    قيد المراجعة
-                                </button>
-                                <button onClick={() => updateComplaint(selectedComplaint._id, 'approved')} style={{ flex: 1, padding: '10px', background: '#4caf50', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                                    موافقة
-                                </button>
-                                <button onClick={() => updateComplaint(selectedComplaint._id, 'rejected')} style={{ flex: 1, padding: '10px', background: '#f44336', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                                    رفض
-                                </button>
-                                <button onClick={() => deleteComplaint(selectedComplaint._id)} style={{ flex: 1, padding: '10px', background: '#9e9e9e', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                                    حذف
-                                </button>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button onClick={() => updateComplaint(selectedComplaint._id, 'under_review')} style={{ flex: 1, padding: '10px', background: '#2196f3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                        قيد المراجعة
+                                    </button>
+                                    <button onClick={() => updateComplaint(selectedComplaint._id, 'approved')} style={{ flex: 1, padding: '10px', background: '#4caf50', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                        موافقة
+                                    </button>
+                                    <button onClick={() => updateComplaint(selectedComplaint._id, 'rejected')} style={{ flex: 1, padding: '10px', background: '#f44336', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                        رفض
+                                    </button>
+                                    <button onClick={() => deleteComplaint(selectedComplaint._id)} style={{ flex: 1, padding: '10px', background: '#9e9e9e', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                        حذف
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                                اختر طلباً للرد عليه
                             </div>
-                        </>
-                    ) : (
-                        <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                            اختر شكوى للرد عليها
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             )}
         </div>
