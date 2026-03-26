@@ -15,6 +15,14 @@ router.get(
 );
 
 router.get(
+    "/my-academic-history",
+    authenticate,
+    requireRole(["student"]),
+    studentCtrl.getMyAcademicHistory
+);
+
+
+router.get(
     "/:id",
     authenticate,
     requireRole(["admin", "academic_guide", "academic_guide_coordinator", "reporter"]),
