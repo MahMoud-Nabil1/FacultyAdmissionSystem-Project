@@ -4,11 +4,22 @@ import { useTranslation } from "react-i18next";
 import "./css/home.css";
 import { ROLES } from "../../services/constants";
 
+interface User {
+    _id: string;
+    name: string;
+    role: string;
+    email?: string;
+    department?: string;
+    gpa?: number;
+    registeredHours?: number;
+    completedHours?: number;
+}
+
 const Home = () => {
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
     const isRTL = i18n.language === "ar";
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [showReset, setShowReset] = useState(false);
     const [newPassword, setNewPassword] = useState("");
@@ -87,8 +98,16 @@ const Home = () => {
             </div>
 
             <div className="buttons-vertical">
-                <button className="btn" onClick={() => navigate("/groups")}>
+                <button className="btn announcements" onClick={() => navigate("/announcements")}>
+                    📢 الإعلانات
+                </button>
+
+                <button className="btn" onClick={() => navigate("/Groups")}>
                     {t("home.viewAllGroups")}
+                </button>
+
+                <button className="btn complaint" onClick={() => navigate("/complaint")}>
+                    📝 الشكاوى
                 </button>
 
                 {user?.role && user.role !== "student" && (

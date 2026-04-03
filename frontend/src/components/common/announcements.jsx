@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import './css/announcements.css'; // تم تغيير المسار
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './css/announcements.css';
 
 const API_URL = 'http://localhost:5000/api';
 
 const Announcements = () => {
-    const { t, i18n } = useTranslation();
+    const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [gpaMin, setGpaMin] = useState(2.5);
@@ -15,36 +15,49 @@ const Announcements = () => {
     const [logoError, setLogoError] = useState(false);
     const [hasInvalidGpaSettings, setHasInvalidGpaSettings] = useState(false);
 
-    const dateLocale = useMemo(() => (i18n.language === 'ar' ? 'ar-EG' : 'en-US'), [i18n.language]);
-    const levelLabel = useMemo(() => {
-        const keyByLevel = {
-            '1': 'announcements.level1',
-            '2': 'announcements.level2',
-            '3': 'announcements.level3',
-            '4': 'announcements.level4',
-        };
-        return t(keyByLevel[levelCode] || 'announcements.level1');
-    }, [levelCode, t]);
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        setUser(null);
+        navigate('/login');
+    };
+
+    // Get user from token
+    const fetchUser = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setUser(null);
+                return;
+            }
+
+            const res = await fetch(`${API_URL}/auth/me`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (res.ok) {
+                const userData = await res.json();
+                setUser(userData);
+            } else {
+                localStorage.removeItem('token');
+                setUser(null);
+            }
+        } catch (error) {
+            console.error('Error fetching user:', error);
+            setUser(null);
+        }
+    };
 
     const fetchData = async () => {
         try {
-            const userData = localStorage.getItem('user');
-            if (userData) {
-                try {
-                    const parsedUser = JSON.parse(userData);
-                    setUser(parsedUser);
-                } catch {
-                    setUser(userData);
-                }
-            }
-
             const [announcementsRes, settingsRes] = await Promise.all([
                 fetch(`${API_URL}/announcements`),
                 fetch(`${API_URL}/announcements/settings`)
             ]);
 
             if (!announcementsRes.ok || !settingsRes.ok) {
-                throw new Error(t('announcements.fetchError'));
+                throw new Error('Failed to fetch');
             }
 
             const announcements = await announcementsRes.json();
@@ -74,14 +87,50 @@ const Announcements = () => {
     };
 
     useEffect(() => {
+        fetchUser();
         fetchData();
         const interval = setInterval(fetchData, 3000);
         return () => clearInterval(interval);
     }, []);
 
+    const getLevelText = (code) => {
+        const levels = {
+            '1': 'المستوى الأول',
+            '2': 'المستوى الثاني',
+            '3': 'المستوى الثالث',
+            '4': 'المستوى الرابع'
+        };
+        return levels[code] || 'المستوى الأول';
+    };
+
+    // Navigation handlers
+    const handleHomeClick = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/login');
+        } else {
+            navigate('/');
+        }
+    };
+
+    const handleComplaintsClick = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/login');
+        } else {
+            navigate('/complaint');
+        }
+    };
+
+    const handleGroupsClick = () => {
+        navigate('/Groups');
+    };
+
     if (loading) {
-        return <div className="loading-container">{t('announcements.loading')}</div>;
+        return <div className="loading-container">جاري التحميل...</div>;
     }
+
+    const isLoggedIn = user !== null;
 
     return (
         <div className="announcements-container">
@@ -91,49 +140,62 @@ const Announcements = () => {
                     {!logoError && (
                         <img
                             src="/logo.png"
-                            alt={t('announcements.logoAlt')}
+                            alt="الشعار"
                             className="logo-img"
                             onError={() => setLogoError(true)}
                         />
                     )}
                 </div>
                 <div>
-                    {!user ? (
-                        <button
-                            className="login-btn"
-                            onClick={() => window.location.href = '/login'}
-                        >
-                            {t('announcements.loginBtn')}
+                    {!isLoggedIn ? (
+                        <button className="login-btn" onClick={() => navigate('/login')}>
+                            تسجيل الدخول
                         </button>
                     ) : (
-                        <span className="user-welcome">
-                            {t('announcements.welcome', {
-                                name: user?.name ?? '',
-                                role: user?.role === 'admin' ? t('announcements.roleAdmin') : t('announcements.roleStudent'),
-                            })}
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <span className="user-welcome">مرحباً, {user.name}</span>
+                            <button onClick={handleLogout} className="logout-btn">
+                                تسجيل الخروج
+                            </button>
+                        </div>
                     )}
                 </div>
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className="nav-buttons">
+                <button className="btn home-btn" onClick={handleHomeClick}>
+                    🏠 الرئيسية
+                </button>
+                <button className="btn complaint-btn" onClick={handleComplaintsClick}>
+                    📝 الشكاوى
+                </button>
+                <button className="btn groups-btn" onClick={handleGroupsClick}>
+                    👥 المجموعات
+                </button>
+                {user?.role === 'admin' && (
+                    <button className="btn admin-btn" onClick={() => navigate('/admin-dashboard')}>
+                        ⚙️ لوحة التحكم
+                    </button>
+                )}
             </div>
 
             {/* GPA Section */}
             {hasInvalidGpaSettings ? (
                 <div className="gpa-error-section">
-                    <h4 className="gpa-error-title">{t('announcements.gpaWarning')}</h4>
-                    <p className="gpa-error-text">{t('announcements.gpaErrorText')}</p>
+                    <h4>⚠️ تحذير: إعدادات المعدل التراكمي غير صحيحة</h4>
+                    <p>يرجى التواصل مع المسؤول لإصلاح الإعدادات.</p>
                 </div>
             ) : (
                 <div className="section-box">
-                    <h4 className="section-title">
-                        {t('announcements.gpaSectionTitle')}
-                    </h4>
+                    <h4 className="section-title">المعدل التراكمي المطلوب للتسجيل في الجدول</h4>
                     <div className="flex-center-gap">
                         <div className="gpa-card">
-                            <span className="card-label">{t('announcements.gpaFrom')}</span>
+                            <span className="card-label">من</span>
                             <span className="card-value">{gpaMin}</span>
                         </div>
                         <div className="gpa-card">
-                            <span className="card-label">{t('announcements.gpaTo')}</span>
+                            <span className="card-label">إلى</span>
                             <span className="card-value">{gpaMax}</span>
                         </div>
                     </div>
@@ -142,34 +204,27 @@ const Announcements = () => {
 
             {/* Level Section */}
             <div className="section-box">
-                <h4 className="section-title">{t('announcements.levelSectionTitle')}</h4>
+                <h4 className="section-title">المستوى المطلوب للتسجيل في الجدول</h4>
                 <div className="gpa-card" style={{ maxWidth: '300px', margin: '0 auto' }}>
-                    <span className="card-value" style={{ color: 'var(--color-primary)' }}>{levelLabel}</span>
+                    <span className="card-value" style={{ color: '#4f46e5' }}>{getLevelText(levelCode)}</span>
                 </div>
             </div>
 
             {/* Announcements List */}
             <div className="posts-list">
-                <h3 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1.5rem' }}>
-                    {t('announcements.announcementsTitle')}
-                </h3>
+                <h3>الإعلانات</h3>
                 {posts.length > 0 ? (
                     posts.map(post => (
                         <div key={post._id} className="post-card">
                             <h4>{post.title}</h4>
                             <p>{post.content}</p>
                             <small className="post-meta">
-                                {t('announcements.postedBy', {
-                                    author: post.author,
-                                    date: new Date(post.createdAt).toLocaleDateString(dateLocale),
-                                })}
+                                نشر بواسطة {post.author} في {new Date(post.createdAt).toLocaleDateString('ar-EG')}
                             </small>
                         </div>
                     ))
                 ) : (
-                    <p style={{ textAlign: 'center', color: 'var(--color-text-placeholder)', padding: '40px' }}>
-                        {t('announcements.noAnnouncements')}
-                    </p>
+                    <p className="no-announcements">لا توجد إعلانات حتى الآن</p>
                 )}
             </div>
         </div>
