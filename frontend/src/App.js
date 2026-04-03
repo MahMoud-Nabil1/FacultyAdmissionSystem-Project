@@ -96,7 +96,7 @@ function App() {
                 } />
                 <Route path="/register-subjects" element={
                     <ProtectedRoute>
-                        put register new subjects component here
+                        <RegisterSubjects />
                     </ProtectedRoute>
                 }
                 />

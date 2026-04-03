@@ -240,7 +240,16 @@
     "saveBtn": "Save settings",
     "savingBtn": "Saving...",
     "saveSuccess": "Settings saved successfully",
-    "saveError": "Connection error"
+    "saveError": "Connection error",
+    "controlPanelTitle": "Registration Control Panel",
+    "registrationStatus": "Registration Status",
+    "withdrawalStatus": "Withdrawal Status",
+    "open": "Open",
+    "closed": "Closed",
+    "openRegistration": "Open Registration",
+    "closeRegistration": "Close Registration",
+    "openWithdrawal": "Open Withdrawal",
+    "closeWithdrawal": "Close Withdrawal"
   },
   "days": {
     "monday": "Monday",
@@ -300,6 +309,7 @@
     "from": "From",
     "to": "To",
     "capacity": "Capacity",
+    "corequisite": "Co-requisite",
     "groupNumber": "Group {{number}}",
     "am": "AM",
     "pm": "PM",

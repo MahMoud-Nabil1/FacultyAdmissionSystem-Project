@@ -12,11 +12,12 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAuth } from '../../context/AuthContext';
+import { getAllGroups } from '../../services/api';
 
 type GroupType = 'lecture' | 'lab' | 'tutorial' | 'seminar';
 type WeekDay = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
 
-interface IGroup {
+export interface IGroup {
     _id: string;
     number: number;
     subject: string;
@@ -66,23 +67,19 @@ export default function Groups() {
     useEffect(() => {
         const fetchGroups = async () => {
             try {
-                const res = await fetch(`${API_BASE}/groups`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                if (res.ok) {
-                    const data: IGroup[] = await res.json();
-                    setGroups(data);
-                } else {
-                    Alert.alert('خطأ', 'تعذّر تحميل المجموعات');
-                }
-            } catch (err) {
-                Alert.alert('خطأ', 'تعذّر الاتصال بالسيرفر');
+
+                const data = await getAllGroups();
+                setGroups(data);
+            } catch (err: any) {
+
+                Alert.alert('خطأ', err.message || 'تعذّر تحميل المجموعات');
             } finally {
                 setLoading(false);
             }
         };
+
         fetchGroups();
-    }, [token]);
+    }, []);
 
     if (loading) {
         return (

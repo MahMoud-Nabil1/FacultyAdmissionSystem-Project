@@ -1,0 +1,205 @@
+{
+  "common": {
+    "switchToAr": "عربي",
+    "switchToEn": "EN",
+    "error": "خطأ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "save": "حفظ",
+    "close": "إغلاق"
+  },
+  "tabs": {
+    "home": "الرئيسية",
+    "edit": "تعديل",
+    "groups": "المجموعات",
+    "support": "الدعم"
+  },
+  "login": {
+    "university": "جامعة القاهرة - كلية العلوم",
+    "title": "تسجيل الدخول",
+    "subtitle": "يرجى إدخال بيانات الاعتماد الخاصة بك للوصول",
+    "userIdLabel": "كود الطالب أو الإيميل",
+    "userIdPlaceholder": "ادخل كود الطالب أو الإيميل",
+    "passwordLabel": "كلمة السر",
+    "passwordPlaceholder": "ادخل كلمة السر",
+    "forgotPassword": "نسيت كلمة السر؟",
+    "contactSupport": "اتصل بالدعم",
+    "submitBtn": "تسجيل الدخول",
+    "fillAll": "يرجى ملء جميع الحقول",
+    "loginFailed": "فشل تسجيل الدخول",
+    "serverError": "لم يمكن التواصل مع السيرفر",
+    "or": "أو",
+    "supportBtn": "🎧  تواصل مع الدعم"
+  },
+  "forgotPassword": {
+    "emailRequired": "البريد الإلكتروني مطلوب.",
+    "genericError": "حدث خطأ ما.",
+    "serverUnreachable": "تعذر التواصل مع السيرفر.",
+    "sentTitle": "تم الإرسال!",
+    "sentMessage": "تم إرسال رابط إعادة التعيين بنجاح إلى بريدك الإلكتروني.",
+    "notFoundTitle": "غير موجود",
+    "notFoundMessage": "لا يوجد حساب مرتبط بهذا البريد الإلكتروني.",
+    "backToLogin": "← العودة لتسجيل الدخول",
+    "title": "نسيت كلمة المرور",
+    "subtitle": "ادخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور.",
+    "emailLabel": "البريد الإلكتروني",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "submitBtn": "إرسال رابط إعادة التعيين"
+  },
+  "resetPassword": {
+    "verifying": "جارٍ التحقق من الرابط…",
+    "invalidTitle": "رابط غير صالح",
+    "noToken": "رابط إعادة التعيين غير صالح. لم يتم العثور على الرمز.",
+    "expiredOrInvalid": "الرابط منتهي الصلاحية أو غير صالح.",
+    "verifyNetwork": "تعذر التحقق من الرابط. حاول مرة أخرى.",
+    "requestNewLink": "طلب رابط إعادة تعيين جديد",
+    "successTitle": "تم التحديث!",
+    "successMessage": "تم تحديث كلمة السر بنجاح! يتم التحويل إلى صفحة تسجيل الدخول…",
+    "title": "إعادة تعيين كلمة السر",
+    "subtitle": "اكتب كلمة السر الجديدة الخاصة بك",
+    "newPasswordLabel": "كلمة السر الجديدة",
+    "newPasswordPlaceholder": "ادخل كلمة السر الجديدة",
+    "confirmLabel": "اعد كتابة كلمة السر",
+    "confirmPlaceholder": "اعد كتابة كلمة السر الجديدة",
+    "submitBtn": "تحديث كلمة السر",
+    "backToLogin": "← ارجع إلى تسجيل الدخول",
+    "passwordMin": "كلمة السر يجب أن تكون على الأقل 6 أحرف.",
+    "passwordMismatch": "كلمتا السر غير متطابقتين.",
+    "resetFailed": "فشلت عملية إعادة تعيين كلمة السر.",
+    "serverUnreachable": "تعذر التواصل مع السيرفر."
+  },
+  "supportContact": {
+    "titleIT": "الدعم الفني",
+    "titleAdmin": "شؤون الطلاب",
+    "toggleIT": "الدعم الفني",
+    "toggleAdmin": "إدارة الكلية",
+    "labelStudentCode": "الكود الشخصي",
+    "labelSubjectIT": "الموضوع",
+    "labelSubjectAdmin": "كود المقرر (إن وجد)",
+    "labelMessage": "نص الرسالة",
+    "submitBtn": "إرسال الآن",
+    "fillRequired": "يرجى ملء البيانات الأساسية (الكود والرسالة).",
+    "sentTitle": "تم الإرسال",
+    "sentMessage": "سيتواصل معك القسم المختص قريباً",
+    "sendFailed": "حدثت مشكلة أثناء الإرسال",
+    "networkError": "تعذر الاتصال بالسيرفر"
+  },
+  "home": {
+    "serverError": "فشل الاتصال بالسيرفر",
+    "logoutTitle": "تسجيل الخروج",
+    "logoutMessage": "هل أنت متأكد أنك تريد الخروج؟",
+    "logoutConfirm": "خروج",
+    "gpa": "المعدل",
+    "hours": "ساعة",
+    "servicesTitle": "الخدمات المتاحة",
+    "registerSubjects": "تسجيل المواد",
+    "studentsList": "قائمة طلابي",
+    "statistics": "الإحصائيات",
+    "logout": "تسجيل الخروج"
+  },
+  "editPanel": {
+    "title": "لوحة الإدارة",
+    "subtitle": "اختر القسم الذي تريد تعديله",
+    "students": "الطلاب",
+    "staff": "الموظفين",
+    "subjects": "المقررات",
+    "groups": "المجموعات",
+    "announcements": "الإعلانات"
+  },
+  "groups": {
+    "title": "المجموعات",
+    "addGroup": "إضافة مجموعة",
+    "modalTitle": "إضافة مجموعة",
+    "saveGroup": "حفظ المجموعة",
+    "empty": "لا توجد مجموعات حتى الآن",
+    "deleteTitle": "حذف مجموعة",
+    "deleteMessage": "حذف المجموعة رقم {{number}}؟",
+    "seat": "مقعد",
+    "fillAll": "يرجى ملء جميع الحقول",
+    "placeholders": {
+      "number": "رقم المجموعة",
+      "subject": "رمز المقرر (مثال: math110)",
+      "place": "المكان",
+      "day": "اليوم",
+      "from": "من (ساعة)",
+      "to": "إلى (ساعة)",
+      "capacity": "السعة"
+    }
+  },
+  "students": {
+    "title": "الطلاب",
+    "addStudent": "إضافة طالب جديد",
+    "cancel": "إلغاء",
+    "saveStudent": "حفظ الطالب",
+    "fillAll": "يرجى ملء جميع الحقول",
+    "duplicateCode": "طالب بنفس الكود موجود بالفعل",
+    "deleteTitle": "حذف طالب",
+    "deleteMessage": "هل تريد حذف {{name}}؟",
+    "empty": "لا يوجد طلاب حتى الآن",
+    "rowGpa": "المعدل: {{gpa}}",
+    "placeholders": {
+      "studentId": "كود الطالب",
+      "name": "الاسم",
+      "email": "الإيميل",
+      "gpa": "المعدل التراكمي",
+      "password": "كلمة السر"
+    }
+  },
+  "subjects": {
+    "title": "المقررات",
+    "addSubject": "إضافة مقرر جديد",
+    "cancel": "إلغاء",
+    "editSubject": "تعديل مقرر",
+    "newSubject": "مقرر جديد",
+    "save": "حفظ",
+    "codeRequired": "رمز المقرر مطلوب",
+    "nameRequired": "اسم المقرر مطلوب",
+    "invalidCredits": "عدد الساعات غير صحيح",
+    "deleteTitle": "حذف مقرر",
+    "deleteMessage": "هل تريد حذف {{name}}؟",
+    "empty": "لا توجد مقررات حتى الآن",
+    "creditsShort": "{{hours}} ساعة معتمدة",
+    "placeholders": {
+      "code": "رمز المقرر (مثال: CS201)",
+      "name": "اسم المقرر",
+      "creditHours": "عدد الساعات المعتمدة"
+    }
+  },
+  "staff": {
+    "title": "الموظفين",
+    "addStaff": "إضافة موظف جديد",
+    "cancel": "إلغاء",
+    "saveStaff": "حفظ الموظف",
+    "fillAll": "يرجى ملء جميع الحقول",
+    "duplicateEmail": "يوجد موظف بنفس الإيميل",
+    "deleteTitle": "حذف موظف",
+    "deleteMessage": "هل تريد حذف {{name}}؟",
+    "empty": "لا يوجد موظفين حتى الآن",
+    "placeholders": {
+      "name": "الاسم",
+      "email": "الإيميل",
+      "password": "كلمة السر"
+    },
+    "roles": {
+      "admin": "ادمن",
+      "academic_guide": "مرشد أكاديمى",
+      "academic_guide_coordinator": "منسق الإرشاد الأكاديمى",
+      "reporter": "مُراجع بيانات"
+    }
+  },
+  "announcements": {
+    "title": "الإعلانات",
+    "addNew": "إضافة إعلان جديد",
+    "modalTitle": "إضافة إعلان جديد",
+    "placeholders": {
+      "title": "العنوان",
+      "content": "المحتوى"
+    },
+    "submitBtn": "نشر الإعلان",
+    "fillAll": "يرجى ملء العنوان والمحتوى",
+    "publishFailed": "فشل النشر",
+    "empty": "لا توجد إعلانات حتى الآن",
+    "deleteTitle": "حذف إعلان",
+    "deleteMessage": "هل تريد حذف \"{{title}}\"؟"
+  }
+}
