@@ -10,6 +10,7 @@ declare global {
                 id: string;
                 role: string;
                 name: string;
+                sessionId: string;
                 department?: string;
             };
         }
@@ -20,6 +21,7 @@ export interface UserPayload {
     id: string;
     role: string;
     name: string;
+    sessionId: string;
     department?: string;
 }
 
@@ -43,7 +45,26 @@ export async function authenticate(
             return res.status(401).json({ error: "Unauthorized" });
         }
 
-        req.user = jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(token, JWT_SECRET) as UserPayload;
+
+        // --- STRICT SESSION MANAGEMENT ---
+        const { id, role, sessionId } = decoded;
+        let user: any;
+
+        if (role === "student") {
+            const { Student } = await import("../models/student");
+            user = await Student.findOne({ studentId: Number(id) });
+        } else {
+            const Staff = (await import("../models/staff")).default;
+            user = await Staff.findById(id);
+        }
+
+        if (!user || user.currentSessionId !== sessionId) {
+            return res.status(401).json({
+                error: "Session invalidated",
+                code: "SESSION_EXPIRED"
+            });
+        }
 
         next();
     } catch (err: any) {

@@ -194,11 +194,16 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             res.status(401).json({ error: "Invalid credentials" });
             return;
         }
+        // --- STRICT SESSION MANAGEMENT ---
+        const sessionId = crypto.randomUUID();
+        user.currentSessionId = sessionId;
+        await user.save();
 
         const tokenPayload: UserPayload = {
             id: role === "student" ? user.studentId : user._id,
             role: role!,
             name: user.name,
+            sessionId,
             ...(user.department && { department: user.department })
         };
 

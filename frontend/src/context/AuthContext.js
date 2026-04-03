@@ -11,8 +11,7 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const checkAuth = () => {
-            const savedToken = localStorage.getItem('token');
+        const savedToken = sessionStorage.getItem('token');
 
             if (!savedToken) {
                 setToken(null);
@@ -41,35 +40,20 @@ export const AuthProvider = ({ children }) => {
             }
         };
 
-        checkAuth();
-
-        // Check for token removal in other tabs or through API calls
-        const handleStorageChange = (e) => {
-            if (e.key === 'token' && !e.newValue) {
-                setToken(null);
-                setUser(null);
-            }
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-        
-        // Polling as a fallback for the same tab token removal if not using an event emitter
-        const interval = setInterval(() => {
-            const currentToken = localStorage.getItem('token');
-            if (!currentToken && token) {
-                setToken(null);
-                setUser(null);
-            }
-        }, 2000);
-
-        return () => {
-            window.removeEventListener('storage', handleStorageChange);
-            clearInterval(interval);
-        };
-    }, [token]);
+        try {
+            const payload = jwtDecode(savedToken);
+            setUser(payload);
+        } catch {
+            sessionStorage.removeItem('token');
+            setToken(null);
+            setUser(null);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
     const login = (tokenValue) => {
-        localStorage.setItem('token', tokenValue);
+        sessionStorage.setItem('token', tokenValue);
         setToken(tokenValue);
 
         try {
@@ -81,7 +65,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
         setToken(null);
         setUser(null);
     };
