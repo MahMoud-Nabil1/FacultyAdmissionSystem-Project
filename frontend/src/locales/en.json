@@ -356,56 +356,11 @@
     "current": "Current:",
     "toggleButton": "Toggle theme"
   },
-  "registration": {
-    "title": "Course Registration",
-    "subtitle": "Select your courses for this semester",
-    "loading": "Loading registration data...",
-    "selectedCredits": "Selected Credits",
-    "registeredTitle": "My Registered Subjects",
-    "noRegistered": "You have not registered for any subjects yet.",
-    "availableTitle": "Available Subjects",
-    "chooseSubject": "Choose a subject:",
-    "selectPlaceholder": "— Select a subject —",
-    "hrs": "hrs",
-    "noGroupsForSubject": "No groups available for this subject.",
-    "colSubject": "Subject",
-    "colGroup": "Group",
-    "colType": "Type",
-    "colDay": "Day",
-    "colTime": "Time",
-    "colCredits": "Credits",
-    "colStatus": "Status",
-    "colActions": "Actions",
-    "myRequestsTitle": "My Enrollment Requests",
-    "enrollBtn": "Enroll",
-    "removeBtn": "Remove",
-    "requestBtn": "Request",
-    "cancelRequestBtn": "Cancel Request",
-    "alreadyRequested": "Already requested",
-    "enrollSuccess": "Successfully enrolled!",
-    "removeSuccess": "Successfully removed.",
-    "requestSuccess": "Request submitted successfully!",
-    "cancelSuccess": "Request cancelled successfully.",
-    "full": "Full",
-    "slotsOpen": "{{count}} slots open",
-    "corequisiteNotice": "This subject has co-requisites that must also be registered",
-    "status": {
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected"
-    },
-    "errors": {
-      "fetchFailed": "Failed to load registration data.",
-      "enrollFailed": "Failed to enroll.",
-      "requestFailed": "Failed to submit request.",
-      "cancelFailed": "Failed to cancel request.",
-      "removeFailed": "Failed to remove enrollment.",
-      "maxHoursExceeded": "Cannot enroll — would exceed the 18 credit hour limit.",
-      "corequisitesRequired": "You must also register: {{subjects}}",
-      "registrationClosed": "Registration is currently closed",
-      "alreadyInGroup": "You are already in this group",
-      "timeCollision": "You have a time collision with another group",
-      "waitlistFull": "Group is full and you are already on the waitlist"
-    }
+  "adminAnalysis": {
+    "title": "Student Registration Analysis",
+    "totalStudents": "Total Students",
+    "finishedRegistration": "Finished Registration",
+    "didNotFinish": "Did Not Finish",
+    "loading": "Loading stats..."
   }
 }

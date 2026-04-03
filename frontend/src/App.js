@@ -16,7 +16,7 @@ import Announcements from "./components/common/announcements.jsx";
 import AdminDashboardTable from "./components/dashboard/tables/table.tsx";
 import Groups from "./components/groups/Groups.tsx";
 import Home from "./components/common/home.tsx";
-import RegisterSubjects from "./components/reg/RegisterSubjects.tsx";
+import AdminAnalysis from "./components/dashboard/AdminAnalysis/AdminAnalysis.tsx";
 
 
 function App() {
@@ -100,6 +100,10 @@ function App() {
                     </ProtectedRoute>
                 }
                 />
+
+                <Route path="/test-analysis" element={
+                    <AdminAnalysis />
+                } />
 
                 <Route path="*" element={<Navigate to="/announcements" replace />}/>
             </Routes>

@@ -123,6 +123,12 @@ export async function deleteStudent(id) {
     return data;
 }
 
+export async function getRegistrationStats() {
+    const {res, data} = await apiGet("/students/stats");
+    if (!res.ok) throw new Error(data.error || "Failed to fetch stats");
+    return data;
+}
+
 export async function createStaff(data) {
     const {res, data: body} = await apiPost("/staff", data);
     if (!res.ok) {

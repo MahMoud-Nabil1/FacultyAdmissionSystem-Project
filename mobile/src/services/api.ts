@@ -137,6 +137,11 @@ export async function deleteStudent(id: string) {
     if (!res.ok) throw new Error((data as any).error || 'Failed to delete student');
     return data;
 }
+export async function getRegistrationStats() {
+    const { res, data } = await apiGet('/students/stats');
+    if (!res.ok) throw new Error((data as any).error || 'Failed to fetch stats');
+    return data;
+}
 
 export async function getAllStaff() {
     const { res, data } = await apiGet('/staff');
