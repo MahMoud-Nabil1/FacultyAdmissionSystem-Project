@@ -1,0 +1,498 @@
+/* ============================================================
+   REGISTER SUBJECTS — Component Styles
+   Uses design-system tokens for consistency with the rest of the app
+   ============================================================ */
+
+.regContainer {
+  max-width: 100%;
+  width: 100%;
+  padding: 24px 32px;
+  margin: 0;
+}
+
+/* ── Header ── */
+.regHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.regHeader h2 {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.regSubtitle {
+  margin: 4px 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* ── Credit counter ── */
+.regCreditCounter {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 16px 24px;
+  min-width: 220px;
+  text-align: center;
+}
+
+.regCreditLabel {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  margin-bottom: 6px;
+}
+
+.regCreditValue {
+  font-size: var(--font-size-2xl);
+  color: var(--color-text);
+}
+
+.regCreditValue strong {
+  color: var(--color-primary);
+  font-size: var(--font-size-3xl);
+}
+
+.regCreditBar {
+  margin-top: 10px;
+  height: 6px;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.regCreditBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-info));
+  border-radius: var(--radius-full);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Two-Column Layout ── */
+.regLayout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  margin-top: 24px;
+  align-items: start;
+}
+
+/* ── Section Titles ── */
+.regSectionTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  margin: 0 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-border);
+}
+
+/* ══════════════════════════════════
+   WEEKLY TIMETABLE
+   ══════════════════════════════════ */
+.regTimetableSection {
+  min-width: 0;
+}
+
+.regTimetableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.regTimetable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+  table-layout: fixed;
+}
+
+.regTimetableCorner {
+  width: 80px;
+  min-width: 80px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-bottom: 2px solid var(--color-border);
+  padding: 12px 8px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.regTimetableDayHeader {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-bottom: 2px solid var(--color-border);
+  padding: 12px 8px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  text-align: center;
+  white-space: nowrap;
+}
+
+
+
+.regTimetableHourCell {
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: top;
+  height: 60px;
+}
+
+.regTimetableCell {
+  border: 1px solid var(--color-border);
+  padding: 0;
+  height: 60px;
+  vertical-align: top;
+  position: relative;
+}
+
+.regTimetableEvent {
+  padding: 6px 8px !important;
+  border-radius: 0;
+}
+
+.regEventContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 100%;
+  text-align: center;
+  position: relative;
+}
+
+.regEventContent strong {
+  font-size: var(--font-size-sm);
+  line-height: 1.2;
+}
+
+.regEventTime {
+  font-size: 0.65rem;
+  opacity: 0.8;
+}
+
+.regEventName {
+  font-size: 0.6rem;
+  opacity: 0.7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.regEventRemoveBtn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.7rem;
+  color: var(--color-error);
+  opacity: 0;
+  transition: opacity 0.2s;
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+}
+
+.regTimetableEvent:hover .regEventRemoveBtn {
+  opacity: 1;
+}
+
+.regEventRemoveBtn:hover {
+  background: var(--color-error);
+  color: white;
+}
+
+/* ══════════════════════════════════
+   SIDEBAR
+   ══════════════════════════════════ */
+.regSidebar {
+  position: sticky;
+  top: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+/* ── Dropdown ── */
+.regDropdownRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.regDropdownRow label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.regDropdownRow select {
+  width: 100%;
+}
+
+/* ── Co-req notice ── */
+.regCoreqNotice {
+  margin-top: 12px;
+}
+
+/* ── Group cards ── */
+.regGroupCards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.regGroupCard {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  transition: var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.regGroupCard:hover {
+  border-color: var(--color-primary-alpha-15);
+  box-shadow: var(--shadow-sm);
+}
+
+.regGroupCardActive {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.regGroupCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.regGroupNumber {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.regCapacityBadge {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 2px 10px;
+}
+
+.regGroupCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.regGroupDetail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.regGroupDetailIcon {
+  font-size: 0.85rem;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.regGroupPairBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.regSlotsOpen {
+  color: var(--color-success);
+  font-weight: var(--font-weight-semibold);
+}
+
+.regSlotsFull {
+  color: var(--color-error);
+  font-weight: var(--font-weight-semibold);
+}
+
+.regGroupCardFooter {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border);
+}
+
+.regGroupCardFooter button {
+  width: 100%;
+  font-size: var(--font-size-sm);
+  padding: 8px 12px;
+}
+
+/* ── Badges ── */
+.regBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border: none;
+}
+
+.regBadgeLecture {
+  background: var(--color-badge-lecture-bg);
+  color: var(--color-badge-lecture-text);
+}
+
+.regBadgeLab {
+  background: var(--color-badge-lab-bg);
+  color: var(--color-badge-lab-text);
+}
+
+.regBadgeTutorial {
+  background: var(--color-badge-tutorial-bg);
+  color: var(--color-badge-tutorial-text);
+}
+
+.regBadgeDefault {
+  background: var(--color-badge-default-bg);
+  color: var(--color-badge-default-text);
+}
+
+/* ── Responsive ── */
+@media (max-width: 960px) {
+  .regLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .regSidebar {
+    position: static;
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .regHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .regCreditCounter {
+    min-width: 100%;
+  }
+}
+
+/* ══════════════════════════════════
+   MY REQUESTS TABLE
+   ══════════════════════════════════ */
+.regRequestsSection {
+  margin-top: 24px;
+}
+
+.regRequestsTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+}
+
+.regRequestsTable th,
+.regRequestsTable td {
+  padding: 12px 16px;
+  text-align: start;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.regRequestsTable th {
+  background: var(--color-bg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.regRequestsTable tr:last-child td {
+  border-bottom: none;
+}
+
+.regRequestsTable tr:hover td {
+  background: var(--color-bg);
+}
+
+.regRequestSubName {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+/* Status badges */
+.regStatusBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.regStatusPending {
+  background: var(--color-warning-light, #fff3cd);
+  color: var(--color-warning, #856404);
+}
+
+.regStatusApproved {
+  background: var(--color-success-light, #d4edda);
+  color: var(--color-success, #155724);
+}
+
+.regStatusRejected {
+  background: var(--color-error-light, #f8d7da);
+  color: var(--color-error, #721c24);
+}
+
+.regStatusEnrolled {
+  background: var(--color-success-light, #d4edda);
+  color: var(--color-success, #155724);
+}
+
+/* Small button variant */
+.btn-sm {
+  padding: 4px 10px !important;
+  font-size: var(--font-size-xs) !important;
+}

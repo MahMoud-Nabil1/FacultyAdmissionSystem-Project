@@ -227,7 +227,7 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
         }
         const student = await Student.findOne({ studentId: Number(userPayload.id) })
             .populate("requestedSubjects", "creditHours")
-            .populate("completedSubjects", "creditHours");
+            .populate("completedSubjects", "creditHours code");
 
         if (!student) {
             res.status(404).json({ error: "Student not found" });
@@ -240,12 +240,14 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
 
         res.json({
             id: student.studentId,
+            _id: student._id,
             role: "student",
             name: student.name,
             department: student.department,
             gpa: student.gpa,
             registeredHours,
-            completedHours
+            completedHours,
+            completedSubjects: (student.completedSubjects as any[]).map(s => s._id.toString())
         });
     } catch (err: any) {
         res.status(500).json({ error: err.message });
