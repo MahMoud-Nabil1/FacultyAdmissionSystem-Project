@@ -11,20 +11,40 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const savedToken = localStorage.getItem('token');
+        const savedToken = sessionStorage.getItem('token');
 
-        if (!savedToken) {
-            setLoading(false);
-            return;
-        }
+            if (!savedToken) {
+                setToken(null);
+                setUser(null);
+                setLoading(false);
+                return;
+            }
 
-        setToken(savedToken);
+            try {
+                const payload = jwtDecode(savedToken);
+                const now = Date.now() / 1000;
+                if (payload.exp && payload.exp < now) {
+                    localStorage.removeItem('token');
+                    setToken(null);
+                    setUser(null);
+                } else {
+                    setToken(savedToken);
+                    setUser(payload);
+                }
+            } catch {
+                localStorage.removeItem('token');
+                setToken(null);
+                setUser(null);
+            } finally {
+                setLoading(false);
+            }
+        };
 
         try {
             const payload = jwtDecode(savedToken);
             setUser(payload);
         } catch {
-            localStorage.removeItem('token');
+            sessionStorage.removeItem('token');
             setToken(null);
             setUser(null);
         } finally {
@@ -33,7 +53,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = (tokenValue) => {
-        localStorage.setItem('token', tokenValue);
+        sessionStorage.setItem('token', tokenValue);
         setToken(tokenValue);
 
         try {
@@ -45,7 +65,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
         setToken(null);
         setUser(null);
     };

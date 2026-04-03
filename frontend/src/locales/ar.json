@@ -240,7 +240,16 @@
     "saveBtn": "حفظ الإعدادات",
     "savingBtn": "جاري الحفظ...",
     "saveSuccess": "تم حفظ الإعدادات بنجاح",
-    "saveError": "حدث خطأ في الاتصال"
+    "saveError": "حدث خطأ في الاتصال",
+    "controlPanelTitle": "لوحة التحكم في التسجيل",
+    "registrationStatus": "حالة التسجيل",
+    "withdrawalStatus": "حالة الانسحاب",
+    "open": "مفتوح",
+    "closed": "مغلق",
+    "openRegistration": "فتح التسجيل",
+    "closeRegistration": "إغلاق التسجيل",
+    "openWithdrawal": "فتح الانسحاب",
+    "closeWithdrawal": "إغلاق الانسحاب"
   },
   "days": {
     "monday": "الاثنين",
@@ -300,6 +309,7 @@
     "from": "من",
     "to": "إلى",
     "capacity": "السعة",
+    "corequisite": "متطلب مصاحب",
     "groupNumber": "مجموعة {{number}}",
     "am": "ص",
     "pm": "م",
@@ -345,5 +355,12 @@
     "title": "المظهر",
     "current": "الحالي:",
     "toggleButton": "تبديل المظهر"
+  },
+  "adminAnalysis": {
+    "title": "تحليل تسجيل الطلاب",
+    "totalStudents": "إجمالي الطلاب",
+    "finishedRegistration": "أتموا التسجيل",
+    "didNotFinish": "لم يتموا التسجيل",
+    "loading": "جاري تحميل الإحصائيات..."
   }
 }

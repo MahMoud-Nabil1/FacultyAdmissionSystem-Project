@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
     View, Text, TextInput, TouchableOpacity, StyleSheet,
-    ScrollView, ActivityIndicator, Alert,
+    ScrollView, ActivityIndicator, Alert, Modal, Pressable,
+    KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getAllStudents, createStudent, deleteStudent } from '../../../services/api';
+import { useLanguage } from '../../../context/LanguageContext';
 
 interface Student {
     _id: string;
@@ -17,6 +19,7 @@ interface Student {
 const EMPTY = { studentId: '', name: '', email: '', password: '', gpa: '' };
 
 export default function StudentsScreen() {
+    const { t } = useLanguage();
     const [students, setStudents] = useState<Student[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -30,11 +33,11 @@ export default function StudentsScreen() {
             const data = await getAllStudents();
             setStudents((data as any) ?? []);
         } catch (e: any) {
-            Alert.alert('خطأ', e.message);
+            Alert.alert(t('common.error'), e.message);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [t]);
 
     useEffect(() => { load(); }, [load]);
 
@@ -51,7 +54,7 @@ export default function StudentsScreen() {
             setShowForm(false);
             await load();
         } catch (e: any) {
-            setError(e.status === 409 ? 'طالب بنفس الكود موجود بالفعل' : e.message);
+            setError(e.status === 409 ? t('students.duplicateCode') : e.message);
         } finally {
             setSaving(false);
         }
@@ -70,58 +73,104 @@ export default function StudentsScreen() {
         ]);
     };
 
+    const closeModal = () => {
+        setShowForm(false);
+        setError('');
+        setForm(EMPTY);
+    };
+
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-            <Text style={styles.title}>👨‍🎓 الطلاب</Text>
+            <Text style={styles.title}>👨‍🎓 {t('students.title')}</Text>
 
             <TouchableOpacity
                 style={[styles.btn, showForm && styles.btnOutline]}
-                onPress={() => { setShowForm(p => !p); setError(''); }}
+                onPress={() => {
+                    if (showForm) return closeModal();
+                    setError('');
+                    setForm(EMPTY);
+                    setShowForm(true);
+                }}
             >
                 <Ionicons name={showForm ? 'close' : 'person-add-outline'} size={18} color={showForm ? '#1a73e8' : '#fff'} />
                 <Text style={[styles.btnText, showForm && styles.btnTextOutline]}>
-                    {showForm ? 'إلغاء' : 'إضافة طالب جديد'}
+                    {showForm ? t('students.cancel') : t('students.addStudent')}
                 </Text>
             </TouchableOpacity>
 
-            {showForm && (
-                <View style={styles.form}>
-                    {!!error && <Text style={styles.error}>{error}</Text>}
-                    {[
-                        { key: 'studentId', ph: 'كود الطالب' },
-                        { key: 'name', ph: 'الاسم' },
-                        { key: 'email', ph: 'الإيميل', kb: 'email-address' as const },
-                        { key: 'gpa', ph: 'المعدل التراكمي', kb: 'decimal-pad' as const },
-                        { key: 'password', ph: 'كلمة السر', secure: true },
-                    ].map(f => (
-                        <TextInput
-                            key={f.key}
-                            style={styles.input}
-                            placeholder={f.ph}
-                            placeholderTextColor="#9ca3af"
-                            value={(form as any)[f.key]}
-                            onChangeText={v => setForm(p => ({ ...p, [f.key]: v }))}
-                            keyboardType={f.kb}
-                            secureTextEntry={f.secure}
-                            textAlign="right"
-                        />
-                    ))}
-                    <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} disabled={saving}>
-                        {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>حفظ الطالب</Text>}
-                    </TouchableOpacity>
+            <Modal
+                visible={showForm}
+                animationType="fade"
+                transparent
+                onRequestClose={closeModal}
+            >
+                <View style={styles.modalOverlay}>
+                    <Pressable
+                        style={StyleSheet.absoluteFill}
+                        onPress={closeModal}
+                        accessibilityRole="button"
+                        accessibilityLabel={t('common.close')}
+                    />
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                        keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+                        style={styles.modalKeyboard}
+                    >
+                        <View style={styles.modalCard}>
+                            <View style={styles.modalHeader}>
+                                <Text style={styles.modalTitle}>{t('students.addStudent')}</Text>
+                                <TouchableOpacity
+                                    onPress={closeModal}
+                                    style={styles.modalClose}
+                                    hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                                >
+                                    <Ionicons name="close" size={26} color="#6b7280" />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.modalFormBody}>
+                                {!!error && <Text style={styles.error}>{error}</Text>}
+                                {[
+                                    { key: 'studentId', ph: t('students.placeholders.studentId') },
+                                    { key: 'name', ph: t('students.placeholders.name') },
+                                    { key: 'email', ph: t('students.placeholders.email'), kb: 'email-address' as const },
+                                    { key: 'gpa', ph: t('students.placeholders.gpa'), kb: 'decimal-pad' as const },
+                                    { key: 'password', ph: t('students.placeholders.password'), secure: true },
+                                ].map(f => (
+                                    <TextInput
+                                        key={f.key}
+                                        style={styles.input}
+                                        placeholder={f.ph}
+                                        placeholderTextColor="#9ca3af"
+                                        value={(form as any)[f.key]}
+                                        onChangeText={v => setForm(p => ({ ...p, [f.key]: v }))}
+                                        keyboardType={f.kb}
+                                        secureTextEntry={f.secure}
+                                        textAlign="right"
+                                    />
+                                ))}
+                                <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} disabled={saving}>
+                                    {saving ? (
+                                        <ActivityIndicator color="#fff" />
+                                    ) : (
+                                        <Text style={styles.submitText}>{t('students.saveStudent')}</Text>
+                                    )}
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </KeyboardAvoidingView>
                 </View>
-            )}
+            </Modal>
 
             {loading ? (
                 <ActivityIndicator color="#1a73e8" style={{ marginTop: 32 }} />
             ) : students.length === 0 ? (
-                <Text style={styles.empty}>لا يوجد طلاب حتى الآن</Text>
+                <Text style={styles.empty}>{t('students.empty')}</Text>
             ) : (
                 students.map(s => (
                     <View key={s._id} style={styles.row}>
                         <View style={styles.rowInfo}>
                             <Text style={styles.rowName}>{s.name}</Text>
-                            <Text style={styles.rowSub}>{s.studentId} • GPA: {s.gpa}</Text>
+                            <Text style={styles.rowSub}>{s.studentId} • {t('students.rowGpa', { gpa: s.gpa })}</Text>
                             <Text style={styles.rowSub}>{s.email}</Text>
                         </View>
                         <TouchableOpacity onPress={() => handleDelete(s)} style={styles.deleteBtn}>
@@ -136,7 +185,7 @@ export default function StudentsScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f0f4ff' },
-    content: { padding: 20, paddingBottom: 40 },
+    content: { padding: 20, paddingTop: 90, paddingBottom: 40 },
     title: { fontSize: 22, fontWeight: '800', color: '#1a73e8', marginBottom: 16, textAlign: 'center' },
     btn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#1a73e8', borderRadius: 10, padding: 13, justifyContent: 'center', marginBottom: 16 },
     btnOutline: { backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#1a73e8' },
@@ -148,6 +197,43 @@ const styles = StyleSheet.create({
     submitText: { color: '#fff', fontWeight: '700', fontSize: 15 },
     error: { color: '#ef4444', textAlign: 'center', marginBottom: 8 },
     empty: { textAlign: 'center', color: '#9ca3af', marginTop: 40, fontSize: 15 },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.45)',
+        justifyContent: 'center',
+        padding: 20,
+        position: 'relative',
+    },
+    modalKeyboard: { width: '100%', maxWidth: 420, alignSelf: 'center', flexShrink: 1 },
+    modalCard: {
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        borderWidth: 2,
+        borderColor: '#1a73e8',
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowRadius: 16,
+        elevation: 8,
+        overflow: 'hidden',
+        width: '100%',
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 18,
+        paddingVertical: 14,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f3f4f6',
+    },
+    modalTitle: { fontSize: 18, fontWeight: '800', color: '#1a73e8' },
+    modalClose: { padding: 4 },
+    modalFormBody: {
+        paddingHorizontal: 18,
+        paddingTop: 16,
+        paddingBottom: 22,
+        gap: 9,
+    },
     row: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 2 },
     rowInfo: { flex: 1 },
     rowName: { fontSize: 15, fontWeight: '700', color: '#111' },

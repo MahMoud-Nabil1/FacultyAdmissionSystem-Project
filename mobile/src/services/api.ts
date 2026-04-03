@@ -2,6 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 import { jwtDecode } from 'jwt-decode';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
+import { IGroup } from '../components/Dashboards/Groups';
 
 const API_BASE: string =
     (Constants.expoConfig?.extra?.apiBaseUrl as string) ||
@@ -136,6 +137,11 @@ export async function deleteStudent(id: string) {
     if (!res.ok) throw new Error((data as any).error || 'Failed to delete student');
     return data;
 }
+export async function getRegistrationStats() {
+    const { res, data } = await apiGet('/students/stats');
+    if (!res.ok) throw new Error((data as any).error || 'Failed to fetch stats');
+    return data;
+}
 
 export async function getAllStaff() {
     const { res, data } = await apiGet('/staff');
@@ -180,7 +186,8 @@ export async function deleteSubject(id: string) {
 }
 
 export async function getAllGroups() {
-    const { res, data } = await apiGet('/groups');
+
+    const { res, data } = await apiGet<IGroup[]>('/groups');
     if (!res.ok) throw new Error((data as any).error || 'Failed to fetch groups');
     return data;
 }

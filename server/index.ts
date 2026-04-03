@@ -12,6 +12,7 @@ import staffRoutes from "./routes/staff.routes";
 import subjectRoutes from "./routes/subject.routes";
 import announcementRoutes from "./routes/announcement.routes";
 import groupRoutes from "./routes/group.routes";
+import systemSettingRoutes from "./routes/systemSetting.routes";
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use("/api/staff", staffRoutes);
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/announcements", announcementRoutes);
 app.use("/api/groups", groupRoutes);
+app.use("/api/settings", systemSettingRoutes);
 
 app.use((req: Request, res: Response) => {
     res.status(404).json({ message: "Route not found" });

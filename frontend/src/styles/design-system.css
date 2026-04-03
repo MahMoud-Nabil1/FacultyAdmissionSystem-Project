@@ -24,16 +24,19 @@
   --color-success:           #10b981;
   --color-success-hover:     #059669;
   --color-success-bg:        #ecfdf5;
+  --color-success-light:     #d4edda;
   --color-success-border:    #a7f3d0;
 
   --color-error:             #ef4444;
   --color-error-hover:       #dc2626;
   --color-error-bg:          #fef2f2;
+  --color-error-light:       #f8d7da;
   --color-error-border:      #fecaca;
 
   --color-warning:           #f59e0b;
   --color-warning-hover:     #d97706;
   --color-warning-bg:        #fffbeb;
+  --color-warning-light:     #fff3cd;
   --color-warning-border:    #fde68a;
 
   --color-info:              #3b82f6;

@@ -13,6 +13,7 @@ import {
 import { router } from 'expo-router';
 import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { API_BASE } from '../../services/api';
 
 interface LoginPayload {
@@ -23,6 +24,7 @@ interface LoginPayload {
 
 export default function Login() {
     const { login } = useAuth();
+    const { t } = useLanguage();
     const [userId, setUserId] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -32,7 +34,7 @@ export default function Login() {
     const handleSubmit = async () => {
         setError('');
         if (!userId.trim() || !password) {
-            setError('يرجى ملء جميع الحقول');
+            setError(t('login.fillAll'));
             return;
         }
         setLoading(true);
@@ -48,7 +50,7 @@ export default function Login() {
             const data = await res.json();
 
             if (!res.ok) {
-                setError(data.error || 'فشل تسجيل الدخول');
+                setError(data.error || t('login.loginFailed'));
                 return;
             }
 
@@ -61,7 +63,7 @@ export default function Login() {
                 router.replace('/');
             }
         } catch {
-            setError('لم يمكن التواصل مع السيرفر');
+            setError(t('login.serverError'));
         } finally {
             setLoading(false);
         }
@@ -76,9 +78,9 @@ export default function Login() {
                 {/* Header */}
                 <View style={styles.header}>
                     <Text style={styles.logo}>🎓</Text>
-                    <Text style={styles.university}>جامعة القاهرة - كلية العلوم</Text>
-                    <Text style={styles.title}>تسجيل الدخول</Text>
-                    <Text style={styles.subtitle}>يرجى إدخال بيانات الاعتماد الخاصة بك للوصول</Text>
+                    <Text style={styles.university}>{t('login.university')}</Text>
+                    <Text style={styles.title}>{t('login.title')}</Text>
+                    <Text style={styles.subtitle}>{t('login.subtitle')}</Text>
                 </View>
 
                 {/* Error Banner */}
@@ -90,10 +92,10 @@ export default function Login() {
 
                 {/* Identifier Field */}
                 <View style={styles.fieldGroup}>
-                    <Text style={styles.label}>كود الطالب أو الإيميل</Text>
+                    <Text style={styles.label}>{t('login.userIdLabel')}</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="ادخل كود الطالب أو الإيميل"
+                        placeholder={t('login.userIdPlaceholder')}
                         placeholderTextColor="#9ca3af"
                         value={userId}
                         onChangeText={setUserId}
@@ -105,11 +107,11 @@ export default function Login() {
 
                 {/* Password Field */}
                 <View style={styles.fieldGroup}>
-                    <Text style={styles.label}>كلمة السر</Text>
+                    <Text style={styles.label}>{t('login.passwordLabel')}</Text>
                     <View style={styles.passwordRow}>
                         <TextInput
                             style={[styles.input, styles.passwordInput]}
-                            placeholder="ادخل كلمة السر"
+                            placeholder={t('login.passwordPlaceholder')}
                             placeholderTextColor="#9ca3af"
                             value={password}
                             onChangeText={setPassword}
@@ -127,7 +129,7 @@ export default function Login() {
 
                 {/* Forgot Password Link */}
                 <TouchableOpacity onPress={() => router.push('/(auth)/forgot-password')}>
-                    <Text style={styles.link}>نسيت كلمة السر؟</Text>
+                    <Text style={styles.link}>{t('login.forgotPassword')}</Text>
                 </TouchableOpacity>
 
                 {/* Submit Button */}
@@ -139,21 +141,21 @@ export default function Login() {
                     {loading ? (
                         <ActivityIndicator color="#fff" />
                     ) : (
-                        <Text style={styles.btnText}>سجل الدخول</Text>
+                        <Text style={styles.btnText}>{t('login.submitBtn')}</Text>
                     )}
                 </TouchableOpacity>
 
                 {/* Contact Support Button (pre-login, for guests / prospective students) */}
                 <View style={styles.supportDivider}>
                     <View style={styles.dividerLine} />
-                    <Text style={styles.dividerText}>أو</Text>
+                    <Text style={styles.dividerText}>{t('login.or')}</Text>
                     <View style={styles.dividerLine} />
                 </View>
                 <TouchableOpacity
                     style={styles.supportBtn}
                     onPress={() => router.push('/(auth)/support')}
                 >
-                    <Text style={styles.supportBtnText}>🎧  تواصل مع الدعم</Text>
+                    <Text style={styles.supportBtnText}>{t('login.supportBtn')}</Text>
                 </TouchableOpacity>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -164,7 +166,7 @@ export default function Login() {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f0f4ff' },
-    scroll: { flexGrow: 1, padding: 24, justifyContent: 'center' },
+    scroll: { flexGrow: 1, padding: 24, paddingBottom: 80, justifyContent: 'center' },
     header: { alignItems: 'center', marginBottom: 28 },
     logo: { fontSize: 52, marginBottom: 8 },
     university: { fontSize: 13, color: '#6b7280', marginBottom: 12, textAlign: 'center' },
