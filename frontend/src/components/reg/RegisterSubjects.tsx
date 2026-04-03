@@ -116,7 +116,7 @@ const RegisterSubjects = () => {
         try {
             setLoading(true);
             setError(null);
-            const token = localStorage.getItem("token");
+            const token = sessionStorage.getItem("token");
             if (!token) throw new Error("No token");
 
             const [meRes, subRes, grpRes, reqRes] = await Promise.all([
