@@ -66,6 +66,7 @@ export async function authenticate(
             });
         }
 
+        req.user = decoded;
         next();
     } catch (err: any) {
         console.error("JWT auth error:", err.message);

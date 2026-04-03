@@ -11,7 +11,6 @@ export interface IStaff extends Document {
     students: mongoose.Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
-    currentSessionId?: string | null;
 
     // Virtual for setting password
     password?: string;
@@ -53,12 +52,7 @@ const staffSchema = new Schema<IStaff>({
     students: [{
         type: Schema.Types.ObjectId,
         ref: 'Student'
-    }],
-    currentSessionId: {
-        type: String,
-        default: null
-    }
-
+    }]
 }, {
     timestamps: true,
     toJSON: { virtuals: true },

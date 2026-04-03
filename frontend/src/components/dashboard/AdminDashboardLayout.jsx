@@ -11,7 +11,7 @@ const AdminDashboardLayout = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const token = localStorage.getItem("token");
+                const token = sessionStorage.getItem("token");
                 const res = await fetch("http://localhost:5000/api/auth/me", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
@@ -26,7 +26,7 @@ const AdminDashboardLayout = () => {
     }, []);
 
     const handleSignOut = () => {
-        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
         window.location.href = "/login";
     };
 

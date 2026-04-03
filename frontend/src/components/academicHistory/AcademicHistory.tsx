@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {JSX, useEffect, useState} from "react";
 
 type Item = {
   s_code: string;
@@ -14,7 +14,7 @@ function AcademicHistory(): JSX.Element {
   useEffect(() => {
     fetch("http://localhost:5000/api/student/my-academic-history", {
       headers: {
-        Authorization: "Bearer " + localStorage.getItem("token")
+        Authorization: "Bearer " + sessionStorage.getItem("token")
       }
     })
       .then((res) => {

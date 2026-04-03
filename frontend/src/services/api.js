@@ -9,7 +9,7 @@ function getToken() {
 }
 
 function clearToken() {
-    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
 }
 
 function getAuthHeader() {

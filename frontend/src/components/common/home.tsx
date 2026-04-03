@@ -4,8 +4,11 @@ import { useTranslation } from "react-i18next";
 import "./css/home.css";
 import { ROLES } from "../../services/constants";
 
+import { useAuth } from "../../context/AuthContext";
+
 const Home = () => {
     const navigate = useNavigate();
+    const { logout } = useAuth();
     const { t, i18n } = useTranslation();
     const isRTL = i18n.language === "ar";
     const [user, setUser] = useState<any>(null);
@@ -19,7 +22,7 @@ const Home = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const token = localStorage.getItem("token");
+                const token = sessionStorage.getItem("token");
                 const res = await fetch("http://localhost:5000/api/auth/me", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
@@ -27,8 +30,9 @@ const Home = () => {
                 const data = await res.json();
                 setUser(data);
             } catch (err) {
-                console.error(err);
-                navigate("/login");
+                console.error("Auth fetch failed:", err);
+                sessionStorage.removeItem("token");
+                window.location.href = "/login";
             } finally {
                 setLoading(false);
             }
@@ -45,7 +49,7 @@ const Home = () => {
         }
 
         try {
-            const token = localStorage.getItem("token");
+            const token = sessionStorage.getItem("token");
             const res = await fetch("http://localhost:5000/api/auth/change-password", {
                 method: "POST",
                 headers: {
@@ -104,6 +108,12 @@ const Home = () => {
                 <button className="btn register" onClick={() => navigate("/register-subjects")}>
                     {t("home.registerSubjects")}
                 </button>
+
+                {user?.role === "student" && (
+                    <button className="btn" onClick={() => navigate("/academic-history")}>
+                        {t("home.academicHistory") || "Academic History"}
+                    </button>
+                )}
             </div>
 
             {showReset && (

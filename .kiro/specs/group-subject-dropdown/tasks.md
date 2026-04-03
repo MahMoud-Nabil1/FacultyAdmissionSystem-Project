@@ -1,0 +1,137 @@
+# Implementation Plan
+
+- [x] 1. Write bug condition exploration test
+  - **Property 1: Bug Condition** - Subject Field is Text Input Instead of API-Populated Dropdown
+  - **CRITICAL**: This test MUST FAIL on unfixed code - failure confirms the bug exists
+  - **DO NOT attempt to fix the test or the code when it fails**
+  - **NOTE**: This test encodes the expected behavior - it will validate the fix when it passes after implementation
+  - **GOAL**: Surface counterexamples that demonstrate the bug exists
+  - **Scoped PBT Approach**: Scope the property to the concrete failing case - subject field is a text input accepting arbitrary values
+  - Test that the subject field in GroupPanel is an `<input type="text">` element (from Bug Condition in design)
+  - Test that arbitrary text values (e.g., "INVALID123", "xyz") are accepted without validation
+  - Test that no API call to `/api/subjects` is made when the form loads
+  - Test that corequisite form inherits the arbitrary typed text from the main form
+  - The test assertions should match the Expected Behavior Properties from design (dropdown with API data)
+  - Run test on UNFIXED code
+  - **EXPECTED OUTCOME**: Test FAILS (this is correct - it proves the bug exists)
+  - Document counterexamples found to understand root cause (e.g., "subject field accepts 'INVALID123' without validation", "no API call observed")
+  - Mark task complete when test is written, run, and failure is documented
+  - _Requirements: 1.1, 1.2, 1.3_
+
+- [x] 2. Write preservation property tests (BEFORE implementing fix)
+  - **Property 2: Preservation** - Non-Subject Field Behavior Unchanged
+  - **IMPORTANT**: Follow observation-first methodology
+  - Observe behavior on UNFIXED code for non-subject field interactions
+  - Observe: Group number input validation works (required field, numeric)
+  - Observe: Type, day, time, capacity fields validate correctly
+  - Observe: Corequisite checkbox toggles the corequisite form section
+  - Observe: Form submission POSTs to `/api/groups` with correct data structure
+  - Observe: Edit mode populates form and updates via PUT request
+  - Observe: Delete functionality removes groups from the table
+  - Observe: Groups table displays all group information correctly
+  - Write property-based tests capturing observed behavior patterns from Preservation Requirements
+  - Property-based testing generates many test cases for stronger guarantees
+  - Test that for all non-subject field interactions, validation and submission logic remains unchanged
+  - Test that corequisite checkbox functionality is preserved
+  - Test that edit/delete operations work identically
+  - Run tests on UNFIXED code
+  - **EXPECTED OUTCOME**: Tests PASS (this confirms baseline behavior to preserve)
+  - Mark task complete when tests are written, run, and passing on unfixed code
+  - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6_
+
+- [ ] 3. Fix for subject field dropdown with API integration
+
+  - [x] 3.1 Add state management for subjects
+    - Add state variable: `const [subjects, setSubjects] = useState<Array<{_id: string, code: string, name: string}>>([]);`
+    - Add loading state: `const [loadingSubjects, setLoadingSubjects] = useState(false);`
+    - Add error state: `const [subjectsError, setSubjectsError] = useState<string | null>(null);`
+    - _Bug_Condition: isBugCondition(input) where input.field == "subject" AND input.fieldType == "text_input"_
+    - _Expected_Behavior: Subject field is a dropdown populated from `/api/subjects` endpoint_
+    - _Preservation: All non-subject field behavior (validation, submission, corequisite, edit/delete) remains unchanged_
+    - _Requirements: 2.1, 2.2_
+
+  - [x] 3.2 Implement API fetch function for subjects
+    - Create `fetchSubjects` async function that calls `GET http://localhost:5000/api/subjects`
+    - Set loading state to true before fetch
+    - On success: store subjects in state, clear error
+    - On failure: set error message, log error to console
+    - Always set loading state to false in finally block
+    - _Bug_Condition: No API call to `/api/subjects` is made in unfixed code_
+    - _Expected_Behavior: Subjects are fetched from API and stored in state_
+    - _Preservation: Existing API calls for groups CRUD operations remain unchanged_
+    - _Requirements: 2.2_
+
+  - [x] 3.3 Add useEffect hook to fetch subjects on mount
+    - Add `useEffect(() => { fetchSubjects(); }, []);` to call fetch when component mounts
+    - Ensure it runs only once on initial render
+    - _Bug_Condition: No subjects are loaded from API in unfixed code_
+    - _Expected_Behavior: Subjects are loaded automatically when form opens_
+    - _Preservation: Existing useEffect for fetchGroups remains unchanged_
+    - _Requirements: 2.2_
+
+  - [x] 3.4 Replace subject text input with select dropdown
+    - Replace the subject `<input type="text">` element (around line 300) with `<select>` element
+    - Add placeholder option: `<option value="">Select subject</option>`
+    - Map over subjects array to create options: `subjects.map(s => <option key={s._id} value={s.code.toLowerCase()}>{s.code.toUpperCase()}</option>)`
+    - Maintain existing onChange handler: `onChange={e => { setSubject(e.target.value); setFormErrors(f => ({...f, subject: ""})); }}`
+    - Maintain existing error styling with `inputStyle("subject")`
+    - Keep the same label and error display logic
+    - _Bug_Condition: Subject field is text input accepting arbitrary values_
+    - _Expected_Behavior: Subject field is dropdown with options from API_
+    - _Preservation: Subject field onChange handler and validation logic remain unchanged_
+    - _Requirements: 2.1, 2.2, 2.3_
+
+  - [ ] 3.5 Add loading and error UI for subjects
+    - Show loading indicator when `loadingSubjects` is true (e.g., "Loading subjects..." text or spinner)
+    - Show error message when `subjectsError` is not null (e.g., red alert box with error text)
+    - Provide retry button if fetch fails: `<button onClick={fetchSubjects}>Retry</button>`
+    - Disable subject dropdown while loading
+    - _Bug_Condition: No loading/error handling for subjects in unfixed code_
+    - _Expected_Behavior: User sees loading state and can retry on error_
+    - _Preservation: Existing form error handling and validation messages remain unchanged_
+    - _Requirements: 2.2_
+
+  - [ ] 3.6 Verify corequisite form inherits selected subject
+    - Test that the corequisite form's disabled subject input displays the selected dropdown value
+    - Verify the display shows `subject.toUpperCase()` as before
+    - Confirm no changes needed to corequisite form logic (it already inherits the subject state)
+    - _Bug_Condition: Corequisite inherits arbitrary typed text in unfixed code_
+    - _Expected_Behavior: Corequisite inherits selected subject code from dropdown_
+    - _Preservation: Corequisite form display and inheritance logic remain unchanged_
+    - _Requirements: 2.4, 3.2_
+
+  - [ ] 3.7 Verify bug condition exploration test now passes
+    - **Property 1: Expected Behavior** - Subject Field is API-Populated Dropdown
+    - **IMPORTANT**: Re-run the SAME test from task 1 - do NOT write a new test
+    - The test from task 1 encodes the expected behavior
+    - When this test passes, it confirms the expected behavior is satisfied
+    - Run bug condition exploration test from step 1
+    - Verify subject field is now a `<select>` element
+    - Verify dropdown options are populated from `/api/subjects` API call
+    - Verify arbitrary text cannot be entered (only selection from dropdown)
+    - Verify corequisite inherits the selected subject code
+    - **EXPECTED OUTCOME**: Test PASSES (confirms bug is fixed)
+    - _Requirements: 2.1, 2.2, 2.3, 2.4_
+
+  - [ ] 3.8 Verify preservation tests still pass
+    - **Property 2: Preservation** - Non-Subject Field Behavior Unchanged
+    - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
+    - Run preservation property tests from step 2
+    - Verify group number, type, day, time, capacity validation unchanged
+    - Verify corequisite checkbox toggle functionality unchanged
+    - Verify form submission to `/api/groups` unchanged
+    - Verify edit/delete operations unchanged
+    - Verify groups table display unchanged
+    - **EXPECTED OUTCOME**: Tests PASS (confirms no regressions)
+    - Confirm all tests still pass after fix (no regressions)
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6_
+
+- [ ] 4. Checkpoint - Ensure all tests pass
+  - Run all tests (bug condition exploration + preservation tests)
+  - Verify bug condition test passes (subject field is now a dropdown with API data)
+  - Verify preservation tests pass (all non-subject functionality unchanged)
+  - Manually test the complete flow: load form → see subjects dropdown → select subject → create group → verify group created
+  - Manually test corequisite flow: select subject → enable corequisite → verify subject inherited → submit → verify both groups created
+  - Manually test edit flow: click edit → verify subject dropdown shows current value → change subject → update → verify change saved
+  - Manually test error handling: simulate API failure (disconnect network) → verify error message → retry → verify subjects load
+  - Ensure all tests pass, ask the user if questions arise

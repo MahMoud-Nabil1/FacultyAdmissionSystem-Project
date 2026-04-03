@@ -15,7 +15,7 @@ const SettingsPanel: React.FC = () => {
     const [selectedLevels, setSelectedLevels] = useState<string[]>(["1"]);
     const [error, setError] = useState<string | null>(null);
     const [settingsLoading, setSettingsLoading] = useState(false);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     const fetchSettings = async () => {
         try {

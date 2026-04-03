@@ -14,9 +14,12 @@ import LanguageFloatingButton from "./components/common/LanguageFloatingButton.j
 import SupportContact from "./components/support/SupportContact.jsx";
 import Announcements from "./components/common/announcements.jsx";
 import AdminDashboardTable from "./components/dashboard/tables/table.tsx";
+import GroupPanel from "./components/dashboard/panels/groupPanel.tsx";
 import Groups from "./components/groups/Groups.tsx";
 import Home from "./components/common/home.tsx";
 import AdminAnalysis from "./components/dashboard/AdminAnalysis/AdminAnalysis.tsx";
+import RegisterSubjects from "./components/reg/RegisterSubjects.tsx";
+import AcademicHistory from "./components/academicHistory/AcademicHistory.tsx";
 
 
 function App() {
@@ -33,7 +36,7 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <button onClick={() => {
-                                localStorage.removeItem("token");
+                                sessionStorage.removeItem("token");
                                 window.location.href = "/login";
                             }}>
                                 {t('sidePanel.signOut')}
@@ -67,7 +70,7 @@ function App() {
                 >
                     <Route index element={<AdminDashboard />} />
                     <Route path="table" element={<AdminDashboardTable />} />
-                    <Route path="groups" element={<Groups />} />
+                    <Route path="groups" element={<GroupPanel />} />
                 </Route>
                 <Route path="/login" element={
                     <GuestRoute>
@@ -100,6 +103,12 @@ function App() {
                     </ProtectedRoute>
                 }
                 />
+
+                <Route path="/academic-history" element={
+                    <ProtectedRoute>
+                        <AcademicHistory />
+                    </ProtectedRoute>
+                } />
 
                 <Route path="/test-analysis" element={
                     <AdminAnalysis />

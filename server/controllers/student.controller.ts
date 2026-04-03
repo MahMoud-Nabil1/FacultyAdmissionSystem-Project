@@ -182,7 +182,7 @@ export const getMyAcademicHistory = async (req: Request, res: Response): Promise
         
 
         const student = await Student
-            .findOne({ studentId: user.id })
+            .findOne({ studentId: Number(user.id) })
             .populate('completedSubjects');
 
         if (!student) {

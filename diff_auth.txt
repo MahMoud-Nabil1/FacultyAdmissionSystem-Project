@@ -1,0 +1,71 @@
+﻿diff --git a/frontend/src/context/AuthContext.js b/frontend/src/context/AuthContext.js
+index e4f9e25..23ba255 100644
+--- a/frontend/src/context/AuthContext.js
++++ b/frontend/src/context/AuthContext.js
+@@ -11,7 +11,8 @@ export const AuthProvider = ({ children }) => {
+     const [loading, setLoading] = useState(true);
+ 
+     useEffect(() => {
+-        const savedToken = sessionStorage.getItem('token');
++        const checkAuth = () => {
++            const savedToken = localStorage.getItem('token');
+ 
+             if (!savedToken) {
+                 setToken(null);
+@@ -40,20 +41,35 @@ export const AuthProvider = ({ children }) => {
+             }
+         };
+ 
+-        try {
+-            const payload = jwtDecode(savedToken);
+-            setUser(payload);
+-        } catch {
+-            sessionStorage.removeItem('token');
+-            setToken(null);
+-            setUser(null);
+-        } finally {
+-            setLoading(false);
+-        }
+-    }, []);
++        checkAuth();
++
++        // Check for token removal in other tabs or through API calls
++        const handleStorageChange = (e) => {
++            if (e.key === 'token' && !e.newValue) {
++                setToken(null);
++                setUser(null);
++            }
++        };
++
++        window.addEventListener('storage', handleStorageChange);
++        
++        // Polling as a fallback for the same tab token removal if not using an event emitter
++        const interval = setInterval(() => {
++            const currentToken = localStorage.getItem('token');
++            if (!currentToken && token) {
++                setToken(null);
++                setUser(null);
++            }
++        }, 2000);
++
++        return () => {
++            window.removeEventListener('storage', handleStorageChange);
++            clearInterval(interval);
++        };
++    }, [token]);
+ 
+     const login = (tokenValue) => {
+-        sessionStorage.setItem('token', tokenValue);
++        localStorage.setItem('token', tokenValue);
+         setToken(tokenValue);
+ 
+         try {
+@@ -65,7 +81,7 @@ export const AuthProvider = ({ children }) => {
+     };
+ 
+     const logout = () => {
+-        sessionStorage.removeItem('token');
++        localStorage.removeItem('token');
+         setToken(null);
+         setUser(null);
+     };

@@ -22,7 +22,7 @@ const AnnouncementsPanel: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const itemsPerPage = 5;
     const [page, setPage] = useState(1);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     const fetchAnnouncements = async () => {
         try {
