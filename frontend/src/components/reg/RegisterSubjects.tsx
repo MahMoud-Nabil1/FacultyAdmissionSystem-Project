@@ -105,6 +105,7 @@ const RegisterSubjects = () => {
     const [subjects, setSubjects]       = useState([] as SubjectData[]);
     const [groups, setGroups]           = useState([] as GroupData[]);
     const [myRequests, setMyRequests]   = useState([] as EnrollmentRequestData[]);
+    const [registrationOpen, setRegistrationOpen] = useState(true);
     const [loading, setLoading]         = useState(true);
     const [error, setError]             = useState(null as string | null);
     const [selectedSubject, setSelectedSubject] = useState("");
@@ -119,13 +120,14 @@ const RegisterSubjects = () => {
             const token = sessionStorage.getItem("token");
             if (!token) throw new Error("No token");
 
-            const [meRes, subRes, grpRes, reqRes] = await Promise.all([
+            const [meRes, subRes, grpRes, reqRes, settingsRes] = await Promise.all([
                 fetch("http://localhost:5000/api/auth/me", {
                     headers: { Authorization: `Bearer ${token}` },
                 }),
                 apiGet("/subjects"),
                 apiGet("/groups"),
                 apiGet("/groups/my-requests"),
+                apiGet("/system-settings"),
             ]);
 
             if (!meRes.ok) throw new Error("Failed to fetch student data");
@@ -140,6 +142,10 @@ const RegisterSubjects = () => {
 
             if (reqRes.res.ok) {
                 setMyRequests(reqRes.data as EnrollmentRequestData[]);
+            }
+
+            if (settingsRes.res.ok) {
+                setRegistrationOpen((settingsRes.data as any).registrationOpen ?? true);
             }
         } catch (err: any) {
             setError(err.message || t("registration.errors.fetchFailed"));
@@ -448,6 +454,21 @@ const RegisterSubjects = () => {
                     </div>
                 </div>
             </div>
+
+            {/* ── Registration status alert ── */}
+            {!registrationOpen && (
+                <div style={{
+                    marginBottom: '1rem',
+                    padding: '12px 16px',
+                    backgroundColor: '#fff3cd',
+                    borderLeft: '4px solid #ffc107',
+                    borderRadius: '4px',
+                    color: '#856404'
+                }}>
+                    <strong>⚠️ {t("registration.errors.registrationClosed")}</strong>
+                    <p style={{ margin: '8px 0 0 0' }}>{t("registration.closedMessage") || "Registration is currently closed. You cannot request new groups at this time."}</p>
+                </div>
+            )}
 
             {/* ── Action messages ── */}
             {actionMsg && (
@@ -788,6 +809,14 @@ const RegisterSubjects = () => {
                                                         title={t("registration.alreadyRequested")}
                                                     >
                                                         {t("registration.alreadyRequested")}
+                                                    </button>
+                                                ) : !registrationOpen ? (
+                                                    <button
+                                                        className="btn-secondary"
+                                                        disabled
+                                                        title={t("registration.errors.registrationClosed")}
+                                                    >
+                                                        {t("registration.errors.registrationClosed")}
                                                     </button>
                                                 ) : (
                                                     <button
