@@ -175,3 +175,23 @@ export const contactAdmin = async (req: Request, res: Response): Promise<void> =
         res.status(500).json({ error: "خطأ في السيرفر: " + err.message });
     }
 };
+
+export const getMyAcademicHistory = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = getUser(req);
+        
+
+        const student = await Student
+            .findOne({ studentId: user.id })
+            .populate('completedSubjects');
+
+        if (!student) {
+            res.status(404).json({ error: "Student not found" });
+            return;
+        }
+
+        res.json(student.completedSubjects);
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};

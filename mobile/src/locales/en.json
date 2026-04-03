@@ -1,0 +1,205 @@
+{
+  "common": {
+    "switchToAr": "عربي",
+    "switchToEn": "EN",
+    "error": "Error",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "save": "Save",
+    "close": "Close"
+  },
+  "tabs": {
+    "home": "Home",
+    "edit": "Edit",
+    "groups": "Groups",
+    "support": "Support"
+  },
+  "login": {
+    "university": "Cairo University - Faculty of Science",
+    "title": "Login",
+    "subtitle": "Enter your credentials to continue",
+    "userIdLabel": "Student code or email",
+    "userIdPlaceholder": "Enter student code or email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter password",
+    "forgotPassword": "Forgot password?",
+    "contactSupport": "Contact support",
+    "submitBtn": "Login",
+    "fillAll": "Please fill all fields",
+    "loginFailed": "Login failed",
+    "serverError": "Could not reach the server",
+    "or": "Or",
+    "supportBtn": "🎧 Contact support"
+  },
+  "forgotPassword": {
+    "emailRequired": "Email is required.",
+    "genericError": "Something went wrong.",
+    "serverUnreachable": "Could not reach the server.",
+    "sentTitle": "Sent!",
+    "sentMessage": "A password reset link has been sent to your email.",
+    "notFoundTitle": "Not found",
+    "notFoundMessage": "No account is linked to this email address.",
+    "backToLogin": "← Back to login",
+    "title": "Forgot password",
+    "subtitle": "Enter your email and we will send you a link to reset your password.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your email",
+    "submitBtn": "Send reset link"
+  },
+  "resetPassword": {
+    "verifying": "Verifying link…",
+    "invalidTitle": "Invalid link",
+    "noToken": "This reset link is invalid. No token was found.",
+    "expiredOrInvalid": "This link has expired or is invalid.",
+    "verifyNetwork": "Could not verify the link. Please try again.",
+    "requestNewLink": "Request a new reset link",
+    "successTitle": "Updated!",
+    "successMessage": "Your password was updated. Redirecting to login…",
+    "title": "Reset password",
+    "subtitle": "Enter your new password",
+    "newPasswordLabel": "New password",
+    "newPasswordPlaceholder": "Enter new password",
+    "confirmLabel": "Confirm password",
+    "confirmPlaceholder": "Re-enter new password",
+    "submitBtn": "Update password",
+    "backToLogin": "← Back to login",
+    "passwordMin": "Password must be at least 6 characters.",
+    "passwordMismatch": "Passwords do not match.",
+    "resetFailed": "Could not reset the password.",
+    "serverUnreachable": "Could not reach the server."
+  },
+  "supportContact": {
+    "titleIT": "IT support",
+    "titleAdmin": "Student affairs",
+    "toggleIT": "IT support",
+    "toggleAdmin": "Faculty administration",
+    "labelStudentCode": "Student code",
+    "labelSubjectIT": "Subject",
+    "labelSubjectAdmin": "Course code (if any)",
+    "labelMessage": "Message",
+    "submitBtn": "Send now",
+    "fillRequired": "Please enter your student code and message.",
+    "sentTitle": "Sent",
+    "sentMessage": "The relevant office will get back to you shortly.",
+    "sendFailed": "Something went wrong while sending your message.",
+    "networkError": "Could not reach the server."
+  },
+  "home": {
+    "serverError": "Failed to connect to the server",
+    "logoutTitle": "Sign out",
+    "logoutMessage": "Are you sure you want to sign out?",
+    "logoutConfirm": "Sign out",
+    "gpa": "GPA",
+    "hours": "Hours",
+    "servicesTitle": "Available services",
+    "registerSubjects": "Course registration",
+    "studentsList": "My students list",
+    "statistics": "Statistics",
+    "logout": "Sign out"
+  },
+  "editPanel": {
+    "title": "Admin Panel",
+    "subtitle": "Choose a section to manage",
+    "students": "Students",
+    "staff": "Staff",
+    "subjects": "Subjects",
+    "groups": "Groups",
+    "announcements": "Announcements"
+  },
+  "groups": {
+    "title": "Groups",
+    "addGroup": "Add group",
+    "modalTitle": "Add group",
+    "saveGroup": "Save group",
+    "empty": "No groups yet",
+    "deleteTitle": "Delete group",
+    "deleteMessage": "Delete group #{{number}}?",
+    "seat": "seats",
+    "fillAll": "Please fill all fields",
+    "placeholders": {
+      "number": "Group number",
+      "subject": "Course code (e.g. math110)",
+      "place": "Place",
+      "day": "Day",
+      "from": "From (hour)",
+      "to": "To (hour)",
+      "capacity": "Capacity"
+    }
+  },
+  "students": {
+    "title": "Students",
+    "addStudent": "Add new student",
+    "cancel": "Cancel",
+    "saveStudent": "Save student",
+    "fillAll": "Please fill all fields",
+    "duplicateCode": "A student with this code already exists",
+    "deleteTitle": "Delete student",
+    "deleteMessage": "Delete {{name}}?",
+    "empty": "No students yet",
+    "rowGpa": "GPA: {{gpa}}",
+    "placeholders": {
+      "studentId": "Student code",
+      "name": "Name",
+      "email": "Email",
+      "gpa": "GPA",
+      "password": "Password"
+    }
+  },
+  "subjects": {
+    "title": "Courses",
+    "addSubject": "Add new course",
+    "cancel": "Cancel",
+    "editSubject": "Edit course",
+    "newSubject": "New course",
+    "save": "Save",
+    "codeRequired": "Course code is required",
+    "nameRequired": "Course name is required",
+    "invalidCredits": "Invalid credit hours",
+    "deleteTitle": "Delete course",
+    "deleteMessage": "Delete {{name}}?",
+    "empty": "No courses yet",
+    "creditsShort": "{{hours}} credit hours",
+    "placeholders": {
+      "code": "Course code (e.g. CS201)",
+      "name": "Course name",
+      "creditHours": "Credit hours"
+    }
+  },
+  "staff": {
+    "title": "Staff",
+    "addStaff": "Add new staff",
+    "cancel": "Cancel",
+    "saveStaff": "Save staff",
+    "fillAll": "Please fill all fields",
+    "duplicateEmail": "A staff member with this email already exists",
+    "deleteTitle": "Delete staff",
+    "deleteMessage": "Delete {{name}}?",
+    "empty": "No staff yet",
+    "placeholders": {
+      "name": "Name",
+      "email": "Email",
+      "password": "Password"
+    },
+    "roles": {
+      "admin": "Admin",
+      "academic_guide": "Academic guide",
+      "academic_guide_coordinator": "Academic guide coordinator",
+      "reporter": "Data reviewer"
+    }
+  },
+  "announcements": {
+    "title": "Announcements",
+    "addNew": "Add new announcement",
+    "modalTitle": "Add new announcement",
+    "placeholders": {
+      "title": "Title",
+      "content": "Content"
+    },
+    "submitBtn": "Publish announcement",
+    "fillAll": "Please fill in the title and content",
+    "publishFailed": "Failed to publish",
+    "empty": "No announcements yet",
+    "deleteTitle": "Delete announcement",
+    "deleteMessage": "Are you sure you want to delete \"{{title}}\"?"
+  }
+}

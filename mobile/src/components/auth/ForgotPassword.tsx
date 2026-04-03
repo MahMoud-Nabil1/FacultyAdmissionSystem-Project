@@ -11,11 +11,14 @@ import {
     ScrollView,
 } from 'react-native';
 import { router } from 'expo-router';
+import { useLanguage } from '../../context/LanguageContext';
 import { apiPost } from '../../services/api';
 
 type Status = null | 'sent' | 'not_found';
 
 export default function ForgotPassword() {
+    const { t, locale } = useLanguage();
+    const align = locale === 'ar' ? 'right' : 'left';
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -25,14 +28,14 @@ export default function ForgotPassword() {
         setError('');
         const trimmed = email.trim().toLowerCase();
         if (!trimmed) {
-            setError('البريد الإلكتروني مطلوب.');
+            setError(t('forgotPassword.emailRequired'));
             return;
         }
         setLoading(true);
         try {
             const { res, data } = await apiPost('/auth/forgot-password', { email: trimmed }, false);
             if (!res.ok) {
-                setError((data as { error?: string }).error || 'حدث خطأ ما.');
+                setError((data as { error?: string }).error || t('forgotPassword.genericError'));
                 return;
             }
             setStatus(
@@ -41,7 +44,7 @@ export default function ForgotPassword() {
                     : 'not_found'
             );
         } catch {
-            setError('تعذر التواصل مع السيرفر.');
+            setError(t('forgotPassword.serverUnreachable'));
         } finally {
             setLoading(false);
         }
@@ -52,12 +55,12 @@ export default function ForgotPassword() {
         return (
             <View style={styles.centerContainer}>
                 <Text style={styles.icon}>✅</Text>
-                <Text style={styles.statusTitle}>تم الإرسال!</Text>
-                <Text style={styles.statusMessage}>
-                    تم إرسال رابط إعادة التعيين بنجاح إلى بريدك الإلكتروني.
+                <Text style={[styles.statusTitle, { textAlign: align }]}>{t('forgotPassword.sentTitle')}</Text>
+                <Text style={[styles.statusMessage, { textAlign: align }]}>
+                    {t('forgotPassword.sentMessage')}
                 </Text>
                 <TouchableOpacity style={styles.btn} onPress={() => router.replace('/(auth)/login')}>
-                    <Text style={styles.btnText}>← العودة لتسجيل الدخول</Text>
+                    <Text style={styles.btnText}>{t('forgotPassword.backToLogin')}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -68,12 +71,12 @@ export default function ForgotPassword() {
         return (
             <View style={styles.centerContainer}>
                 <Text style={styles.icon}>❌</Text>
-                <Text style={styles.statusTitle}>غير موجود</Text>
-                <Text style={styles.statusMessage}>
-                    لا يوجد حساب مرتبط بهذا البريد الإلكتروني.
+                <Text style={[styles.statusTitle, { textAlign: align }]}>{t('forgotPassword.notFoundTitle')}</Text>
+                <Text style={[styles.statusMessage, { textAlign: align }]}>
+                    {t('forgotPassword.notFoundMessage')}
                 </Text>
                 <TouchableOpacity style={styles.btn} onPress={() => router.replace('/(auth)/login')}>
-                    <Text style={styles.btnText}>← العودة لتسجيل الدخول</Text>
+                    <Text style={styles.btnText}>{t('forgotPassword.backToLogin')}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -88,10 +91,8 @@ export default function ForgotPassword() {
             <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
                 <View style={styles.header}>
                     <Text style={styles.icon}>🔑</Text>
-                    <Text style={styles.title}>نسيت كلمة المرور</Text>
-                    <Text style={styles.subtitle}>
-                        ادخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور.
-                    </Text>
+                    <Text style={[styles.title, { textAlign: align }]}>{t('forgotPassword.title')}</Text>
+                    <Text style={[styles.subtitle, { textAlign: align }]}>{t('forgotPassword.subtitle')}</Text>
                 </View>
 
                 {!!error && (
@@ -101,17 +102,17 @@ export default function ForgotPassword() {
                 )}
 
                 <View style={styles.fieldGroup}>
-                    <Text style={styles.label}>البريد الإلكتروني</Text>
+                    <Text style={[styles.label, { textAlign: align }]}>{t('forgotPassword.emailLabel')}</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="أدخل بريدك الإلكتروني"
+                        placeholder={t('forgotPassword.emailPlaceholder')}
                         placeholderTextColor="#9ca3af"
                         value={email}
                         onChangeText={setEmail}
                         keyboardType="email-address"
                         autoCapitalize="none"
                         autoCorrect={false}
-                        textAlign="right"
+                        textAlign={align}
                         editable={!loading}
                     />
                 </View>
@@ -124,12 +125,12 @@ export default function ForgotPassword() {
                     {loading ? (
                         <ActivityIndicator color="#fff" />
                     ) : (
-                        <Text style={styles.btnText}>إرسال رابط إعادة التعيين</Text>
+                        <Text style={styles.btnText}>{t('forgotPassword.submitBtn')}</Text>
                     )}
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => router.back()}>
-                    <Text style={styles.backLink}>← العودة لتسجيل الدخول</Text>
+                    <Text style={[styles.backLink, { textAlign: align }]}>{t('forgotPassword.backToLogin')}</Text>
                 </TouchableOpacity>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -140,7 +141,7 @@ export default function ForgotPassword() {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f0f4ff' },
-    scroll: { flexGrow: 1, padding: 24, justifyContent: 'center' },
+    scroll: { flexGrow: 1, padding: 24, paddingBottom: 80, justifyContent: 'center' },
     centerContainer: {
         flex: 1,
         backgroundColor: '#f0f4ff',
@@ -150,15 +151,15 @@ const styles = StyleSheet.create({
     },
     header: { alignItems: 'center', marginBottom: 28 },
     icon: { fontSize: 52, marginBottom: 12 },
-    title: { fontSize: 24, fontWeight: '700', color: '#1a73e8', marginBottom: 8 },
-    subtitle: { fontSize: 14, color: '#6b7280', textAlign: 'center', lineHeight: 22 },
-    statusTitle: { fontSize: 22, fontWeight: '700', color: '#111827', marginBottom: 8 },
+    title: { fontSize: 24, fontWeight: '700', color: '#1a73e8', marginBottom: 8, width: '100%' },
+    subtitle: { fontSize: 14, color: '#6b7280', lineHeight: 22, width: '100%' },
+    statusTitle: { fontSize: 22, fontWeight: '700', color: '#111827', marginBottom: 8, width: '100%' },
     statusMessage: {
         fontSize: 14,
         color: '#6b7280',
-        textAlign: 'center',
         marginBottom: 28,
         lineHeight: 22,
+        width: '100%',
     },
     errorBox: {
         backgroundColor: '#fee2e2',
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     },
     errorText: { color: '#b91c1c', textAlign: 'center', fontSize: 14 },
     fieldGroup: { marginBottom: 20 },
-    label: { fontSize: 14, fontWeight: '600', color: '#374151', marginBottom: 6, textAlign: 'right' },
+    label: { fontSize: 14, fontWeight: '600', color: '#374151', marginBottom: 6, width: '100%' },
     input: {
         backgroundColor: '#fff',
         borderWidth: 1,
@@ -187,8 +188,9 @@ const styles = StyleSheet.create({
         paddingVertical: 14,
         alignItems: 'center',
         marginBottom: 16,
+        width: '100%',
     },
     btnDisabled: { opacity: 0.6 },
     btnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-    backLink: { color: '#1a73e8', textAlign: 'center', fontSize: 14 },
+    backLink: { color: '#1a73e8', fontSize: 14, width: '100%' },
 });
