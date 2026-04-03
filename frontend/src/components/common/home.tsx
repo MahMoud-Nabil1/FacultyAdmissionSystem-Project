@@ -62,10 +62,13 @@ const Home = () => {
             const data = await res.json();
             if (res.ok) {
                 setResetMessage(t("home.passwordUpdateSuccess"));
-                setShowReset(false);
-                setCurrentPassword("");
-                setNewPassword("");
-                setConfirmPassword("");
+                setTimeout(() => {
+                    setShowReset(false);
+                    setCurrentPassword("");
+                    setNewPassword("");
+                    setConfirmPassword("");
+                    setResetMessage("");
+                }, 1500);
             } else {
                 setResetMessage(data.error || t("home.passwordUpdateError"));
             }
@@ -75,72 +78,89 @@ const Home = () => {
         }
     };
 
+    const closeModal = () => {
+        setShowReset(false);
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setResetMessage("");
+    };
+
     if (loading) return <p className="loading">{t("home.loading")}</p>;
 
     return (
         <div className="home-container" dir={isRTL ? "rtl" : "ltr"}>
             <h1 className="home-title">{t("home.title")}</h1>
 
-            <div className="info-card">
-                <p><strong>{t("home.name")}</strong> {user?.name}</p>
-                <p><strong>{t("home.role")}</strong> {roleLabel}</p>
-                {user?.department && <p><strong>{t("home.department")}</strong> {user.department}</p>}
-                {user?.gpa !== undefined && <p><strong>{t("home.gpa")}</strong> {user.gpa}</p>}
-                {user?.registeredHours !== undefined && <p><strong>{t("home.registeredHours")}</strong> {user.registeredHours}</p>}
-                {user?.completedHours !== undefined && <p><strong>{t("home.completedHours")}</strong> {user.completedHours}</p>}
-            </div>
+            <div className="home-content">
+                <div className="info-card">
+                    <p><strong>{t("home.name")}</strong> {user?.name}</p>
+                    <p><strong>{t("home.role")}</strong> {roleLabel}</p>
+                    {user?.department && <p><strong>{t("home.department")}</strong> {user.department}</p>}
+                    {user?.gpa !== undefined && <p><strong>{t("home.gpa")}</strong> {user.gpa}</p>}
+                    {user?.registeredHours !== undefined && <p><strong>{t("home.registeredHours")}</strong> {user.registeredHours}</p>}
+                    {user?.completedHours !== undefined && <p><strong>{t("home.completedHours")}</strong> {user.completedHours}</p>}
+                </div>
 
-            <div className="buttons-vertical">
-                <button className="btn" onClick={() => navigate("/groups")}>
-                    {t("home.viewAllGroups")}
-                </button>
-
-                {user?.role && user.role !== "student" && (
-                    <button className="btn admin" onClick={() => navigate("/admin-dashboard")}>
-                        {t("home.adminDashboard")}
+                <div className="buttons-horizontal">
+                    <button className="btn" onClick={() => navigate("/groups")}>
+                        {t("home.viewAllGroups")}
                     </button>
-                )}
 
-                <button className="btn reset" onClick={() => setShowReset(!showReset)}>
-                    {t("home.changePassword")}
-                </button>
+                    {user?.role && user.role !== "student" && (
+                        <button className="btn admin" onClick={() => navigate("/admin-dashboard")}>
+                            {t("home.adminDashboard")}
+                        </button>
+                    )}
 
-                <button className="btn register" onClick={() => navigate("/register-subjects")}>
-                    {t("home.registerSubjects")}
-                </button>
-
-                {user?.role === "student" && (
-                    <button className="btn" onClick={() => navigate("/academic-history")}>
-                        {t("home.academicHistory") || "Academic History"}
+                    <button className="btn reset" onClick={() => setShowReset(true)}>
+                        {t("home.changePassword")}
                     </button>
-                )}
+
+                    <button className="btn register" onClick={() => navigate("/register-subjects")}>
+                        {t("home.registerSubjects")}
+                    </button>
+
+                    {user?.role === "student" && (
+                        <button className="btn" onClick={() => navigate("/academic-history")}>
+                            {t("home.academicHistory") || "Academic History"}
+                        </button>
+                    )}
+
+                    <button className="btn signout" onClick={() => { logout(); navigate("/login"); }}>
+                        {t("sidePanel.signOut")}
+                    </button>
+                </div>
             </div>
 
             {showReset && (
-                <div className="reset-panel">
-                    <h3>{t("home.changePasswordTitle")}</h3>
-                    <input
-                        type="password"
-                        placeholder={t("home.currentPasswordPlaceholder")}
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                    />
-                    <input
-                        type="password"
-                        placeholder={t("home.newPasswordPlaceholder")}
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                    />
-                    <input
-                        type="password"
-                        placeholder={t("home.confirmPasswordPlaceholder")}
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
-                    <button className="btn submit" onClick={handleResetPassword}>
-                        {t("home.save")}
-                    </button>
-                    {resetMessage && <p className="reset-message">{resetMessage}</p>}
+                <div className="modal-overlay" onClick={closeModal}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <button className="modal-close" onClick={closeModal}>&times;</button>
+                        <h3>{t("home.changePasswordTitle")}</h3>
+                        <input
+                            type="password"
+                            placeholder={t("home.currentPasswordPlaceholder")}
+                            value={currentPassword}
+                            onChange={(e) => setCurrentPassword(e.target.value)}
+                        />
+                        <input
+                            type="password"
+                            placeholder={t("home.newPasswordPlaceholder")}
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                        <input
+                            type="password"
+                            placeholder={t("home.confirmPasswordPlaceholder")}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
+                        <button className="btn submit" onClick={handleResetPassword}>
+                            {t("home.save")}
+                        </button>
+                        {resetMessage && <p className="reset-message">{resetMessage}</p>}
+                    </div>
                 </div>
             )}
         </div>

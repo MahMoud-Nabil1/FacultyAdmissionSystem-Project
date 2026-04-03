@@ -1,4 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import Pagination from "../pagination";
+import { PAGE_SIZE } from "../../../services/constants";
+import { getAllSubjects, apiGet, apiPost, apiPut, apiDelete } from "../../../services/api";
 
 interface Group {
     _id?: string;
@@ -15,11 +19,18 @@ interface Group {
 const GroupPanel: React.FC = () => {
 
     const [groups, setGroups] = useState<Group[]>([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [page, setPage] = useState(0);
+
+    const { t } = useTranslation();
 
     // --- Subjects state management ---
     const [subjects, setSubjects] = useState<Array<{_id: string, code: string, name: string}>>([]);
     const [loadingSubjects, setLoadingSubjects] = useState(false);
     const [subjectsError, setSubjectsError] = useState<string | null>(null);
+
+    // --- Modal state ---
+    const [showModal, setShowModal] = useState(false);
 
     // --- Lecture (main group) fields ---
     const [subject, setSubject] = useState("");
@@ -74,11 +85,16 @@ const GroupPanel: React.FC = () => {
         fetchSubjects();
     }, []);
 
+    useEffect(() => {
+        setPage(0);
+    }, [searchTerm]);
+
     const fetchGroups = async () => {
         try {
-            const res = await fetch("http://localhost:5000/api/groups");
-            const data = await res.json();
-            setGroups(Array.isArray(data) ? data : []);
+            const { res, data } = await apiGet("/groups");
+            if (res.ok) {
+                setGroups(Array.isArray(data) ? data : []);
+            }
         } catch (err) {
             console.log(err);
         }
@@ -87,8 +103,7 @@ const GroupPanel: React.FC = () => {
     const fetchSubjects = async () => {
         setLoadingSubjects(true);
         try {
-            const res = await fetch("http://localhost:5000/api/subjects");
-            const data = await res.json();
+            const data = await getAllSubjects();
             setSubjects(Array.isArray(data) ? data : []);
             setSubjectsError(null);
         } catch (err) {
@@ -138,29 +153,19 @@ const GroupPanel: React.FC = () => {
     });
 
     const postGroup = async (data: any) => {
-        const res = await fetch("http://localhost:5000/api/groups", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        });
+        const { res, data: responseData } = await apiPost("/groups", data);
         if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.error || "Failed to save group");
+            throw new Error(responseData.error || "Failed to save group");
         }
-        return res.json();
+        return responseData;
     };
 
     const putGroup = async (id: string, data: any) => {
-        const res = await fetch(`http://localhost:5000/api/groups/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        });
+        const { res, data: responseData } = await apiPut(`/groups/${id}`, data);
         if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.error || "Failed to update group");
+            throw new Error(responseData.error || "Failed to update group");
         }
-        return res.json();
+        return responseData;
     };
 
     const handleSubmit = async () => {
@@ -189,7 +194,7 @@ const GroupPanel: React.FC = () => {
                     });
                     const coGroupSaved = await postGroup(coReqData);
                     newGroups.push(coGroupSaved);
-                    alert(`✅ Groups added successfully!\n• ${type.charAt(0).toUpperCase() + type.slice(1)} group #${number}\n• ${coReqType.charAt(0).toUpperCase() + coReqType.slice(1)} group #${number}`);
+                    alert(`Groups added successfully!\n• ${type.charAt(0).toUpperCase() + type.slice(1)} group #${number}\n• ${coReqType.charAt(0).toUpperCase() + coReqType.slice(1)} group #${number}`);
                 } else {
                     alert("Group added successfully!");
                 }
@@ -197,7 +202,7 @@ const GroupPanel: React.FC = () => {
                 setGroups([...groups, ...newGroups]);
             }
 
-            resetForm();
+            closeModal();
         } catch (err: any) {
             alert(err.message || "Error saving group");
         } finally {
@@ -222,13 +227,20 @@ const GroupPanel: React.FC = () => {
         setFormErrors({});
     };
 
+    const closeModal = () => {
+        setShowModal(false);
+        setEditingId(null);
+        resetForm();
+    };
+
     const handleDelete = async (id: string) => {
         if (!window.confirm("Are you sure you want to delete this group?")) return;
         try {
-            const res = await fetch(`http://localhost:5000/api/groups/${id}`, { method: "DELETE" });
-            if (!res.ok) throw new Error("Failed to delete group");
-            setGroups(groups.filter(g => g._id !== id));
-            alert("Group deleted successfully!");
+            const { res } = await apiDelete(`/groups/${id}`);
+            if (res.ok) {
+                setGroups(groups.filter(g => g._id !== id));
+                alert("Group deleted successfully!");
+            }
         } catch (err) {
             alert("Error deleting group");
         }
@@ -245,11 +257,7 @@ const GroupPanel: React.FC = () => {
         setCapacity(group.capacity);
         setHasCoreq(false);
         setFormErrors({});
-    };
-
-    const handleCancel = () => {
-        setEditingId(null);
-        resetForm();
+        setShowModal(true);
     };
 
     const getTypeStyle = (type: string) => {
@@ -262,371 +270,310 @@ const GroupPanel: React.FC = () => {
         }
     };
 
-    const inputStyle = (errKey: string) => ({
-        padding: "10px",
-        borderRadius: "6px",
-        border: formErrors[errKey] ? "2px solid var(--color-error)" : "1px solid var(--color-border)",
-        width: "100%",
-        fontSize: "14px",
-        backgroundColor: "white",
-        boxSizing: "border-box" as const
-    });
+    const filteredGroups = useMemo(() => {
+        const term = searchTerm.trim().toLowerCase();
+        if (!term) return groups;
+        return groups.filter(g => (
+            g.subject?.toLowerCase().includes(term) ||
+            String(g.number).includes(term) ||
+            g.type?.toLowerCase().includes(term) ||
+            g.day?.toLowerCase().includes(term) ||
+            String(g.capacity).includes(term) ||
+            String(g.students?.length ?? 0).includes(term)
+        ));
+    }, [groups, searchTerm]);
 
-    const labelStyle: React.CSSProperties = {
-        fontSize: "12px",
-        color: "var(--color-text-muted)",
-        display: "block",
-        marginBottom: "4px",
-        fontWeight: 600
-    };
-
-    const sectionStyle: React.CSSProperties = {
-        display: "flex",
-        gap: "12px",
-        flexWrap: "wrap",
-        alignItems: "flex-start"
-    };
-
-    const fieldStyle = (width?: string): React.CSSProperties => ({
-        flex: width ? "none" : "1",
-        minWidth: "120px",
-        width: width
-    });
-
-    const errorText = (key: string) =>
-        formErrors[key] ? <span style={{ color: "var(--color-error)", fontSize: "11px" }}>{formErrors[key]}</span> : null;
-
-    const DaySelect = ({ value, onChange, errKey }: { value: string, onChange: (v: string) => void, errKey: string }) => (
-        <select value={value} onChange={e => onChange(e.target.value)} style={inputStyle(errKey)}>
-            <option value="">Select day</option>
-            {["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"].map(d =>
-                <option key={d} value={d.toLowerCase()}>{d}</option>
-            )}
-        </select>
+    const paginatedGroups = filteredGroups.slice(
+        page * PAGE_SIZE,
+        page * PAGE_SIZE + PAGE_SIZE
     );
 
-    const TimeSelect = ({ value, onChange, errKey }: { value: number | "", onChange: (v: number | "") => void, errKey: string }) => (
-        <select value={value} onChange={e => onChange(e.target.value === "" ? "" : Number(e.target.value))} style={inputStyle(errKey)}>
-            <option value="">Select</option>
-            {hours.map(h => <option key={h} value={timeToNumber(h)}>{h}</option>)}
-        </select>
-    );
+    const tableHeaders = [
+        t("groupPanel.columnSubject"),
+        t("groupPanel.columnGroupNumber"),
+        t("groupPanel.columnType"),
+        t("groupPanel.columnDay"),
+        t("groupPanel.columnFrom"),
+        t("groupPanel.columnTo"),
+    ];
 
     return (
-        <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", maxWidth: "1200px", margin: "0 auto" }}>
-            <h2 style={{ color: "var(--color-text-secondary)", borderBottom: "2px solid var(--color-success)", paddingBottom: "10px" }}>
-                {editingId ? "✏️ Update Group" : "➕ Add New Group"}
-            </h2>
-
-            {/* ===== MAIN GROUP FORM ===== */}
-            <div style={{
-                display: "flex", flexDirection: "column", gap: "15px",
-                marginBottom: hasCoreq ? "0" : "30px", padding: "25px",
-                backgroundColor: "var(--color-bg)", borderRadius: hasCoreq ? "10px 10px 0 0" : "10px",
-                boxShadow: hasCoreq ? "0 2px 0 rgba(0,0,0,0.08)" : "0 2px 4px rgba(0,0,0,0.1)",
-                borderBottom: hasCoreq ? "2px dashed var(--color-border)" : "none"
-            }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                    <span style={{
-                        backgroundColor: "var(--color-info-bg)", color: "var(--color-info)",
-                        padding: "3px 10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700
-                    }}>📚 LECTURE / MAIN GROUP</span>
-                </div>
-
-                <div style={sectionStyle}>
-                    {/* Subject */}
-                    <div style={fieldStyle()}>
-                        <label style={labelStyle}>Subject *</label>
-                        <select
-                            value={subject}
-                            onChange={e => { setSubject(e.target.value); setFormErrors(f => ({...f, subject: ""})); }}
-                            style={inputStyle("subject")}
-                        >
-                            <option value="">Select subject</option>
-                            {subjects.map(s => <option key={s._id} value={s.code.toLowerCase()}>{s.code.toUpperCase()}</option>)}
-                        </select>
-                        {errorText("subject")}
-                    </div>
-
-                    {/* Group Number */}
-                    <div style={fieldStyle("100px")}>
-                        <label style={labelStyle}>Group # *</label>
-                        <input
-                            type="number"
-                            placeholder="1"
-                            value={number}
-                            onChange={e => { setNumber(Number(e.target.value)); setFormErrors(f => ({...f, number: ""})); }}
-                            style={inputStyle("number")}
-                        />
-                        {errorText("number")}
-                    </div>
-
-                    {/* Type */}
-                    <div style={fieldStyle("130px")}>
-                        <label style={labelStyle}>Type *</label>
-                        <select value={type} onChange={e => { setType(e.target.value); setFormErrors(f => ({...f, type: ""})); }} style={inputStyle("type")}>
-                            <option value="lecture">📚 Lecture</option>
-                            <option value="lab">🔬 Lab</option>
-                            <option value="tutorial">📝 Tutorial</option>
-                            <option value="seminar">🎤 Seminar</option>
-                        </select>
-                    </div>
-
-                    {/* Day */}
-                    <div style={fieldStyle("130px")}>
-                        <label style={labelStyle}>Day *</label>
-                        <DaySelect value={day} onChange={v => { setDay(v); setFormErrors(f => ({...f, day: ""})); }} errKey="day" />
-                        {errorText("day")}
-                    </div>
-
-                    {/* From */}
-                    <div style={fieldStyle("100px")}>
-                        <label style={labelStyle}>From *</label>
-                        <TimeSelect value={from} onChange={v => { setFrom(v); setFormErrors(f => ({...f, from: "", time: ""})); }} errKey="from" />
-                        {errorText("from")}
-                    </div>
-
-                    {/* To */}
-                    <div style={fieldStyle("100px")}>
-                        <label style={labelStyle}>To *</label>
-                        <TimeSelect value={to} onChange={v => { setTo(v); setFormErrors(f => ({...f, to: "", time: ""})); }} errKey="to" />
-                        {errorText("to")}
-                    </div>
-
-                    {/* Capacity */}
-                    <div style={fieldStyle("90px")}>
-                        <label style={labelStyle}>Capacity *</label>
-                        <input
-                            type="number" min="1" value={capacity}
-                            onChange={e => { setCapacity(Number(e.target.value)); setFormErrors(f => ({...f, capacity: ""})); }}
-                            style={inputStyle("capacity")}
-                        />
-                        {errorText("capacity")}
-                    </div>
-                </div>
-
-                {formErrors.time && (
-                    <div style={{ color: "var(--color-error)", fontSize: "13px", padding: "8px", backgroundColor: "var(--color-error-bg)", borderRadius: "4px" }}>
-                        ⚠️ {formErrors.time}
-                    </div>
-                )}
-
-                {/* Corequisite toggle — only when adding */}
-                {!editingId && (
-                    <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", marginTop: "4px", userSelect: "none" }}>
-                        <input
-                            type="checkbox"
-                            checked={hasCoreq}
-                            onChange={e => setHasCoreq(e.target.checked)}
-                            style={{ width: "16px", height: "16px", cursor: "pointer" }}
-                        />
-                        <span style={{ fontSize: "14px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
-                            Add corequisite group (Lab / Tutorial) at the same time
-                        </span>
-                    </label>
-                )}
-            </div>
-
-            {/* ===== COREQUISITE FORM ===== */}
-            {hasCoreq && !editingId && (
-                <div style={{
-                    display: "flex", flexDirection: "column", gap: "15px",
-                    marginBottom: "30px", padding: "25px",
-                    backgroundColor: "#fdf6ff",
-                    borderRadius: "0 0 10px 10px",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                    borderTop: "none"
-                }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                        <span style={{
-                            backgroundColor: "#f3e5f5", color: "#7b1fa2",
-                            padding: "3px 10px", borderRadius: "12px", fontSize: "12px", fontWeight: 700
-                        }}>🔬 COREQUISITE GROUP (same subject &amp; group #)</span>
-                    </div>
-
-                    <div style={sectionStyle}>
-                        {/* Subject (readonly display) */}
-                        <div style={fieldStyle()}>
-                            <label style={labelStyle}>Subject (inherited)</label>
-                            <input
-                                value={subject ? subject.toUpperCase() : "—"}
-                                disabled
-                                style={{ ...inputStyle(""), backgroundColor: "#f5f5f5", color: "#888", cursor: "not-allowed" }}
-                            />
-                        </div>
-
-                        {/* Group # (readonly display) */}
-                        <div style={fieldStyle("100px")}>
-                            <label style={labelStyle}>Group # (inherited)</label>
-                            <input
-                                value={number !== "" ? number : "—"}
-                                disabled
-                                style={{ ...inputStyle(""), backgroundColor: "#f5f5f5", color: "#888", cursor: "not-allowed" }}
-                            />
-                        </div>
-
-                        {/* Coreq Type */}
-                        <div style={fieldStyle("130px")}>
-                            <label style={labelStyle}>Type *</label>
-                            <select value={coReqType} onChange={e => { setCoReqType(e.target.value); setFormErrors(f => ({...f, coReqType: ""})); }} style={inputStyle("coReqType")}>
-                                <option value="lab">🔬 Lab</option>
-                                <option value="tutorial">📝 Tutorial</option>
-                                <option value="seminar">🎤 Seminar</option>
-                            </select>
-                            {errorText("coReqType")}
-                        </div>
-
-                        {/* Coreq Day */}
-                        <div style={fieldStyle("130px")}>
-                            <label style={labelStyle}>Day *</label>
-                            <DaySelect value={coReqDay} onChange={v => { setCoReqDay(v); setFormErrors(f => ({...f, coReqDay: ""})); }} errKey="coReqDay" />
-                            {errorText("coReqDay")}
-                        </div>
-
-                        {/* Coreq From */}
-                        <div style={fieldStyle("100px")}>
-                            <label style={labelStyle}>From *</label>
-                            <TimeSelect value={coReqFrom} onChange={v => { setCoReqFrom(v); setFormErrors(f => ({...f, coReqFrom: "", coReqTime: ""})); }} errKey="coReqFrom" />
-                            {errorText("coReqFrom")}
-                        </div>
-
-                        {/* Coreq To */}
-                        <div style={fieldStyle("100px")}>
-                            <label style={labelStyle}>To *</label>
-                            <TimeSelect value={coReqTo} onChange={v => { setCoReqTo(v); setFormErrors(f => ({...f, coReqTo: "", coReqTime: ""})); }} errKey="coReqTo" />
-                            {errorText("coReqTo")}
-                        </div>
-
-                        {/* Coreq Capacity */}
-                        <div style={fieldStyle("90px")}>
-                            <label style={labelStyle}>Capacity *</label>
-                            <input
-                                type="number" min="1" value={coReqCapacity}
-                                onChange={e => { setCoReqCapacity(Number(e.target.value)); setFormErrors(f => ({...f, coReqCapacity: ""})); }}
-                                style={inputStyle("coReqCapacity")}
-                            />
-                            {errorText("coReqCapacity")}
-                        </div>
-                    </div>
-
-                    {formErrors.coReqTime && (
-                        <div style={{ color: "var(--color-error)", fontSize: "13px", padding: "8px", backgroundColor: "var(--color-error-bg)", borderRadius: "4px" }}>
-                            ⚠️ {formErrors.coReqTime}
-                        </div>
-                    )}
-                </div>
-            )}
-
-            {/* ===== ACTION BUTTONS ===== */}
-            <div style={{ display: "flex", gap: "10px", marginBottom: "30px", marginTop: hasCoreq ? "0" : "-10px" }}>
-                <button
-                    onClick={handleSubmit}
-                    disabled={submitting}
-                    style={{
-                        padding: "11px 24px",
-                        backgroundColor: editingId ? "var(--color-info)" : "var(--color-success)",
-                        color: "white", border: "none", borderRadius: "6px",
-                        cursor: submitting ? "wait" : "pointer",
-                        fontWeight: "bold", fontSize: "14px",
-                        opacity: submitting ? 0.7 : 1,
-                        transition: "opacity 0.2s"
-                    }}
-                >
-                    {submitting ? "⏳ Saving..." : editingId ? "✏️ Update Group" : hasCoreq ? "➕ Add Both Groups" : "➕ Add Group"}
+        <div className="dashboard-container">
+            <div className="table-header">
+                <h2>{t("groupPanel.tableTitle", { count: groups.length })}</h2>
+                <button className="add-btn" onClick={() => setShowModal(true)}>
+                    + {t("groupPanel.addBtn")}
                 </button>
-
-                {editingId && (
-                    <button
-                        onClick={handleCancel}
-                        style={{
-                            padding: "11px 24px",
-                            backgroundColor: "var(--color-error)",
-                            color: "white", border: "none", borderRadius: "6px",
-                            cursor: "pointer", fontWeight: "bold", fontSize: "14px"
-                        }}
-                    >
-                        ✕ Cancel
-                    </button>
-                )}
             </div>
 
-            {/* ===== GROUPS TABLE ===== */}
-            <h2 style={{ color: "var(--color-text-secondary)", borderBottom: "2px solid var(--color-success)", paddingBottom: "10px" }}>
-                📊 Groups Dashboard ({groups.length})
-            </h2>
+            {/* Search Bar */}
+            <div style={{ display: "flex", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
+                <input
+                    type="text"
+                    placeholder={t("groupPanel.searchPlaceholder")}
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    style={{ padding: "8px", flex: "1 1 200px" }}
+                />
+            </div>
 
-            {groups.length === 0 ? (
-                <div style={{
-                    textAlign: "center", padding: "60px",
-                    backgroundColor: "var(--color-bg)", borderRadius: "8px",
-                    color: "var(--color-text-muted)", fontSize: "16px"
-                }}>
-                    📭 No groups found. Add your first group above!
-                </div>
-            ) : (
-                <div style={{ overflowX: "auto" }}>
-                    <table style={{
-                        width: "100%", borderCollapse: "collapse",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                        borderRadius: "8px", overflow: "hidden"
-                    }}>
-                        <thead>
-                        <tr style={{ backgroundColor: "var(--color-success)", color: "white" }}>
-                            {["Subject","Group #","Type","Day","From","To","Capacity","Students","Actions"].map(h =>
-                                <th key={h} style={{ padding: "14px", textAlign: "left" }}>{h}</th>
-                            )}
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {groups.map((group, index) => (
-                            <tr
-                                key={group._id}
-                                style={{
-                                    backgroundColor: index % 2 === 0 ? "var(--color-bg)" : "white",
-                                    borderBottom: "1px solid var(--color-border)",
-                                    transition: "background-color 0.2s"
-                                }}
-                                onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#f1f8e9")}
-                                onMouseLeave={e => (e.currentTarget.style.backgroundColor = index % 2 === 0 ? "var(--color-bg)" : "white")}
-                            >
-                                <td style={{ padding: "14px", fontWeight: "bold" }}>{group.subject.toUpperCase()}</td>
-                                <td style={{ padding: "14px" }}>{group.number}</td>
-                                <td style={{ padding: "14px" }}>
-                                    <span style={{ padding: "5px 12px", borderRadius: "20px", fontSize: "13px", fontWeight: 500, display: "inline-block", ...getTypeStyle(group.type) }}>
-                                        {group.type.charAt(0).toUpperCase() + group.type.slice(1)}
-                                    </span>
-                                </td>
-                                <td style={{ padding: "14px" }}>{formatDay(group.day)}</td>
-                                <td style={{ padding: "14px", fontWeight: 500 }}>{numberToTime(group.from)}</td>
-                                <td style={{ padding: "14px", fontWeight: 500 }}>{numberToTime(group.to)}</td>
-                                <td style={{ padding: "14px" }}>
-                                    <span style={{ backgroundColor: "var(--color-success-bg)", padding: "4px 8px", borderRadius: "4px", color: "var(--color-success)", fontWeight: 500 }}>
-                                        {group.capacity}
-                                    </span>
-                                </td>
-                                <td style={{ padding: "14px" }}>
-                                    <span style={{ backgroundColor: "var(--color-warning-bg)", padding: "4px 8px", borderRadius: "4px", color: "var(--color-warning)", fontWeight: 500 }}>
-                                        {group.students?.length || 0}
-                                    </span>
-                                </td>
-                                <td style={{ padding: "14px" }}>
-                                    <button
-                                        onClick={() => handleEdit(group)}
-                                        style={{ padding: "6px 12px", marginRight: "6px", backgroundColor: "var(--color-info)", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", fontSize: "13px" }}
-                                    >
-                                        ✏️ Edit
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(group._id!)}
-                                        style={{ padding: "6px 12px", backgroundColor: "var(--color-error)", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", fontSize: "13px" }}
-                                    >
-                                        🗑️ Delete
-                                    </button>
-                                </td>
-                            </tr>
+            {/* Groups Table */}
+            <table className="staff-table">
+                <thead>
+                    <tr>
+                        {tableHeaders.map(h => (
+                            <th key={h}>{h}</th>
                         ))}
-                        </tbody>
-                    </table>
+                    </tr>
+                </thead>
+                <tbody>
+                    {paginatedGroups.map(group => (
+                        <tr 
+                            key={group._id}
+                            onClick={() => handleEdit(group)}
+                            style={{ cursor: "pointer" }}
+                        >
+                            <td>{group.subject.toUpperCase()}</td>
+                            <td>{group.number}</td>
+                            <td>
+                                <span className={`badge badge-${group.type === 'lecture' ? 'info' : group.type === 'lab' ? 'primary' : group.type === 'tutorial' ? 'warning' : 'success'}`}>
+                                    {group.type.charAt(0).toUpperCase() + group.type.slice(1)}
+                                </span>
+                            </td>
+                            <td>{formatDay(group.day)}</td>
+                            <td>{numberToTime(group.from)}</td>
+                            <td>{numberToTime(group.to)}</td>
+                        </tr>
+                    ))}
+                    {paginatedGroups.length === 0 && (
+                        <tr>
+                            <td colSpan={tableHeaders.length} style={{ textAlign: "center" }}>
+                                {t("dashboardCommon.noResults")}
+                            </td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+
+            <Pagination
+                page={page}
+                setPage={setPage}
+                total={filteredGroups.length}
+            />
+
+            {/* Add/Edit Modal */}
+            {showModal && (
+                <div className="modal-overlay" onMouseDown={(e) => {
+                    if (e.target === e.currentTarget) closeModal();
+                }}>
+                    <div className="modal-content" style={{ maxWidth: "900px" }}>
+                        <div className="modal-header">
+                            <h3>{editingId ? t("groupPanel.editHeader") : t("groupPanel.addHeader")}</h3>
+                            <button className="modal-close" onClick={closeModal} type="button">×</button>
+                        </div>
+                        <div className="modal-body">
+                            <form onSubmit={e => { e.preventDefault(); handleSubmit(); }}>
+                                {subjectsError && <p className="error">{subjectsError}</p>}
+
+                                {/* Action buttons in modal header */}
+                                {editingId && (
+                                    <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
+                                        <button
+                                            type="button"
+                                            className="delete-btn"
+                                            onClick={() => {
+                                                if (editingId && window.confirm("Are you sure you want to delete this group?")) {
+                                                    handleDelete(editingId);
+                                                    closeModal();
+                                                }
+                                            }}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* Subject */}
+                                <div className="form-group">
+                                    <label>{t("groupPanel.subjectLabel")} *</label>
+                                    <select
+                                        value={subject}
+                                        onChange={e => { setSubject(e.target.value); setFormErrors(f => ({...f, subject: ""})); }}
+                                        disabled={loadingSubjects}
+                                    >
+                                        <option value="">
+                                            {loadingSubjects ? "Loading subjects..." : "Select subject"}
+                                        </option>
+                                        {subjects.map(s => (
+                                            <option key={s._id} value={s.code.toLowerCase()}>
+                                                {s.code.toUpperCase()} - {s.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {formErrors.subject && <span className="error">{formErrors.subject}</span>}
+                                </div>
+
+                                {/* Group Number and Type */}
+                                <div className="settings-form-row">
+                                    <div className="form-group" style={{ flex: 1 }}>
+                                        <label>{t("groupPanel.groupNumberLabel")} *</label>
+                                        <input
+                                            type="number"
+                                            placeholder="1"
+                                            value={number}
+                                            onChange={e => { setNumber(Number(e.target.value)); setFormErrors(f => ({...f, number: ""})); }}
+                                        />
+                                        {formErrors.number && <span className="error">{formErrors.number}</span>}
+                                    </div>
+
+                                    <div className="form-group" style={{ flex: 1 }}>
+                                        <label>{t("groupPanel.typeLabel")} *</label>
+                                        <select value={type} onChange={e => { setType(e.target.value); setFormErrors(f => ({...f, type: ""})); }}>
+                                            <option value="lecture">Lecture</option>
+                                            <option value="lab">Lab</option>
+                                            <option value="tutorial">Tutorial</option>
+                                            <option value="seminar">Seminar</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {/* Day and Time */}
+                                <div className="settings-form-row">
+                                    <div className="form-group" style={{ flex: 1 }}>
+                                        <label>{t("groupPanel.dayLabel")} *</label>
+                                        <select value={day} onChange={e => { setDay(e.target.value); setFormErrors(f => ({...f, day: ""})); }}>
+                                            <option value="">Select day</option>
+                                            {["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"].map(d =>
+                                                <option key={d} value={d.toLowerCase()}>{d}</option>
+                                            )}
+                                        </select>
+                                        {formErrors.day && <span className="error">{formErrors.day}</span>}
+                                    </div>
+
+                                    <div className="form-group" style={{ flex: 1 }}>
+                                        <label>{t("groupPanel.fromLabel")} *</label>
+                                        <select value={from} onChange={e => { setFrom(e.target.value === "" ? "" : Number(e.target.value)); setFormErrors(f => ({...f, from: "", time: ""})); }}>
+                                            <option value="">Select</option>
+                                            {hours.map(h => <option key={h} value={timeToNumber(h)}>{h}</option>)}
+                                        </select>
+                                        {formErrors.from && <span className="error">{formErrors.from}</span>}
+                                    </div>
+
+                                    <div className="form-group" style={{ flex: 1 }}>
+                                        <label>{t("groupPanel.toLabel")} *</label>
+                                        <select value={to} onChange={e => { setTo(e.target.value === "" ? "" : Number(e.target.value)); setFormErrors(f => ({...f, to: "", time: ""})); }}>
+                                            <option value="">Select</option>
+                                            {hours.map(h => <option key={h} value={timeToNumber(h)}>{h}</option>)}
+                                        </select>
+                                        {formErrors.to && <span className="error">{formErrors.to}</span>}
+                                    </div>
+                                </div>
+
+                                {formErrors.time && (
+                                    <div className="error">{formErrors.time}</div>
+                                )}
+
+                                {/* Capacity */}
+                                <div className="form-group">
+                                    <label>{t("groupPanel.capacityLabel")} *</label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={capacity}
+                                        onChange={e => { setCapacity(Number(e.target.value)); setFormErrors(f => ({...f, capacity: ""})); }}
+                                    />
+                                    {formErrors.capacity && <span className="error">{formErrors.capacity}</span>}
+                                </div>
+
+                                {/* Corequisite toggle — only when adding */}
+                                {!editingId && (
+                                    <label className="settings-level-option" style={{ marginTop: "8px", cursor: "pointer" }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={hasCoreq}
+                                            onChange={e => setHasCoreq(e.target.checked)}
+                                            style={{ width: "16px", height: "16px", cursor: "pointer" }}
+                                        />
+                                        <span style={{ fontSize: "14px", fontWeight: 600, color: "var(--color-text)" }}>
+                                            Add corequisite group (Lab / Tutorial) at the same time
+                                        </span>
+                                    </label>
+                                )}
+
+                                {/* Corequisite fields */}
+                                {hasCoreq && !editingId && (
+                                    <>
+                                        <div className="settings-form-row">
+                                            <div className="form-group" style={{ flex: 1 }}>
+                                                <label>{t("groupPanel.typeLabel")} *</label>
+                                                <select value={coReqType} onChange={e => { setCoReqType(e.target.value); setFormErrors(f => ({...f, coReqType: ""})); }}>
+                                                    <option value="lab">Lab</option>
+                                                    <option value="tutorial">Tutorial</option>
+                                                    <option value="seminar">Seminar</option>
+                                                </select>
+                                                {formErrors.coReqType && <span className="error">{formErrors.coReqType}</span>}
+                                            </div>
+
+                                            <div className="form-group" style={{ flex: 1 }}>
+                                                <label>{t("groupPanel.dayLabel")} *</label>
+                                                <select value={coReqDay} onChange={e => { setCoReqDay(e.target.value); setFormErrors(f => ({...f, coReqDay: ""})); }}>
+                                                    <option value="">Select day</option>
+                                                    {["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"].map(d =>
+                                                        <option key={d} value={d.toLowerCase()}>{d}</option>
+                                                    )}
+                                                </select>
+                                                {formErrors.coReqDay && <span className="error">{formErrors.coReqDay}</span>}
+                                            </div>
+                                        </div>
+
+                                        <div className="settings-form-row">
+                                            <div className="form-group" style={{ flex: 1 }}>
+                                                <label>{t("groupPanel.fromLabel")} *</label>
+                                                <select value={coReqFrom} onChange={e => { setCoReqFrom(e.target.value === "" ? "" : Number(e.target.value)); setFormErrors(f => ({...f, coReqFrom: "", coReqTime: ""})); }}>
+                                                    <option value="">Select</option>
+                                                    {hours.map(h => <option key={h} value={timeToNumber(h)}>{h}</option>)}
+                                                </select>
+                                                {formErrors.coReqFrom && <span className="error">{formErrors.coReqFrom}</span>}
+                                            </div>
+
+                                            <div className="form-group" style={{ flex: 1 }}>
+                                                <label>{t("groupPanel.toLabel")} *</label>
+                                                <select value={coReqTo} onChange={e => { setCoReqTo(e.target.value === "" ? "" : Number(e.target.value)); setFormErrors(f => ({...f, coReqTo: "", coReqTime: ""})); }}>
+                                                    <option value="">Select</option>
+                                                    {hours.map(h => <option key={h} value={timeToNumber(h)}>{h}</option>)}
+                                                </select>
+                                                {formErrors.coReqTo && <span className="error">{formErrors.coReqTo}</span>}
+                                            </div>
+
+                                            <div className="form-group" style={{ flex: 1 }}>
+                                                <label>{t("groupPanel.capacityLabel")} *</label>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    value={coReqCapacity}
+                                                    onChange={e => { setCoReqCapacity(Number(e.target.value)); setFormErrors(f => ({...f, coReqCapacity: ""})); }}
+                                                />
+                                                {formErrors.coReqCapacity && <span className="error">{formErrors.coReqCapacity}</span>}
+                                            </div>
+                                        </div>
+
+                                        {formErrors.coReqTime && (
+                                            <div className="error">{formErrors.coReqTime}</div>
+                                        )}
+                                    </>
+                                )}
+
+                                <div className="modal-footer">
+                                    <button type="button" className="cancel-btn" onClick={closeModal}>
+                                        {t("dashboardCommon.cancel")}
+                                    </button>
+                                    <button type="submit" className="submit-btn" disabled={submitting}>
+                                        {submitting ? t("studentPanel.loadingBtn") : editingId ? t("groupPanel.updateBtn") : hasCoreq ? t("groupPanel.addBothBtn") : t("subjectPanel.saveBtn")}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

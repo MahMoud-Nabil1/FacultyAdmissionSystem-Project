@@ -134,7 +134,7 @@
   min-width: 720px;
 }
 
-.groupsTh {
+.groupsTable th {
   background-color: var(--color-bg);
   color: var(--color-primary);
   padding: 16px;
@@ -148,7 +148,7 @@
   white-space: nowrap;
 }
 
-.groupsTd {
+.groupsTable td {
   padding: 14px 16px;
   border-bottom: 1px solid var(--color-border);
   font-size: 1rem;
@@ -296,4 +296,71 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+/* Action buttons for student view */
+.join-btn,
+.waitlist-btn,
+.leave-btn,
+.waitlist-cancel-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Alexandria', sans-serif;
+}
+
+.join-btn {
+    background-color: var(--color-success);
+    color: white;
+}
+
+.join-btn:hover:not(:disabled) {
+    background-color: var(--color-success-hover, #059669);
+    transform: translateY(-1px);
+}
+
+.waitlist-btn {
+    background-color: var(--color-warning);
+    color: white;
+}
+
+.waitlist-btn:hover:not(:disabled) {
+    background-color: var(--color-warning-hover, #d97706);
+    transform: translateY(-1px);
+}
+
+.leave-btn {
+    background-color: var(--color-error-bg);
+    color: var(--color-error);
+    border: 1px solid var(--color-error);
+}
+
+.leave-btn:hover:not(:disabled) {
+    background-color: var(--color-error);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.waitlist-cancel-btn {
+    background-color: var(--color-info-bg);
+    color: var(--color-info);
+}
+
+.waitlist-cancel-btn:hover:not(:disabled) {
+    background-color: var(--color-info);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.join-btn:disabled,
+.waitlist-btn:disabled,
+.leave-btn:disabled,
+.waitlist-cancel-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
 }

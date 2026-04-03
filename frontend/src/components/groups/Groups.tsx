@@ -28,10 +28,11 @@ interface Group {
 }
 
 const Groups: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { user, token } = useAuth();
     const isAdmin = user?.role === 'admin';
     const isStudent = user?.role === 'student';
+    const isEnglish = i18n.language?.startsWith("en");
 
     // Core Data
     const [groups, setGroups] = useState<Group[]>([]);
@@ -213,7 +214,11 @@ const Groups: React.FC = () => {
         <div className="dashboard-container groupsContainer">
             <div className="table-header">
                 <h2>{t("groupsSchedule.title")}</h2>
-                {isAdmin && <button className="add-btn" onClick={() => setShowModal(true)}>+ {t("groupsSchedule.addNew")}</button>}
+                {isAdmin && (
+                    <button className="add-btn" onClick={() => setShowModal(true)}>
+                        + {t("groupsSchedule.addNew")}
+                    </button>
+                )}
             </div>
 
             {/* Filter Controls */}
@@ -227,38 +232,82 @@ const Groups: React.FC = () => {
                         className="groupsSearchInput"
                     />
                 </div>
-                <select value={filterDay} onChange={(e) => setFilterDay(e.target.value)} className="groupsSelect">
-                    <option value="all">{t("groupsSchedule.allDays")}</option>
-                    {DAYS.map(day => <option key={day} value={day}>{t(`days.${day}`)}</option>)}
-                </select>
+                <div className="groupsFilterGroup">
+                    <select value={filterDay} onChange={(e) => setFilterDay(e.target.value)} className="groupsSelect">
+                        <option value="all">{t("groupsSchedule.allDays")}</option>
+                        {DAYS.map(day => (
+                            <option key={day} value={day}>{t(`days.${day}`)}</option>
+                        ))}
+                    </select>
+                </div>
             </div>
 
             <div className="groupsTableWrapper">
                 <table className="groupsTable">
                     <thead>
-                    <tr>
-                        <th>{t("groupsSchedule.subject")}</th>
-                        <th>{t("groupsSchedule.group")}</th>
-                        <th>{t("groupsSchedule.type")}</th>
-                        <th>{t("groupsSchedule.day")}</th>
-                        <th>{t("groupsSchedule.time")}</th>
-                        <th>{isAdmin ? t("dashboardCommon.actions") : t("groupsSchedule.status")}</th>
-                    </tr>
+                        <tr>
+                            {isEnglish ? (
+                                <>
+                                    <th>{t("groupsSchedule.time")}</th>
+                                    <th>{t("groupsSchedule.day")}</th>
+                                    <th>{t("groupsSchedule.type")}</th>
+                                    <th>{t("groupsSchedule.group")}</th>
+                                    <th>{t("groupsSchedule.subject")}</th>
+                                    {isAdmin && <th>{t("dashboardCommon.actions")}</th>}
+                                </>
+                            ) : (
+                                <>
+                                    <th>{t("groupsSchedule.subject")}</th>
+                                    <th>{t("groupsSchedule.group")}</th>
+                                    <th>{t("groupsSchedule.type")}</th>
+                                    <th>{t("groupsSchedule.day")}</th>
+                                    <th>{t("groupsSchedule.time")}</th>
+                                    {isAdmin && <th>{t("dashboardCommon.actions")}</th>}
+                                </>
+                            )}
+                        </tr>
                     </thead>
                     <tbody>
-                    {filteredGroups.map((group) => (
-                        <tr key={group._id}>
-                            <td className="groupsSubjectCell">{formatSubject(group.subject)}</td>
-                            <td><strong>{group.number}</strong></td>
-                            <td><span className={`groupsBadge groupsBadge${group.type}`}>{group.type}</span></td>
-                            <td>{t(`days.${group.day.toLowerCase()}`)}</td>
-                            <td>{formatTime(group.from)} - {formatTime(group.to)}</td>
-                            <td>{renderActionButtons(group)}</td>
-                        </tr>
-                    ))}
+                        {filteredGroups.map((group) => (
+                            <tr key={group._id}>
+                                {isEnglish ? (
+                                    <>
+                                        <td className="groupsTimeSlot">{formatTime(group.from)} - {formatTime(group.to)}</td>
+                                        <td>{t(`days.${group.day.toLowerCase()}`)}</td>
+                                        <td>
+                                            <span className={`groupsBadge groupsBadge${group.type}`}>
+                                                {group.type}
+                                            </span>
+                                        </td>
+                                        <td><strong>{group.number}</strong></td>
+                                        <td className="groupsSubjectCell">{formatSubject(group.subject)}</td>
+                                        {isAdmin && <td>{renderActionButtons(group)}</td>}
+                                    </>
+                                ) : (
+                                    <>
+                                        <td className="groupsSubjectCell">{formatSubject(group.subject)}</td>
+                                        <td><strong>{group.number}</strong></td>
+                                        <td>
+                                            <span className={`groupsBadge groupsBadge${group.type}`}>
+                                                {group.type}
+                                            </span>
+                                        </td>
+                                        <td>{t(`days.${group.day.toLowerCase()}`)}</td>
+                                        <td className="groupsTimeSlot">{formatTime(group.from)} - {formatTime(group.to)}</td>
+                                        {isAdmin && <td>{renderActionButtons(group)}</td>}
+                                    </>
+                                )}
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>
+
+            {filteredGroups.length === 0 && (
+                <div className="groupsEmptyState">
+                    {t("groupPanel.noGroupsMessage")}
+                </div>
+            )}
         </div>
     );
 };

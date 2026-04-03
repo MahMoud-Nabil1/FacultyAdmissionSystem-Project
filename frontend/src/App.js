@@ -35,12 +35,6 @@ function App() {
                     path="/"
                     element={
                         <ProtectedRoute>
-                            <button onClick={() => {
-                                sessionStorage.removeItem("token");
-                                window.location.href = "/login";
-                            }}>
-                                {t('sidePanel.signOut')}
-                            </button>
                             <Home/>
                         </ProtectedRoute>
                     }

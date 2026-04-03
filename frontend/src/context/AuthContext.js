@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const checkAuth = () => {
-            const savedToken = localStorage.getItem('token');
+            const savedToken = sessionStorage.getItem('token');
 
             if (!savedToken) {
                 setToken(null);
@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
                 const payload = jwtDecode(savedToken);
                 const now = Date.now() / 1000;
                 if (payload.exp && payload.exp < now) {
-                    localStorage.removeItem('token');
+                    sessionStorage.removeItem('token');
                     setToken(null);
                     setUser(null);
                 } else {
@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
                     setUser(payload);
                 }
             } catch {
-                localStorage.removeItem('token');
+                sessionStorage.removeItem('token');
                 setToken(null);
                 setUser(null);
             } finally {
@@ -43,19 +43,9 @@ export const AuthProvider = ({ children }) => {
 
         checkAuth();
 
-        // Check for token removal in other tabs or through API calls
-        const handleStorageChange = (e) => {
-            if (e.key === 'token' && !e.newValue) {
-                setToken(null);
-                setUser(null);
-            }
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-        
-        // Polling as a fallback for the same tab token removal if not using an event emitter
+        // Polling to check for token removal in the same tab
         const interval = setInterval(() => {
-            const currentToken = localStorage.getItem('token');
+            const currentToken = sessionStorage.getItem('token');
             if (!currentToken && token) {
                 setToken(null);
                 setUser(null);
@@ -63,13 +53,12 @@ export const AuthProvider = ({ children }) => {
         }, 2000);
 
         return () => {
-            window.removeEventListener('storage', handleStorageChange);
             clearInterval(interval);
         };
     }, [token]);
 
     const login = (tokenValue) => {
-        localStorage.setItem('token', tokenValue);
+        sessionStorage.setItem('token', tokenValue);
         setToken(tokenValue);
 
         try {
@@ -81,7 +70,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
         setToken(null);
         setUser(null);
     };
