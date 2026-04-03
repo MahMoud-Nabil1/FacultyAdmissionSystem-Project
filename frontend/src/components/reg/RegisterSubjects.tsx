@@ -127,7 +127,7 @@ const RegisterSubjects = () => {
                 apiGet("/subjects"),
                 apiGet("/groups"),
                 apiGet("/groups/my-requests"),
-                apiGet("/system-settings"),
+                apiGet("/settings"),
             ]);
 
             if (!meRes.ok) throw new Error("Failed to fetch student data");
