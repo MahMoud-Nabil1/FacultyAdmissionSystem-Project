@@ -16,6 +16,7 @@ import Announcements from "./components/common/announcements.jsx";
 import AdminDashboardTable from "./components/dashboard/tables/table.tsx";
 import Groups from "./components/groups/Groups.tsx";
 import Home from "./components/common/home.tsx";
+import RegisterSubjects from "./components/reg/RegisterSubjects.tsx";
 
 
 function App() {
@@ -95,7 +96,7 @@ function App() {
                 } />
                 <Route path="/register-subjects" element={
                     <ProtectedRoute>
-                        put register new subjects component here
+                        <RegisterSubjects />
                     </ProtectedRoute>
                 }
                 />

@@ -13,12 +13,32 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const savedToken = sessionStorage.getItem('token');
 
-        if (!savedToken) {
-            setLoading(false);
-            return;
-        }
+            if (!savedToken) {
+                setToken(null);
+                setUser(null);
+                setLoading(false);
+                return;
+            }
 
-        setToken(savedToken);
+            try {
+                const payload = jwtDecode(savedToken);
+                const now = Date.now() / 1000;
+                if (payload.exp && payload.exp < now) {
+                    localStorage.removeItem('token');
+                    setToken(null);
+                    setUser(null);
+                } else {
+                    setToken(savedToken);
+                    setUser(payload);
+                }
+            } catch {
+                localStorage.removeItem('token');
+                setToken(null);
+                setUser(null);
+            } finally {
+                setLoading(false);
+            }
+        };
 
         try {
             const payload = jwtDecode(savedToken);

@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../src/context/AuthContext';
+import { useLanguage } from '../../src/context/LanguageContext';
 
 /** Returns tab visibility options — hides tab button when condition is false */
 function tabVisibility(visible: boolean) {
@@ -14,15 +15,17 @@ function tabVisibility(visible: boolean) {
 
 export default function TabsLayout() {
     const { user } = useAuth();
+    const { t } = useLanguage();
     const isAdmin = user?.role === 'admin';
     const isStudent = user?.role === 'student';
 
     return (
         <Tabs
             screenOptions={{
-                headerStyle: { backgroundColor: '#1a73e8' },
-                headerTintColor: '#fff',
-                headerTitleStyle: { fontWeight: 'bold' },
+                headerShown: false,
+                headerTitle: '',
+                headerShadowVisible: false,
+                headerStyle: { backgroundColor: '#ffffff' },
                 tabBarActiveTintColor: '#1a73e8',
                 tabBarInactiveTintColor: '#9ca3af',
                 tabBarStyle: {
@@ -43,8 +46,8 @@ export default function TabsLayout() {
             <Tabs.Screen
                 name="home"
                 options={{
-                    title: 'الرئيسية',
-                    tabBarLabel: 'الرئيسية',
+                    title: t('tabs.home'),
+                    tabBarLabel: t('tabs.home'),
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="home" size={size} color={color} />
                     ),
@@ -55,12 +58,13 @@ export default function TabsLayout() {
             <Tabs.Screen
                 name="edit"
                 options={{
-                    title: 'Edit',
-                    tabBarLabel: 'Edit',
+                    title: t('tabs.edit'),
+                    tabBarLabel: t('tabs.edit'),
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="create-outline" size={size} color={color} />
                     ),
                     ...tabVisibility(isAdmin),
+                    paddingTop: 200,
                 }}
             />
 
@@ -68,8 +72,8 @@ export default function TabsLayout() {
             <Tabs.Screen
                 name="groups"
                 options={{
-                    title: 'Groups',
-                    tabBarLabel: 'Groups',
+                    title: t('tabs.groups'),
+                    tabBarLabel: t('tabs.groups'),
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="people" size={size} color={color} />
                     ),
@@ -81,8 +85,8 @@ export default function TabsLayout() {
             <Tabs.Screen
                 name="support"
                 options={{
-                    title: 'Contact Support',
-                    tabBarLabel: 'Support',
+                    title: t('tabs.support'),
+                    tabBarLabel: t('tabs.support'),
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="headset" size={size} color={color} />
                     ),

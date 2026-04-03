@@ -8,9 +8,13 @@ function getToken() {
     return sessionStorage.getItem("token");
 }
 
+function clearToken() {
+    localStorage.removeItem("token");
+}
+
 function getAuthHeader() {
     const token = getToken();
-    if (!token) throw new Error("No token found. Please login.");
+    if (!token) return null;
     return {Authorization: `Bearer ${token}`};
 }
 
@@ -19,10 +23,26 @@ export function decodeToken() {
     if (!token) return null;
 
     try {
-        return jwtDecode(token);
+        const decoded = jwtDecode(token);
+        const now = Date.now() / 1000;
+        if (decoded.exp && decoded.exp < now) {
+            clearToken();
+            return null;
+        }
+        return decoded;
     } catch {
+        clearToken();
         return null;
     }
+}
+
+async function handleResponse(res) {
+    if (res.status === 401) {
+        clearToken();
+        window.location.href = '/login';
+    }
+    const data = await res.json().catch(() => ({}));
+    return {res, data};
 }
 
 
@@ -39,16 +59,18 @@ export async function apiPost(path, body, auth = true) {
         body: JSON.stringify(body),
     });
 
-    const data = await res.json().catch(() => ({}));
-    return {res, data};
+    return handleResponse(res);
 }
 
 
 export async function apiGet(path, auth = true) {
-    const headers = auth ? getAuthHeader() : {};
+    const headers = {};
+    if (auth) {
+        const authHeader = getAuthHeader();
+        if (authHeader) Object.assign(headers, authHeader);
+    }
     const res = await fetch(`${API_BASE}${path}`, {headers});
-    const data = await res.json().catch(() => ({}));
-    return {res, data};
+    return handleResponse(res);
 }
 
 export async function apiPut(path, body, auth = true) {
@@ -62,8 +84,7 @@ export async function apiPut(path, body, auth = true) {
         headers,
         body: JSON.stringify(body),
     });
-    const data = await res.json().catch(() => ({}));
-    return {res, data};
+    return handleResponse(res);
 }
 
 
@@ -74,8 +95,7 @@ export async function apiDelete(path, auth = true) {
         if (token) headers['Authorization'] = `Bearer ${token}`;
     }
     const res = await fetch(`${API_BASE}${path}`, {method: 'DELETE', headers});
-    const data = await res.json().catch(() => ({}));
-    return {res, data};
+    return handleResponse(res);
 }
 
 
@@ -129,7 +149,7 @@ export async function deleteStaff(id) {
 
 export async function getMe() {
     const payload = decodeToken();
-    if (!payload) throw new Error("No valid token found");
+    if (!payload) return null;
 
     return {
         id: payload.id,
@@ -166,5 +186,17 @@ export async function updateSubject(id, data) {
 export async function deleteSubject(id) {
     const {res, data} = await apiDelete(`/subjects/${id}`);
     if (!res.ok) throw new Error(data.error || "Failed to delete subject");
+    return data;
+}
+
+export async function getSystemSettings() {
+    const {res, data} = await apiGet("/settings", false);
+    if (!res.ok) throw new Error(data.error || "Failed to fetch settings");
+    return data;
+}
+
+export async function updateSystemSettings(settings) {
+    const {res, data} = await apiPut("/settings", settings);
+    if (!res.ok) throw new Error(data.error || "Failed to update settings");
     return data;
 }
