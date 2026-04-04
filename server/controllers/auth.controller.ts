@@ -194,10 +194,17 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             res.status(401).json({ error: "Invalid credentials" });
             return;
         }
+
         // --- STRICT SESSION MANAGEMENT ---
         const sessionId = crypto.randomUUID();
-        user.currentSessionId = sessionId;
-        await user.save();
+        
+        // Update session ID without triggering pre-save hooks
+        if (role === "student") {
+            await Student.findByIdAndUpdate(user._id, { currentSessionId: sessionId });
+        } else {
+            const Staff = (await import("../models/staff")).default;
+            await Staff.findByIdAndUpdate(user._id, { currentSessionId: sessionId });
+        }
 
         const tokenPayload: UserPayload = {
             id: role === "student" ? user.studentId : user._id,

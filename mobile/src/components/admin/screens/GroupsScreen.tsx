@@ -3,22 +3,25 @@ import {
     View, Text, TextInput, TouchableOpacity, StyleSheet,
     ScrollView, ActivityIndicator, Alert, Modal, Pressable, KeyboardAvoidingView, Platform,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
-import { getAllGroups, createGroup, deleteGroup } from '../../../services/api';
+import { getAllGroups, createGroup, deleteGroup, getAllSubjects } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import { useLanguage } from '../../../context/LanguageContext';
 
 interface Group { _id: string; subject: string; number: number; place: string; day: string; from: number; to: number; capacity: number; }
+interface Subject { _id: string; code: string; name: string; }
 
 const EMPTY = { number: '', subject: '', place: '', day: '', from: '', to: '', capacity: '' };
 
-const FIELD_KEYS = ['number', 'subject', 'place', 'day', 'from', 'to', 'capacity'] as const;
+const FIELD_KEYS = ['number', 'place', 'day', 'from', 'to', 'capacity'] as const;
 
 export default function GroupsScreen() {
     const { user } = useAuth();
     const { t } = useLanguage();
     const isAdmin = user?.role === 'admin';
     const [groups, setGroups] = useState<Group[]>([]);
+    const [subjects, setSubjects] = useState<Subject[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [form, setForm] = useState(EMPTY);
@@ -34,7 +37,14 @@ export default function GroupsScreen() {
         finally { setLoading(false); }
     }, [t]);
 
-    useEffect(() => { load(); }, [load]);
+    const loadSubjects = useCallback(async () => {
+        try {
+            const data = await getAllSubjects();
+            setSubjects((data as any) ?? []);
+        } catch (e: any) { console.error('Failed to load subjects:', e); }
+    }, []);
+
+    useEffect(() => { load(); loadSubjects(); }, [load, loadSubjects]);
 
     const closeModal = () => {
         setShowForm(false);
@@ -106,6 +116,22 @@ export default function GroupsScreen() {
                             </View>
                             <View style={styles.modalFormBody}>
                                 {!!error && <Text style={styles.error}>{error}</Text>}
+
+                                {/* Subject Picker */}
+                                <View style={styles.pickerWrapper}>
+                                    <Picker
+                                        selectedValue={form.subject}
+                                        onValueChange={(v) => setForm(p => ({ ...p, subject: v }))}
+                                        style={styles.picker}
+                                        mode="dropdown"
+                                    >
+                                        <Picker.Item label={t('groups.placeholders.subject')} value="" enabled={false} />
+                                        {subjects.map(s => (
+                                            <Picker.Item key={s._id} label={`${s.code.toUpperCase()} - ${s.name}`} value={s.code.toLowerCase()} />
+                                        ))}
+                                    </Picker>
+                                </View>
+
                                 {FIELD_KEYS.map((key) => {
                                     const kb = (key === 'number' || key === 'from' || key === 'to' || key === 'capacity') ? 'number-pad' as const : undefined;
                                     return (
@@ -163,6 +189,8 @@ const styles = StyleSheet.create({
     btnTextOutline: { color: '#1a73e8' },
     form: { backgroundColor: '#fff', borderRadius: 14, padding: 16, marginBottom: 20, gap: 10, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 },
     input: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 10, padding: 12, fontSize: 14, color: '#111', backgroundColor: '#fafafa' },
+    pickerWrapper: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 10, backgroundColor: '#fafafa', overflow: 'hidden' },
+    picker: { height: 50, width: '100%' },
     submitBtn: { backgroundColor: '#1a73e8', borderRadius: 10, padding: 13, alignItems: 'center', marginTop: 4 },
     submitText: { color: '#fff', fontWeight: '700', fontSize: 15 },
     error: { color: '#ef4444', textAlign: 'center', marginBottom: 8 },

@@ -43,6 +43,18 @@ export const processEnrollmentRequest = async (req: Request, res: Response): Pro
                 throw new Error("Student has a time collision with another group");
             }
 
+            // Check if already enrolled in any other group for the same subject
+            const alreadyEnrolledInSubject = await Group.findOne({
+                subject: group.subject,
+                students: request.student
+            }).session(session);
+
+            if (alreadyEnrolledInSubject) {
+                request.status = 'rejected';
+                await request.save({ session });
+                throw new Error("registration.errors.alreadyEnrolledInSubject");
+            }
+
             // Try atomic enrollment
             const updatedGroup = await Group.findOneAndUpdate(
                 {
@@ -108,6 +120,16 @@ export const requestJoinGroup = async (req: Request, res: Response): Promise<voi
             // Check if already in group
             if (group.students.some(id => id.toString() === student._id.toString())) {
                 throw new Error("registration.errors.alreadyInGroup");
+            }
+
+            // Check if already enrolled in any other group for the same subject
+            const alreadyEnrolledInSubject = await Group.findOne({
+                subject: group.subject,
+                students: student._id
+            }).session(session);
+
+            if (alreadyEnrolledInSubject) {
+                throw new Error("registration.errors.alreadyEnrolledInSubject");
             }
 
             // Check for time collision

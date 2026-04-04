@@ -62,8 +62,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             try {
                 const savedToken = await getStorageItemAsync('token');
                 if (!savedToken) return;
+                
+                const payload = jwtDecode<{ exp: number } & AuthUser>(savedToken);
+                
+                // Check if token is expired
+                if (payload.exp && payload.exp < Date.now() / 1000) {
+                    await deleteStorageItemAsync('token');
+                    return;
+                }
+                
                 setToken(savedToken);
-                const payload = jwtDecode(savedToken) as AuthUser;
                 setUser(payload);
             } catch {
                 await deleteStorageItemAsync('token');

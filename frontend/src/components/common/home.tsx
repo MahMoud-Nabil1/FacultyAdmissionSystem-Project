@@ -23,16 +23,27 @@ const Home = () => {
         const fetchUser = async () => {
             try {
                 const token = sessionStorage.getItem("token");
+                if (!token) {
+                    setLoading(false);
+                    return;
+                }
+                
                 const res = await fetch("http://localhost:5000/api/auth/me", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                if (!res.ok) throw new Error("Unauthorized");
+                
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        sessionStorage.removeItem("token");
+                        window.location.href = "/login";
+                    }
+                    return;
+                }
+                
                 const data = await res.json();
                 setUser(data);
             } catch (err) {
                 console.error("Auth fetch failed:", err);
-                sessionStorage.removeItem("token");
-                window.location.href = "/login";
             } finally {
                 setLoading(false);
             }

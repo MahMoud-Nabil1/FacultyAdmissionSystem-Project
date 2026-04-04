@@ -450,6 +450,7 @@
       "corequisitesRequired": "You must also register: {{subjects}}",
       "registrationClosed": "Registration is currently closed",
       "alreadyInGroup": "You are already in this group",
+      "alreadyEnrolledInSubject": "You are already registered for this subject in another group",
       "timeCollision": "You have a time collision with another group",
       "waitlistFull": "Group is full and you are already on the waitlist"
     }

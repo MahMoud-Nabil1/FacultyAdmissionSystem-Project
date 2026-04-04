@@ -449,6 +449,7 @@
       "corequisitesRequired": "يجب تسجيل أيضاً: {{subjects}}",
       "registrationClosed": "التسجيل مغلق حالياً",
       "alreadyInGroup": "أنت مسجل بالفعل في هذه المجموعة",
+      "alreadyEnrolledInSubject": "أنت مسجل بالفعل في هذا المقرر في مجموعة أخرى",
       "timeCollision": "لديك تعارض في الوقت مع مجموعة أخرى",
       "waitlistFull": "المجموعة ممتلئة وأنت بالفعل على قائمة الانتظار"
     }

@@ -83,7 +83,7 @@ studentSchema.virtual("password").set(function (this: StudentDocument, password:
 });
 
 studentSchema.pre("save", async function (this: StudentDocument) {
-    if (!this._password) return;
+    if (!this._password || !this.isModified("password")) return;
 
     const salt = await bcrypt.genSalt(10);
     this.salt = salt;

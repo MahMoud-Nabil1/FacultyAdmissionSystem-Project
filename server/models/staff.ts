@@ -9,6 +9,7 @@ export interface IStaff extends Document {
     salt?: string;
     departments: mongoose.Types.ObjectId[];
     students: mongoose.Types.ObjectId[];
+    currentSessionId?: string | null;
     createdAt: Date;
     updatedAt: Date;
 
@@ -52,7 +53,11 @@ const staffSchema = new Schema<IStaff>({
     students: [{
         type: Schema.Types.ObjectId,
         ref: 'Student'
-    }]
+    }],
+    currentSessionId: {
+        type: String,
+        default: null
+    }
 }, {
     timestamps: true,
     toJSON: { virtuals: true },
@@ -65,7 +70,7 @@ staffSchema.virtual('password')
     });
 
 staffSchema.pre<IStaff>('save', async function () {
-    if (!this._password) return;
+    if (!this._password || !this.isModified('password')) return;
 
     try {
         const salt = await bcrypt.genSalt(10);

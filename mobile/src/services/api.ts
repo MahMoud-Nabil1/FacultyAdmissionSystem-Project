@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
@@ -22,6 +23,9 @@ async function fetchWithTimeout(url: string, options: RequestInit, ms = 10000): 
 
 
 async function getToken(): Promise<string | null> {
+    if (Platform.OS === 'web') {
+        return await AsyncStorage.getItem('token');
+    }
     return SecureStore.getItemAsync('token');
 }
 
