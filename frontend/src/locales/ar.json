@@ -204,6 +204,33 @@
     "academic_guide_coordinator": "منسق للإرشاد الاكاديمى",
     "reporter": "مُراجع بيانات"
   },
+  "studentProfile": {
+    "title": "ملف الطالب",
+    "studentCode": "كود الطالب",
+    "nameLabel": "الاسم",
+    "emailLabel": "البريد الإلكتروني",
+    "gpaLabel": "المعدل التراكمي",
+    "completedSubjects": "المواد المكتملة",
+    "requestedSubjects": "المواد المطلوبة",
+    "registeredGroups": "المجموعات المسجلة",
+    "availableGroups": "المجموعات المتاحة",
+    "subject": "المادة",
+    "type": "النوع",
+    "groupNumber": "رقم المجموعة",
+    "day": "اليوم",
+    "time": "الوقت",
+    "place": "المكان",
+    "action": "الإجراء",
+    "addBtn": "إضافة",
+    "removeBtn": "حذف",
+    "loadingStudent": "جارٍ تحميل بيانات الطالب...",
+    "groupTypes": {
+      "lecture": "محاضرة",
+      "lab": "معمل",
+      "tutorial": "تمارين",
+      "seminar": "سيمينار"
+    }
+  },
   "dashboardCommon": {
     "all": "الكل",
     "delete": "حذف",
