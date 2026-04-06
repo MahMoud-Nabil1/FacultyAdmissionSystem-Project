@@ -1,0 +1,287 @@
+/* Import Modern Font */
+@import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700&display=swap');
+
+/* ---------- Root Variables ---------- */
+:root {
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --success: #10b981;
+    --danger: #ef4444;
+    --bg-main: #f8fafc;
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-blur: 10px;
+    --text-main: #1e293b;
+    --text-light: #64748b;
+    --shadow: 0 10px 25px rgba(0,0,0,0.08);
+    --radius: 16px;
+    --transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ---------- Base Styles ---------- */
+body {
+    background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+    font-family: 'Alexandria', sans-serif;
+    color: var(--text-main);
+    transition: background 0.5s;
+}
+
+/* ---------- Container ---------- */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 3rem auto;
+    padding: 2rem;
+    position: relative;
+}
+
+/* ---------- Header ---------- */
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+}
+
+.profile-header h2 {
+    font-size: 2.3rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Back Button Floating Style */
+.profile-header .btn-back {
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+    padding: 0.6rem 1.4rem;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(79,70,229,0.3);
+    transition: var(--transition);
+}
+.profile-header .btn-back:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 10px 30px rgba(79,70,229,0.35);
+}
+
+/* ---------- Info Cards ---------- */
+.student-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.75rem;
+    margin-bottom: 3rem;
+}
+
+.info-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    border-radius: var(--radius);
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 1.75rem;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    cursor: pointer;
+}
+.info-card:hover {
+    transform: translateY(-6px) rotateX(2deg);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+}
+.info-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.6rem;
+    transition: var(--transition);
+}
+.info-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* ---------- Section Titles ---------- */
+.section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 2.5rem 0 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+}
+.section-title::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(to right, var(--primary), #818cf8);
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease-out;
+}
+.section-title:hover::after {
+    transform: scaleX(1);
+}
+
+/* ---------- Subjects Tags ---------- */
+.subjects-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 2.5rem;
+}
+.subject-tag {
+    background: #f1f5f9;
+    padding: 0.6rem 1.2rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    border: 1px solid #e2e8f0;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+}
+.subject-tag::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+.subject-tag:hover::before {
+    opacity: 0.15;
+}
+.subject-tag span {
+    color: var(--primary);
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+/* ---------- Table Styles ---------- */
+.table-wrapper {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    border-radius: var(--radius);
+    border: 1px solid rgba(255,255,255,0.4);
+    overflow-x: auto;
+    box-shadow: var(--shadow);
+    margin-bottom: 2.5rem;
+    padding: 0.75rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    transition: var(--transition);
+}
+
+thead th {
+    background: #f1f5f9;
+    padding: 1.2rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+tbody td {
+    padding: 1rem;
+    border-top: 1px solid #e2e8f0;
+    font-size: 0.95rem;
+    position: relative;
+}
+
+/* Hover row effect */
+tbody tr {
+    transition: var(--transition);
+}
+tbody tr:hover {
+    background: rgba(255,255,255,0.7);
+    transform: scale(1.01);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+/* Type Badges */
+.type-badge {
+    padding: 0.3rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    display: inline-block;
+    transition: var(--transition);
+}
+.type-badge.lecture { background: #e0e7ff; color: #4338ca; }
+.type-badge.lab { background: #d1fae5; color: #059669; }
+.type-badge.tutorial { background: #fef3c7; color: #b45309; }
+.type-badge.seminar { background: #fee2e2; color: #b91c1c; }
+
+/* ---------- Buttons ---------- */
+.btn {
+    padding: 0.55rem 1.3rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+.btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s ease-out;
+}
+.btn:hover::after {
+    transform: scaleX(1);
+}
+.btn-add {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 5px 15px rgba(79,70,229,0.25);
+}
+.btn-add:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px) scale(1.05);
+}
+.btn-remove {
+    background: #fee2e2;
+    color: var(--danger);
+}
+.btn-remove:hover {
+    background: var(--danger);
+    color: white;
+    transform: translateY(-2px) scale(1.05);
+}
+
+/* ---------- Loading / Empty ---------- */
+.text-muted {
+    color: var(--text-light);
+    font-style: italic;
+    opacity: 0.8;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    .student-info-grid { grid-template-columns: 1fr; }
+    .table-wrapper { padding: 0.5rem; }
+
+    table, thead, tbody, tr, th, td { display: block; }
+    thead tr { position: absolute; top: -9999px; left: -9999px; }
+    tr { margin-bottom: 1rem; border-radius: var(--radius); background: var(--glass-bg); padding: 1rem; box-shadow: var(--shadow); }
+    td { border: none; position: relative; padding-left: 50%; text-align: left; }
+    td::before { content: attr(data-label); position: absolute; left: 1rem; font-weight: 600; color: var(--text-main); }
+}
