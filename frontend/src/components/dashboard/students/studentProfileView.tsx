@@ -1,6 +1,12 @@
-import React, {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
-import {addStudentToGroup, getAllGroups, getStudentById, removeStudentFromGroup} from "../../../services/api";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import {
+    addStudentToGroup,
+    getAllGroups,
+    getStudentById,
+    removeStudentFromGroup
+} from "../../../services/api";
+import { useTranslation } from "react-i18next";
 
 interface Subject {
     _id: string;
@@ -22,30 +28,31 @@ interface Group {
     _id: string;
     number: number;
     subject: string;
-    type: string;
+    type: "lecture" | "lab" | "tutorial" | "seminar";
     day: string;
     from: number;
     to: number;
+    students: (string | { _id: string })[];
+    capacity: number;
+    place: string;
 }
 
 const StudentProfile: React.FC = () => {
-    const {id} = useParams();
+    const { id } = useParams<{ id: string }>();
+    const { t } = useTranslation();
     const [student, setStudent] = useState<Student | null>(null);
-    const [loading, setLoading] = useState(true);
     const [groups, setGroups] = useState<Group[]>([]);
-    const [selectedGroup, setSelectedGroup] = useState("");
+    const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-
                 const [studentData, groupsData] = await Promise.all([
                     getStudentById(id!),
                     getAllGroups()
                 ]);
-
                 setStudent(studentData);
                 setGroups(groupsData);
             } catch (err) {
@@ -54,100 +61,164 @@ const StudentProfile: React.FC = () => {
                 setLoading(false);
             }
         };
-
         fetchData();
     }, [id]);
 
-    const handleAddToGroup = async () => {
-        if (!selectedGroup || !student) return;
+    if (!student) return <p>{t("studentProfile.loadingStudent")}</p>;
 
+    const studentGroups = groups.filter((g) =>
+        g.students.some((s) =>
+            typeof s === "string" ? s === student._id : s._id === student._id
+        )
+    );
+
+    const availableGroups = groups.filter(
+        (g) =>
+            !g.students.some((s) =>
+                typeof s === "string" ? s === student._id : s._id === student._id
+            )
+    );
+
+    const handleAddToGroup = async (groupId: string) => {
+        if (!student) return;
         setActionLoading(true);
-
         try {
-            await addStudentToGroup(selectedGroup, student._id);
-
-            const updatedStudent = await getStudentById(student._id);
+            await addStudentToGroup(groupId, student._id);
+            const [updatedStudent, updatedGroups] = await Promise.all([
+                getStudentById(student._id),
+                getAllGroups()
+            ]);
             setStudent(updatedStudent);
-            alert("Student added to group");
+            setGroups(updatedGroups);
+        } catch (err) {
+            console.error(err);
+            alert(t("studentProfile.addGroupFailed"));
         } finally {
             setActionLoading(false);
         }
     };
 
-    const handleRemoveFromGroup = async () => {
-        if (!selectedGroup || !student) return;
-
+    const handleRemoveFromGroup = async (groupId: string) => {
+        if (!student) return;
         setActionLoading(true);
-
         try {
-            await removeStudentFromGroup(selectedGroup, student._id);
-
-            const updatedStudent = await getStudentById(student._id);
+            await removeStudentFromGroup(groupId, student._id);
+            const [updatedStudent, updatedGroups] = await Promise.all([
+                getStudentById(student._id),
+                getAllGroups()
+            ]);
             setStudent(updatedStudent);
-            alert("Student removed from group");
+            setGroups(updatedGroups);
+        } catch (err) {
+            console.error(err);
+            alert(t("studentProfile.removeGroupFailed"));
         } finally {
             setActionLoading(false);
         }
     };
-
-    if (loading) return <p>Loading...</p>;
-    if (!student) return <p>Student not found</p>;
 
     return (
         <div className="dashboard-container">
-
-            <h2>Student Profile</h2>
+            <h2>{t("studentProfile.title")}</h2>
 
             <div className="student-info">
-                <p><strong>ID:</strong> {student.studentId}</p>
-                <p><strong>Name:</strong> {student.name}</p>
-                <p><strong>Email:</strong> {student.email}</p>
-                <p><strong>GPA:</strong> {student.gpa}</p>
+                <p><strong>{t("studentProfile.studentCode")}:</strong> {student.studentId}</p>
+                <p><strong>{t("studentProfile.nameLabel")}:</strong> {student.name}</p>
+                <p><strong>{t("studentProfile.emailLabel")}:</strong> {student.email}</p>
+                <p><strong>{t("studentProfile.gpaLabel")}:</strong> {student.gpa}</p>
             </div>
 
-            <h3>Completed Subjects</h3>
+            <h3>{t("studentProfile.completedSubjects")}</h3>
             <ul>
-                {student.completedSubjects.map(s => (
+                {student.completedSubjects.map((s) => (
                     <li key={s._id}>{s.code} - {s.name}</li>
                 ))}
             </ul>
 
-            <h3>Requested Subjects</h3>
+            <h3>{t("studentProfile.requestedSubjects")}</h3>
             <ul>
-                {student.requestedSubjects.map(s => (
+                {student.requestedSubjects.map((s) => (
                     <li key={s._id}>{s.code} - {s.name}</li>
                 ))}
             </ul>
 
-            <h3>Admin Controls</h3>
-
-            <div className="admin-controls">
-
-                <select
-                    value={selectedGroup}
-                    onChange={(e) => setSelectedGroup(e.target.value)}
-                >
-                    <option value="">Select group</option>
-
-                    {groups.map(g => (
-                        <option key={g._id} value={g._id}>
-                            {g.subject} - {g.type} (#{g.number}) {g.day} {g.from}-{g.to}
-                        </option>
+            <h3>{t("studentProfile.registeredGroups")}</h3>
+            {studentGroups.length === 0 ? (
+                <p>{t("studentProfile.noRegisteredGroups")}</p>
+            ) : (
+                <table>
+                    <thead>
+                    <tr>
+                        <th>{t("studentProfile.subject")}</th>
+                        <th>{t("studentProfile.type")}</th>
+                        <th>{t("studentProfile.groupNumber")}</th>
+                        <th>{t("studentProfile.day")}</th>
+                        <th>{t("studentProfile.time")}</th>
+                        <th>{t("studentProfile.place")}</th>
+                        <th>{t("studentProfile.action")}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {studentGroups.map((g) => (
+                        <tr key={g._id}>
+                            <td>{g.subject}</td>
+                            <td>{t(`studentProfile.groupTypes.${g.type}`)}</td>
+                            <td>#{g.number}</td>
+                            <td>{g.day}</td>
+                            <td>{g.from}-{g.to}</td>
+                            <td>{g.place}</td>
+                            <td>
+                                <button
+                                    onClick={() => handleRemoveFromGroup(g._id)}
+                                    disabled={actionLoading}
+                                >
+                                    {t("studentProfile.removeBtn")}
+                                </button>
+                            </td>
+                        </tr>
                     ))}
-                </select>
+                    </tbody>
+                </table>
+            )}
 
-                <div style={{display: "flex", gap: "10px", marginTop: "10px"}}>
-                    <button onClick={handleAddToGroup} disabled={actionLoading}>
-                        Add to Group
-                    </button>
-
-                    <button onClick={handleRemoveFromGroup} disabled={actionLoading}>
-                        Remove from Group
-                    </button>
-                </div>
-
-            </div>
-
+            <h3>{t("studentProfile.availableGroups")}</h3>
+            {availableGroups.length === 0 ? (
+                <p>{t("studentProfile.noAvailableGroups")}</p>
+            ) : (
+                <table>
+                    <thead>
+                    <tr>
+                        <th>{t("studentProfile.subject")}</th>
+                        <th>{t("studentProfile.type")}</th>
+                        <th>{t("studentProfile.groupNumber")}</th>
+                        <th>{t("studentProfile.day")}</th>
+                        <th>{t("studentProfile.time")}</th>
+                        <th>{t("studentProfile.place")}</th>
+                        <th>{t("studentProfile.action")}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {availableGroups.map((g) => (
+                        <tr key={g._id}>
+                            <td>{g.subject}</td>
+                            <td>{t(`studentProfile.groupTypes.${g.type}`)}</td>
+                            <td>#{g.number}</td>
+                            <td>{g.day}</td>
+                            <td>{g.from}-{g.to}</td>
+                            <td>{g.place}</td>
+                            <td>
+                                <button
+                                    onClick={() => handleAddToGroup(g._id)}
+                                    disabled={actionLoading}
+                                >
+                                    {t("studentProfile.addBtn")}
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            )}
         </div>
     );
 };

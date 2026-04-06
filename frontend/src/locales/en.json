@@ -204,6 +204,37 @@
     "academic_guide_coordinator": "Academic Guide Coordinator",
     "reporter": "Reporter"
   },
+  "studentProfile": {
+    "title": "Student Profile",
+    "loadingStudent": "Loading student profile...",
+    "studentCode": "Student code",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "gpaLabel": "GPA",
+    "completedSubjects": "Completed Subjects",
+    "requestedSubjects": "Requested Subjects",
+    "registeredGroups": "Registered Groups",
+    "noRegisteredGroups": "No registered groups found.",
+    "availableGroups": "Available Groups",
+    "noAvailableGroups": "No available groups found.",
+    "subject": "Subject",
+    "type": "Type",
+    "groupNumber": "Group",
+    "day": "Day",
+    "time": "Time",
+    "place": "Place",
+    "action": "Action",
+    "addBtn": "Add",
+    "removeBtn": "Remove",
+    "addGroupFailed": "Failed to add student to group.",
+    "removeGroupFailed": "Failed to remove student from group.",
+    "groupTypes": {
+      "lecture": "Lecture",
+      "lab": "Lab",
+      "tutorial": "Tutorial",
+      "seminar": "Seminar"
+    }
+  },
   "dashboardCommon": {
     "all": "All",
     "delete": "Delete",

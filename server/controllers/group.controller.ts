@@ -168,33 +168,28 @@ async function updateStudentSubjectsOnRemoval(studentId: string | mongoose.Types
     }
 }
 
-export const removeStudentFromGroup = async (req: Request, res: Response): Promise<void> => {
-    const session = await mongoose.startSession();
+export const removeStudentFromGroup = async (req: Request, res: Response) => {
+    const studentId = req.query.studentId as string;
     const groupId = req.params.id as string;
 
+    if (!studentId) return res.status(400).json({ error: "studentId is required" });
+
+    const session = await mongoose.startSession();
     try {
         await session.withTransaction(async () => {
-            const { studentId } = req.body;
             const group = await Group.findByIdAndUpdate(
                 groupId,
                 { $pull: { students: studentId } },
                 { session, new: true }
             );
-
             if (!group) throw new Error("Group not found");
 
             await updateStudentSubjectsOnRemoval(studentId, group._id, group.subject, session);
-
-            await EnrollmentRequest.deleteMany({
-                student: studentId,
-                group: groupId,
-                status: 'pending'
-            }, { session });
-
+            await EnrollmentRequest.deleteMany({ student: studentId, group: groupId, status: 'pending' }, { session });
             await processNextInWaitlist(groupId, session);
         });
 
-        res.json({ message: 'Student removed successfully and waitlist processed' });
+        res.json({ message: 'Student removed successfully' });
     } catch (err: any) {
         res.status(400).json({ error: err.message });
     } finally {

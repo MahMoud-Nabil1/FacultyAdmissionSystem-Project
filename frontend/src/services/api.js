@@ -223,8 +223,6 @@ export const addStudentToGroup = async (groupId, studentId) => {
 };
 
 export const removeStudentFromGroup = async (groupId, studentId) => {
-    const res = await apiDelete(`/groups/${groupId}/students`, {
-        data: { studentId }
-    });
+    const res = await apiDelete(`/groups/${groupId}/students?studentId=${studentId}`);
     return res.data;
 };
