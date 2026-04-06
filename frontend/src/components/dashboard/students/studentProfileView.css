@@ -184,7 +184,7 @@ table {
 thead th {
     background: #f1f5f9;
     padding: 1.2rem;
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--text-light);
 }
@@ -192,7 +192,7 @@ thead th {
 tbody td {
     padding: 1rem;
     border-top: 1px solid #e2e8f0;
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     position: relative;
 }
 
@@ -208,10 +208,10 @@ tbody tr:hover {
 
 /* Type Badges */
 .type-badge {
-    padding: 0.3rem 0.85rem;
+    padding: 0.45rem 1rem;
     border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 500;
+    font-size: 0.95rem;
+    font-weight: 600;
     text-transform: capitalize;
     display: inline-block;
     transition: var(--transition);
