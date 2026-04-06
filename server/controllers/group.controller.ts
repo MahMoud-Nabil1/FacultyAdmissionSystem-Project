@@ -97,50 +97,54 @@ export const deleteGroup = async (req: Request, res: Response): Promise<void> =>
 };
 
 export const addStudentToGroup = async (req: Request, res: Response): Promise<void> => {
+    const session = await mongoose.startSession();
+
     try {
-        const { studentId } = req.body;
-        const user = req.user as UserPayload;
-        const group = await Group.findById(req.params.id);
+        await session.withTransaction(async () => {
 
-        if (!group) {
-            res.status(404).json({ error: 'Group not found' });
-            return;
-        }
+            const { studentId } = req.body;
+            const user = req.user as UserPayload;
 
-        // Permission Check
-        if (user.role !== 'admin') {
-            const staff = await Staff.findById(user.id);
-            if (!staff) {
-                res.status(404).json({ error: "Staff not found" });
-                return;
+            const group = await Group.findById(req.params.id).session(session);
+
+            if (!group) {
+                throw new Error("Group not found");
             }
-            const allowed = await canManageStudent(staff, studentId);
-            if (!allowed) {
-                res.status(403).json({ error: "Forbidden: cannot manage this student" });
-                return;
+
+            // Permission check
+            if (user.role !== 'admin') {
+                const staff = await Staff.findById(user.id);
+                if (!staff) throw new Error("Staff not found");
+
+                const allowed = await canManageStudent(staff, studentId);
+                if (!allowed) throw new Error("Forbidden: cannot manage this student");
             }
-        }
 
-        // Capacity Check (Admins and Coordinators can bypass)
-        const isPrivileged = user.role === 'admin' || user.role === 'academic_guide_coordinator';
-        if (group.students.length >= group.capacity && !isPrivileged) {
-            res.status(400).json({ error: 'Group has reached maximum capacity' });
-            return;
-        }
+            const isPrivileged =
+                user.role === 'admin' || user.role === 'academic_guide_coordinator';
 
-        // Duplication Check
-        if (group.students.map(id => id.toString()).includes(studentId)) {
-            res.status(400).json({ error: 'Student already in this group' });
-            return;
-        }
+            if (group.students.length >= group.capacity && !isPrivileged) {
+                throw new Error("Group has reached maximum capacity");
+            }
 
-        group.students.push(studentId);
-        await group.save();
+            if (group.students.map(id => id.toString()).includes(studentId)) {
+                throw new Error("Student already in this group");
+            }
 
-        const updatedGroup = await Group.findById(req.params.id).populate('students');
+            // Add student to group
+            group.students.push(new mongoose.Types.ObjectId(studentId));
+            await group.save({ session });
+
+            await ensureSubjectRequested(studentId, group.subject, session);
+        });
+
+        const updatedGroup = await Group.findById(req.params.id).populate("students");
         res.json(updatedGroup);
+
     } catch (err: any) {
         res.status(400).json({ error: err.message });
+    } finally {
+        await session.endSession();
     }
 };
 
@@ -174,7 +178,7 @@ export const removeStudentFromGroup = async (req: Request, res: Response): Promi
             const group = await Group.findByIdAndUpdate(
                 groupId,
                 { $pull: { students: studentId } },
-                { session }
+                { session, new: true }
             );
 
             if (!group) throw new Error("Group not found");
@@ -217,7 +221,7 @@ export const removeSelfFromGroup = async (req: Request, res: Response): Promise<
             const group = await Group.findByIdAndUpdate(
                 groupId,
                 { $pull: { students: student._id } },
-                { session }
+                { session, new: true }
             );
 
             if (!group) throw new Error("Group not found");
