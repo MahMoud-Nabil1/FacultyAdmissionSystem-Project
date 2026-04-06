@@ -43,16 +43,25 @@ export const getStudentById = async (req: Request, res: Response): Promise<void>
     try {
         const user = getUser(req);
 
-        // Security check: Match the ID from token with params ID
-        // Note: user.id might be a number or string depending on your JWT payload logic
         if (user?.role === 'student' && String(user.id) !== req.params.id) {
             res.status(403).json({ error: "Forbidden" });
             return;
         }
 
         const student = await Student
-            .findOne({ _id: req.params.id })
-            .populate('department');
+            .findById(req.params.id)
+            .populate({
+                path: "completedSubjects",
+                select: "code name creditHours"
+            })
+            .populate({
+                path: "requestedSubjects",
+                select: "code name creditHours"
+            })
+            .populate({
+                path: "department",
+                select: "name"
+            });
 
         if (!student) {
             res.status(404).json({ error: "Student not found" });
