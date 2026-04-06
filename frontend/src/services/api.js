@@ -206,3 +206,8 @@ export async function updateSystemSettings(settings) {
     if (!res.ok) throw new Error(data.error || "Failed to update settings");
     return data;
 }
+
+export const getStudentById = async (id) => {
+    const res = await apiGet(`/students/${id}`);
+    return res.data;
+};

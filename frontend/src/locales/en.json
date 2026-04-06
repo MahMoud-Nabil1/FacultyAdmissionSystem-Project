@@ -224,7 +224,8 @@
     "confirmDeleteAnnouncement": "Are you sure you want to delete this announcement?",
     "select": "Select",
     "submit": "Submit",
-    "submitting": "Submitting..."
+    "submitting": "Submitting...",
+    "getStudent": "Access student profile"
   },
   "dashboardTable": {
     "backToAdminDashboard": "Back to Admin Dashboard"
@@ -236,7 +237,8 @@
     "name": "Name",
     "email": "Email",
     "gpa": "GPA",
-    "copyId": "Copy ID"
+    "copyId": "Copy ID",
+    "getStudent": "More about the student"
   },
   "staffTable": {
     "title": "Staff Table",
