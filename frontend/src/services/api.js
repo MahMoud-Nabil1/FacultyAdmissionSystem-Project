@@ -211,3 +211,20 @@ export const getStudentById = async (id) => {
     const res = await apiGet(`/students/${id}`);
     return res.data;
 };
+
+export const getAllGroups = async () => {
+    const res = await apiGet("/groups");
+    return res.data;
+};
+
+export const addStudentToGroup = async (groupId, studentId) => {
+    const res = await apiPost(`/groups/${groupId}/students`, { studentId });
+    return res.data;
+};
+
+export const removeStudentFromGroup = async (groupId, studentId) => {
+    const res = await apiDelete(`/groups/${groupId}/students`, {
+        data: { studentId }
+    });
+    return res.data;
+};
