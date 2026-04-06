@@ -1,7 +1,7 @@
 import './App.css';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { ThemeProvider } from './context/ThemeContext';
+import {Navigate, Route, Routes} from 'react-router-dom';
+import {useTranslation} from 'react-i18next';
+import {ThemeProvider} from './context/ThemeContext';
 import './styles/themeVariables.css';
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 import GuestRoute from './components/auth/GuestRoute.jsx';
@@ -20,97 +20,109 @@ import Home from "./components/common/home.tsx";
 import AdminAnalysis from "./components/dashboard/AdminAnalysis/AdminAnalysis.tsx";
 import RegisterSubjects from "./components/reg/RegisterSubjects.tsx";
 import AcademicHistory from "./components/academicHistory/AcademicHistory.tsx";
+import StudentProfileView from "./components/dashboard/students/studentProfileView.tsx";
 
 
 function App() {
-    const { t } = useTranslation();
+    const {t} = useTranslation();
     return (
         <ThemeProvider>
-        <div className="App">
-            <LanguageFloatingButton />
+            <div className="App">
+                <LanguageFloatingButton/>
 
-            <Routes>
-                {}
-                <Route
-                    path="/"
-                    element={
+                <Routes>
+                    {}
+                    <Route
+                        path="/"
+                        element={
+                            <ProtectedRoute>
+                                <Home/>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/Groups"
+                        element={
+                            <Groups/>
+                        }
+                    />
+                    <Route
+                        path="/announcements"
+                        element={
+                            <Announcements/>
+                        }>
+                    </Route>
+
+                    <Route
+                        path={"admin-dashboard/students/:id"}
+                        element={
+                            <ProtectedRoute allowedRoles={['admin', 'academic_guide', 'academic_guide_coordinator']}>
+                                <div className="app-container">
+                                    <StudentProfileView/>
+                                </div>
+                            </ProtectedRoute>
+                        }/>
+
+                    <Route
+                        path="/admin-dashboard"
+                        element={
+                            <ProtectedRoute
+                                allowedRoles={['admin', 'academic_guide', 'academic_guide_coordinator', 'reporter']}>
+                                <div className="app-container">
+                                    <AdminDashboardLayout/>
+                                </div>
+                            </ProtectedRoute>
+                        }
+                    >
+                        <Route index element={<AdminDashboard/>}/>
+                        <Route path="table" element={<AdminDashboardTable/>}/>
+                        <Route path="groups" element={<GroupPanel/>}/>
+                    </Route>
+                    <Route path="/login" element={
+                        <GuestRoute>
+                            <Login/>
+                        </GuestRoute>
+                    }/>
+                    <Route path="/forgot-password" element={
+                        <GuestRoute>
+                            <ForgotPassword/>
+                        </GuestRoute>
+                    }/>
+                    <Route path="/reset-password" element={
+                        <GuestRoute>
+                            <ResetPassword/>
+                        </GuestRoute>
+                    }/>
+                    <Route path="/ITContact" element={
+                        <GuestRoute>
+                            <SupportContact target="it"/>
+                        </GuestRoute>
+                    }/>
+                    <Route path="/AdminContact" element={
+                        <GuestRoute>
+                            <SupportContact target="admin"/>
+                        </GuestRoute>
+                    }/>
+                    <Route path="/register-subjects" element={
                         <ProtectedRoute>
-                            <Home/>
+                            <RegisterSubjects/>
                         </ProtectedRoute>
                     }
-                />
-                <Route
-                    path="/Groups"
-                    element={
-                        <Groups />
-                    }
-                />
-                <Route
-                    path="/announcements"
-                    element={
-                        <Announcements />
-                    }>
-                </Route>
+                    />
 
-                <Route
-                    path="/admin-dashboard"
-                    element={
-                        <ProtectedRoute allowedRoles={['admin', 'academic_guide', 'academic_guide_coordinator', 'reporter']}>
-                            <div className="app-container">
-                                <AdminDashboardLayout />
-                            </div>
+                    <Route path="/academic-history" element={
+                        <ProtectedRoute>
+                            <AcademicHistory/>
                         </ProtectedRoute>
-                    }
-                >
-                    <Route index element={<AdminDashboard />} />
-                    <Route path="table" element={<AdminDashboardTable />} />
-                    <Route path="groups" element={<GroupPanel />} />
-                </Route>
-                <Route path="/login" element={
-                    <GuestRoute>
-                        <Login />
-                    </GuestRoute>
-                } />
-                <Route path="/forgot-password" element={
-                    <GuestRoute>
-                        <ForgotPassword />
-                    </GuestRoute>
-                } />
-                <Route path="/reset-password" element={
-                    <GuestRoute>
-                        <ResetPassword />
-                    </GuestRoute>
-                } />
-                <Route path="/ITContact" element={
-                    <GuestRoute>
-                        <SupportContact target="it" />
-                    </GuestRoute>
-                } />
-                <Route path="/AdminContact" element={
-                    <GuestRoute>
-                        <SupportContact target="admin" />
-                    </GuestRoute>
-                } />
-                <Route path="/register-subjects" element={
-                    <ProtectedRoute>
-                        <RegisterSubjects />
-                    </ProtectedRoute>
-                }
-                />
+                    }/>
 
-                <Route path="/academic-history" element={
-                    <ProtectedRoute>
-                        <AcademicHistory />
-                    </ProtectedRoute>
-                } />
+                    <Route path="/test-analysis" element={
+                        <AdminAnalysis/>
+                    }/>
 
-                <Route path="/test-analysis" element={
-                    <AdminAnalysis />
-                } />
-
-                <Route path="*" element={<Navigate to="/announcements" replace />}/>
-            </Routes>
-        </div>
+                    <Route path="*" element={<Navigate to="/announcements" replace/>}/>
+                </Routes>
+            </div>
         </ThemeProvider>
     );
 }

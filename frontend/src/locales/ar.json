@@ -224,7 +224,8 @@
     "confirmDeleteAnnouncement": "هل أنت متأكد من حذف هذا الإعلان؟",
     "select": "اختر",
     "submit": "إرسال",
-    "submitting": "جاري الإرسال..."
+    "submitting": "جاري الإرسال...",
+    "getStudent": "ادخل الى حساب الطالب"
   },
   "dashboardTable": {
     "backToAdminDashboard": "العودة إلى لوحة الإدارة"
@@ -236,7 +237,8 @@
     "name": "الإسم",
     "email": "الإيميل",
     "gpa": "المعدل التراكمى",
-    "copyId": "نسخ ID"
+    "copyId": "نسخ ID",
+    "getStudent": "المزيد عن الطالب"
   },
   "staffTable": {
     "title": "جدول الموظفين",

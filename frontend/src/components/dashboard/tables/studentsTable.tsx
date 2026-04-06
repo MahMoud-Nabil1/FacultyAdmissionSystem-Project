@@ -101,6 +101,10 @@ const StudentsTable: React.FC = () => {
         }
     };
 
+    const handleViewProfile = (id: string) => {
+        navigate(`/admin-dashboard/students/${id}`);
+    };
+
     const closeModal = () => {
         setShowModal(false);
         setForm({ studentId: "", name: "", email: "", password: "", gpa: "" });
@@ -138,7 +142,7 @@ const StudentsTable: React.FC = () => {
                     <th>{t("studentsTable.name")}</th>
                     <th>{t("studentsTable.email")}</th>
                     <th>{t("studentsTable.gpa")}</th>
-                    <th>{t("studentsTable.copyId")}</th>
+                    <th>{t("studentsTable.getStudent")}</th>
                     <th>{t("dashboardCommon.delete")}</th>
                 </tr>
                 </thead>
@@ -151,10 +155,10 @@ const StudentsTable: React.FC = () => {
                         <td>{s.gpa}</td>
                         <td>
                             <button
-                                className="copy-btn"
-                                onClick={() => handleCopy(s._id)}
+                                className="view-btn"
+                                onClick={() => handleViewProfile(s._id)}
                             >
-                                {copiedId === s._id ? t("dashboardCommon.copied") : t("dashboardCommon.copy")}
+                                {t("dashboardCommon.getStudent")}
                             </button>
                         </td>
                         <td>
