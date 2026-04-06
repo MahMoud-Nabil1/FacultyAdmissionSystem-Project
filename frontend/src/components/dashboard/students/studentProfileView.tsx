@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
     addStudentToGroup,
     getAllGroups,
@@ -7,6 +7,7 @@ import {
     removeStudentFromGroup
 } from "../../../services/api";
 import { useTranslation } from "react-i18next";
+import "./studentProfileView.css"
 
 interface Subject {
     _id: string;
@@ -40,6 +41,7 @@ interface Group {
 const StudentProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [student, setStudent] = useState<Student | null>(null);
     const [groups, setGroups] = useState<Group[]>([]);
     const [loading, setLoading] = useState(true);
@@ -119,106 +121,149 @@ const StudentProfile: React.FC = () => {
 
     return (
         <div className="dashboard-container">
-            <h2>{t("studentProfile.title")}</h2>
+            <header className="profile-header">
+                <h2>{t("studentProfile.title")}</h2>
+                <button
+                    className="btn btn-add"
+                    style={{ height: "fit-content" }}
+                    onClick={() => navigate("/admin-dashboard/table?type=students")}
+                >
+                    {t("dashboardCommon.back")}
+                </button>
+            </header>
 
-            <div className="student-info">
-                <p><strong>{t("studentProfile.studentCode")}:</strong> {student.studentId}</p>
-                <p><strong>{t("studentProfile.nameLabel")}:</strong> {student.name}</p>
-                <p><strong>{t("studentProfile.emailLabel")}:</strong> {student.email}</p>
-                <p><strong>{t("studentProfile.gpaLabel")}:</strong> {student.gpa}</p>
+            {/* Top Info Cards */}
+            <div className="student-info-grid">
+                <div className="info-card">
+                    <span className="info-label">{t("studentProfile.studentCode")}</span>
+                    <span className="info-value">{student.studentId}</span>
+                </div>
+                <div className="info-card">
+                    <span className="info-label">{t("studentProfile.nameLabel")}</span>
+                    <span className="info-value">{student.name}</span>
+                </div>
+                <div className="info-card">
+                    <span className="info-label">{t("studentProfile.emailLabel")}</span>
+                    <span className="info-value">{student.email}</span>
+                </div>
+                <div className="info-card">
+                    <span className="info-label">{t("studentProfile.gpaLabel")}</span>
+                    <span className="info-value">{student.gpa}</span>
+                </div>
             </div>
 
-            <h3>{t("studentProfile.completedSubjects")}</h3>
-            <ul>
-                {student.completedSubjects.map((s) => (
-                    <li key={s._id}>{s.code} - {s.name}</li>
-                ))}
-            </ul>
+            {/* Subjects Sections */}
+            <h3 className="section-title">{t("studentProfile.completedSubjects")}</h3>
+            <div className="subjects-container">
+                {student.completedSubjects.length > 0 ? (
+                    student.completedSubjects.map((s) => (
+                        <div key={s._id} className="subject-tag">
+                            <span>{s.code}</span> {s.name}
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-muted">None</p>
+                )}
+            </div>
 
-            <h3>{t("studentProfile.requestedSubjects")}</h3>
-            <ul>
-                {student.requestedSubjects.map((s) => (
-                    <li key={s._id}>{s.code} - {s.name}</li>
-                ))}
-            </ul>
+            <h3 className="section-title">{t("studentProfile.requestedSubjects")}</h3>
+            <div className="subjects-container">
+                {student.requestedSubjects.length > 0 ? (
+                    student.requestedSubjects.map((s) => (
+                        <div key={s._id} className="subject-tag">
+                            <span>{s.code}</span> {s.name}
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-muted">None</p>
+                )}
+            </div>
 
-            <h3>{t("studentProfile.registeredGroups")}</h3>
-            {studentGroups.length === 0 ? (
-                <p>{t("studentProfile.noRegisteredGroups")}</p>
-            ) : (
-                <table>
-                    <thead>
-                    <tr>
-                        <th>{t("studentProfile.subject")}</th>
-                        <th>{t("studentProfile.type")}</th>
-                        <th>{t("studentProfile.groupNumber")}</th>
-                        <th>{t("studentProfile.day")}</th>
-                        <th>{t("studentProfile.time")}</th>
-                        <th>{t("studentProfile.place")}</th>
-                        <th>{t("studentProfile.action")}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {studentGroups.map((g) => (
-                        <tr key={g._id}>
-                            <td>{g.subject}</td>
-                            <td>{t(`studentProfile.groupTypes.${g.type}`)}</td>
-                            <td>#{g.number}</td>
-                            <td>{g.day}</td>
-                            <td>{g.from}-{g.to}</td>
-                            <td>{g.place}</td>
-                            <td>
-                                <button
-                                    onClick={() => handleRemoveFromGroup(g._id)}
-                                    disabled={actionLoading}
-                                >
-                                    {t("studentProfile.removeBtn")}
-                                </button>
-                            </td>
+            {/* Registered Groups */}
+            <h3 className="section-title">{t("studentProfile.registeredGroups")}</h3>
+            <div className="table-wrapper">
+                {studentGroups.length === 0 ? (
+                    <p style={{ padding: '2rem' }}>{t("studentProfile.noRegisteredGroups")}</p>
+                ) : (
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>{t("studentProfile.subject")}</th>
+                            <th>{t("studentProfile.type")}</th>
+                            <th>{t("studentProfile.groupNumber")}</th>
+                            <th>{t("studentProfile.day")}</th>
+                            <th>{t("studentProfile.time")}</th>
+                            <th>{t("studentProfile.place")}</th>
+                            <th>{t("studentProfile.action")}</th>
                         </tr>
-                    ))}
-                    </tbody>
-                </table>
-            )}
+                        </thead>
+                        <tbody>
+                        {studentGroups.map((g) => (
+                            <tr key={g._id}>
+                                <td><strong>{g.subject}</strong></td>
+                                <td><span className="type-badge">{t(`studentProfile.groupTypes.${g.type}`)}</span></td>
+                                <td>{g.number}</td>
+                                <td>{g.day}</td>
+                                <td>{g.from}-{g.to}</td>
+                                <td>{g.place}</td>
+                                <td>
+                                    <button
+                                        className="btn btn-remove"
+                                        onClick={() => handleRemoveFromGroup(g._id)}
+                                        disabled={actionLoading}
+                                    >
+                                        {t("studentProfile.removeBtn")}
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                )}
+            </div>
 
-            <h3>{t("studentProfile.availableGroups")}</h3>
-            {availableGroups.length === 0 ? (
-                <p>{t("studentProfile.noAvailableGroups")}</p>
-            ) : (
-                <table>
-                    <thead>
-                    <tr>
-                        <th>{t("studentProfile.subject")}</th>
-                        <th>{t("studentProfile.type")}</th>
-                        <th>{t("studentProfile.groupNumber")}</th>
-                        <th>{t("studentProfile.day")}</th>
-                        <th>{t("studentProfile.time")}</th>
-                        <th>{t("studentProfile.place")}</th>
-                        <th>{t("studentProfile.action")}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {availableGroups.map((g) => (
-                        <tr key={g._id}>
-                            <td>{g.subject}</td>
-                            <td>{t(`studentProfile.groupTypes.${g.type}`)}</td>
-                            <td>#{g.number}</td>
-                            <td>{g.day}</td>
-                            <td>{g.from}-{g.to}</td>
-                            <td>{g.place}</td>
-                            <td>
-                                <button
-                                    onClick={() => handleAddToGroup(g._id)}
-                                    disabled={actionLoading}
-                                >
-                                    {t("studentProfile.addBtn")}
-                                </button>
-                            </td>
+            {/* Available Groups */}
+            <h3 className="section-title">{t("studentProfile.availableGroups")}</h3>
+            <div className="table-wrapper">
+                {availableGroups.length === 0 ? (
+                    <p style={{ padding: '2rem' }}>{t("studentProfile.noAvailableGroups")}</p>
+                ) : (
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>{t("studentProfile.subject")}</th>
+                            <th>{t("studentProfile.type")}</th>
+                            <th>{t("studentProfile.groupNumber")}</th>
+                            <th>{t("studentProfile.day")}</th>
+                            <th>{t("studentProfile.time")}</th>
+                            <th>{t("studentProfile.place")}</th>
+                            <th>{t("studentProfile.action")}</th>
                         </tr>
-                    ))}
-                    </tbody>
-                </table>
-            )}
+                        </thead>
+                        <tbody>
+                        {availableGroups.map((g) => (
+                            <tr key={g._id}>
+                                <td><strong>{g.subject}</strong></td>
+                                <td><span className="type-badge">{t(`studentProfile.groupTypes.${g.type}`)}</span></td>
+                                <td>{g.number}</td>
+                                <td>{g.day}</td>
+                                <td>{g.from}-{g.to}</td>
+                                <td>{g.place}</td>
+                                <td>
+                                    <button
+                                        className="btn btn-add"
+                                        onClick={() => handleAddToGroup(g._id)}
+                                        disabled={actionLoading}
+                                    >
+                                        {t("studentProfile.addBtn")}
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                )}
+            </div>
         </div>
     );
 };

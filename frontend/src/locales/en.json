@@ -256,7 +256,8 @@
     "select": "Select",
     "submit": "Submit",
     "submitting": "Submitting...",
-    "getStudent": "Access student profile"
+    "getStudent": "Access student profile",
+    "back": "Go back"
   },
   "dashboardTable": {
     "backToAdminDashboard": "Back to Admin Dashboard"

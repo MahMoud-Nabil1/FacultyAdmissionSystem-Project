@@ -252,7 +252,8 @@
     "select": "اختر",
     "submit": "إرسال",
     "submitting": "جاري الإرسال...",
-    "getStudent": "ادخل الى حساب الطالب"
+    "getStudent": "ادخل الى حساب الطالب",
+    "back": "ارجع"
   },
   "dashboardTable": {
     "backToAdminDashboard": "العودة إلى لوحة الإدارة"
