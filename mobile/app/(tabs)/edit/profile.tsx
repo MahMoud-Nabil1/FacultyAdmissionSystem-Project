@@ -76,7 +76,7 @@ export default function Profile() {
                 }
                 setProfileData(pData);
 
-                // Fetch groups and filter by student
+                // Fetch groups and filter by studentg
                 const groups = await getAllGroups();
                 const myGroups = groups.filter((g: IGroup) => {
                     if (!g.students) return false;
