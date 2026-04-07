@@ -175,6 +175,19 @@ export const contactAdmin = async (req: Request, res: Response): Promise<void> =
         res.status(500).json({ error: "خطأ في السيرفر: " + err.message });
     }
 };
+export const getRegistrationStats = async (_req: Request, res: Response): Promise<void> => {
+    try {
+        const totalStudents = await Student.countDocuments();
+        const finishedRegistration = await Student.countDocuments({
+            requestedSubjects: { $exists: true, $not: { $size: 0 } }
+        });
+        const didNotFinishRegistration = totalStudents - finishedRegistration;
+
+        res.json({ totalStudents, finishedRegistration, didNotFinishRegistration });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
 
 export const getMyAcademicHistory = async (req: Request, res: Response): Promise<void> => {
     try {

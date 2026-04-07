@@ -20,6 +20,13 @@ router.get(
     requireRole(["student"]),
     studentCtrl.getMyAcademicHistory
 );
+router.get(
+    "/stats",
+    authenticate,
+    requireRole(["admin", "academic_guide", "academic_guide_coordinator", "reporter"]),
+    studentCtrl.getRegistrationStats
+);
+
 
 
 router.get(

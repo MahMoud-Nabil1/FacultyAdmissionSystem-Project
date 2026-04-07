@@ -88,7 +88,7 @@ const Homepage = () => {
                 {role === 'student' && (
                     <TouchableOpacity
                         style={[styles.menuCard, { borderBottomColor: '#10b981' }]}
-                        onPress={() => router.push('/register-subjects')}
+                        onPress={() => router.push('/(tabs)/register')}
                     >
                         <Ionicons name="book" size={32} color="#10b981" />
                         <Text style={styles.menuLabel}>تسجيل المواد</Text>
