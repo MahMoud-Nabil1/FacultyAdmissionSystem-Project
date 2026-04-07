@@ -42,7 +42,7 @@ export default function TabsLayout() {
                 },
             }}
         >
-            {/* ── Home — visible to everyone ── */}
+
             <Tabs.Screen
                 name="home"
                 options={{
@@ -54,7 +54,7 @@ export default function TabsLayout() {
                 }}
             />
 
-            {/* ── Edit — admin only ── */}
+
             <Tabs.Screen
                 name="edit"
                 options={{
@@ -71,7 +71,7 @@ export default function TabsLayout() {
                 }}
             />
 
-            {/* ── Groups — student only ── */}
+
             <Tabs.Screen
                 name="groups"
                 options={{
@@ -84,7 +84,7 @@ export default function TabsLayout() {
                 }}
             />
 
-            {/* ── Register Subjects — student only ── */}
+
             <Tabs.Screen
                 name="register"
                 options={{
@@ -92,6 +92,17 @@ export default function TabsLayout() {
                     tabBarLabel: t('tabs.register'),
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="document-text" size={size} color={color} />
+                    ),
+                    ...tabVisibility(isStudent),
+                }}
+            />
+            <Tabs.Screen
+                name="profile"
+                options={{
+                    title: t('tabs.profile'),
+                    tabBarLabel: t('tabs.profile'),
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="person" size={size} color={color} />
                     ),
                     ...tabVisibility(isStudent),
                 }}
