@@ -16,6 +16,14 @@ async function fetchWithTimeout(url: string, options: RequestInit, ms = 10000): 
     const id = setTimeout(() => controller.abort(), ms);
     try {
         return await fetch(url, { ...options, signal: controller.signal });
+    } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+            throw new Error('Request timed out');
+        }
+        if (error instanceof Error) {
+            throw new Error(`Network error: ${error.message}`);
+        }
+        throw new Error('An unexpected error occurred');
     } finally {
         clearTimeout(id);
     }
@@ -56,32 +64,46 @@ export async function apiPost<T = Record<string, unknown>>(
     body: Record<string, unknown>,
     auth = true
 ): Promise<ApiResponse<T>> {
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (auth) {
-        const token = await getToken();
-        if (token) headers['Authorization'] = `Bearer ${token}`;
+    try {
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (auth) {
+            const token = await getToken();
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+        }
+        const res = await fetchWithTimeout(`${API_BASE}${path}`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(body),
+        });
+        const data: T = await res.json().catch(() => ({}) as T);
+        return { res, data };
+    } catch (error) {
+        if (error instanceof Error) {
+            throw error;
+        }
+        throw new Error('An unexpected error occurred');
     }
-    const res = await fetchWithTimeout(`${API_BASE}${path}`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(body),
-    });
-    const data: T = await res.json().catch(() => ({}) as T);
-    return { res, data };
 }
 
 export async function apiGet<T = Record<string, unknown>>(
     path: string,
     auth = true
 ): Promise<ApiResponse<T>> {
-    const headers: Record<string, string> = {};
-    if (auth) {
-        const token = await getToken();
-        if (token) headers['Authorization'] = `Bearer ${token}`;
+    try {
+        const headers: Record<string, string> = {};
+        if (auth) {
+            const token = await getToken();
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+        }
+        const res = await fetchWithTimeout(`${API_BASE}${path}`, { headers });
+        const data: T = await res.json().catch(() => ({}) as T);
+        return { res, data };
+    } catch (error) {
+        if (error instanceof Error) {
+            throw error;
+        }
+        throw new Error('An unexpected error occurred');
     }
-    const res = await fetch(`${API_BASE}${path}`, { headers });
-    const data: T = await res.json().catch(() => ({}) as T);
-    return { res, data };
 }
 
 export async function apiPut<T = Record<string, unknown>>(
@@ -89,32 +111,46 @@ export async function apiPut<T = Record<string, unknown>>(
     body: Record<string, unknown>,
     auth = true
 ): Promise<ApiResponse<T>> {
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (auth) {
-        const token = await getToken();
-        if (token) headers['Authorization'] = `Bearer ${token}`;
+    try {
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (auth) {
+            const token = await getToken();
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+        }
+        const res = await fetchWithTimeout(`${API_BASE}${path}`, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify(body),
+        });
+        const data: T = await res.json().catch(() => ({}) as T);
+        return { res, data };
+    } catch (error) {
+        if (error instanceof Error) {
+            throw error;
+        }
+        throw new Error('An unexpected error occurred');
     }
-    const res = await fetchWithTimeout(`${API_BASE}${path}`, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify(body),
-    });
-    const data: T = await res.json().catch(() => ({}) as T);
-    return { res, data };
 }
 
 export async function apiDelete<T = Record<string, unknown>>(
     path: string,
     auth = true
 ): Promise<ApiResponse<T>> {
-    const headers: Record<string, string> = {};
-    if (auth) {
-        const token = await getToken();
-        if (token) headers['Authorization'] = `Bearer ${token}`;
+    try {
+        const headers: Record<string, string> = {};
+        if (auth) {
+            const token = await getToken();
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+        }
+        const res = await fetchWithTimeout(`${API_BASE}${path}`, { method: 'DELETE', headers });
+        const data: T = await res.json().catch(() => ({}) as T);
+        return { res, data };
+    } catch (error) {
+        if (error instanceof Error) {
+            throw error;
+        }
+        throw new Error('An unexpected error occurred');
     }
-    const res = await fetch(`${API_BASE}${path}`, { method: 'DELETE', headers });
-    const data: T = await res.json().catch(() => ({}) as T);
-    return { res, data };
 }
 
 

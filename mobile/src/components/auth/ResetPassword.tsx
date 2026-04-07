@@ -11,6 +11,7 @@ import {
     ScrollView,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../../context/LanguageContext';
 import { apiGet, apiPost } from '../../services/api';
 
@@ -154,6 +155,15 @@ export default function ResetPassword() {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
             <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+                {/* Back Button */}
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => router.back()}
+                    hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                >
+                    <Ionicons name="arrow-back" size={24} color="#1a73e8" />
+                </TouchableOpacity>
+
                 <View style={styles.header}>
                     <Text style={styles.icon}>🔒</Text>
                     <Text style={[styles.title, { textAlign: align }]}>{t('resetPassword.title')}</Text>
@@ -269,4 +279,11 @@ const styles = StyleSheet.create({
     btnDisabled: { opacity: 0.6 },
     btnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
     backLink: { color: '#1a73e8', fontSize: 14, width: '100%' },
+    backButton: {
+        position: 'absolute',
+        top: 50,
+        left: 24,
+        zIndex: 10,
+        padding: 4,
+    },
 });

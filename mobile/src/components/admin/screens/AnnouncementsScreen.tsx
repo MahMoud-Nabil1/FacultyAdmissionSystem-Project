@@ -2,9 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import {
     View, Text, TextInput, TouchableOpacity, StyleSheet,
     ScrollView, ActivityIndicator, Alert, Modal, Pressable,
-    KeyboardAvoidingView, Platform,
+    KeyboardAvoidingView, Platform, RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { apiGet, apiPost, apiDelete } from '../../../services/api';
 import { useLanguage } from '../../../context/LanguageContext';
 
@@ -22,6 +23,7 @@ export default function AnnouncementsScreen() {
     const [form, setForm] = useState(EMPTY);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
+    const [refreshing, setRefreshing] = useState(false);
 
     const load = useCallback(async () => {
         try {
@@ -33,6 +35,12 @@ export default function AnnouncementsScreen() {
     }, []);
 
     useEffect(() => { load(); }, [load]);
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await load();
+        setRefreshing(false);
+    }, [load]);
 
     const handleSubmit = async () => {
         setError('');
@@ -75,7 +83,22 @@ export default function AnnouncementsScreen() {
     };
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <ScrollView
+            style={styles.container}
+            contentContainerStyle={styles.content}
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#1a73e8']} tintColor="#1a73e8" />
+            }
+        >
+            {/* Back Button */}
+            <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => router.back()}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+                <Ionicons name="arrow-back" size={24} color="#1a73e8" />
+            </TouchableOpacity>
+
             <Text style={styles.title}>📣 {t('announcements.title')}</Text>
 
             <TouchableOpacity
@@ -245,4 +268,11 @@ const styles = StyleSheet.create({
     cardTitle: { fontSize: 15, fontWeight: '700', color: '#111', flex: 1, marginRight: 8, textAlign: 'right' },
     cardContent: { fontSize: 13, color: '#374151', lineHeight: 20, textAlign: 'right' },
     cardDate: { fontSize: 11, color: '#9ca3af', marginTop: 8, textAlign: 'right' },
+    backButton: {
+        position: 'absolute',
+        top: 50,
+        left: 20,
+        zIndex: 10,
+        padding: 4,
+    },
 });
