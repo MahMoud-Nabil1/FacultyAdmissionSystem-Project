@@ -21,6 +21,7 @@ import AdminAnalysis from "./components/dashboard/AdminAnalysis/AdminAnalysis.ts
 import RegisterSubjects from "./components/reg/RegisterSubjects.tsx";
 import AcademicHistory from "./components/academicHistory/AcademicHistory.tsx";
 import StudentProfileView from "./components/dashboard/students/studentProfileView.tsx";
+import StudentComplaintPage from "./components/complaints/studentsComplaints.tsx";
 
 
 function App() {
@@ -115,6 +116,12 @@ function App() {
                             <AcademicHistory/>
                         </ProtectedRoute>
                     }/>
+                    <Route path="/students-complaints" element={
+                        <ProtectedRoute>
+                            <StudentComplaintPage/>
+                        </ProtectedRoute>
+                    }/>
+
 
                     <Route path="/test-analysis" element={
                         <AdminAnalysis/>

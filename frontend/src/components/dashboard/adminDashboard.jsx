@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { AdminDashboardContext } from "./AdminDashboardLayout";
+import WithDrawlPanel from "./panels/withDrawlPanel.tsx";
 import AnnouncementsPanel from "./panels/createAnnouncementsPanel.tsx";
 import RegistrationControlPanel from "./panels/RegistrationControlPanel.tsx";
 import SettingsPanel from "./panels/settingsPanel.tsx";
@@ -20,6 +21,7 @@ const AdminDashboard = () => {
                 </div>
                 <div className="dashboard-column">
                     <SettingsPanel />
+                    <WithDrawlPanel />
                 </div>
             </div>
         </>
