@@ -139,7 +139,7 @@ const Home = () => {
                     )}
                     {user?.role === "student" && (
                         <button className="btn" onClick={() => navigate("/students-complaints")}>
-                            {t("home.studentsComplaints") || "studentsComplaintsPage"}
+                            {t("home.complaints") || "Students Complaints"}
                         </button>
                     )}
 
