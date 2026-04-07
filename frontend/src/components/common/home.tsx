@@ -137,6 +137,11 @@ const Home = () => {
                             {t("home.academicHistory") || "Academic History"}
                         </button>
                     )}
+                    {user?.role === "student" && (
+                        <button className="btn" onClick={() => navigate("/students-complaints")}>
+                            {t("home.studentsComplaints") || "studentsComplaintsPage"}
+                        </button>
+                    )}
 
                     <button className="btn signout" onClick={() => { logout(); navigate("/login"); }}>
                         {t("sidePanel.signOut")}
