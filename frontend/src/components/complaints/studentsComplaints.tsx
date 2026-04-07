@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiGet, apiPost, apiPut, getMe, decodeToken } from '../../services/api'; // Adjust path to your api file
+import { useTranslation } from 'react-i18next';
+import { apiGet, apiPost, apiPut, getMe, decodeToken } from '../../services/api';
 
 interface Complaint {
     _id: string;
@@ -25,6 +26,7 @@ interface User {
 }
 
 const StudentComplaintPage: React.FC = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [user, setUser] = useState<User | null>(null);
     const [complaints, setComplaints] = useState<Complaint[]>([]);
@@ -48,7 +50,6 @@ const StudentComplaintPage: React.FC = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                // Check if user is authenticated using decodeToken
                 const decoded = decodeToken();
 
                 if (!decoded) {
@@ -56,7 +57,6 @@ const StudentComplaintPage: React.FC = () => {
                     return;
                 }
 
-                // Get user details from token
                 const userData = await getMe();
                 if (!userData) {
                     navigate('/login');
@@ -107,7 +107,7 @@ const StudentComplaintPage: React.FC = () => {
             const { res, data } = await apiPost('/complaints', formData);
 
             if (res.ok) {
-                setMessage('✅ تم تقديم الطلب بنجاح!');
+                setMessage('✅ ' + (t("complaints.submitSuccess") || "تم تقديم الطلب بنجاح!"));
                 setFormData({
                     ...formData,
                     requestType: '',
@@ -121,10 +121,10 @@ const StudentComplaintPage: React.FC = () => {
                 setActiveTab('view');
                 setTimeout(() => setMessage(''), 3000);
             } else {
-                setMessage('❌ خطأ: ' + (data.message || data.error || 'Unknown error'));
+                setMessage('❌ ' + (t("complaints.submitError") || "خطأ: ") + (data.message || data.error || 'Unknown error'));
             }
         } catch (err) {
-            setMessage('❌ خطأ في الاتصال بالخادم');
+            setMessage('❌ ' + (t("complaints.serverError") || "خطأ في الاتصال بالخادم"));
         } finally {
             setSubmitting(false);
         }
@@ -138,7 +138,7 @@ const StudentComplaintPage: React.FC = () => {
             });
 
             if (res.ok) {
-                setMessage('✅ تم تحديث الطلب بنجاح');
+                setMessage('✅ ' + (t("complaints.updateSuccess") || "تم تحديث الطلب بنجاح"));
                 if (user) {
                     fetchComplaints(String(user.id));
                 }
@@ -147,10 +147,10 @@ const StudentComplaintPage: React.FC = () => {
                 setEditAdditional('');
                 setTimeout(() => setMessage(''), 3000);
             } else {
-                setMessage('❌ فشل التحديث: ' + (data.message || data.error));
+                setMessage('❌ ' + (t("complaints.updateError") || "فشل التحديث: ") + (data.message || data.error));
             }
         } catch (err) {
-            setMessage('❌ خطأ في تحديث الطلب');
+            setMessage('❌ ' + (t("complaints.updateError") || "خطأ في تحديث الطلب"));
         }
     };
 
@@ -166,10 +166,10 @@ const StudentComplaintPage: React.FC = () => {
 
     const getStatusText = (status: string) => {
         switch(status) {
-            case 'pending': return '⏳ قيد الانتظار';
-            case 'under_review': return '🔍 قيد المراجعة';
-            case 'approved': return '✓ تمت الموافقة';
-            case 'rejected': return '✗ مرفوض';
+            case 'pending': return '⏳ ' + (t("complaints.pending") || "قيد الانتظار");
+            case 'under_review': return '🔍 ' + (t("complaints.underReview") || "قيد المراجعة");
+            case 'approved': return '✓ ' + (t("complaints.approved") || "تمت الموافقة");
+            case 'rejected': return '✗ ' + (t("complaints.rejected") || "مرفوض");
             default: return status;
         }
     };
@@ -192,7 +192,7 @@ const StudentComplaintPage: React.FC = () => {
                 fontSize: '18px',
                 color: '#666'
             }}>
-                ⏳ جاري التحميل...
+                ⏳ {t("common.loading") || "جاري التحميل..."}
             </div>
         );
     }
@@ -204,10 +204,10 @@ const StudentComplaintPage: React.FC = () => {
     return (
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px', direction: 'rtl' }}>
             <h1 style={{ textAlign: 'center', marginBottom: '10px', color: '#333' }}>
-                🎓 نظام الطلبات الأكاديمية
+                🎓 {t("home.complaints") || "نظام الطلبات الأكاديمية"}
             </h1>
             <p style={{ textAlign: 'center', color: '#666', marginBottom: '30px' }}>
-                مرحباً, <strong>{user.name}</strong> | الرقم الجامعي: <strong>{user.id}</strong>
+                {t("complaints.welcome") || "مرحباً"} <strong>{user.name}</strong> | {t("complaints.studentId") || "الرقم الجامعي"}: <strong>{user.id}</strong>
             </p>
 
             <div style={{
@@ -232,7 +232,7 @@ const StudentComplaintPage: React.FC = () => {
                         transition: 'all 0.3s'
                     }}
                 >
-                    📝 تقديم طلب جديد
+                    📝 {t("complaints.newComplaint") || "تقديم طلب جديد"}
                 </button>
                 <button
                     onClick={() => {
@@ -251,7 +251,7 @@ const StudentComplaintPage: React.FC = () => {
                         transition: 'all 0.3s'
                     }}
                 >
-                    📋 طلباتي ({complaints.length})
+                    📋 {t("home.complaints") || "طلباتي"} ({complaints.length})
                 </button>
             </div>
 
@@ -278,11 +278,11 @@ const StudentComplaintPage: React.FC = () => {
                     borderRadius: '12px',
                     boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
                 }}>
-                    <h2 style={{ marginBottom: '20px', color: '#333' }}>تقديم طلب أكاديمي</h2>
+                    <h2 style={{ marginBottom: '20px', color: '#333' }}>{t("complaints.submitNew") || "تقديم طلب أكاديمي"}</h2>
                     <form onSubmit={handleSubmit}>
                         <input
                             type="text"
-                            placeholder="الاسم الكامل *"
+                            placeholder={t("complaints.fullName") || "الاسم الكامل *"}
                             value={formData.studentName}
                             disabled
                             style={{
@@ -297,7 +297,7 @@ const StudentComplaintPage: React.FC = () => {
                         />
                         <input
                             type="text"
-                            placeholder="الرقم الجامعي *"
+                            placeholder={t("complaints.studentId") || "الرقم الجامعي *"}
                             value={formData.studentId}
                             disabled
                             style={{
@@ -313,7 +313,7 @@ const StudentComplaintPage: React.FC = () => {
 
                         <input
                             type="text"
-                            placeholder="نوع الطلب (مثال: انسحاب من مادة، تسجيل مادة من سنة أعلى، تعديل جدول، ...) *"
+                            placeholder={t("complaints.requestType") || "نوع الطلب (مثال: انسحاب من مادة، تسجيل مادة من سنة أعلى، تعديل جدول، ...) *"}
                             value={formData.requestType}
                             onChange={(e) => setFormData({ ...formData, requestType: e.target.value })}
                             required
@@ -322,7 +322,7 @@ const StudentComplaintPage: React.FC = () => {
 
                         <input
                             type="text"
-                            placeholder="اسم المادة *"
+                            placeholder={t("complaints.courseName") || "اسم المادة *"}
                             value={formData.courseName}
                             onChange={(e) => setFormData({ ...formData, courseName: e.target.value })}
                             required
@@ -331,7 +331,7 @@ const StudentComplaintPage: React.FC = () => {
 
                         <textarea
                             rows={5}
-                            placeholder="وصف المشكلة بالتفصيل *"
+                            placeholder={t("complaints.problemDescription") || "وصف المشكلة بالتفصيل *"}
                             value={formData.problemDescription}
                             onChange={(e) => setFormData({ ...formData, problemDescription: e.target.value })}
                             required
@@ -340,7 +340,7 @@ const StudentComplaintPage: React.FC = () => {
 
                         <textarea
                             rows={3}
-                            placeholder="تفاصيل إضافية (اختياري)"
+                            placeholder={t("complaints.additionalDetails") || "تفاصيل إضافية (اختياري)"}
                             value={formData.additionalDetails}
                             onChange={(e) => setFormData({ ...formData, additionalDetails: e.target.value })}
                             style={{ width: '100%', padding: '10px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '6px', fontFamily: 'inherit' }}
@@ -361,7 +361,7 @@ const StudentComplaintPage: React.FC = () => {
                                 fontWeight: 'bold'
                             }}
                         >
-                            {submitting ? 'جاري الإرسال...' : 'إرسال الطلب'}
+                            {submitting ? (t("complaints.submitting") || "جاري الإرسال...") : (t("complaints.submit") || "إرسال الطلب")}
                         </button>
                     </form>
                 </div>
@@ -377,8 +377,8 @@ const StudentComplaintPage: React.FC = () => {
                             borderRadius: '12px'
                         }}>
                             <div style={{ fontSize: '48px' }}>📭</div>
-                            <h3 style={{ color: '#333' }}>لا توجد طلبات</h3>
-                            <p style={{ color: '#666' }}>لم تقم بتقديم أي طلبات حتى الآن.</p>
+                            <h3 style={{ color: '#333' }}>{t("complaints.noComplaints") || "لا توجد طلبات"}</h3>
+                            <p style={{ color: '#666' }}>{t("complaints.noComplaintsDesc") || "لم تقم بتقديم أي طلبات حتى الآن."}</p>
                             <button
                                 onClick={() => setActiveTab('submit')}
                                 style={{
@@ -391,7 +391,7 @@ const StudentComplaintPage: React.FC = () => {
                                     fontSize: '14px'
                                 }}
                             >
-                                📝 تقديم طلب
+                                📝 {t("complaints.submitNew") || "تقديم طلب"}
                             </button>
                         </div>
                     ) : (
@@ -434,14 +434,14 @@ const StudentComplaintPage: React.FC = () => {
                                             value={editDescription}
                                             onChange={(e) => setEditDescription(e.target.value)}
                                             rows={4}
-                                            placeholder="وصف المشكلة"
+                                            placeholder={t("complaints.problemDescription") || "وصف المشكلة"}
                                             style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '10px', fontFamily: 'inherit' }}
                                         />
                                         <textarea
                                             value={editAdditional}
                                             onChange={(e) => setEditAdditional(e.target.value)}
                                             rows={3}
-                                            placeholder="تفاصيل إضافية"
+                                            placeholder={t("complaints.additionalDetails") || "تفاصيل إضافية"}
                                             style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '10px', fontFamily: 'inherit' }}
                                         />
                                         <div style={{ display: 'flex', gap: '10px' }}>
@@ -449,21 +449,21 @@ const StudentComplaintPage: React.FC = () => {
                                                 onClick={() => handleUpdate(complaint._id, editDescription, editAdditional)}
                                                 style={{ padding: '8px 16px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
                                             >
-                                                💾 حفظ
+                                                💾 {t("common.save") || "حفظ"}
                                             </button>
                                             <button
                                                 onClick={() => { setEditingId(null); setEditDescription(''); setEditAdditional(''); }}
                                                 style={{ padding: '8px 16px', backgroundColor: '#9e9e9e', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
                                             >
-                                                ❌ إلغاء
+                                                ❌ {t("common.cancel") || "إلغاء"}
                                             </button>
                                         </div>
                                     </div>
                                 ) : (
                                     <div style={{ backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '8px', marginBottom: '15px' }}>
-                                        <p style={{ margin: '0 0 10px 0' }}><strong>📝 وصف المشكلة:</strong> {complaint.problemDescription}</p>
+                                        <p style={{ margin: '0 0 10px 0' }}><strong>📝 {t("complaints.problemDescription") || "وصف المشكلة"}:</strong> {complaint.problemDescription}</p>
                                         {complaint.additionalDetails && (
-                                            <p style={{ margin: 0 }}><strong>📌 تفاصيل إضافية:</strong> {complaint.additionalDetails}</p>
+                                            <p style={{ margin: 0 }}><strong>📌 {t("complaints.additionalDetails") || "تفاصيل إضافية"}:</strong> {complaint.additionalDetails}</p>
                                         )}
                                         {complaint.status === 'pending' && (
                                             <button
@@ -483,7 +483,7 @@ const StudentComplaintPage: React.FC = () => {
                                                     fontSize: '12px'
                                                 }}
                                             >
-                                                ✏️ تعديل الطلب
+                                                ✏️ {t("common.edit") || "تعديل الطلب"}
                                             </button>
                                         )}
                                     </div>
@@ -497,11 +497,11 @@ const StudentComplaintPage: React.FC = () => {
                                         borderRadius: '8px',
                                         borderRight: '4px solid #4CAF50'
                                     }}>
-                                        <strong>📨 رد الإدارة:</strong>
+                                        <strong>📨 {t("complaints.adminResponse") || "رد الإدارة"}:</strong>
                                         <p style={{ margin: '8px 0 0 0' }}>{complaint.adminResponse}</p>
                                         {complaint.reviewedBy && (
                                             <div style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
-                                                👤 تمت المراجعة بواسطة: {complaint.reviewedBy} في {formatDate(complaint.reviewedAt)}
+                                                👤 {t("complaints.reviewedBy") || "تمت المراجعة بواسطة"}: {complaint.reviewedBy} {t("complaints.on") || "في"} {formatDate(complaint.reviewedAt)}
                                             </div>
                                         )}
                                     </div>
@@ -516,8 +516,8 @@ const StudentComplaintPage: React.FC = () => {
                                     flexWrap: 'wrap',
                                     gap: '10px'
                                 }}>
-                                    <span>📅 تاريخ التقديم: {formatDate(complaint.createdAt)}</span>
-                                    <span>🆔 رقم الطلب: {complaint._id.slice(-6)}</span>
+                                    <span>📅 {t("complaints.submittedOn") || "تاريخ التقديم"}: {formatDate(complaint.createdAt)}</span>
+                                    <span>🆔 {t("complaints.requestNumber") || "رقم الطلب"}: {complaint._id.slice(-6)}</span>
                                 </div>
                             </div>
                         ))
