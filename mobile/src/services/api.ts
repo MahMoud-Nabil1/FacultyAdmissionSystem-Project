@@ -171,6 +171,12 @@ export async function getAllSubjects() {
     return data;
 }
 
+export async function getEligibleSubjects() {
+    const { res, data } = await apiGet('/subjects/eligible');
+    if (!res.ok) throw new Error((data as { error?: string }).error || 'Failed to fetch eligible subjects');
+    return data;
+}
+
 export async function createSubject(form: Record<string, unknown>) {
     const { res, data } = await apiPost('/subjects', form);
     if (!res.ok) throw new Error((data as any).error || 'Failed to create subject');

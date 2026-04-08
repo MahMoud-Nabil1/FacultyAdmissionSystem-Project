@@ -93,6 +93,14 @@ export default function TabsLayout() {
                     ...tabVisibility(isStudent),
                 }}
             />
+
+            {/* ── Register Subjects — student only (hidden from tab bar, accessed via home) ── */}
+            <Tabs.Screen
+                name="register-subjects"
+                options={{
+                    href: null,
+                }}
+            />
         </Tabs>
     );
 }

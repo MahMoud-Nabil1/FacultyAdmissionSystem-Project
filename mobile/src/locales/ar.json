@@ -97,6 +97,22 @@
     "statistics": "الإحصائيات",
     "logout": "تسجيل الخروج"
   },
+  "registerSubjects": {
+    "title": "تسجيل المواد",
+    "fetchFailed": "فشل تحميل المواد المتاحة",
+    "requestSuccess": "تم تقديم الطلب بنجاح!",
+    "requestFailed": "فشل تقديم الطلب",
+    "noEligibleSubjects": "لا توجد مواد متاحة",
+    "noEligibleSubjectsSubtitle": "لقد أكملت جميع المواد المتاحة أو لا تستوفي المتطلبات بعد.",
+    "creditHours": "ساعات معتمدة",
+    "group": "المجموعة",
+    "request": "طلب",
+    "full": "ممتلئ",
+    "noGroupsAvailable": "لا توجد مجموعات متاحة لهذه المادة"
+  },
+  "common": {
+    "success": "نجاح"
+  },
   "editPanel": {
     "title": "لوحة الإدارة",
     "subtitle": "اختر القسم الذي تريد تعديله",

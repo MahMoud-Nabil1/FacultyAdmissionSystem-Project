@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { apiGet, apiPost, apiDelete } from "../../services/api";
+import { apiGet, apiPost, apiDelete, getEligibleSubjects } from "../../services/api";
 import "./RegisterSubjects.css";
 
 /* ── Types ── */
@@ -8,6 +8,7 @@ interface SubjectData {
     _id: string;
     code: string;
     name: string;
+    level: '1' | '2' | '3' | '4';
     creditHours: number;
     prerequisites: { _id: string; code: string; name: string }[];
     corequisites: { _id: string; code: string; name: string }[];
@@ -80,7 +81,7 @@ const getTypeClass = (type: string) => {
 const getStudentObjectId = (students: ({ _id: string } | string)[]): string[] =>
     students.map(s => (typeof s === "object" && s !== null ? s._id?.toString() : String(s)));
 
-const DAYS = ["saturday", "sunday", "monday", "tuesday", "wednesday", "thursday", "friday"];
+const DAYS = ["saturday", "sunday", "monday", "tuesday", "wednesday", "thursday"];
 const HOURS_RANGE = Array.from({ length: 13 }, (_, i) => i + 8); // 8 AM to 8 PM
 
 const TIMETABLE_COLORS = [
@@ -103,6 +104,7 @@ const RegisterSubjects = () => {
     /* ── State ── */
     const [student, setStudent]         = useState(null as StudentMe | null);
     const [subjects, setSubjects]       = useState([] as SubjectData[]);
+    const [eligibleSubjects, setEligibleSubjects] = useState([] as SubjectData[]);
     const [groups, setGroups]           = useState([] as GroupData[]);
     const [myRequests, setMyRequests]   = useState([] as EnrollmentRequestData[]);
     const [registrationOpen, setRegistrationOpen] = useState(true);
@@ -120,11 +122,12 @@ const RegisterSubjects = () => {
             const token = sessionStorage.getItem("token");
             if (!token) throw new Error("No token");
 
-            const [meRes, subRes, grpRes, reqRes, settingsRes] = await Promise.all([
+            const [meRes, subRes, eligibleRes, grpRes, reqRes, settingsRes] = await Promise.all([
                 fetch("http://localhost:5000/api/auth/me", {
                     headers: { Authorization: `Bearer ${token}` },
                 }),
                 apiGet("/subjects"),
+                getEligibleSubjects(),
                 apiGet("/groups"),
                 apiGet("/groups/my-requests"),
                 apiGet("/settings"),
@@ -136,6 +139,8 @@ const RegisterSubjects = () => {
 
             if (!subRes.res.ok) throw new Error("Failed to fetch subjects");
             setSubjects(subRes.data as SubjectData[]);
+
+            setEligibleSubjects(eligibleRes as SubjectData[]);
 
             if (!grpRes.res.ok) throw new Error("Failed to fetch groups");
             setGroups(grpRes.data as GroupData[]);
@@ -243,16 +248,33 @@ const RegisterSubjects = () => {
         return total;
     }, [allSelectedSubjectCodes, subjectByCode]);
 
+    // Calculate completed credit hours from completed subjects
+    const completedHours = useMemo(() => {
+        let total = 0;
+        student?.completedSubjects?.forEach((completedId: string) => {
+            const sub = subjectById.get(completedId);
+            if (sub) total += sub.creditHours;
+        });
+        return total;
+    }, [student, subjectById]);
+
+    // Calculate student level from completed hours
+    const studentLevel = useMemo(() => {
+        if (!student || completedHours === 0) return '1';
+        if (completedHours <= 30) return '1';
+        if (completedHours <= 60) return '2';
+        if (completedHours <= 90) return '3';
+        return '4';
+    }, [student, completedHours]);
+
     const availableSubjects = useMemo(() => {
-        return subjects.filter((s: SubjectData) => {
+        return eligibleSubjects.filter((s: SubjectData) => {
             if (completedIds.has(s._id)) return false;
             // Exclude subjects that are enrolled OR have pending/approved requests
             if (allSelectedSubjectCodes.has(s.code.toLowerCase())) return false;
-            const prereqsMet = s.prerequisites.every((pre: { _id: string }) => completedIds.has(pre._id));
-            if (!prereqsMet) return false;
             return true;
         });
-    }, [subjects, completedIds, allSelectedSubjectCodes]);
+    }, [eligibleSubjects, completedIds, allSelectedSubjectCodes]);
 
     const groupsForSelected = useMemo(() => {
         if (!selectedSubject) return [];
@@ -441,16 +463,26 @@ const RegisterSubjects = () => {
                     <h2>{t("registration.title")}</h2>
                     <p className="regSubtitle">{t("registration.subtitle")}</p>
                 </div>
-                <div className="regCreditCounter">
-                    <span className="regCreditLabel">{t("registration.selectedCredits")}</span>
-                    <span className="regCreditValue">
-                        <strong>{enrolledHours}</strong> / {MAX_HOURS}
-                    </span>
-                    <div className="regCreditBar">
-                        <div
-                            className="regCreditBarFill"
-                            style={{ width: `${Math.min((enrolledHours / MAX_HOURS) * 100, 100)}%` }}
-                        />
+                <div className="regHeaderStats">
+                    {student && (
+                        <div className="regLevelBadge">
+                            <span className="regLevelLabel">{t("registration.studentLevel")}</span>
+                            <span className={`regLevelValue regLevel${studentLevel}`}>
+                                {t(`registration.level${studentLevel}`)}
+                            </span>
+                        </div>
+                    )}
+                    <div className="regCreditCounter">
+                        <span className="regCreditLabel">{t("registration.selectedCredits")}</span>
+                        <span className="regCreditValue">
+                            <strong>{enrolledHours}</strong> / {MAX_HOURS}
+                        </span>
+                        <div className="regCreditBar">
+                            <div
+                                className="regCreditBarFill"
+                                style={{ width: `${Math.min((enrolledHours / MAX_HOURS) * 100, 100)}%` }}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

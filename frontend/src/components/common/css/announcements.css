@@ -14,10 +14,11 @@
 .announcements-container {
     direction: rtl;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 0 20px;
+    width: 100%;
+    margin: 0;
+    padding: 3rem 2rem;
     background-color: var(--bg-main);
+    min-height: 100vh;
 }
 
 /* --- Header Section --- */
@@ -212,6 +213,25 @@
     color: var(--primary);
 }
 
+/* Level Badges */
+.levels-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.level-badge {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: #eef2ff;
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
 /* GPA Error Section */
 .gpa-error-section {
     background: #fef2f2;
@@ -292,8 +312,8 @@
 /* --- Mobile Specifics --- */
 @media (max-width: 768px) {
     .announcements-container {
-        margin: 20px auto;
-        padding: 0 15px;
+        margin: 0;
+        padding: 2rem 1rem;
     }
 
     .flex-center-gap {

@@ -6,12 +6,12 @@ const API_URL = "http://localhost:5000/api";
 interface GPASettings {
     gpaMin: number;
     gpaMax: number;
-    level: string;
+    level: string[];
 }
 
 const SettingsPanel: React.FC = () => {
     const { t } = useTranslation();
-    const [settings, setSettings] = useState<GPASettings>({ gpaMin: 2.5, gpaMax: 5, level: "1" });
+    const [settings, setSettings] = useState<GPASettings>({ gpaMin: 2.5, gpaMax: 5, level: ["1"] });
     const [selectedLevels, setSelectedLevels] = useState<string[]>(["1"]);
     const [error, setError] = useState<string | null>(null);
     const [settingsLoading, setSettingsLoading] = useState(false);
@@ -26,14 +26,10 @@ const SettingsPanel: React.FC = () => {
             setSettings({
                 gpaMin: Math.min(data.gpaMin, data.gpaMax),
                 gpaMax: Math.max(data.gpaMin, data.gpaMax),
-                level: data.level,
+                level: Array.isArray(data.level) ? data.level : [data.level || "1"],
             });
-            
-            // Parse level as array if it contains commas, otherwise single value
-            const levels = data.level.includes(',') 
-                ? data.level.split(',').map((l: string) => l.trim())
-                : [data.level];
-            setSelectedLevels(levels);
+
+            setSelectedLevels(Array.isArray(data.level) ? data.level : [data.level || "1"]);
         } catch (err) {
             console.error(err);
         }
@@ -72,14 +68,17 @@ const SettingsPanel: React.FC = () => {
 
         setSettingsLoading(true);
         try {
-            const levelString = selectedLevels.join(',');
             const res = await fetch(`${API_URL}/announcements/settings`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
                 },
-                body: JSON.stringify({ ...settings }),
+                body: JSON.stringify({
+                    gpaMin: settings.gpaMin,
+                    gpaMax: settings.gpaMax,
+                    level: selectedLevels,
+                }),
             });
 
             const data = await res.json();
@@ -89,6 +88,7 @@ const SettingsPanel: React.FC = () => {
             }
 
             alert(t("settingsPanel.saveSuccess"));
+            await fetchSettings();
         } catch (err) {
             console.error(err);
             alert(t("settingsPanel.saveError"));
