@@ -485,7 +485,8 @@
         gap: 0;
     }
     
-    .dashboard-container {
+    .eduadmin-content .dashboard-container,
+    .admin-dashboard-layout .dashboard-container {
         padding: 24px;
     }
 }
@@ -552,8 +553,9 @@
     }
 }
 
-/* Dashboard Cards */
-.dashboard-container {
+/* Dashboard Cards - scoped to admin dashboard only */
+.eduadmin-content .dashboard-container,
+.admin-dashboard-layout .dashboard-container {
     background: var(--color-text-inverse);
     border-radius: 0;
     padding: 40px;
@@ -571,7 +573,8 @@
     overflow: auto;
 }
 
-.dashboard-container:hover {
+.eduadmin-content .dashboard-container:hover,
+.admin-dashboard-layout .dashboard-container:hover {
     box-shadow: none;
 }
 
@@ -607,7 +610,8 @@
     box-shadow: none;
 }
 
-.dashboard-container h2 {
+.eduadmin-content .dashboard-container h2,
+.admin-dashboard-layout .dashboard-container h2 {
     color: var(--color-text);
     margin-bottom: 24px;
     font-weight: 700;
@@ -918,13 +922,15 @@ td style[display="flex"] {
     font-size: 0.85rem;
 }
 
-/* Search bar styling inside the Table panels */
-.dashboard-container input[type="text"] {
+/* Search bar styling inside the admin dashboard Table panels */
+.eduadmin-content .dashboard-container input[type="text"],
+.admin-dashboard-layout .dashboard-container input[type="text"] {
     margin-bottom: 10px;
     border: 1.5px solid var(--color-border);
 }
 
-.dashboard-container select {
+.eduadmin-content .dashboard-container select,
+.admin-dashboard-layout .dashboard-container select {
     cursor: pointer;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
@@ -933,41 +939,48 @@ td style[display="flex"] {
     padding-left: 2.5rem;
 }
 
-/* Core Table Container */
-.dashboard-container table {
+/* Core Table Container - admin dashboard only */
+.eduadmin-content .dashboard-container table,
+.admin-dashboard-layout .dashboard-container table {
     width: 100%;
     border-collapse: collapse;
-    direction: rtl; /* Forces the whole table logic to start from the right */
+    direction: rtl;
     margin-top: 1.5rem;
 }
 
-/* Force Header and Data to align exactly the same */
-.dashboard-container th,
-.dashboard-container td {
-    text-align: right !important; /* Forces right alignment for Arabic */
+/* Force Header and Data to align exactly the same - admin dashboard only */
+.eduadmin-content .dashboard-container th,
+.eduadmin-content .dashboard-container td,
+.admin-dashboard-layout .dashboard-container th,
+.admin-dashboard-layout .dashboard-container td {
+    text-align: right !important;
     padding: 16px;
     border-bottom: 1px solid var(--color-border);
     vertical-align: middle;
 }
 
-/* Ensure specific columns like 'Actions' or 'Buttons' stay tidy */
-.dashboard-container td:last-child,
-.dashboard-container th:last-child {
+/* Ensure specific columns like 'Actions' or 'Buttons' stay tidy - admin dashboard only */
+.eduadmin-content .dashboard-container td:last-child,
+.eduadmin-content .dashboard-container th:last-child,
+.admin-dashboard-layout .dashboard-container td:last-child,
+.admin-dashboard-layout .dashboard-container th:last-child {
     text-align: center !important;
     width: 150px;
 }
 
-/* Header Specifics */
-.dashboard-container th {
+/* Header Specifics - admin dashboard only */
+.eduadmin-content .dashboard-container th,
+.admin-dashboard-layout .dashboard-container th {
     background-color: var(--color-bg);
     color: var(--color-primary);
     font-weight: 600;
     font-size: 0.95rem;
-    white-space: nowrap; /* Prevents titles from breaking into two lines */
+    white-space: nowrap;
 }
 
-/* The Row Hover Effect */
-.dashboard-container tbody tr:hover {
+/* The Row Hover Effect - admin dashboard only */
+.eduadmin-content .dashboard-container tbody tr:hover,
+.admin-dashboard-layout .dashboard-container tbody tr:hover {
     background-color: #f1f7ff;
 }
 
@@ -1300,13 +1313,15 @@ select::-ms-expand {
     margin-bottom: 24px;
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments - admin dashboard only */
 @media (max-width: 768px) {
-    .dashboard-container {
+    .eduadmin-content .dashboard-container,
+    .admin-dashboard-layout .dashboard-container {
         padding: 24px;
     }
-    
-    .dashboard-container h2 {
+
+    .eduadmin-content .dashboard-container h2,
+    .admin-dashboard-layout .dashboard-container h2 {
         font-size: 1.25rem;
         margin-bottom: 20px;
     }
