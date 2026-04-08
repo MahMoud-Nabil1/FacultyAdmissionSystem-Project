@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { getAllSubjects, deleteSubject, createSubject } from "../../../services/api";
 import Pagination from "../pagination";
 import { PAGE_SIZE } from "../../../services/constants";
@@ -26,7 +25,7 @@ interface SubjectsTableProps {
     onEdit: (subject: Subject) => void;
 }
 
-const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
+const SubjectsTable: React.FC<SubjectsTableProps> = () => {
     const { t } = useTranslation();
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [page, setPage] = useState<number>(0);
@@ -43,7 +42,6 @@ const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
     const [showPrereqDropdown, setShowPrereqDropdown] = useState(false);
     const [loading, setLoading] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const navigate = useNavigate();
 
     const load = async () => {
         const data = await getAllSubjects();

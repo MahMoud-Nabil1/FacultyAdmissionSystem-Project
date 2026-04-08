@@ -120,7 +120,10 @@ const RegisterSubjects = () => {
             setLoading(true);
             setError(null);
             const token = sessionStorage.getItem("token");
-            if (!token) throw new Error("No token");
+            if (!token) {
+                setError("No token");
+                return;
+            }
 
             const [meRes, subRes, eligibleRes, grpRes, reqRes, settingsRes] = await Promise.all([
                 fetch("http://localhost:5000/api/auth/me", {
@@ -133,16 +136,25 @@ const RegisterSubjects = () => {
                 apiGet("/settings"),
             ]);
 
-            if (!meRes.ok) throw new Error("Failed to fetch student data");
+            if (!meRes.ok) {
+                setError("Failed to fetch student data");
+                return;
+            }
             const meData: StudentMe = await meRes.json();
             setStudent(meData);
 
-            if (!subRes.res.ok) throw new Error("Failed to fetch subjects");
+            if (!subRes.res.ok) {
+                setError("Failed to fetch subjects");
+                return;
+            }
             setSubjects(subRes.data as SubjectData[]);
 
             setEligibleSubjects(eligibleRes as SubjectData[]);
 
-            if (!grpRes.res.ok) throw new Error("Failed to fetch groups");
+            if (!grpRes.res.ok) {
+                setError("Failed to fetch groups");
+                return;
+            }
             setGroups(grpRes.data as GroupData[]);
 
             if (reqRes.res.ok) {
@@ -550,7 +562,6 @@ const RegisterSubjects = () => {
                                                 const sub = subjectForGroup(g);
                                                 const isEnrolled = g.requestStatus === 'enrolled';
                                                 const isPending = g.requestStatus === 'pending';
-                                                const isApproved = g.requestStatus === 'approved';
                                                 const isRejected = g.requestStatus === 'rejected';
 
                                                 return (

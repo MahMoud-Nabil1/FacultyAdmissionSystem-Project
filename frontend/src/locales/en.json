@@ -112,14 +112,8 @@
   "adminDashboard": {
     "welcome": "Welcome {{name}}"
   },
-  "groupPanel": {
-    "title": "Add Groups"
-  },
   "staffPanel": {
     "title": "Staff",
-    "addBtn": "Add New Staff",
-    "cancelBtn": "Cancel",
-    "viewAllBtn": "View All Staff",
     "nameLabel": "Name",
     "namePlaceholder": "Enter full name",
     "emailLabel": "Email",

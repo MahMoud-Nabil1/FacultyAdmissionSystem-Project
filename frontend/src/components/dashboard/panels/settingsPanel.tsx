@@ -20,7 +20,10 @@ const SettingsPanel: React.FC = () => {
     const fetchSettings = async () => {
         try {
             const res = await fetch(`${API_URL}/announcements/settings`);
-            if (!res.ok) throw new Error(t("settingsPanel.fetchError"));
+            if (!res.ok) {
+                console.error(t("settingsPanel.fetchError"));
+                return;
+            }
             const data = await res.json();
 
             setSettings({

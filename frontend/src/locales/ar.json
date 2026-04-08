@@ -112,14 +112,8 @@
   "adminDashboard": {
     "welcome": "مرحبًا {{name}}"
   },
-  "groupPanel": {
-    "title": "اضافة مجموعات"
-  },
   "staffPanel": {
     "title": "الموظفين",
-    "addBtn": "اضف موظف جديد",
-    "cancelBtn": "إلغاء",
-    "viewAllBtn": "عرض جميع الموظفين",
     "nameLabel": "الإسم",
     "namePlaceholder": "أدخل الاسم الكامل",
     "emailLabel": "الإيميل",

@@ -61,7 +61,8 @@ const Announcements = () => {
             ]);
 
             if (!announcementsRes.ok || !settingsRes.ok) {
-                throw new Error('Failed to fetch');
+                console.error('Failed to fetch');
+                return;
             }
 
             const announcements = await announcementsRes.json();
@@ -107,7 +108,7 @@ const Announcements = () => {
     };
 
     const renderLevels = () => {
-        return levelCodes.map((code, index) => (
+        return levelCodes.map((code) => (
             <span key={code} className="level-badge">
                 {getLevelText(code)}
             </span>

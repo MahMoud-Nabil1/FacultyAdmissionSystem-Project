@@ -47,13 +47,11 @@ const StudentProfile: React.FC = () => {
     const [student, setStudent] = useState<Student | null>(null);
     const [groups, setGroups] = useState<Group[]>([]);
     const [subjects, setSubjects] = useState<Subject[]>([]);
-    const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setLoading(true);
                 const [studentData, groupsData, subjectsData] = await Promise.all([
                     getStudentById(id!),
                     getAllGroups(),
@@ -64,8 +62,6 @@ const StudentProfile: React.FC = () => {
                 setSubjects(subjectsData);
             } catch (err) {
                 console.error(err);
-            } finally {
-                setLoading(false);
             }
         };
         fetchData();

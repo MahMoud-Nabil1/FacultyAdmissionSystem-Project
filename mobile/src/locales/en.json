@@ -110,9 +110,6 @@
     "full": "Full",
     "noGroupsAvailable": "No groups available for this subject"
   },
-  "common": {
-    "success": "Success"
-  },
   "editPanel": {
     "title": "Admin Panel",
     "subtitle": "Choose a section to manage",
