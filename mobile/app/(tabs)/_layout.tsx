@@ -64,7 +64,6 @@ export default function TabsLayout() {
                         <Ionicons name="create-outline" size={size} color={color} />
                     ),
                     ...tabVisibility(isAdmin),
-                    paddingTop: 200,
                 }}
             />
 

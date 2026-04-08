@@ -12,20 +12,10 @@ import {
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-import { useAuth } from '../../context/AuthContext';
-import { useLanguage } from '../../context/LanguageContext';
-import { getEligibleSubjects, getAllGroups, apiPost, apiDelete } from '../../services/api';
-import { IGroup } from '../Dashboards/Groups';
-
-interface ISubject {
-    _id: string;
-    code: string;
-    name: string;
-    level: '1' | '2' | '3' | '4';
-    creditHours: number;
-    prerequisites: { _id: string; code: string; name: string }[];
-    corequisites: { _id: string; code: string; name: string }[];
-}
+import { useAuth } from '../../src/context/AuthContext';
+import { useLanguage } from '../../src/context/LanguageContext';
+import { getEligibleSubjects, getAllGroups, apiPost, ISubject } from '../../src/services/api';
+import { IGroup } from '../../src/components/Dashboards/Groups';
 
 export default function RegisterSubjects() {
     const { token } = useAuth();
@@ -35,8 +25,6 @@ export default function RegisterSubjects() {
     const [loading, setLoading] = useState(true);
     const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
     const [actionLoading, setActionLoading] = useState(false);
-
-    const API_BASE = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://10.0.2.2:5000/api';
 
     useEffect(() => {
         const fetchData = async () => {
@@ -200,11 +188,14 @@ export default function RegisterSubjects() {
     );
 }
 
+const BRAND_BLUE = '#004a99';
+const BRAND_LIGHT_BG = '#eef6ff';
+
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f8f9ff' },
+    container: { flex: 1, backgroundColor: BRAND_LIGHT_BG },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     header: {
-        backgroundColor: '#1a73e8',
+        backgroundColor: BRAND_BLUE,
         paddingTop: 50,
         paddingBottom: 18,
         paddingHorizontal: 20,
@@ -221,7 +212,7 @@ const styles = StyleSheet.create({
         padding: 18,
         marginBottom: 14,
         borderLeftWidth: 4,
-        borderLeftColor: '#1a73e8',
+        borderLeftColor: BRAND_BLUE,
         elevation: 3,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -239,7 +230,7 @@ const styles = StyleSheet.create({
     subjectInfo: { flex: 1 },
     subjectCode: { fontSize: 16, fontWeight: '700', color: '#1f2937', textAlign: 'right' },
     subjectName: { fontSize: 14, color: '#6b7280', textAlign: 'right', marginTop: 4 },
-    subjectCredits: { fontSize: 12, color: '#1a73e8', fontWeight: '600', textAlign: 'right', marginTop: 4 },
+    subjectCredits: { fontSize: 12, color: BRAND_BLUE, fontWeight: '600', textAlign: 'right', marginTop: 4 },
     groupsContainer: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: '#f0f0f0' },
     groupItem: {
         flexDirection: 'row-reverse',
@@ -253,10 +244,10 @@ const styles = StyleSheet.create({
     groupNumber: { fontSize: 14, fontWeight: '600', color: '#1f2937', textAlign: 'right' },
     groupType: { fontSize: 12, color: '#6b7280', textAlign: 'right', marginTop: 2 },
     groupDay: { fontSize: 12, color: '#6b7280', textAlign: 'right', marginTop: 2 },
-    groupTime: { fontSize: 12, color: '#1a73e8', fontWeight: '500', textAlign: 'right', marginTop: 2 },
+    groupTime: { fontSize: 12, color: BRAND_BLUE, fontWeight: '500', textAlign: 'right', marginTop: 2 },
     groupPlace: { fontSize: 11, color: '#9ca3af', textAlign: 'right', marginTop: 2 },
     requestButton: {
-        backgroundColor: '#1a73e8',
+        backgroundColor: BRAND_BLUE,
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 8,

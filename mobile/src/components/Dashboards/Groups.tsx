@@ -27,6 +27,7 @@ export interface IGroup {
     day: WeekDay;
     place?: string;
     capacity: number;
+    students?: string[];
 }
 
 const TYPE_LABEL: Record<GroupType, string> = {

@@ -171,8 +171,18 @@ export async function getAllSubjects() {
     return data;
 }
 
+export interface ISubject {
+    _id: string;
+    code: string;
+    name: string;
+    level: '1' | '2' | '3' | '4';
+    creditHours: number;
+    prerequisites: { _id: string; code: string; name: string }[];
+    corequisites: { _id: string; code: string; name: string }[];
+}
+
 export async function getEligibleSubjects() {
-    const { res, data } = await apiGet('/subjects/eligible');
+    const { res, data } = await apiGet<ISubject[]>('/subjects/eligible');
     if (!res.ok) throw new Error((data as { error?: string }).error || 'Failed to fetch eligible subjects');
     return data;
 }
