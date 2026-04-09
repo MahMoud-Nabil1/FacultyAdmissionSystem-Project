@@ -46,6 +46,7 @@ const StudentProfile: React.FC = () => {
     const navigate = useNavigate();
     const [student, setStudent] = useState<Student | null>(null);
     const [groups, setGroups] = useState<Group[]>([]);
+    const [loading, setLoading] = useState(true);
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [actionLoading, setActionLoading] = useState(false);
 

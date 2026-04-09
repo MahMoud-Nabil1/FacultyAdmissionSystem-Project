@@ -131,6 +131,11 @@ export const addStudentToGroup = async (req: Request, res: Response): Promise<vo
                 throw new Error("Student already in this group");
             }
 
+            // Add student to group
+            group.students.push(new mongoose.Types.ObjectId(studentId));
+            await group.save({ session });
+
+
             // Validate prerequisites
             const subject = await Subject.findOne({ code: new RegExp(`^${group.subject}$`, 'i') }).session(session);
             if (subject) {
