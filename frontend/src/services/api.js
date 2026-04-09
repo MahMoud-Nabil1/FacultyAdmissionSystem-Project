@@ -171,6 +171,12 @@ export async function getAllSubjects() {
     return data;
 }
 
+export async function getEligibleSubjects() {
+    const {res, data} = await apiGet("/subjects/eligible");
+    if (!res.ok) throw new Error(data.error || "Failed to fetch eligible subjects");
+    return data;
+}
+
 export async function getSubjectById(id) {
     const {res, data} = await apiGet(`/subjects/${id}`);
     if (!res.ok) throw new Error(data.error || "Failed to fetch subject");

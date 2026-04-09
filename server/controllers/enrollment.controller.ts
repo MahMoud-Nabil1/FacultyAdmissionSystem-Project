@@ -4,8 +4,9 @@ import {EnrollmentRequest} from "../models/enrollmentRequest";
 import {Group} from "../models/group";
 import Student from "../models/student";
 import {UserPayload} from "../middleware/authMiddleware";
-import {ensureSubjectRequested, hasTimeCollision} from "../utils/enrollment.utils";
+import {ensureSubjectRequested, hasTimeCollision, checkPrerequisites, checkGpaRange, checkSubjectLevel} from "../utils/enrollment.utils";
 import SystemSetting from "../models/systemSetting";
+import { Subject } from "../models/subject";
 
 export const processEnrollmentRequest = async (req: Request, res: Response): Promise<void> => {
     const { requestId } = req.params;
@@ -40,7 +41,34 @@ export const processEnrollmentRequest = async (req: Request, res: Response): Pro
             if (collision) {
                 request.status = 'rejected';
                 await request.save({ session });
-                throw new Error("Student has a time collision with another group");
+                throw new Error("registration.errors.timeCollision");
+            }
+
+            // Validate prerequisites
+            const subject = await Subject.findOne({ code: new RegExp(`^${group.subject}$`, 'i') }).session(session);
+            if (subject) {
+                const prereqCheck = await checkPrerequisites(request.student, subject._id, session);
+                if (!prereqCheck.met) {
+                    request.status = 'rejected';
+                    await request.save({ session });
+                    throw new Error("registration.errors.prerequisitesNotMet");
+                }
+
+                // Validate GPA range
+                const gpaCheck = await checkGpaRange(request.student, session);
+                if (!gpaCheck.valid) {
+                    request.status = 'rejected';
+                    await request.save({ session });
+                    throw new Error("registration.errors.gpaOutOfRange");
+                }
+
+                // Validate subject level
+                const levelCheck = await checkSubjectLevel(subject._id, request.student, session);
+                if (!levelCheck.valid) {
+                    request.status = 'rejected';
+                    await request.save({ session });
+                    throw new Error("registration.errors.levelNotAllowed");
+                }
             }
 
             // Check if already enrolled in any other group for the same subject
@@ -136,6 +164,27 @@ export const requestJoinGroup = async (req: Request, res: Response): Promise<voi
             const collision = await hasTimeCollision(student._id as mongoose.Types.ObjectId, group, session);
             if (collision) {
                 throw new Error("registration.errors.timeCollision");
+            }
+
+            // Validate prerequisites
+            const subject = await Subject.findOne({ code: new RegExp(`^${group.subject}$`, 'i') }).session(session);
+            if (subject) {
+                const prereqCheck = await checkPrerequisites(student._id as mongoose.Types.ObjectId, subject._id, session);
+                if (!prereqCheck.met) {
+                    throw new Error("registration.errors.prerequisitesNotMet");
+                }
+
+                // Validate GPA range
+                const gpaCheck = await checkGpaRange(student._id as mongoose.Types.ObjectId, session);
+                if (!gpaCheck.valid) {
+                    throw new Error("registration.errors.gpaOutOfRange");
+                }
+
+                // Validate subject level
+                const levelCheck = await checkSubjectLevel(subject._id, student._id as mongoose.Types.ObjectId, session);
+                if (!levelCheck.valid) {
+                    throw new Error("registration.errors.levelNotAllowed");
+                }
             }
 
             // Auto-process logic

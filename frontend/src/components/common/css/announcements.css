@@ -1,23 +1,22 @@
 :root {
-    --primary: #4f46e5;
-    --primary-hover: #4338ca;
     --bg-main: var(--color-bg);
     --text-dark: var(--color-text);
     --text-muted: var(--color-text-muted);
-    --white: #ffffff;
+    --white: var(--color-text-inverse);
     --error-bg: var(--color-error-bg);
     --error-text: #991b1b;
-    --danger: #dc2626;
-    --danger-hover: #b91c1c;
+    --danger: var(--color-error);
+    --danger-hover: var(--color-error-hover);
 }
 
 .announcements-container {
     direction: rtl;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 0 20px;
+    width: 100%;
+    margin: 0;
+    padding: 3rem 2rem;
     background-color: var(--bg-main);
+    min-height: 100vh;
 }
 
 /* --- Header Section --- */
@@ -109,60 +108,60 @@
     transition: all 0.2s ease;
     font-size: 0.95rem;
     color: white;
+    background-color: var(--color-primary);
+}
+
+.btn:hover {
+    background-color: var(--color-primary-hover);
+    transform: translateY(-1px);
 }
 
 .home-btn {
-    background-color: #3b82f6;
+    background-color: var(--color-primary);
 }
 
 .home-btn:hover {
-    background-color: #2563eb;
-    transform: translateY(-1px);
+    background-color: var(--color-primary-hover);
 }
 
 .complaint-btn {
-    background-color: #8b5cf6;
+    background-color: var(--color-primary);
 }
 
 .complaint-btn:hover {
-    background-color: #7c3aed;
-    transform: translateY(-1px);
+    background-color: var(--color-primary-hover);
 }
 
 .groups-btn {
-    background-color: #10b981;
+    background-color: var(--color-primary);
 }
 
 .groups-btn:hover {
-    background-color: #059669;
-    transform: translateY(-1px);
+    background-color: var(--color-primary-hover);
 }
 
 .register-btn {
-    background-color: #f59e0b;
+    background-color: var(--color-primary);
 }
 
 .register-btn:hover {
-    background-color: #d97706;
-    transform: translateY(-1px);
+    background-color: var(--color-primary-hover);
 }
 
 .history-btn {
-    background-color: #6366f1;
+    background-color: var(--color-primary);
 }
 
 .history-btn:hover {
-    background-color: #4f46e5;
-    transform: translateY(-1px);
+    background-color: var(--color-primary-hover);
 }
 
 .admin-btn {
-    background-color: #ef4444;
+    background-color: var(--color-primary);
 }
 
 .admin-btn:hover {
-    background-color: #dc2626;
-    transform: translateY(-1px);
+    background-color: var(--color-primary-hover);
 }
 
 /* --- Stats/GPA Layout --- */
@@ -209,7 +208,26 @@
 .card-value {
     font-size: 2rem;
     font-weight: 800;
-    color: var(--primary);
+    color: var(--color-primary);
+}
+
+/* Level Badges */
+.levels-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.level-badge {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-primary-light);
+    border: 2px solid var(--color-primary);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-primary);
 }
 
 /* GPA Error Section */
@@ -253,7 +271,7 @@
 }
 
 .post-card:hover {
-    border-color: var(--primary);
+    border-color: var(--color-primary);
 }
 
 .post-card h4 {
@@ -292,8 +310,8 @@
 /* --- Mobile Specifics --- */
 @media (max-width: 768px) {
     .announcements-container {
-        margin: 20px auto;
-        padding: 0 15px;
+        margin: 0;
+        padding: 2rem 1rem;
     }
 
     .flex-center-gap {

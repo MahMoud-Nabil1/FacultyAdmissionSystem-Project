@@ -6,7 +6,7 @@ import Staff, { IStaff } from '../models/staff';
 import { EnrollmentRequest } from '../models/enrollmentRequest';
 import { UserPayload } from '../middleware/authMiddleware';
 import mongoose from "mongoose";
-import { ensureSubjectRequested, hasTimeCollision } from '../utils/enrollment.utils';
+import { ensureSubjectRequested, hasTimeCollision, checkPrerequisites, checkGpaRange, checkSubjectLevel } from '../utils/enrollment.utils';
 import SystemSetting from '../models/systemSetting';
 
 /**
@@ -129,6 +129,27 @@ export const addStudentToGroup = async (req: Request, res: Response): Promise<vo
 
             if (group.students.map(id => id.toString()).includes(studentId)) {
                 throw new Error("Student already in this group");
+            }
+
+            // Validate prerequisites
+            const subject = await Subject.findOne({ code: new RegExp(`^${group.subject}$`, 'i') }).session(session);
+            if (subject) {
+                const prereqCheck = await checkPrerequisites(new mongoose.Types.ObjectId(studentId), subject._id, session);
+                if (!prereqCheck.met) {
+                    throw new Error("registration.errors.prerequisitesNotMet");
+                }
+
+                // Validate GPA range
+                const gpaCheck = await checkGpaRange(new mongoose.Types.ObjectId(studentId), session);
+                if (!gpaCheck.valid) {
+                    throw new Error("registration.errors.gpaOutOfRange");
+                }
+
+                // Validate subject level
+                const levelCheck = await checkSubjectLevel(subject._id, new mongoose.Types.ObjectId(studentId), session);
+                if (!levelCheck.valid) {
+                    throw new Error("registration.errors.levelNotAllowed");
+                }
             }
 
             // Add student to group
@@ -333,6 +354,8 @@ async function processNextInWaitlist(groupId: string, session: mongoose.ClientSe
     const group = await Group.findById(groupId).session(session);
     if (!group) return;
 
+    const subject = await Subject.findOne({ code: new RegExp(`^${group.subject}$`, 'i') }).session(session);
+
     for (const request of pendingRequests) {
         if (group.students.length >= group.capacity) break;
 
@@ -342,6 +365,32 @@ async function processNextInWaitlist(groupId: string, session: mongoose.ClientSe
             request.status = 'rejected';
             await request.save({ session });
             continue; // Move to next person in waitlist
+        }
+
+        // Validate prerequisites if subject exists
+        if (subject) {
+            const prereqCheck = await checkPrerequisites(request.student, subject._id, session);
+            if (!prereqCheck.met) {
+                request.status = 'rejected';
+                await request.save({ session });
+                continue;
+            }
+
+            // Validate GPA range
+            const gpaCheck = await checkGpaRange(request.student, session);
+            if (!gpaCheck.valid) {
+                request.status = 'rejected';
+                await request.save({ session });
+                continue;
+            }
+
+            // Validate subject level
+            const levelCheck = await checkSubjectLevel(subject._id, request.student, session);
+            if (!levelCheck.valid) {
+                request.status = 'rejected';
+                await request.save({ session });
+                continue;
+            }
         }
 
         // Enroll the student

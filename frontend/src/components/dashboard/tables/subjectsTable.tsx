@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { getAllSubjects, deleteSubject, createSubject } from "../../../services/api";
 import Pagination from "../pagination";
 import { PAGE_SIZE } from "../../../services/constants";
@@ -9,6 +8,7 @@ interface Subject {
     _id: string;
     code: string;
     name: string;
+    level: '1' | '2' | '3' | '4';
     creditHours: number;
     prerequisites?: any[];
 }
@@ -16,6 +16,7 @@ interface Subject {
 interface SubjectForm {
     code: string;
     name: string;
+    level: '1' | '2' | '3' | '4';
     creditHours: string;
     prerequisites: string[];
 }
@@ -24,7 +25,7 @@ interface SubjectsTableProps {
     onEdit: (subject: Subject) => void;
 }
 
-const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
+const SubjectsTable: React.FC<SubjectsTableProps> = () => {
     const { t } = useTranslation();
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [page, setPage] = useState<number>(0);
@@ -33,6 +34,7 @@ const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
     const [form, setForm] = useState<SubjectForm>({
         code: "",
         name: "",
+        level: "",
         creditHours: "",
         prerequisites: [],
     });
@@ -40,7 +42,6 @@ const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
     const [showPrereqDropdown, setShowPrereqDropdown] = useState(false);
     const [loading, setLoading] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const navigate = useNavigate();
 
     const load = async () => {
         const data = await getAllSubjects();
@@ -108,6 +109,7 @@ const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
         const payload = {
             code,
             name,
+            level: form.level,
             creditHours: credit,
             prerequisites: form.prerequisites,
         };
@@ -125,7 +127,7 @@ const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
 
     const closeModal = () => {
         setShowModal(false);
-        setForm({ code: "", name: "", creditHours: "", prerequisites: [] });
+        setForm({ code: "", name: "", level: "", creditHours: "", prerequisites: [] });
         setError("");
         setShowPrereqDropdown(false);
     };
@@ -178,6 +180,7 @@ const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
                 <tr>
                     <th>{t("subjectsTable.code")}</th>
                     <th>{t("subjectsTable.name")}</th>
+                    <th>{t("subjectsTable.level")}</th>
                     <th>{t("subjectsTable.creditHours")}</th>
                     <th>{t("subjectsTable.prerequisites")}</th>
                     <th>{t("dashboardCommon.actions")}</th>
@@ -189,6 +192,7 @@ const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
                     <tr key={s._id}>
                         <td>{s.code}</td>
                         <td>{s.name}</td>
+                        <td>{t(`subjectsTable.level${s.level}`)}</td>
                         <td>{s.creditHours}</td>
                         <td>
                             {(s.prerequisites || [])
@@ -211,7 +215,7 @@ const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
 
                 {slice.length === 0 && (
                     <tr>
-                        <td colSpan={5} style={{ textAlign: "center" }}>
+                        <td colSpan={6} style={{ textAlign: "center" }}>
                             {t("dashboardCommon.noResults")}
                         </td>
                     </tr>
@@ -255,6 +259,22 @@ const SubjectsTable: React.FC<SubjectsTableProps> = ({ onEdit }) => {
                                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                                         required
                                     />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>{t("subjectPanel.levelLabel")}</label>
+                                    <select
+                                        value={form.level}
+                                        onChange={(e) => setForm({ ...form, level: e.target.value })}
+                                        required
+                                        style={{ width: "100%", padding: "8px", border: "1px solid #ccc", borderRadius: "4px" }}
+                                    >
+                                        <option value="">{t("subjectPanel.levelPlaceholder")}</option>
+                                        <option value="1">{t("subjectsTable.level1")}</option>
+                                        <option value="2">{t("subjectsTable.level2")}</option>
+                                        <option value="3">{t("subjectsTable.level3")}</option>
+                                        <option value="4">{t("subjectsTable.level4")}</option>
+                                    </select>
                                 </div>
 
                                 <div className="form-group">

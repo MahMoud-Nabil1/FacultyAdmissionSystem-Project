@@ -99,6 +99,19 @@
     "statistics": "Statistics",
     "logout": "Sign out"
   },
+  "registerSubjects": {
+    "title": "Course Registration",
+    "fetchFailed": "Failed to load eligible subjects",
+    "requestSuccess": "Request submitted successfully!",
+    "requestFailed": "Failed to submit request",
+    "noEligibleSubjects": "No eligible subjects",
+    "noEligibleSubjectsSubtitle": "You have completed all available subjects or don't meet the requirements yet.",
+    "creditHours": "credit hours",
+    "group": "Group",
+    "request": "Request",
+    "full": "Full",
+    "noGroupsAvailable": "No groups available for this subject"
+  },
   "editPanel": {
     "title": "Admin Panel",
     "subtitle": "Choose a section to manage",

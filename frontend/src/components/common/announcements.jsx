@@ -11,7 +11,7 @@ const Announcements = () => {
     const [loading, setLoading] = useState(true);
     const [gpaMin, setGpaMin] = useState(2.5);
     const [gpaMax, setGpaMax] = useState(5);
-    const [levelCode, setLevelCode] = useState('1');
+    const [levelCodes, setLevelCodes] = useState(['1']);
     const [posts, setPosts] = useState([]);
     const [logoError, setLogoError] = useState(false);
     const [hasInvalidGpaSettings, setHasInvalidGpaSettings] = useState(false);
@@ -61,7 +61,8 @@ const Announcements = () => {
             ]);
 
             if (!announcementsRes.ok || !settingsRes.ok) {
-                throw new Error('Failed to fetch');
+                console.error('Failed to fetch');
+                return;
             }
 
             const announcements = await announcementsRes.json();
@@ -81,7 +82,7 @@ const Announcements = () => {
                 setHasInvalidGpaSettings(false);
             }
 
-            setLevelCode(String(settings.level || '1'));
+            setLevelCodes(Array.isArray(settings.level) ? settings.level : [settings.level || '1']);
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -104,6 +105,14 @@ const Announcements = () => {
             '4': 'المستوى الرابع'
         };
         return levels[code] || 'المستوى الأول';
+    };
+
+    const renderLevels = () => {
+        return levelCodes.map((code) => (
+            <span key={code} className="level-badge">
+                {getLevelText(code)}
+            </span>
+        ));
     };
 
     // Navigation handlers (all using sessionStorage)
@@ -236,8 +245,8 @@ const Announcements = () => {
             {/* Level Section */}
             <div className="section-box">
                 <h4 className="section-title">المستوى المطلوب للتسجيل في الجدول</h4>
-                <div className="gpa-card" style={{ maxWidth: '300px', margin: '0 auto' }}>
-                    <span className="card-value" style={{ color: '#4f46e5' }}>{getLevelText(levelCode)}</span>
+                <div className="levels-container">
+                    {renderLevels()}
                 </div>
             </div>
 

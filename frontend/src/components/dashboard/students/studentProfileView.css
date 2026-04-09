@@ -102,6 +102,39 @@ body {
     color: var(--text-main);
 }
 
+/* Level Badge in Info Card */
+.info-card-level {
+    text-align: center;
+}
+
+.level-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.level-1 {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.level-2 {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.level-3 {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.level-4 {
+    background: #ede9fe;
+    color: #5b21b6;
+}
+
 /* ---------- Section Titles ---------- */
 .section-title {
     font-size: 1.4rem;
