@@ -1,21 +1,22 @@
 :root {
-    --primary: #4f46e5;
-    --primary-hover: #4338ca;
     --bg-main: var(--color-bg);
     --text-dark: var(--color-text);
     --text-muted: var(--color-text-muted);
-    --white: #ffffff;
+    --white: var(--color-text-inverse);
     --error-bg: var(--color-error-bg);
     --error-text: #991b1b;
+    --danger: var(--color-error);
+    --danger-hover: var(--color-error-hover);
 }
 
 .announcements-container {
     direction: rtl;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    max-width: 900px; /* Narrower looks more modern */
-    margin: 40px auto;
-    padding: 0 20px;
+    width: 100%;
+    margin: 0;
+    padding: 3rem 2rem;
     background-color: var(--bg-main);
+    min-height: 100vh;
 }
 
 /* --- Header Section --- */
@@ -25,6 +26,8 @@
     align-items: center;
     padding: 1.5rem 0;
     margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .logo-img {
@@ -32,9 +35,22 @@
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
 }
 
+/* User controls row */
+.user-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 .login-btn {
-    background-color: var(--color-primary);
-    color: var(--color-text-inverse);
+    background-color: var(--primary);
+    color: white;
     border: none;
     padding: 10px 24px;
     border-radius: 10px;
@@ -44,7 +60,7 @@
 }
 
 .login-btn:hover {
-    background-color: var(--color-primary-hover);
+    background-color: var(--primary-hover);
     transform: translateY(-1px);
 }
 
@@ -55,6 +71,97 @@
     background: #eef2ff;
     padding: 8px 16px;
     border-radius: 8px;
+}
+
+/* Logout button - RED */
+.logout-btn {
+    background-color: var(--danger);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background-color: var(--danger-hover);
+    transform: translateY(-1px);
+}
+
+/* --- Navigation Buttons Row --- */
+.nav-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+    color: white;
+    background-color: var(--color-primary);
+}
+
+.btn:hover {
+    background-color: var(--color-primary-hover);
+    transform: translateY(-1px);
+}
+
+.home-btn {
+    background-color: var(--color-primary);
+}
+
+.home-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.complaint-btn {
+    background-color: var(--color-primary);
+}
+
+.complaint-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.groups-btn {
+    background-color: var(--color-primary);
+}
+
+.groups-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.register-btn {
+    background-color: var(--color-primary);
+}
+
+.register-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.history-btn {
+    background-color: var(--color-primary);
+}
+
+.history-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.admin-btn {
+    background-color: var(--color-primary);
+}
+
+.admin-btn:hover {
+    background-color: var(--color-primary-hover);
 }
 
 /* --- Stats/GPA Layout --- */
@@ -104,6 +211,44 @@
     color: var(--color-primary);
 }
 
+/* Level Badges */
+.levels-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.level-badge {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-primary-light);
+    border: 2px solid var(--color-primary);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+/* GPA Error Section */
+.gpa-error-section {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.gpa-error-section h4 {
+    color: var(--error-text);
+    margin-bottom: 0.5rem;
+}
+
+.gpa-error-section p {
+    color: #991b1b;
+}
+
 /* --- Announcements List --- */
 .posts-list {
     margin-top: 3rem;
@@ -113,6 +258,7 @@
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
+    color: var(--color-text);
 }
 
 .post-card {
@@ -145,9 +291,69 @@
     color: var(--color-text-placeholder);
 }
 
+/* Loading Container */
+.loading-container {
+    text-align: center;
+    padding: 50px;
+    font-size: 1.2rem;
+    color: var(--color-text-muted);
+}
+
+.no-announcements {
+    text-align: center;
+    padding: 40px;
+    color: var(--color-text-muted);
+    background: var(--color-text-inverse);
+    border-radius: 16px;
+}
+
 /* --- Mobile Specifics --- */
+@media (max-width: 768px) {
+    .announcements-container {
+        margin: 0;
+        padding: 2rem 1rem;
+    }
+
+    .flex-center-gap {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .gpa-card {
+        width: 100%;
+        max-width: none;
+    }
+
+    .header-wrapper {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .nav-buttons {
+        gap: 0.75rem;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+    }
+
+    .user-controls {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 @media (max-width: 640px) {
-    .flex-center-gap { flex-direction: column; align-items: center; }
-    .gpa-card { width: 100%; max-width: none; }
-    .header-wrapper { flex-direction: column; gap: 1rem; }
+    .nav-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .btn {
+        text-align: center;
+        justify-content: center;
+    }
 }

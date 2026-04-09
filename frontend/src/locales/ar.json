@@ -112,14 +112,8 @@
   "adminDashboard": {
     "welcome": "مرحبًا {{name}}"
   },
-  "groupPanel": {
-    "title": "اضافة مجموعات"
-  },
   "staffPanel": {
     "title": "الموظفين",
-    "addBtn": "اضف موظف جديد",
-    "cancelBtn": "إلغاء",
-    "viewAllBtn": "عرض جميع الموظفين",
     "nameLabel": "الإسم",
     "namePlaceholder": "أدخل الاسم الكامل",
     "emailLabel": "الإيميل",
@@ -153,6 +147,8 @@
     "viewTableBtn": "عرض جدول المقررات",
     "codePlaceholder": "رمز المقرر (مثال: س202)",
     "namePlaceholder": "اسم المقرر (مثال: هياكل البيانات والخوارزميات)",
+    "levelLabel": "المستوى الأكاديمي",
+    "levelPlaceholder": "— اختر مستوى —",
     "creditHoursPlaceholder": "عدد الساعات المعتمدة",
     "prerequisitesLabel": "المتطلبات السابقة",
     "prerequisitesEmpty": "اختر المتطلبات",
@@ -162,6 +158,35 @@
     "errorName": "اسم المقرر مطلوب",
     "errorCreditHours": "عدد الساعات غير صحيح",
     "errorGeneric": "حدث خطأ"
+  },
+  "complaints": {
+    "welcome": "مرحباً",
+    "studentId": "الرقم الجامعي",
+    "newComplaint": "تقديم طلب جديد",
+    "submitNew": "تقديم طلب أكاديمي",
+    "fullName": "الاسم الكامل",
+    "requestType": "نوع الطلب",
+    "courseName": "اسم المادة",
+    "problemDescription": "وصف المشكلة",
+    "additionalDetails": "تفاصيل إضافية",
+    "submit": "إرسال الطلب",
+    "submitting": "جاري الإرسال...",
+    "submitSuccess": "تم تقديم الطلب بنجاح!",
+    "submitError": "خطأ",
+    "serverError": "خطأ في الاتصال بالخادم",
+    "updateSuccess": "تم تحديث الطلب بنجاح",
+    "updateError": "خطأ في تحديث الطلب",
+    "pending": "قيد الانتظار",
+    "underReview": "قيد المراجعة",
+    "approved": "تمت الموافقة",
+    "rejected": "مرفوض",
+    "noComplaints": "لا توجد طلبات",
+    "noComplaintsDesc": "لم تقم بتقديم أي طلبات حتى الآن.",
+    "adminResponse": "رد الإدارة",
+    "reviewedBy": "تمت المراجعة بواسطة",
+    "on": "في",
+    "submittedOn": "تاريخ التقديم",
+    "requestNumber": "رقم الطلب"
   },
   "groupPanel": {
     "title": "المجموعات",
@@ -282,6 +307,11 @@
     "searchPlaceholder": "ابحث باسم المقرر أو الرمز...",
     "code": "رمز المقرر",
     "name": "اسم المقرر",
+    "level": "المستوى",
+    "level1": "المستوى الأول",
+    "level2": "المستوى الثاني",
+    "level3": "المستوى الثالث",
+    "level4": "المستوى الرابع",
     "creditHours": "عدد الساعات",
     "prerequisites": "المتطلبات السابقة"
   },
@@ -349,6 +379,7 @@
     "changePassword": "تغيير كلمة السر",
     "registerSubjects": "تسجيل المواد",
     "academicHistory": "التاريخ الأكاديمي",
+    "complaints": "طلبات الطلاب",
     "changePasswordTitle": "تغيير كلمة السر",
     "currentPasswordPlaceholder": "كلمة السر الحالية",
     "newPasswordPlaceholder": "كلمة السر الجديدة",
@@ -443,6 +474,11 @@
     "selectPlaceholder": "— اختر مادة —",
     "hrs": "ساعة",
     "noGroupsForSubject": "لا توجد مجموعات متاحة لهذه المادة.",
+    "studentLevel": "مستواك",
+    "level1": "المستوى الأول",
+    "level2": "المستوى الثاني",
+    "level3": "المستوى الثالث",
+    "level4": "المستوى الرابع",
     "colSubject": "المادة",
     "colGroup": "المجموعة",
     "colType": "النوع",
@@ -481,7 +517,10 @@
       "alreadyInGroup": "أنت مسجل بالفعل في هذه المجموعة",
       "alreadyEnrolledInSubject": "أنت مسجل بالفعل في هذا المقرر في مجموعة أخرى",
       "timeCollision": "لديك تعارض في الوقت مع مجموعة أخرى",
-      "waitlistFull": "المجموعة ممتلئة وأنت بالفعل على قائمة الانتظار"
+      "waitlistFull": "المجموعة ممتلئة وأنت بالفعل على قائمة الانتظار",
+      "prerequisitesNotMet": "لم تكمل المتطلبات السابقة المطلوبة لهذه المادة",
+      "gpaOutOfRange": "معدلك التراكمي خارج النطاق المسموح به للتسجيل",
+      "levelNotAllowed": "مستوى هذه المادة غير متاح لمستواك الأكاديمي الحالي أو في هذا الفصل الدراسي"
     }
   }
 }

@@ -4,10 +4,13 @@
    ============================================================ */
 
 .regContainer {
-  max-width: 100%;
-  width: 100%;
+  max-width: 100% !important;
+  width: 100% !important;
   padding: 24px 32px;
-  margin: 0;
+  margin: 0 !important;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
 }
 
 /* ── Header ── */
@@ -20,6 +23,13 @@
   margin-bottom: 8px;
 }
 
+.regHeaderStats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .regHeader h2 {
   margin: 0;
   font-size: var(--font-size-2xl);
@@ -30,6 +40,56 @@
   margin: 4px 0 0;
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
+}
+
+/* ── Level Badge ── */
+.regLevelBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 12px 20px;
+  min-width: 120px;
+  text-align: center;
+}
+
+.regLevelLabel {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  margin-bottom: 4px;
+}
+
+.regLevelValue {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  display: inline-block;
+}
+
+.regLevel1 {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.regLevel2 {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.regLevel3 {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.regLevel4 {
+  background: #ede9fe;
+  color: #5b21b6;
 }
 
 /* ── Credit counter ── */
@@ -105,114 +165,157 @@
 
 .regTimetableWrapper {
   overflow-x: auto;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
+  border-radius: 12px;
+  border: 2px solid #d1d5db;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .regTimetable {
   width: 100%;
-  border-collapse: collapse;
-  min-width: 900px;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 850px;
   table-layout: fixed;
 }
 
+/* Header row with gradient */
+.regTimetable thead tr {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.regTimetable th {
+  padding: 16px 10px;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+}
+
+.regTimetable th:last-child {
+  border-right: none;
+}
+
+/* Top-left corner cell */
 .regTimetableCorner {
-  width: 80px;
-  min-width: 80px;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-bottom: 2px solid var(--color-border);
-  padding: 12px 8px;
+  width: 90px;
+  min-width: 90px;
+  background: linear-gradient(135deg, #5a67d8 0%, #6b4fa0 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 16px 10px;
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-muted);
+  font-weight: 700;
+  color: #ffffff;
   text-align: center;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.regTimetableDayHeader {
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-bottom: 2px solid var(--color-border);
-  padding: 12px 8px;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-primary);
-  text-align: center;
-  white-space: nowrap;
-}
-
-
-
+/* Time column cells */
 .regTimetableHourCell {
-  padding: 8px;
-  border: 1px solid var(--color-border);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-muted);
+  padding: 10px 8px;
+  border: 1px solid #e5e7eb;
+  border-right: 2px solid #d1d5db;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
   text-align: center;
   white-space: nowrap;
-  vertical-align: top;
-  height: 60px;
+  vertical-align: middle;
+  height: 70px;
+  background: #f9fafb;
+  position: sticky;
+  left: 0;
+  z-index: 1;
 }
 
+/* Empty grid cells */
 .regTimetableCell {
-  border: 1px solid var(--color-border);
-  padding: 0;
-  height: 60px;
+  border: 1px solid #e5e7eb;
+  padding: 3px;
+  height: 70px;
   vertical-align: top;
+  position: relative;
+  background: #ffffff;
+  transition: background-color 0.15s ease;
+}
+
+.regTimetableCell:hover {
+  background: #f3f4f6;
+}
+
+/* Event cells (filled cells with subject data) */
+.regTimetableEvent {
+  padding: 0 !important;
+  border: 2px solid;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.regTimetableEvent:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  z-index: 10;
   position: relative;
 }
 
-.regTimetableEvent {
-  padding: 6px 8px !important;
-  border-radius: 0;
-}
-
+/* Content inside event cells */
 .regEventContent {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 5px;
   height: 100%;
+  padding: 8px 6px;
   text-align: center;
   position: relative;
 }
 
 .regEventContent strong {
-  font-size: var(--font-size-sm);
-  line-height: 1.2;
+  font-size: 14px;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: 0.3px;
 }
 
 .regEventTime {
-  font-size: 0.65rem;
-  opacity: 0.8;
+  font-size: 11px;
+  opacity: 0.85;
+  font-weight: 500;
 }
 
 .regEventName {
-  font-size: 0.6rem;
-  opacity: 0.7;
+  font-size: 11px;
+  opacity: 0.8;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 100%;
+  line-height: 1.3;
 }
 
+/* Remove button (appears on hover) */
 .regEventRemoveBtn {
   position: absolute;
-  top: 0;
-  right: 0;
-  background: none;
-  border: none;
+  top: 4px;
+  right: 4px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--color-border);
   cursor: pointer;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--color-error);
   opacity: 0;
-  transition: opacity 0.2s;
-  padding: 2px 4px;
+  transition: all 0.2s ease;
+  padding: 4px 6px;
   line-height: 1;
   border-radius: var(--radius-sm);
+  backdrop-filter: blur(4px);
 }
 
 .regTimetableEvent:hover .regEventRemoveBtn {
@@ -222,6 +325,34 @@
 .regEventRemoveBtn:hover {
   background: var(--color-error);
   color: white;
+  border-color: var(--color-error);
+}
+
+/* Status badges inside events */
+.regStatusBadge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.regStatusPending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.regStatusApproved,
+.regStatusEnrolled {
+  background: #d4edda;
+  color: #155724;
+}
+
+.regStatusRejected {
+  background: #f8d7da;
+  color: #721c24;
 }
 
 /* ══════════════════════════════════
@@ -458,37 +589,6 @@
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   margin-top: 2px;
-}
-
-/* Status badges */
-.regStatusBadge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.regStatusPending {
-  background: var(--color-warning-light, #fff3cd);
-  color: var(--color-warning, #856404);
-}
-
-.regStatusApproved {
-  background: var(--color-success-light, #d4edda);
-  color: var(--color-success, #155724);
-}
-
-.regStatusRejected {
-  background: var(--color-error-light, #f8d7da);
-  color: var(--color-error, #721c24);
-}
-
-.regStatusEnrolled {
-  background: var(--color-success-light, #d4edda);
-  color: var(--color-success, #155724);
 }
 
 /* Small button variant */

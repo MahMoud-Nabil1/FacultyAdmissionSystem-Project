@@ -12,7 +12,9 @@
     "home": "الرئيسية",
     "edit": "تعديل",
     "groups": "المجموعات",
-    "support": "الدعم"
+    "support": "الدعم",
+    "register": "تسجيل المواد",
+    "profile": "الملف الشخصي"
   },
   "login": {
     "university": "جامعة القاهرة - كلية العلوم",
@@ -96,6 +98,19 @@
     "studentsList": "قائمة طلابي",
     "statistics": "الإحصائيات",
     "logout": "تسجيل الخروج"
+  },
+  "registerSubjects": {
+    "title": "تسجيل المواد",
+    "fetchFailed": "فشل تحميل المواد المتاحة",
+    "requestSuccess": "تم تقديم الطلب بنجاح!",
+    "requestFailed": "فشل تقديم الطلب",
+    "noEligibleSubjects": "لا توجد مواد متاحة",
+    "noEligibleSubjectsSubtitle": "لقد أكملت جميع المواد المتاحة أو لا تستوفي المتطلبات بعد.",
+    "creditHours": "ساعات معتمدة",
+    "group": "المجموعة",
+    "request": "طلب",
+    "full": "ممتلئ",
+    "noGroupsAvailable": "لا توجد مجموعات متاحة لهذه المادة"
   },
   "editPanel": {
     "title": "لوحة الإدارة",
@@ -201,5 +216,54 @@
     "empty": "لا توجد إعلانات حتى الآن",
     "deleteTitle": "حذف إعلان",
     "deleteMessage": "هل تريد حذف \"{{title}}\"؟"
+  },
+  "register": {
+    "title": "تسجيل المواد",
+    "subtitle": "حدد جدولك الدراسي للفصل القادم",
+    "selectedCredits": "عدد الساعات المسجلة:",
+    "hrs": "ساعة",
+    "loading": "جارٍ تحميل بيانات التسجيل...",
+    "closed": "التسجيل مغلق",
+    "closedMessage": "التسجيل مغلق حالياً. لا يمكنك طلب مجموعات جديدة في الوقت الحالي.",
+    "registeredTitle": "الجدول الخاص بي",
+    "myRequestsTitle": "طلباتي",
+    "availableTitle": "المواد المتاحة",
+    "chooseSubject": "اختر المادة",
+    "selectPlaceholder": "اختر مادة...",
+    "corequisiteNotice": "متطلبات متزامنة مطلوبة",
+    "noGroupsForSubject": "لا توجد مجموعات متاحة لهذه المادة.",
+    "colSubject": "المادة",
+    "colGroup": "المجموعة",
+    "colType": "النوع",
+    "colStatus": "الحالة",
+    "colActions": "إجراءات",
+    "status": {
+      "pending": "قيد الانتظار",
+      "approved": "مقبول",
+      "rejected": "مرفوض",
+      "enrolled": "مسجل"
+    },
+    "errors": {
+      "maxHoursExceeded": "تجاوز الحد الأقصى للساعات المعتمدة.",
+      "corequisitesRequired": "يجب تسجيل: {{subjects}}"
+    },
+    "removeBtn": "إزالة",
+    "cancelRequestBtn": "إلغاء الطلب",
+    "requestBtn": "تسجيل",
+    "success": "تم إرسال الطلب بنجاح",
+    "cancelSuccess": "تم إلغاء الطلب",
+    "removeSuccess": "تمت الإزالة بنجاح",
+    "failed": "فشلت العملية",
+    "noRegistered": "لا توجد مواد مسجلة."
+  },
+  "groupsSchedule": {
+    "groupNumber": "مجموعة {{number}}",
+    "am": "ص",
+    "pm": "م",
+    "typeValues": {
+      "lecture": "محاضرة",
+      "lab": "معمل",
+      "tutorial": "سيكشن"
+    }
   }
 }

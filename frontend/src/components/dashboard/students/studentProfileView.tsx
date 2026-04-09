@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
     addStudentToGroup,
     getAllGroups,
     getStudentById,
-    removeStudentFromGroup
+    removeStudentFromGroup,
+    getAllSubjects
 } from "../../../services/api";
 import { useTranslation } from "react-i18next";
 import "./studentProfileView.css"
@@ -13,6 +14,7 @@ interface Subject {
     _id: string;
     name: string;
     code: string;
+    creditHours: number;
 }
 
 interface Student {
@@ -45,26 +47,43 @@ const StudentProfile: React.FC = () => {
     const [student, setStudent] = useState<Student | null>(null);
     const [groups, setGroups] = useState<Group[]>([]);
     const [loading, setLoading] = useState(true);
+    const [subjects, setSubjects] = useState<Subject[]>([]);
     const [actionLoading, setActionLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setLoading(true);
-                const [studentData, groupsData] = await Promise.all([
+                const [studentData, groupsData, subjectsData] = await Promise.all([
                     getStudentById(id!),
-                    getAllGroups()
+                    getAllGroups(),
+                    getAllSubjects()
                 ]);
                 setStudent(studentData);
                 setGroups(groupsData);
+                setSubjects(subjectsData);
             } catch (err) {
                 console.error(err);
-            } finally {
-                setLoading(false);
             }
         };
         fetchData();
     }, [id]);
+
+    // Calculate completed credit hours and student level
+    const completedHours = useMemo(() => {
+        if (!student) return 0;
+        return student.completedSubjects.reduce((sum, s) => {
+            const subject = subjects.find(sub => sub._id === s._id);
+            return sum + (subject?.creditHours || 0);
+        }, 0);
+    }, [student, subjects]);
+
+    const studentLevel = useMemo(() => {
+        if (completedHours === 0) return '1';
+        if (completedHours <= 30) return '1';
+        if (completedHours <= 60) return '2';
+        if (completedHours <= 90) return '3';
+        return '4';
+    }, [completedHours]);
 
     if (!student) return <p>{t("studentProfile.loadingStudent")}</p>;
 
@@ -149,6 +168,15 @@ const StudentProfile: React.FC = () => {
                 <div className="info-card">
                     <span className="info-label">{t("studentProfile.gpaLabel")}</span>
                     <span className="info-value">{student.gpa}</span>
+                </div>
+                <div className="info-card info-card-level">
+                    <span className="info-label">{t("registration.studentLevel")}</span>
+                    <span className={`level-badge level-${studentLevel}`}>
+                        {t(`registration.level${studentLevel}`)}
+                    </span>
+                    <span className="info-value-sub" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                        ({completedHours} {t("academicHistory.creditHours")})
+                    </span>
                 </div>
             </div>
 

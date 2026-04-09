@@ -9,6 +9,7 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
+    RefreshControl,
 } from 'react-native';
 import { router } from 'expo-router';
 import { jwtDecode } from 'jwt-decode';
@@ -30,6 +31,15 @@ export default function Login() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        setUserId('');
+        setPassword('');
+        setError('');
+        setRefreshing(false);
+    };
 
     const handleSubmit = async () => {
         setError('');
@@ -74,7 +84,13 @@ export default function Login() {
             style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-            <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+            <ScrollView
+                contentContainerStyle={styles.scroll}
+                keyboardShouldPersistTaps="handled"
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} colors={['#1a73e8']} tintColor="#1a73e8" />
+                }
+            >
                 {/* Header */}
                 <View style={styles.header}>
                     <Text style={styles.logo}>🎓</Text>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     View,
     Text,
@@ -6,6 +6,7 @@ import {
     ScrollView,
     ActivityIndicator,
     Alert,
+    RefreshControl,
     TouchableOpacity,
 } from 'react-native';
 import { router } from 'expo-router';
@@ -27,6 +28,7 @@ export interface IGroup {
     day: WeekDay;
     place?: string;
     capacity: number;
+    students?: string[];
 }
 
 const TYPE_LABEL: Record<GroupType, string> = {
@@ -61,25 +63,30 @@ export default function Groups() {
     const { token } = useAuth();
     const [groups, setGroups] = useState<IGroup[]>([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
     const API_BASE = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://10.0.2.2:5000/api';
 
-    useEffect(() => {
-        const fetchGroups = async () => {
-            try {
-
-                const data = await getAllGroups();
-                setGroups(data);
-            } catch (err: any) {
-
-                Alert.alert('خطأ', err.message || 'تعذّر تحميل المجموعات');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchGroups();
+    const load = useCallback(async () => {
+        try {
+            const data = await getAllGroups();
+            setGroups(data);
+        } catch (err: any) {
+            Alert.alert('خطأ', err.message || 'تعذّر تحميل المجموعات');
+        } finally {
+            setLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        load();
+    }, [load]);
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await load();
+        setRefreshing(false);
+    }, [load]);
 
     if (loading) {
         return (
@@ -91,15 +98,22 @@ export default function Groups() {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()}>
-                    <Ionicons name="arrow-forward" size={26} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>المجموعات</Text>
-                <View style={{ width: 26 }} />
-            </View>
+            {/* Back Button */}
+            <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => router.back()}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+                <Ionicons name="arrow-back" size={24} color="#1a73e8" />
+            </TouchableOpacity>
 
-            <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+            <ScrollView
+                contentContainerStyle={styles.scroll}
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#1a73e8']} tintColor="#1a73e8" />
+                }
+            >
                 {groups.length === 0 ? (
                     <View style={styles.emptyState}>
                         <Ionicons name="albums-outline" size={72} color="#d1d5db" />
@@ -150,17 +164,7 @@ export default function Groups() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f8f9ff' },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    header: {
-        backgroundColor: '#1a73e8',
-        paddingTop: 50,
-        paddingBottom: 18,
-        paddingHorizontal: 20,
-        flexDirection: 'row-reverse',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
-    scroll: { padding: 20, paddingBottom: 40 },
+    scroll: { padding: 20, paddingTop: 90, paddingBottom: 40 },
     card: {
         backgroundColor: '#fff',
         borderRadius: 16,
@@ -185,4 +189,11 @@ const styles = StyleSheet.create({
     emptyState: { alignItems: 'center', paddingTop: 80 },
     emptyTitle: { fontSize: 18, fontWeight: 'bold', color: '#4b5563', marginTop: 10 },
     emptySubtitle: { fontSize: 14, color: '#9ca3af', textAlign: 'center', marginTop: 5 },
+    backButton: {
+        position: 'absolute',
+        top: 50,
+        left: 20,
+        zIndex: 10,
+        padding: 4,
+    },
 });

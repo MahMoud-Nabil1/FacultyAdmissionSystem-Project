@@ -12,6 +12,7 @@ const Home = () => {
     const { t, i18n } = useTranslation();
     const isRTL = i18n.language === "ar";
     const [user, setUser] = useState<any>(null);
+    const [subjects, setSubjects] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showReset, setShowReset] = useState(false);
     const [newPassword, setNewPassword] = useState("");
@@ -20,36 +21,61 @@ const Home = () => {
     const [resetMessage, setResetMessage] = useState("");
 
     useEffect(() => {
-        const fetchUser = async () => {
+        const fetchData = async () => {
             try {
                 const token = sessionStorage.getItem("token");
                 if (!token) {
                     setLoading(false);
                     return;
                 }
-                
-                const res = await fetch("http://localhost:5000/api/auth/me", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                
-                if (!res.ok) {
-                    if (res.status === 401) {
+
+                const [userRes, subjectsRes] = await Promise.all([
+                    fetch("http://localhost:5000/api/auth/me", {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }),
+                    fetch("http://localhost:5000/api/subjects", {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }),
+                ]);
+
+                if (!userRes.ok) {
+                    if (userRes.status === 401) {
                         sessionStorage.removeItem("token");
                         window.location.href = "/login";
                     }
                     return;
                 }
-                
-                const data = await res.json();
-                setUser(data);
+
+                const userData = await userRes.json();
+                setUser(userData);
+
+                if (subjectsRes.ok) {
+                    const subjectsData = await subjectsRes.json();
+                    setSubjects(subjectsData);
+                }
             } catch (err) {
                 console.error("Auth fetch failed:", err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchUser();
+        fetchData();
     }, [navigate]);
+
+    // Calculate student level from completed subjects
+    const studentLevel = React.useMemo(() => {
+        if (!user?.completedSubjects) return null;
+        let totalHours = 0;
+        user.completedSubjects.forEach((completedId: string) => {
+            const subject = subjects.find((s: any) => s._id === completedId);
+            if (subject) totalHours += subject.creditHours || 0;
+        });
+        if (totalHours === 0) return '1';
+        if (totalHours <= 30) return '1';
+        if (totalHours <= 60) return '2';
+        if (totalHours <= 90) return '3';
+        return '4';
+    }, [user, subjects]);
 
     const roleLabel: string = user?.role ? t(ROLES[user.role as keyof typeof ROLES]) || t("home.defaultRole") : "";
 
@@ -104,13 +130,23 @@ const Home = () => {
             <h1 className="home-title">{t("home.title")}</h1>
 
             <div className="home-content">
-                <div className="info-card">
-                    <p><strong>{t("home.name")}</strong> {user?.name}</p>
-                    <p><strong>{t("home.role")}</strong> {roleLabel}</p>
-                    {user?.department && <p><strong>{t("home.department")}</strong> {user.department}</p>}
-                    {user?.gpa !== undefined && <p><strong>{t("home.gpa")}</strong> {user.gpa}</p>}
-                    {user?.registeredHours !== undefined && <p><strong>{t("home.registeredHours")}</strong> {user.registeredHours}</p>}
-                    {user?.completedHours !== undefined && <p><strong>{t("home.completedHours")}</strong> {user.completedHours}</p>}
+                <div className="info-card info-card-home">
+                    {user?.role === "student" && studentLevel && (
+                        <div className="home-level-badge">
+                            <strong>{t("registration.studentLevel")}</strong>{" "}
+                            <span className={`level-badge level-${studentLevel}`}>
+                                {t(`registration.level${studentLevel}`)}
+                            </span>
+                        </div>
+                    )}
+                    <div className="home-info-list">
+                        <p><strong>{t("home.name")}</strong> {user?.name}</p>
+                        <p><strong>{t("home.role")}</strong> {roleLabel}</p>
+                        {user?.department && <p><strong>{t("home.department")}</strong> {user.department}</p>}
+                        {user?.gpa !== undefined && <p><strong>{t("home.gpa")}</strong> {user.gpa}</p>}
+                        {user?.registeredHours !== undefined && <p><strong>{t("home.registeredHours")}</strong> {user.registeredHours}</p>}
+                        {user?.completedHours !== undefined && <p><strong>{t("home.completedHours")}</strong> {user.completedHours}</p>}
+                    </div>
                 </div>
 
                 <div className="buttons-horizontal">
@@ -135,6 +171,11 @@ const Home = () => {
                     {user?.role === "student" && (
                         <button className="btn" onClick={() => navigate("/academic-history")}>
                             {t("home.academicHistory") || "Academic History"}
+                        </button>
+                    )}
+                    {user?.role === "student" && (
+                        <button className="btn" onClick={() => navigate("/students-complaints")}>
+                            {t("home.complaints") || "Students Complaints"}
                         </button>
                     )}
 

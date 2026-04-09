@@ -2,9 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import {
     View, Text, TextInput, TouchableOpacity, StyleSheet,
     ScrollView, ActivityIndicator, Alert, Modal, Pressable,
-    KeyboardAvoidingView, Platform,
+    KeyboardAvoidingView, Platform, RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { getAllSubjects, createSubject, updateSubject, deleteSubject } from '../../../services/api';
 import { useLanguage } from '../../../context/LanguageContext';
 
@@ -21,6 +22,7 @@ export default function SubjectsScreen() {
     const [form, setForm] = useState(EMPTY);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
+    const [refreshing, setRefreshing] = useState(false);
 
     const load = useCallback(async () => {
         try {
@@ -32,6 +34,12 @@ export default function SubjectsScreen() {
     }, [t]);
 
     useEffect(() => { load(); }, [load]);
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await load();
+        setRefreshing(false);
+    }, [load]);
 
     const openAdd = () => {
         setEditingId(null); setForm(EMPTY);
@@ -77,7 +85,22 @@ export default function SubjectsScreen() {
     };
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <ScrollView
+            style={styles.container}
+            contentContainerStyle={styles.content}
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#1a73e8']} tintColor="#1a73e8" />
+            }
+        >
+            {/* Back Button */}
+            <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => router.back()}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+                <Ionicons name="arrow-back" size={24} color="#1a73e8" />
+            </TouchableOpacity>
+
             <Text style={styles.title}>📚 {t('subjects.title')}</Text>
 
             <TouchableOpacity
@@ -164,7 +187,7 @@ export default function SubjectsScreen() {
             </Modal>
 
             {loading ? (
-                <ActivityIndicator color="#10b981" style={{ marginTop: 32 }} />
+                <ActivityIndicator color="#1a73e8" style={{ marginTop: 32 }} />
             ) : subjects.length === 0 ? (
                 <Text style={styles.empty}>{t('subjects.empty')}</Text>
             ) : (
@@ -176,7 +199,7 @@ export default function SubjectsScreen() {
                             <Text style={styles.rowSub}>{t('subjects.creditsShort', { hours: s.creditHours })}</Text>
                         </View>
                         <TouchableOpacity onPress={() => openEdit(s)} style={styles.actionBtn}>
-                            <Ionicons name="create-outline" size={20} color="#10b981" />
+                            <Ionicons name="create-outline" size={20} color="#1a73e8" />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => handleDelete(s)} style={styles.actionBtn}>
                             <Ionicons name="trash-outline" size={20} color="#ef4444" />
@@ -240,10 +263,17 @@ const styles = StyleSheet.create({
         gap: 9,
     },
     row: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 10, alignItems: 'center', gap: 10, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 2 },
-    badge: { backgroundColor: '#00A2E8', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
+    badge: { backgroundColor: '#1a73e8', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
     badgeText: { color: '#fff', fontWeight: '700', fontSize: 12 },
     rowInfo: { flex: 1 },
     rowName: { fontSize: 14, fontWeight: '700', color: '#111' },
     rowSub: { fontSize: 12, color: '#6b7280', marginTop: 2 },
     actionBtn: { padding: 6 },
+    backButton: {
+        position: 'absolute',
+        top: 50,
+        left: 20,
+        zIndex: 10,
+        padding: 4,
+    },
 });

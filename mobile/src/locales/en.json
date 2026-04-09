@@ -12,7 +12,9 @@
     "home": "Home",
     "edit": "Edit",
     "groups": "Groups",
-    "support": "Support"
+    "support": "Support",
+    "register": "Register Subjects",
+    "profile": "Profile"
   },
   "login": {
     "university": "Cairo University - Faculty of Science",
@@ -96,6 +98,19 @@
     "studentsList": "My students list",
     "statistics": "Statistics",
     "logout": "Sign out"
+  },
+  "registerSubjects": {
+    "title": "Course Registration",
+    "fetchFailed": "Failed to load eligible subjects",
+    "requestSuccess": "Request submitted successfully!",
+    "requestFailed": "Failed to submit request",
+    "noEligibleSubjects": "No eligible subjects",
+    "noEligibleSubjectsSubtitle": "You have completed all available subjects or don't meet the requirements yet.",
+    "creditHours": "credit hours",
+    "group": "Group",
+    "request": "Request",
+    "full": "Full",
+    "noGroupsAvailable": "No groups available for this subject"
   },
   "editPanel": {
     "title": "Admin Panel",
@@ -201,5 +216,54 @@
     "empty": "No announcements yet",
     "deleteTitle": "Delete announcement",
     "deleteMessage": "Are you sure you want to delete \"{{title}}\"?"
+  },
+  "register": {
+    "title": "Register Subjects",
+    "subtitle": "Select your schedule for the upcoming semester",
+    "selectedCredits": "Selected Credits:",
+    "hrs": "hrs",
+    "loading": "Loading registration data...",
+    "closed": "Registration Closed",
+    "closedMessage": "Registration is currently closed. You cannot request new groups at this time.",
+    "registeredTitle": "My Schedule",
+    "myRequestsTitle": "My Requests",
+    "availableTitle": "Available Subjects",
+    "chooseSubject": "Choose Subject",
+    "selectPlaceholder": "Select a subject...",
+    "corequisiteNotice": "Co-requisites required",
+    "noGroupsForSubject": "No available groups for this subject.",
+    "colSubject": "Subject",
+    "colGroup": "Group",
+    "colType": "Type",
+    "colStatus": "Status",
+    "colActions": "Actions",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "enrolled": "Enrolled"
+    },
+    "errors": {
+      "maxHoursExceeded": "Maximum credit hours exceeded.",
+      "corequisitesRequired": "Must also register for: {{subjects}}"
+    },
+    "removeBtn": "Remove",
+    "cancelRequestBtn": "Cancel Request",
+    "requestBtn": "Request",
+    "success": "Request sent successfully",
+    "cancelSuccess": "Request cancelled",
+    "removeSuccess": "Removed successfully",
+    "failed": "Action failed",
+    "noRegistered": "No registered subjects."
+  },
+  "groupsSchedule": {
+    "groupNumber": "Group {{number}}",
+    "am": "AM",
+    "pm": "PM",
+    "typeValues": {
+      "lecture": "Lecture",
+      "lab": "Lab",
+      "tutorial": "Tutorial"
+    }
   }
 }
