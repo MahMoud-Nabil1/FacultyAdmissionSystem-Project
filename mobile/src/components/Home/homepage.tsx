@@ -87,31 +87,31 @@ const Homepage = () => {
 
                 {role === 'student' && (
                     <TouchableOpacity
-                        style={[styles.menuCard, { borderBottomColor: '#10b981' }]}
-                        onPress={() => router.push('/(tabs)/register')}
+                        style={[styles.menuCard, { borderBottomColor: '#1a73e8' }]}
+                        onPress={() => router.push('/register-subjects')}
                     >
-                        <Ionicons name="book" size={32} color="#10b981" />
-                        <Text style={styles.menuLabel}>تسجيل المواد</Text>
+                        <Ionicons name="book" size={32} color="#1a73e8" />
+                        <Text style={styles.menuLabel}>{t('home.registerSubjects')}</Text>
                     </TouchableOpacity>
                 )}
 
                 {(role === 'academic_guide' || role === 'academic_guide_coordinator') && (
                     <TouchableOpacity
-                        style={[styles.menuCard, { borderBottomColor: '#f59e0b' }]}
+                        style={[styles.menuCard, { borderBottomColor: '#1a73e8' }]}
                         onPress={() => router.push('/students-list')}
                     >
-                        <Ionicons name="people" size={32} color="#f59e0b" />
+                        <Ionicons name="people" size={32} color="#1a73e8" />
                         <Text style={styles.menuLabel}>{t('home.studentsList')}</Text>
                     </TouchableOpacity>
                 )}
 
                 {(role === 'reporter' || role === 'admin') && (
                     <TouchableOpacity
-                        style={[styles.menuCard, { borderBottomColor: '#6366f1' }]}
+                        style={[styles.menuCard, { borderBottomColor: '#1a73e8' }]}
                         onPress={() => router.push('/reports')}
                     >
-                        <Ionicons name="stats-chart" size={32} color="#6366f1" />
-                        <Text style={styles.menuLabel}>الإحصائيات</Text>
+                        <Ionicons name="stats-chart" size={32} color="#1a73e8" />
+                        <Text style={styles.menuLabel}>{t('home.statistics')}</Text>
                     </TouchableOpacity>
                 )}
             </View>

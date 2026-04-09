@@ -11,6 +11,8 @@ import {
     KeyboardAvoidingView,
     Platform,
 } from 'react-native';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -71,6 +73,15 @@ export default function SupportContact() {
             style={styles.container}
         >
             <ScrollView contentContainerStyle={styles.scroll}>
+                {/* Back Button */}
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => router.back()}
+                    hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                >
+                    <Ionicons name="arrow-back" size={24} color="#1a73e8" />
+                </TouchableOpacity>
+
                 <View style={styles.card}>
                     <Text style={styles.headerIcon}>{isIT ? '👨‍💻' : '🏛️'}</Text>
                     <Text style={[styles.title, { textAlign: align }]}>
@@ -188,4 +199,11 @@ const styles = StyleSheet.create({
     itBtn: { backgroundColor: '#1a73e8' },
     adminBtn: { backgroundColor: '#4b5563' },
     submitText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+    backButton: {
+        position: 'absolute',
+        top: 50,
+        left: 20,
+        zIndex: 10,
+        padding: 4,
+    },
 });

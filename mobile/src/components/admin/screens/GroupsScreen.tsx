@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
     View, Text, TextInput, TouchableOpacity, StyleSheet,
-    ScrollView, ActivityIndicator, Alert, Modal, Pressable, KeyboardAvoidingView, Platform,
+    ScrollView, ActivityIndicator, Alert, Modal, Pressable, KeyboardAvoidingView, Platform, RefreshControl,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { getAllGroups, createGroup, deleteGroup, getAllSubjects } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import { useLanguage } from '../../../context/LanguageContext';
@@ -27,6 +28,7 @@ export default function GroupsScreen() {
     const [form, setForm] = useState(EMPTY);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
+    const [refreshing, setRefreshing] = useState(false);
 
     const load = useCallback(async () => {
         try {
@@ -45,6 +47,12 @@ export default function GroupsScreen() {
     }, []);
 
     useEffect(() => { load(); loadSubjects(); }, [load, loadSubjects]);
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await load();
+        setRefreshing(false);
+    }, [load]);
 
     const closeModal = () => {
         setShowForm(false);
@@ -84,7 +92,22 @@ export default function GroupsScreen() {
     };
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <ScrollView
+            style={styles.container}
+            contentContainerStyle={styles.content}
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#1a73e8']} tintColor="#1a73e8" />
+            }
+        >
+            {/* Back Button */}
+            <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => router.back()}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+                <Ionicons name="arrow-back" size={24} color="#1a73e8" />
+            </TouchableOpacity>
+
             <Text style={styles.title}>🗂️ {t('groups.title')}</Text>
 
             {isAdmin && (
@@ -159,7 +182,7 @@ export default function GroupsScreen() {
             {loading ? (
                 <ActivityIndicator color="#f59e0b" style={{ marginTop: 32 }} />
             ) : groups.length === 0 ? (
-                <Text style={styles.empty}>لا توجد مجموعات حتى الآن</Text>
+                <Text style={styles.empty}>{t('groups.empty')}</Text>
             ) : (
                 groups.map(group => (
                     <View key={group._id} style={styles.row}>
@@ -240,4 +263,11 @@ const styles = StyleSheet.create({
     rowSub: { fontSize: 12, color: '#6b7280', marginTop: 2 },
     actionBtn: { padding: 6 },
     deleteBtn: { padding: 6 },
+    backButton: {
+        position: 'absolute',
+        top: 50,
+        left: 20,
+        zIndex: 10,
+        padding: 4,
+    },
 });
