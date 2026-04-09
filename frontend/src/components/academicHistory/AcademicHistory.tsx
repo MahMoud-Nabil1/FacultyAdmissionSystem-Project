@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import "./AcademicHistory.css";
+// import "./AcademicHistory.css";
 
 type Item = {
   s_code: string;
