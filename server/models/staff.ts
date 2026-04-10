@@ -70,7 +70,7 @@ staffSchema.virtual('password')
     });
 
 staffSchema.pre<IStaff>('save', async function () {
-    if (!this._password || !this.isModified('password')) return;
+    if (!this._password ) return;
 
     try {
         const salt = await bcrypt.genSalt(10);
