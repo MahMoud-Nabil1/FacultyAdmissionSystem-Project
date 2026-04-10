@@ -1,113 +1,20 @@
-import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../../../src/context/AuthContext';
-import { useLanguage } from '../../../src/context/LanguageContext';
+import { Stack } from 'expo-router';
 
-/** Returns tab visibility options — hides tab button when condition is false */
-function tabVisibility(visible: boolean) {
-    return visible
-        ? {}
-        : {
-            tabBarButton: () => null,
-            tabBarItemStyle: { display: 'none' as const },
-        };
-}
-
-export default function TabsLayout() {
-    const { user } = useAuth();
-    const { t } = useLanguage();
-    const isAdmin = user?.role === 'admin';
-    const isStudent = user?.role === 'student';
-
+export default function EditLayout() {
     return (
-        <Tabs
+        <Stack
             screenOptions={{
                 headerShown: false,
-                headerTitle: '',
-                headerShadowVisible: false,
-                headerStyle: { backgroundColor: '#ffffff' },
-                tabBarActiveTintColor: '#1a73e8',
-                tabBarInactiveTintColor: '#9ca3af',
-                tabBarStyle: {
-                    backgroundColor: '#ffffff',
-                    borderTopWidth: 1,
-                    borderTopColor: '#e5e7eb',
-                    height: 60,
-                    paddingBottom: 8,
-                    paddingTop: 4,
-                },
-                tabBarLabelStyle: {
-                    fontSize: 12,
-                    fontWeight: '600',
-                },
             }}
         >
-
-            <Tabs.Screen
-                name="home"
-                options={{
-                    title: t('tabs.home'),
-                    tabBarLabel: t('tabs.home'),
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="home" size={size} color={color} />
-                    ),
-                }}
-            />
-
-
-            <Tabs.Screen
-                name="edit"
-                options={{
-                    title: t('tabs.edit'),
-                    tabBarLabel: t('tabs.edit'),
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="create-outline" size={size} color={color} />
-                    ),
-                    ...tabVisibility(isAdmin),
-                    tabBarItemStyle: {
-                        ...(tabVisibility(isAdmin).tabBarItemStyle || {}),
-                        paddingTop: 10,
-                    }
-                }}
-            />
-
-
-            <Tabs.Screen
-                name="groups"
-                options={{
-                    title: t('tabs.groups'),
-                    tabBarLabel: t('tabs.groups'),
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="people" size={size} color={color} />
-                    ),
-                    ...tabVisibility(isStudent),
-                }}
-            />
-
-
-            <Tabs.Screen
-                name="register"
-                options={{
-                    title: t('tabs.register'),
-                    tabBarLabel: t('tabs.register'),
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="document-text" size={size} color={color} />
-                    ),
-                    ...tabVisibility(isStudent),
-                }}
-            />
-            <Tabs.Screen
-                name="profile"
-                options={{
-                    title: t('tabs.profile'),
-                    tabBarLabel: t('tabs.profile'),
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="person" size={size} color={color} />
-                    ),
-                    ...tabVisibility(isStudent),
-                }}
-            />
-        </Tabs>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="students" />
+            <Stack.Screen name="staff" />
+            <Stack.Screen name="subjects" />
+            <Stack.Screen name="groups" />
+            <Stack.Screen name="announcements" />
+            <Stack.Screen name="profile" />
+        </Stack>
     );
 }
 

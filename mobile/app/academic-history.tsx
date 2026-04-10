@@ -48,7 +48,7 @@ export default function AcademicHistoryScreen() {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color="#1a73e8" />
         <Text style={styles.loadingText}>
           {t("academicHistory.loading")}
         </Text>
@@ -65,29 +65,40 @@ export default function AcademicHistoryScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>{t("academicHistory.title")}</Text>
 
-      <View style={styles.row}>
-        <Text style={styles.header}>{t("academicHistory.code")}</Text>
-        <Text style={styles.header}>{t("academicHistory.name")}</Text>
-        <Text style={styles.header}>{t("academicHistory.creditHours")}</Text>
-        <Text style={styles.header}>{t("academicHistory.level")}</Text>
+      {/* Header Row */}
+      <View style={styles.headerRow}>
+        <Text style={[styles.headerText, styles.codeHeader]}>{t("academicHistory.code")}</Text>
+        <Text style={[styles.headerText, styles.nameHeader]}>{t("academicHistory.name")}</Text>
+        <Text style={[styles.headerText, styles.creditHeader]}>{t("academicHistory.creditHours")}</Text>
+        <Text style={[styles.headerText, styles.levelHeader]}>{t("academicHistory.level")}</Text>
       </View>
 
       {data.length === 0 ? (
-        <Text style={styles.emptyText}>
-          {t("academicHistory.noData")}
-        </Text>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>
+            {t("academicHistory.noData")}
+          </Text>
+        </View>
       ) : (
-        data.map((subject) => (
-          <View style={styles.row} key={subject._id}>
-            <Text style={styles.cell}>{subject.code}</Text>
-            <Text style={[styles.cell, styles.nameCell]}>{subject.name}</Text>
-            <Text style={styles.cell}>{subject.creditHours}</Text>
-            <Text style={styles.cell}>{subject.level}</Text>
-          </View>
-        ))
+        <View style={styles.tableBody}>
+          {data.map((subject, index) => (
+            <View 
+              style={[
+                styles.row, 
+                index % 2 === 0 ? styles.rowEven : styles.rowOdd
+              ]} 
+              key={subject._id}
+            >
+              <Text style={[styles.cell, styles.codeCell]} numberOfLines={1}>{subject.code}</Text>
+              <Text style={[styles.cell, styles.nameCell]} numberOfLines={1}>{subject.name}</Text>
+              <Text style={[styles.cell, styles.creditCell]}>{subject.creditHours}</Text>
+              <Text style={[styles.cell, styles.levelCell]}>{subject.level}</Text>
+            </View>
+          ))}
+        </View>
       )}
     </ScrollView>
   );
@@ -95,50 +106,118 @@ export default function AcademicHistoryScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
-    marginTop: 40,
+    flex: 1,
+    backgroundColor: '#f0f4ff',
+  },
+  content: {
+    padding: 20,
+    paddingTop: 90,
+    paddingBottom: 40,
   },
   centerContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
+    backgroundColor: '#f0f4ff',
   },
   title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 15,
+    fontSize: 24,
+    fontWeight: "800",
+    color: '#1a73e8',
+    marginBottom: 20,
     textAlign: "center",
+  },
+  headerRow: {
+    flexDirection: "row",
+    backgroundColor: '#1a73e8',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  headerText: {
+    fontWeight: "700",
+    color: '#ffffff',
+    fontSize: 13,
+  },
+  codeHeader: {
+    flex: 1.2,
+  },
+  nameHeader: {
+    flex: 2.5,
+  },
+  creditHeader: {
+    flex: 1,
+  },
+  levelHeader: {
+    flex: 1,
+  },
+  tableBody: {
+    borderRadius: 12,
+    overflow: 'hidden',
   },
   row: {
     flexDirection: "row",
-    borderBottomWidth: 1,
-    paddingVertical: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    alignItems: 'center',
   },
-  header: {
-    flex: 1,
-    fontWeight: "bold",
+  rowEven: {
+    backgroundColor: '#ffffff',
+  },
+  rowOdd: {
+    backgroundColor: '#f8fafc',
   },
   cell: {
-    flex: 1,
+    fontSize: 14,
+    color: '#374151',
+  },
+  codeCell: {
+    flex: 1.2,
+    fontWeight: '600',
+    color: '#1a73e8',
   },
   nameCell: {
-    flex: 2,
+    flex: 2.5,
+    fontWeight: '600',
+  },
+  creditCell: {
+    flex: 1,
+    textAlign: 'center',
+  },
+  levelCell: {
+    flex: 1,
+    textAlign: 'center',
   },
   loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: "#666",
+    marginTop: 16,
+    fontSize: 15,
+    color: "#6b7280",
   },
   errorText: {
     fontSize: 16,
-    color: "#FF3B30",
+    color: "#ef4444",
     textAlign: "center",
   },
+  emptyContainer: {
+    marginTop: 40,
+    padding: 30,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
+  },
   emptyText: {
-    fontSize: 16,
-    color: "#666",
+    fontSize: 15,
+    color: "#9ca3af",
     textAlign: "center",
-    marginTop: 30,
+    fontStyle: 'italic',
   },
 });

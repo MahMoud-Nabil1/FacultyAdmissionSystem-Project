@@ -124,6 +124,16 @@ const Homepage = () => {
                         <Text style={styles.menuLabel}>{t('home.statistics')}</Text>
                     </TouchableOpacity>
                 )}
+
+                {(role === 'reporter' || role === 'admin') && (
+                    <TouchableOpacity
+                        style={[styles.menuCard, { borderBottomColor: '#1a73e8' }]}
+                        onPress={() => router.push('/admin-complaints')}
+                    >
+                        <Ionicons name="mail-unread" size={32} color="#1a73e8" />
+                        <Text style={styles.menuLabel}>{t('home.complaints')}</Text>
+                    </TouchableOpacity>
+                )}
             </View>
 
 
