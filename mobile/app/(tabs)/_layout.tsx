@@ -14,10 +14,11 @@ function tabVisibility(visible: boolean) {
 }
 
 export default function TabsLayout() {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
     const { t } = useLanguage();
     const isAdmin = user?.role === 'admin';
     const isStudent = user?.role === 'student';
+    const isAcademicGuide = user?.role === 'academic_guide' || user?.role === 'academic_guide_coordinator';
 
     return (
         <Tabs
@@ -96,6 +97,14 @@ export default function TabsLayout() {
             {/* ── Register Subjects — student only (hidden from tab bar, accessed via home) ── */}
             <Tabs.Screen
                 name="register-subjects"
+                options={{
+                    href: null,
+                }}
+            />
+
+            {/* ── Advisor — academic guide only (hidden from tab bar, accessed via home) ── */}
+            <Tabs.Screen
+                name="advisor"
                 options={{
                     href: null,
                 }}

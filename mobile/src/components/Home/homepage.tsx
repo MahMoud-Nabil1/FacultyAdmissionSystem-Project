@@ -98,7 +98,7 @@ const Homepage = () => {
                 {(role === 'academic_guide' || role === 'academic_guide_coordinator') && (
                     <TouchableOpacity
                         style={[styles.menuCard, { borderBottomColor: '#1a73e8' }]}
-                        onPress={() => router.push('/students-list')}
+                        onPress={() => router.push('/advisor')}
                     >
                         <Ionicons name="people" size={32} color="#1a73e8" />
                         <Text style={styles.menuLabel}>{t('home.studentsList')}</Text>

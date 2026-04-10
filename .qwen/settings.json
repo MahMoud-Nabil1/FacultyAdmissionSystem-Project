@@ -6,7 +6,8 @@
       "Bash(netstat *)",
       "Bash(npm run *)",
       "Bash(node *)",
-      "Bash(npx *)"
+      "Bash(npx *)",
+      "Bash(expo *)"
     ]
   },
   "$version": 3

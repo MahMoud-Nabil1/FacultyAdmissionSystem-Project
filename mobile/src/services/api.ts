@@ -259,3 +259,33 @@ export async function deleteGroup(id: string) {
     if (!res.ok) throw new Error((data as any).error || 'Failed to delete group');
     return data;
 }
+
+export async function getAdvisees() {
+    const { res, data } = await apiGet('/students/my-advisees');
+    if (!res.ok) throw new Error((data as { error?: string }).error || 'Failed to fetch advisees');
+    return data;
+}
+
+export async function getStudentDetails(id: string) {
+    const { res, data } = await apiGet(`/students/${id}`);
+    if (!res.ok) throw new Error((data as { error?: string }).error || 'Failed to fetch student details');
+    return data;
+}
+
+export async function getStudentSchedule(studentId: string) {
+    const { res, data } = await apiGet(`/groups/student/${studentId}`);
+    if (!res.ok) throw new Error((data as { error?: string }).error || 'Failed to fetch student schedule');
+    return data;
+}
+
+export async function registerStudentToGroup(groupId: string, studentId: string) {
+    const { res, data } = await apiPost(`/groups/${groupId}/students`, { studentId });
+    if (!res.ok) throw new Error((data as { error?: string }).error || 'Failed to register student');
+    return data;
+}
+
+export async function getAllGroupsForAdvisor() {
+    const { res, data } = await apiGet('/groups');
+    if (!res.ok) throw new Error((data as { error?: string }).error || 'Failed to fetch groups');
+    return data;
+}

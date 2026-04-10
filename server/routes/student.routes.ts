@@ -27,7 +27,12 @@ router.get(
     studentCtrl.getRegistrationStats
 );
 
-
+router.get(
+    "/my-advisees",
+    authenticate,
+    requireRole(["academic_guide", "academic_guide_coordinator"]),
+    studentCtrl.getMyAdvisees
+);
 
 router.get(
     "/:id",
