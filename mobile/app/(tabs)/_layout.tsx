@@ -107,6 +107,29 @@ export default function TabsLayout() {
                 name="advisor"
                 options={{
                     href: null,
+            {/* ── Register — student only ── */}
+            <Tabs.Screen
+                name="register"
+                options={{
+                    title: t('tabs.register'),
+                    tabBarLabel: t('tabs.register'),
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="document-text" size={size} color={color} />
+                    ),
+                    ...tabVisibility(isStudent),
+                }}
+            />
+
+            {/* ── Complaints — student only ── */}
+            <Tabs.Screen
+                name="complaints"
+                options={{
+                    title: t('tabs.complaints'),
+                    tabBarLabel: t('tabs.complaints'),
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="chatbubble-ellipses" size={size} color={color} />
+                    ),
+                    ...tabVisibility(isStudent),
                 }}
             />
         </Tabs>

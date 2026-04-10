@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -6,13 +6,13 @@ import {
     ScrollView,
     ActivityIndicator,
     Alert,
-    RefreshControl,
     TouchableOpacity,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { getAllGroups } from '../../services/api';
 
 type GroupType = 'lecture' | 'lab' | 'tutorial' | 'seminar';
@@ -28,15 +28,7 @@ export interface IGroup {
     day: WeekDay;
     place?: string;
     capacity: number;
-    students?: string[];
 }
-
-const TYPE_LABEL: Record<GroupType, string> = {
-    lecture: 'محاضرة',
-    lab: 'معمل',
-    tutorial: 'تمرين',
-    seminar: 'سيمينار',
-};
 
 const TYPE_STYLE: Record<GroupType, { bg: string; color: string; icon: keyof typeof Ionicons.glyphMap }> = {
     lecture: { bg: '#dbeafe', color: '#1e40af', icon: 'easel-outline' },
@@ -45,48 +37,33 @@ const TYPE_STYLE: Record<GroupType, { bg: string; color: string; icon: keyof typ
     seminar: { bg: '#ede9fe', color: '#5b21b6', icon: 'mic-outline' },
 };
 
-const DAY_AR: Record<WeekDay, string> = {
-    monday: 'الاثنين',
-    tuesday: 'الثلاثاء',
-    wednesday: 'الأربعاء',
-    thursday: 'الخميس',
-    friday: 'الجمعة',
-    saturday: 'السبت',
-    sunday: 'الأحد',
-};
-
 function formatTime(h: number): string {
     return `${String(h).padStart(2, '0')}:00`;
 }
 
 export default function Groups() {
     const { token } = useAuth();
+    const { t } = useLanguage();
     const [groups, setGroups] = useState<IGroup[]>([]);
     const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
 
     const API_BASE = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://10.0.2.2:5000/api';
 
-    const load = useCallback(async () => {
-        try {
-            const data = await getAllGroups();
-            setGroups(data);
-        } catch (err: any) {
-            Alert.alert('خطأ', err.message || 'تعذّر تحميل المجموعات');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
     useEffect(() => {
-        load();
-    }, [load]);
+        const fetchGroups = async () => {
+            try {
 
-    const onRefresh = useCallback(async () => {
-        setRefreshing(true);
-        await load();
-        setRefreshing(false);
-    }, [load]);
+                const data = await getAllGroups();
+                setGroups(data);
+            } catch (err: any) {
+                Alert.alert(t('common.error'), err.message || t('groupsScreen.errors.fetchFailed'));
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchGroups();
+    }, []);
 
     if (loading) {
         return (
@@ -98,27 +75,20 @@ export default function Groups() {
 
     return (
         <View style={styles.container}>
-            {/* Back Button */}
-            <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => router.back()}
-                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            >
-                <Ionicons name="arrow-back" size={24} color="#1a73e8" />
-            </TouchableOpacity>
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back()}>
+                    <Ionicons name="arrow-forward" size={26} color="#fff" />
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>{t('groupsScreen.title')}</Text>
+                <View style={{ width: 26 }} />
+            </View>
 
-            <ScrollView
-                contentContainerStyle={styles.scroll}
-                showsVerticalScrollIndicator={false}
-                refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#1a73e8']} tintColor="#1a73e8" />
-                }
-            >
+            <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
                 {groups.length === 0 ? (
                     <View style={styles.emptyState}>
                         <Ionicons name="albums-outline" size={72} color="#d1d5db" />
-                        <Text style={styles.emptyTitle}>لا توجد مجموعات</Text>
-                        <Text style={styles.emptySubtitle}>لم يتم تسجيلك في أي مجموعة بعد.</Text>
+                        <Text style={styles.emptyTitle}>{t('groupsScreen.empty.title')}</Text>
+                        <Text style={styles.emptySubtitle}>{t('groupsScreen.empty.subtitle')}</Text>
                     </View>
                 ) : (
                     groups.map((group) => {
@@ -126,11 +96,11 @@ export default function Groups() {
                         return (
                             <View key={group._id} style={styles.card}>
                                 <View style={styles.topRow}>
-                                    <Text style={styles.groupName}>مجموعة {group.number}</Text>
+                                    <Text style={styles.groupName}>{t('groupsScreen.groupNumber', { number: group.number })}</Text>
                                     <View style={[styles.badge, { backgroundColor: badge.bg }]}>
                                         <Ionicons name={badge.icon} size={13} color={badge.color} style={{ marginLeft: 4 }} />
                                         <Text style={[styles.badgeText, { color: badge.color }]}>
-                                            {TYPE_LABEL[group.type]}
+                                            {t(`groupsScreen.types.${group.type}`)}
                                         </Text>
                                     </View>
                                 </View>
@@ -138,7 +108,7 @@ export default function Groups() {
                                 <View style={styles.divider} />
                                 <View style={styles.metaRow}>
                                     <Ionicons name="calendar-outline" size={14} color="#9ca3af" />
-                                    <Text style={styles.metaText}>{DAY_AR[group.day]}</Text>
+                                    <Text style={styles.metaText}>{t(`groupsScreen.days.${group.day}`)}</Text>
                                 </View>
                                 <View style={styles.metaRow}>
                                     <Ionicons name="time-outline" size={14} color="#9ca3af" />
@@ -164,7 +134,17 @@ export default function Groups() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f8f9ff' },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    scroll: { padding: 20, paddingTop: 90, paddingBottom: 40 },
+    header: {
+        backgroundColor: '#1a73e8',
+        paddingTop: 50,
+        paddingBottom: 18,
+        paddingHorizontal: 20,
+        flexDirection: 'row-reverse',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
+    scroll: { padding: 20, paddingBottom: 40 },
     card: {
         backgroundColor: '#fff',
         borderRadius: 16,
@@ -189,11 +169,4 @@ const styles = StyleSheet.create({
     emptyState: { alignItems: 'center', paddingTop: 80 },
     emptyTitle: { fontSize: 18, fontWeight: 'bold', color: '#4b5563', marginTop: 10 },
     emptySubtitle: { fontSize: 14, color: '#9ca3af', textAlign: 'center', marginTop: 5 },
-    backButton: {
-        position: 'absolute',
-        top: 50,
-        left: 20,
-        zIndex: 10,
-        padding: 4,
-    },
 });

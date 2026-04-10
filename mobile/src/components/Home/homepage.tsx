@@ -95,6 +95,16 @@ const Homepage = () => {
                     </TouchableOpacity>
                 )}
 
+                {role === 'student' && (
+                    <TouchableOpacity
+                        style={[styles.menuCard, { borderBottomColor: '#1a73e8' }]}
+                        onPress={() => router.push('/academic-history')}
+                    >
+                        <Ionicons name="school-outline" size={32} color="#1a73e8" />
+                        <Text style={styles.menuLabel}>{t('home.academicHistory')}</Text>
+                    </TouchableOpacity>
+                )}
+
                 {(role === 'academic_guide' || role === 'academic_guide_coordinator') && (
                     <TouchableOpacity
                         style={[styles.menuCard, { borderBottomColor: '#1a73e8' }]}
@@ -112,6 +122,16 @@ const Homepage = () => {
                     >
                         <Ionicons name="stats-chart" size={32} color="#1a73e8" />
                         <Text style={styles.menuLabel}>{t('home.statistics')}</Text>
+                    </TouchableOpacity>
+                )}
+
+                {(role === 'reporter' || role === 'admin') && (
+                    <TouchableOpacity
+                        style={[styles.menuCard, { borderBottomColor: '#1a73e8' }]}
+                        onPress={() => router.push('/admin-complaints')}
+                    >
+                        <Ionicons name="mail-unread" size={32} color="#1a73e8" />
+                        <Text style={styles.menuLabel}>{t('home.complaints')}</Text>
                     </TouchableOpacity>
                 )}
             </View>

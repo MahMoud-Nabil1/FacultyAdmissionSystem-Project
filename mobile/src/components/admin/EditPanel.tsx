@@ -57,10 +57,10 @@ export default function EditPanel() {
                         activeOpacity={0.75}
                     >
                         <View style={[styles.iconWrap, { backgroundColor: s.color + '20' }]}>
-                            <Ionicons name={s.icon} size={30} color={s.color} />
+                            <Ionicons name={s.icon} size={32} color={s.color} />
                         </View>
                         <Text style={[styles.cardLabel, { color: s.color }]}>{t(s.titleKey)}</Text>
-                        <Ionicons name="chevron-forward" size={16} color={s.color} style={styles.arrow} />
+                        <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
                     </TouchableOpacity>
                 ))}
             </View>
@@ -90,16 +90,25 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 14,
         borderWidth: 1.5,
-        padding: 16,
+        padding: 18,
         gap: 14,
+        shadowColor: '#000',
+        shadowOpacity: 0.06,
+        shadowRadius: 8,
+        elevation: 3,
     },
     iconWrap: {
-        width: 52,
-        height: 52,
-        borderRadius: 12,
+        width: 56,
+        height: 56,
+        borderRadius: 14,
         alignItems: 'center',
         justifyContent: 'center',
     },
-    cardLabel: { fontSize: 16, fontWeight: '700', flex: 1 },
+    cardLabel: { 
+        fontSize: 16, 
+        fontWeight: '700', 
+        flex: 1,
+        letterSpacing: 0.3,
+    },
     arrow: { marginLeft: 'auto' },
 });

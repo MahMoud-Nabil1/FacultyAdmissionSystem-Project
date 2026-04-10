@@ -8,6 +8,12 @@
       "Bash(node *)",
       "Bash(npx *)",
       "Bash(expo *)"
+      "Bash(\"c:\\program files\\nodejs\\npm.cmd\" *)",
+      "Bash(del *)",
+      "Bash(npx *)",
+      "Bash(timeout *)",
+      "Bash(tasklist *)",
+      "Bash(taskkill *)"
     ]
   },
   "$version": 3

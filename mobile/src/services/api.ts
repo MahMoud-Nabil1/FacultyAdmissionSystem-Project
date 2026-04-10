@@ -287,5 +287,32 @@ export async function registerStudentToGroup(groupId: string, studentId: string)
 export async function getAllGroupsForAdvisor() {
     const { res, data } = await apiGet('/groups');
     if (!res.ok) throw new Error((data as { error?: string }).error || 'Failed to fetch groups');
+export interface IComplaint {
+    _id: string;
+    studentName: string;
+    studentId: string;
+    requestType: string;
+    courseName: string;
+    problemDescription: string;
+    additionalDetails: string;
+    status: string;
+    adminResponse: string;
+    reviewedBy: string;
+    reviewedAt: string;
+    createdAt: string;
+}
+
+export async function getAllComplaints() {
+    const { res, data } = await apiGet<IComplaint[]>('/complaints');
+    if (!res.ok) throw new Error((data as { error?: string }).error || 'Failed to fetch complaints');
+    return data;
+}
+
+export async function respondToComplaint(id: string, response: string, status: string) {
+    const { res, data } = await apiPut(`/complaints/${id}`, {
+        adminResponse: response,
+        status: status
+    });
+    if (!res.ok) throw new Error((data as any).error || 'Failed to respond to complaint');
     return data;
 }

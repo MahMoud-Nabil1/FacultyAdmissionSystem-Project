@@ -1,74 +1,223 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
+import { useLanguage } from "../src/context/LanguageContext";
+import { apiGet } from "../src/services/api";
 
-type Item = {
-  s_code: string;
-  c_hours: number;
-  degree: number;
-  rate: string;
-  gpa: number;
+type CompletedSubject = {
+  _id: string;
+  code: string;
+  name: string;
+  level: string;
+  creditHours: number;
 };
 
 export default function AcademicHistoryScreen() {
-  const [data, setData] = useState<Item[]>([]);
+  const { t } = useLanguage();
+  const [data, setData] = useState<CompletedSubject[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("http://192.168.1.5:5000/api/student/my-academic-history", {
-      headers: {
-        Authorization: "Bearer " + "PUT_YOUR_TOKEN_HERE",
-      },
-    })
-      .then((res) => res.json())
-      .then((d) => setData(d))
-      .catch((err) => console.log(err));
-  }, []);
+    async function fetchAcademicHistory() {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await apiGet<CompletedSubject[]>(
+          "/students/my-academic-history"
+        );
+        setData(response.data);
+      } catch (err: any) {
+        const errorMessage = err.message || t("academicHistory.fetchFailed");
+        setError(errorMessage);
+        Alert.alert(t("common.error"), errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchAcademicHistory();
+  }, [t]);
+
+  if (loading) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color="#1a73e8" />
+        <Text style={styles.loadingText}>
+          {t("academicHistory.loading")}
+        </Text>
+      </View>
+    );
+  }
+
+  if (error && data.length === 0) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Academic History</Text>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <Text style={styles.title}>{t("academicHistory.title")}</Text>
 
-      <View style={styles.row}>
-        <Text style={styles.header}>Code</Text>
-        <Text style={styles.header}>Hours</Text>
-        <Text style={styles.header}>Degree</Text>
-        <Text style={styles.header}>Rate</Text>
-        <Text style={styles.header}>GPA</Text>
+      {/* Header Row */}
+      <View style={styles.headerRow}>
+        <Text style={[styles.headerText, styles.codeHeader]}>{t("academicHistory.code")}</Text>
+        <Text style={[styles.headerText, styles.nameHeader]}>{t("academicHistory.name")}</Text>
+        <Text style={[styles.headerText, styles.creditHeader]}>{t("academicHistory.creditHours")}</Text>
+        <Text style={[styles.headerText, styles.levelHeader]}>{t("academicHistory.level")}</Text>
       </View>
 
-      {data.map((item, index) => (
-        <View style={styles.row} key={index}>
-          <Text style={styles.cell}>{item.s_code}</Text>
-          <Text style={styles.cell}>{item.c_hours}</Text>
-          <Text style={styles.cell}>{item.degree}</Text>
-          <Text style={styles.cell}>{item.rate}</Text>
-          <Text style={styles.cell}>{item.gpa}</Text>
+      {data.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>
+            {t("academicHistory.noData")}
+          </Text>
         </View>
-      ))}
+      ) : (
+        <View style={styles.tableBody}>
+          {data.map((subject, index) => (
+            <View 
+              style={[
+                styles.row, 
+                index % 2 === 0 ? styles.rowEven : styles.rowOdd
+              ]} 
+              key={subject._id}
+            >
+              <Text style={[styles.cell, styles.codeCell]} numberOfLines={1}>{subject.code}</Text>
+              <Text style={[styles.cell, styles.nameCell]} numberOfLines={1}>{subject.name}</Text>
+              <Text style={[styles.cell, styles.creditCell]}>{subject.creditHours}</Text>
+              <Text style={[styles.cell, styles.levelCell]}>{subject.level}</Text>
+            </View>
+          ))}
+        </View>
+      )}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
-    marginTop: 40,
+    flex: 1,
+    backgroundColor: '#f0f4ff',
+  },
+  content: {
+    padding: 20,
+    paddingTop: 90,
+    paddingBottom: 40,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: '#f0f4ff',
   },
   title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 15,
+    fontSize: 24,
+    fontWeight: "800",
+    color: '#1a73e8',
+    marginBottom: 20,
     textAlign: "center",
+  },
+  headerRow: {
+    flexDirection: "row",
+    backgroundColor: '#1a73e8',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  headerText: {
+    fontWeight: "700",
+    color: '#ffffff',
+    fontSize: 13,
+  },
+  codeHeader: {
+    flex: 1.2,
+  },
+  nameHeader: {
+    flex: 2.5,
+  },
+  creditHeader: {
+    flex: 1,
+  },
+  levelHeader: {
+    flex: 1,
+  },
+  tableBody: {
+    borderRadius: 12,
+    overflow: 'hidden',
   },
   row: {
     flexDirection: "row",
-    borderBottomWidth: 1,
-    paddingVertical: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    alignItems: 'center',
   },
-  header: {
-    flex: 1,
-    fontWeight: "bold",
+  rowEven: {
+    backgroundColor: '#ffffff',
+  },
+  rowOdd: {
+    backgroundColor: '#f8fafc',
   },
   cell: {
+    fontSize: 14,
+    color: '#374151',
+  },
+  codeCell: {
+    flex: 1.2,
+    fontWeight: '600',
+    color: '#1a73e8',
+  },
+  nameCell: {
+    flex: 2.5,
+    fontWeight: '600',
+  },
+  creditCell: {
     flex: 1,
+    textAlign: 'center',
+  },
+  levelCell: {
+    flex: 1,
+    textAlign: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 15,
+    color: "#6b7280",
+  },
+  errorText: {
+    fontSize: 16,
+    color: "#ef4444",
+    textAlign: "center",
+  },
+  emptyContainer: {
+    marginTop: 40,
+    padding: 30,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  emptyText: {
+    fontSize: 15,
+    color: "#9ca3af",
+    textAlign: "center",
+    fontStyle: 'italic',
   },
 });

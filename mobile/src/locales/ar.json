@@ -3,10 +3,16 @@
     "switchToAr": "عربي",
     "switchToEn": "EN",
     "error": "خطأ",
+    "warning": "تنبيه",
+    "success": "نجاح",
     "cancel": "إلغاء",
     "delete": "حذف",
     "save": "حفظ",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "edit": "تعديل",
+    "loading": "جاري التحميل...",
+    "sending": "جاري الإرسال...",
+    "logout": "تسجيل خروج"
   },
   "tabs": {
     "home": "الرئيسية",
@@ -16,6 +22,8 @@
     "register": "تسجيل المواد",
     "profile": "الملف الشخصي",
     "advisor": "المرشد الأكاديمي"
+    "complaints": "الشكاوى",
+    "profile": "الملف الشخصي"
   },
   "login": {
     "university": "جامعة القاهرة - كلية العلوم",
@@ -96,8 +104,10 @@
     "hours": "ساعة",
     "servicesTitle": "الخدمات المتاحة",
     "registerSubjects": "تسجيل المواد",
+    "academicHistory": "التاريخ الأكاديمي",
     "studentsList": "قائمة طلابي",
     "statistics": "الإحصائيات",
+    "complaints": "الشكاوى",
     "logout": "تسجيل الخروج"
   },
   "registerSubjects": {
@@ -337,5 +347,141 @@
       "tutorial": "سيكشن",
       "seminar": "ندوة"
     }
+  },
+  "register": {
+    "title": "تسجيل المواد",
+    "subtitle": "حدد جدولك الدراسي للفصل القادم",
+    "selectedCredits": "عدد الساعات المسجلة:",
+    "hrs": "ساعة",
+    "loading": "جارٍ تحميل بيانات التسجيل...",
+    "closed": "التسجيل مغلق",
+    "closedMessage": "التسجيل مغلق حالياً. لا يمكنك طلب مجموعات جديدة في الوقت الحالي.",
+    "registeredTitle": "الجدول الخاص بي",
+    "myRequestsTitle": "طلباتي",
+    "availableTitle": "المواد المتاحة",
+    "chooseSubject": "اختر المادة",
+    "selectPlaceholder": "اختر مادة...",
+    "corequisiteNotice": "متطلبات متزامنة مطلوبة",
+    "noGroupsForSubject": "لا توجد مجموعات متاحة لهذه المادة.",
+    "colSubject": "المادة",
+    "colGroup": "المجموعة",
+    "colType": "النوع",
+    "colStatus": "الحالة",
+    "colActions": "إجراءات",
+    "status": {
+      "pending": "قيد الانتظار",
+      "approved": "مقبول",
+      "rejected": "مرفوض",
+      "enrolled": "مسجل"
+    },
+    "errors": {
+      "maxHoursExceeded": "تجاوز الحد الأقصى للساعات المعتمدة.",
+      "corequisitesRequired": "يجب تسجيل: {{subjects}}"
+    },
+    "removeBtn": "إزالة",
+    "cancelRequestBtn": "إلغاء الطلب",
+    "requestBtn": "تسجيل",
+    "success": "تم إرسال الطلب بنجاح",
+    "cancelSuccess": "تم إلغاء الطلب",
+    "removeSuccess": "تمت الإزالة بنجاح",
+    "failed": "فشلت العملية",
+    "noRegistered": "لا توجد مواد مسجلة."
+  },
+  "groupsSchedule": {
+    "groupNumber": "مجموعة {{number}}",
+    "am": "ص",
+    "pm": "م",
+    "typeValues": {
+      "lecture": "محاضرة",
+      "lab": "معمل",
+      "tutorial": "سيكشن"
+    }
+  },
+  "groupsScreen": {
+    "title": "المجموعات",
+    "groupNumber": "مجموعة {{number}}",
+    "empty": {
+      "title": "لا توجد مجموعات",
+      "subtitle": "لم يتم تسجيلك في أي مجموعة بعد."
+    },
+    "errors": {
+      "fetchFailed": "تعذّر تحميل المجموعات"
+    },
+    "days": {
+      "monday": "الاثنين",
+      "tuesday": "الثلاثاء",
+      "wednesday": "الأربعاء",
+      "thursday": "الخميس",
+      "friday": "الجمعة",
+      "saturday": "السبت",
+      "sunday": "الأحد"
+    },
+    "types": {
+      "lecture": "محاضرة",
+      "lab": "معمل",
+      "tutorial": "تمرين",
+      "seminar": "سيمينار"
+    }
+  "academicHistory": {
+    "title": "السجل الأكاديمي",
+    "loading": "جارٍ تحميل السجل الأكاديمي...",
+    "fetchFailed": "فشل تحميل السجل الأكاديمي",
+    "code": "الرمز",
+    "name": "اسم المادة",
+    "creditHours": "الساعات المعتمدة",
+    "level": "المستوى",
+    "noData": "لا يوجد سجل أكاديمي متاح"
+  },
+  "complaints": {
+    "appTitle": "نظام الطلبات الأكاديمية",
+    "welcome": "مرحباً",
+    "studentIdLabel": "الرقم الجامعي",
+    "newRequestTab": "تقديم طلب جديد",
+    "myRequestsTab": "طلباتي",
+    "submitTitle": "تقديم طلب أكاديمي",
+    "fullNameLabel": "الاسم الكامل",
+    "notAvailable": "غير متوفر",
+    "requestTypeLabel": "نوع الطلب",
+    "requestTypePlaceholder": "مثال: انسحاب من مادة، تسجيل مادة من سنة أعلى، تعديل جدول",
+    "courseNameLabel": "اسم المادة",
+    "courseNamePlaceholder": "اسم المادة",
+    "problemDescriptionLabel": "وصف المشكلة",
+    "problemDescriptionPlaceholder": "وصف المشكلة بالتفصيل",
+    "additionalDetailsLabel": "تفاصيل إضافية",
+    "additionalDetailsPlaceholder": "تفاصيل إضافية",
+    "submitButton": "إرسال الطلب",
+    "fillRequired": "الرجاء تعبئة جميع الحقول المطلوبة",
+    "studentIdMissing": "لم يتم العثور على الرقم الجامعي. الرجاء تسجيل الخروج وإعادة التسجيل",
+    "submittedSuccessfully": "تم تقديم الطلب بنجاح!",
+    "submitFailed": "فشل في تقديم الطلب",
+    "networkError": "فشل في الاتصال بالخادم",
+    "updatedSuccessfully": "تم تحديث الطلب بنجاح",
+    "updateFailed": "فشل في تحديث الطلب",
+    "statusPending": "⏳ قيد الانتظار",
+    "statusUnderReview": "🔍 قيد المراجعة",
+    "statusApproved": "✓ تمت الموافقة",
+    "statusRejected": "✗ مرفوض",
+    "noRequestsTitle": "لا توجد طلبات",
+    "noRequestsMessage": "لم تقم بتقديم أي طلبات حتى الآن.",
+    "submitRequestButton": "تقديم طلب",
+    "adminResponse": "رد الإدارة:",
+    "reviewedBy": "تمت المراجعة بواسطة",
+    "reviewedAt": "في",
+    "unauthorizedTitle": "غير مصرح",
+    "unauthorizedMessage": "الرجاء تسجيل الدخول أولاً",
+    "loginButton": "تسجيل الدخول",
+    "fetchError": "فشل في تحميل الطلبات",
+    "noComplaintsTitle": "لا توجد شكاوى",
+    "noComplaintsMessage": "لا توجد شكاوى لمراجعتها.",
+    "respond": "الرد",
+    "updateResponse": "تحديث الرد",
+    "respondToComplaint": "الرد على الشكوى",
+    "studentNameLabel": "اسم الطالب",
+    "responseStatusLabel": "حالة الرد",
+    "responseMessageLabel": "ردك",
+    "responseMessagePlaceholder": "اكتب ردك هنا...",
+    "responseRequired": "الرجاء إدخال رسالة رد",
+    "responseSent": "تم إرسال الرد بنجاح!",
+    "responseFailed": "فشل في إرسال الرد"
   }
 }
