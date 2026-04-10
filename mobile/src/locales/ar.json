@@ -95,6 +95,7 @@
     "hours": "ساعة",
     "servicesTitle": "الخدمات المتاحة",
     "registerSubjects": "تسجيل المواد",
+    "academicHistory": "التاريخ الأكاديمي",
     "studentsList": "قائمة طلابي",
     "statistics": "الإحصائيات",
     "logout": "تسجيل الخروج"
@@ -340,5 +341,14 @@
       "tutorial": "تمرين",
       "seminar": "سيمينار"
     }
+  "academicHistory": {
+    "title": "السجل الأكاديمي",
+    "loading": "جارٍ تحميل السجل الأكاديمي...",
+    "fetchFailed": "فشل تحميل السجل الأكاديمي",
+    "code": "الرمز",
+    "name": "اسم المادة",
+    "creditHours": "الساعات المعتمدة",
+    "level": "المستوى",
+    "noData": "لا يوجد سجل أكاديمي متاح"
   }
 }

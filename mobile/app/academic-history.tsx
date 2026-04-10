@@ -1,49 +1,94 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
+import { useLanguage } from "../src/context/LanguageContext";
+import { apiGet } from "../src/services/api";
 
-type Item = {
-  s_code: string;
-  c_hours: number;
-  degree: number;
-  rate: string;
-  gpa: number;
+type CompletedSubject = {
+  _id: string;
+  code: string;
+  name: string;
+  level: string;
+  creditHours: number;
 };
 
 export default function AcademicHistoryScreen() {
-  const [data, setData] = useState<Item[]>([]);
+  const { t } = useLanguage();
+  const [data, setData] = useState<CompletedSubject[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("http://192.168.1.5:5000/api/student/my-academic-history", {
-      headers: {
-        Authorization: "Bearer " + "PUT_YOUR_TOKEN_HERE",
-      },
-    })
-      .then((res) => res.json())
-      .then((d) => setData(d))
-      .catch((err) => console.log(err));
-  }, []);
+    async function fetchAcademicHistory() {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await apiGet<CompletedSubject[]>(
+          "/students/my-academic-history"
+        );
+        setData(response.data);
+      } catch (err: any) {
+        const errorMessage = err.message || t("academicHistory.fetchFailed");
+        setError(errorMessage);
+        Alert.alert(t("common.error"), errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchAcademicHistory();
+  }, [t]);
+
+  if (loading) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={styles.loadingText}>
+          {t("academicHistory.loading")}
+        </Text>
+      </View>
+    );
+  }
+
+  if (error && data.length === 0) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Academic History</Text>
+      <Text style={styles.title}>{t("academicHistory.title")}</Text>
 
       <View style={styles.row}>
-        <Text style={styles.header}>Code</Text>
-        <Text style={styles.header}>Hours</Text>
-        <Text style={styles.header}>Degree</Text>
-        <Text style={styles.header}>Rate</Text>
-        <Text style={styles.header}>GPA</Text>
+        <Text style={styles.header}>{t("academicHistory.code")}</Text>
+        <Text style={styles.header}>{t("academicHistory.name")}</Text>
+        <Text style={styles.header}>{t("academicHistory.creditHours")}</Text>
+        <Text style={styles.header}>{t("academicHistory.level")}</Text>
       </View>
 
-      {data.map((item, index) => (
-        <View style={styles.row} key={index}>
-          <Text style={styles.cell}>{item.s_code}</Text>
-          <Text style={styles.cell}>{item.c_hours}</Text>
-          <Text style={styles.cell}>{item.degree}</Text>
-          <Text style={styles.cell}>{item.rate}</Text>
-          <Text style={styles.cell}>{item.gpa}</Text>
-        </View>
-      ))}
+      {data.length === 0 ? (
+        <Text style={styles.emptyText}>
+          {t("academicHistory.noData")}
+        </Text>
+      ) : (
+        data.map((subject) => (
+          <View style={styles.row} key={subject._id}>
+            <Text style={styles.cell}>{subject.code}</Text>
+            <Text style={[styles.cell, styles.nameCell]}>{subject.name}</Text>
+            <Text style={styles.cell}>{subject.creditHours}</Text>
+            <Text style={styles.cell}>{subject.level}</Text>
+          </View>
+        ))
+      )}
     </ScrollView>
   );
 }
@@ -52,6 +97,12 @@ const styles = StyleSheet.create({
   container: {
     padding: 10,
     marginTop: 40,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
   },
   title: {
     fontSize: 22,
@@ -70,5 +121,24 @@ const styles = StyleSheet.create({
   },
   cell: {
     flex: 1,
+  },
+  nameCell: {
+    flex: 2,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#666",
+  },
+  errorText: {
+    fontSize: 16,
+    color: "#FF3B30",
+    textAlign: "center",
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginTop: 30,
   },
 });

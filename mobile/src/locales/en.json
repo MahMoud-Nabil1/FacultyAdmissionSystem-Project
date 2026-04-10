@@ -95,6 +95,7 @@
     "hours": "Hours",
     "servicesTitle": "Available services",
     "registerSubjects": "Course registration",
+    "academicHistory": "Academic History",
     "studentsList": "My students list",
     "statistics": "Statistics",
     "logout": "Sign out"
@@ -340,5 +341,14 @@
       "tutorial": "Tutorial",
       "seminar": "Seminar"
     }
+  "academicHistory": {
+    "title": "Academic History",
+    "loading": "Loading academic history...",
+    "fetchFailed": "Failed to load academic history",
+    "code": "Code",
+    "name": "Subject Name",
+    "creditHours": "Credit Hours",
+    "level": "Level",
+    "noData": "No academic history available"
   }
 }
