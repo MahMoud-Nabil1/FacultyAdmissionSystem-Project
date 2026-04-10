@@ -266,5 +266,15 @@
       "lab": "Lab",
       "tutorial": "Tutorial"
     }
+  },
+  "academicHistory": {
+    "title": "Academic History",
+    "loading": "Loading academic history...",
+    "fetchFailed": "Failed to load academic history",
+    "code": "Code",
+    "name": "Subject Name",
+    "creditHours": "Credit Hours",
+    "level": "Level",
+    "noData": "No academic history available"
   }
 }
