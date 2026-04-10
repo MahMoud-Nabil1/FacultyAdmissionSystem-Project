@@ -50,6 +50,13 @@ router.delete(
     studentCtrl.deleteStudent
 );
 
+router.put(
+    "/:id/assign-advisor",
+    authenticate,
+    requireRole(["admin"]),
+    studentCtrl.assignAcademicAdvisor
+);
+
 router.post("/contact-it", studentCtrl.contactIT);
 router.post("/contact-admin", studentCtrl.contactAdmin);
 

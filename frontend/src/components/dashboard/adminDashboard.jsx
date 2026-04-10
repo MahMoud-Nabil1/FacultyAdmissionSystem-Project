@@ -16,6 +16,7 @@ const AdminDashboard = () => {
     // Use role from auth context (more reliable) or fallback to context
     const role = user?.role || userRole;
     const isAdmin = role === "admin";
+    const isAcademicGuide = role === "academic_guide";
 
     return (
         <>
@@ -24,7 +25,8 @@ const AdminDashboard = () => {
             </h1>
             <div className="dashboard-grid">
                 <div className="dashboard-column">
-                    <SettingsPanel />
+                    {/* academic_guide can only see Announcements */}
+                    {!isAcademicGuide && <SettingsPanel />}
                     <AnnouncementsPanel />
                 </div>
 
