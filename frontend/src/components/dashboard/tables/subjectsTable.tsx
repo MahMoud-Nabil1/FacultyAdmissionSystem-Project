@@ -3,6 +3,7 @@ import { getAllSubjects, deleteSubject, createSubject } from "../../../services/
 import Pagination from "../pagination";
 import { PAGE_SIZE } from "../../../services/constants";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../../context/AuthContext";
 
 interface Subject {
     _id: string;
@@ -27,6 +28,7 @@ interface SubjectsTableProps {
 
 const SubjectsTable: React.FC<SubjectsTableProps> = () => {
     const { t } = useTranslation();
+    const { user } = useAuth(); // Get current logged-in user
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [page, setPage] = useState<number>(0);
     const [search, setSearch] = useState<string>("");
@@ -42,6 +44,9 @@ const SubjectsTable: React.FC<SubjectsTableProps> = () => {
     const [showPrereqDropdown, setShowPrereqDropdown] = useState(false);
     const [loading, setLoading] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Check if user has admin role
+    const isAdmin = user?.role === "admin";
 
     const load = async () => {
         const data = await getAllSubjects();
@@ -157,9 +162,11 @@ const SubjectsTable: React.FC<SubjectsTableProps> = () => {
         <div className="dashboard-container">
             <div className="table-header">
                 <h2>{t("subjectsTable.title")}</h2>
-                <button className="add-btn" onClick={() => setShowModal(true)}>
-                    + {t("subjectsTable.addNew")}
-                </button>
+                {isAdmin && (
+                    <button className="add-btn" onClick={() => setShowModal(true)}>
+                        + {t("subjectsTable.addNew")}
+                    </button>
+                )}
             </div>
 
             {/* ===== Search Bar ===== */}
@@ -169,7 +176,6 @@ const SubjectsTable: React.FC<SubjectsTableProps> = () => {
                     placeholder={t("subjectsTable.searchPlaceholder")}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    /* 2. Style matches the other tables' search bars */
                     style={{ padding: "8px", flex: "1 1 200px" }}
                 />
             </div>
@@ -183,7 +189,7 @@ const SubjectsTable: React.FC<SubjectsTableProps> = () => {
                     <th>{t("subjectsTable.level")}</th>
                     <th>{t("subjectsTable.creditHours")}</th>
                     <th>{t("subjectsTable.prerequisites")}</th>
-                    <th>{t("dashboardCommon.actions")}</th>
+                    {isAdmin && <th>{t("dashboardCommon.actions")}</th>}
                 </tr>
                 </thead>
 
@@ -201,21 +207,23 @@ const SubjectsTable: React.FC<SubjectsTableProps> = () => {
                                 )
                                 .join(", ") || "—"}
                         </td>
-                        <td>
-                            {/* 4. Using the delete-btn class we styled in CSS */}
-                            <button
-                                className="delete-btn"
-                                onClick={() => handleDelete(s._id)}
-                            >
-                                {t("dashboardCommon.delete")}
-                            </button>
-                        </td>
+                        {isAdmin && (
+                            <td>
+                                {/* 4. Using the delete-btn class we styled in CSS */}
+                                <button
+                                    className="delete-btn"
+                                    onClick={() => handleDelete(s._id)}
+                                >
+                                    {t("dashboardCommon.delete")}
+                                </button>
+                            </td>
+                        )}
                     </tr>
                 ))}
 
                 {slice.length === 0 && (
                     <tr>
-                        <td colSpan={6} style={{ textAlign: "center" }}>
+                        <td colSpan={isAdmin ? 6 : 5} style={{ textAlign: "center" }}>
                             {t("dashboardCommon.noResults")}
                         </td>
                     </tr>
@@ -229,8 +237,8 @@ const SubjectsTable: React.FC<SubjectsTableProps> = () => {
                 total={filteredSubjects.length}
             />
 
-            {/* Add Subject Modal */}
-            {showModal && (
+            {/* Add Subject Modal - Only show if admin */}
+            {isAdmin && showModal && (
                 <div className="modal-overlay" onMouseDown={(e) => {
                     if (e.target === e.currentTarget) closeModal();
                 }}>
