@@ -4,6 +4,7 @@ import { getAllStudents, deleteStudent, createStudent } from "../../../services/
 import Pagination from "../pagination";
 import { PAGE_SIZE } from "../../../services/constants";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../../context/AuthContext";
 
 interface Student {
     _id: string;
@@ -11,6 +12,7 @@ interface Student {
     name: string;
     email: string;
     gpa: string;
+    academicAdvisor?: string | { _id: string; name: string };
 }
 
 interface StudentForm {
@@ -23,6 +25,7 @@ interface StudentForm {
 
 const StudentsTable: React.FC = () => {
     const { t } = useTranslation();
+    const { user } = useAuth(); // Get current logged-in user
     const [students, setStudents] = useState<Student[]>([]);
     const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -41,9 +44,22 @@ const StudentsTable: React.FC = () => {
 
     const navigate = useNavigate();
 
+    // Check if user has admin role
+    const isAdmin = user?.role === "admin";
+    const isAcademicGuide = user?.role === "academic_guide";
+
     const loadStudents = async () => {
         try {
-            const data = await getAllStudents();
+            let data = await getAllStudents();
+            // Filter students by assigned advisor for academic_guide
+            if (isAcademicGuide && user?.id) {
+                data = data.filter((s: Student) =>
+                    s.academicAdvisor && (
+                        (typeof s.academicAdvisor === "string" && s.academicAdvisor === user.id) ||
+                        (typeof s.academicAdvisor === "object" && s.academicAdvisor._id === user.id)
+                    )
+                );
+            }
             setStudents(data);
         } catch {
             setError(t("studentPanel.errorGeneric"));
@@ -118,9 +134,11 @@ const StudentsTable: React.FC = () => {
         <div className="dashboard-container">
             <div className="table-header">
                 <h2>{t("studentsTable.title")}</h2>
-                <button className="add-btn" onClick={() => setShowModal(true)}>
-                    + {t("studentsTable.addNew")}
-                </button>
+                {isAdmin && (
+                    <button className="add-btn" onClick={() => setShowModal(true)}>
+                        + {t("studentsTable.addNew")}
+                    </button>
+                )}
             </div>
             {error && <p className="error">{error}</p>}
 
@@ -143,7 +161,7 @@ const StudentsTable: React.FC = () => {
                     <th>{t("studentsTable.email")}</th>
                     <th>{t("studentsTable.gpa")}</th>
                     <th>{t("studentsTable.getStudent")}</th>
-                    <th>{t("dashboardCommon.delete")}</th>
+                    {isAdmin && <th>{t("dashboardCommon.delete")}</th>}
                 </tr>
                 </thead>
                 <tbody>
@@ -161,14 +179,16 @@ const StudentsTable: React.FC = () => {
                                 {t("dashboardCommon.getStudent")}
                             </button>
                         </td>
-                        <td>
-                            <button
-                                className="delete-btn"
-                                onClick={() => handleDelete(s._id)}
-                            >
-                                {t("dashboardCommon.delete")}
-                            </button>
-                        </td>
+                        {isAdmin && (
+                            <td>
+                                <button
+                                    className="delete-btn"
+                                    onClick={() => handleDelete(s._id)}
+                                >
+                                    {t("dashboardCommon.delete")}
+                                </button>
+                            </td>
+                        )}
                     </tr>
                 ))}
                 </tbody>
@@ -177,8 +197,8 @@ const StudentsTable: React.FC = () => {
             {/* Pagination */}
             <Pagination page={page} setPage={setPage} total={filteredStudents.length} />
 
-            {/* Add Student Modal */}
-            {showModal && (
+            {/* Add Student Modal - Only show if admin */}
+            {isAdmin && showModal && (
                 <div className="modal-overlay" onMouseDown={(e) => {
                     if (e.target === e.currentTarget) closeModal();
                 }}>

@@ -6,7 +6,7 @@ import Staff, { IStaff } from '../models/staff';
 import { EnrollmentRequest } from '../models/enrollmentRequest';
 import { UserPayload } from '../middleware/authMiddleware';
 import mongoose from "mongoose";
-import { ensureSubjectRequested, hasTimeCollision } from '../utils/enrollment.utils';
+import { ensureSubjectRequested, hasTimeCollision, checkPrerequisites, checkGpaRange, checkSubjectLevel } from '../utils/enrollment.utils';
 import SystemSetting from '../models/systemSetting';
 
 /**
@@ -35,6 +35,26 @@ async function canManageStudent(staff: IStaff, studentId: string): Promise<boole
 
 export const createGroup = async (req: Request, res: Response): Promise<void> => {
     try {
+        const { day, from, to, place } = req.body;
+
+        // Check for place time collision
+        if (place && day && from !== undefined && to !== undefined) {
+            const collision = await Group.findOne({
+                place,
+                day: day.toLowerCase(),
+                $or: [
+                    { from: { $lt: Number(to) }, to: { $gt: Number(from) } },
+                ],
+            });
+
+            if (collision) {
+                const placeDoc = await import('../models/place').then(m => m.Place.findById(place));
+                const placeName = placeDoc ? placeDoc.name : 'this place';
+                res.status(400).json({ error: `Place "${placeName}" is already reserved on ${day} from ${collision.from}:00 to ${collision.to}:00` });
+                return;
+            }
+        }
+
         const group = new Group(req.body);
         await group.save();
         res.status(201).json(group);
@@ -67,6 +87,28 @@ export const getGroupById = async (req: Request, res: Response): Promise<void> =
 
 export const updateGroup = async (req: Request, res: Response): Promise<void> => {
     try {
+        const { day, from, to, place } = req.body;
+
+        // Check for place time collision (excluding current group)
+        if (place && day && from !== undefined && to !== undefined) {
+            const currentId = new mongoose.Types.ObjectId(String(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id));
+            const collision = await Group.findOne({
+                _id: { $ne: currentId },
+                place,
+                day: day.toLowerCase(),
+                $or: [
+                    { from: { $lt: Number(to) }, to: { $gt: Number(from) } },
+                ],
+            });
+
+            if (collision) {
+                const placeDoc = await import('../models/place').then(m => m.Place.findById(place));
+                const placeName = placeDoc ? placeDoc.name : 'this place';
+                res.status(400).json({ error: `Place "${placeName}" is already reserved on ${day} from ${collision.from}:00 to ${collision.to}:00` });
+                return;
+            }
+        }
+
         const group = await Group.findByIdAndUpdate(
             req.params.id,
             req.body,
@@ -129,6 +171,32 @@ export const addStudentToGroup = async (req: Request, res: Response): Promise<vo
 
             if (group.students.map(id => id.toString()).includes(studentId)) {
                 throw new Error("Student already in this group");
+            }
+
+            // Add student to group
+            group.students.push(new mongoose.Types.ObjectId(studentId));
+            await group.save({ session });
+
+
+            // Validate prerequisites
+            const subject = await Subject.findOne({ code: new RegExp(`^${group.subject}$`, 'i') }).session(session);
+            if (subject) {
+                const prereqCheck = await checkPrerequisites(new mongoose.Types.ObjectId(studentId), subject._id, session);
+                if (!prereqCheck.met) {
+                    throw new Error("registration.errors.prerequisitesNotMet");
+                }
+
+                // Validate GPA range
+                const gpaCheck = await checkGpaRange(new mongoose.Types.ObjectId(studentId), session);
+                if (!gpaCheck.valid) {
+                    throw new Error("registration.errors.gpaOutOfRange");
+                }
+
+                // Validate subject level
+                const levelCheck = await checkSubjectLevel(subject._id, new mongoose.Types.ObjectId(studentId), session);
+                if (!levelCheck.valid) {
+                    throw new Error("registration.errors.levelNotAllowed");
+                }
             }
 
             // Add student to group
@@ -333,6 +401,8 @@ async function processNextInWaitlist(groupId: string, session: mongoose.ClientSe
     const group = await Group.findById(groupId).session(session);
     if (!group) return;
 
+    const subject = await Subject.findOne({ code: new RegExp(`^${group.subject}$`, 'i') }).session(session);
+
     for (const request of pendingRequests) {
         if (group.students.length >= group.capacity) break;
 
@@ -342,6 +412,32 @@ async function processNextInWaitlist(groupId: string, session: mongoose.ClientSe
             request.status = 'rejected';
             await request.save({ session });
             continue; // Move to next person in waitlist
+        }
+
+        // Validate prerequisites if subject exists
+        if (subject) {
+            const prereqCheck = await checkPrerequisites(request.student, subject._id, session);
+            if (!prereqCheck.met) {
+                request.status = 'rejected';
+                await request.save({ session });
+                continue;
+            }
+
+            // Validate GPA range
+            const gpaCheck = await checkGpaRange(request.student, session);
+            if (!gpaCheck.valid) {
+                request.status = 'rejected';
+                await request.save({ session });
+                continue;
+            }
+
+            // Validate subject level
+            const levelCheck = await checkSubjectLevel(subject._id, request.student, session);
+            if (!levelCheck.valid) {
+                request.status = 'rejected';
+                await request.save({ session });
+                continue;
+            }
         }
 
         // Enroll the student

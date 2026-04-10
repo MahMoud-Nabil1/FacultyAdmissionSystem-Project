@@ -5,6 +5,7 @@ import { ROLES } from "../../../services/constants";
 import Pagination from "../pagination";
 import { PAGE_SIZE } from "../../../services/constants";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../../context/AuthContext";
 
 interface Staff {
     _id: string;
@@ -22,6 +23,7 @@ interface StaffForm {
 
 export const StaffTable: React.FC = () => {
     const { t } = useTranslation();
+    const { user } = useAuth(); // Get current logged-in user
     const [staff, setStaff] = useState<Staff[]>([]);
     const [filteredStaff, setFilteredStaff] = useState<Staff[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -112,6 +114,9 @@ export const StaffTable: React.FC = () => {
         loadStaff();
     }, []);
 
+    // Check if user has admin role
+    const isAdmin = user?.role === "admin";
+
     // Pagination slice
     const pagedStaff = filteredStaff.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
@@ -119,9 +124,11 @@ export const StaffTable: React.FC = () => {
         <div className="dashboard-container">
             <div className="table-header">
                 <h2>{t("staffTable.title")}</h2>
-                <button className="add-btn" onClick={() => setShowModal(true)}>
-                    + {t("staffTable.addNew")}
-                </button>
+                {isAdmin && (
+                    <button className="add-btn" onClick={() => setShowModal(true)}>
+                        + {t("staffTable.addNew")}
+                    </button>
+                )}
             </div>
             {error && <p className="error">{error}</p>}
 
@@ -155,7 +162,7 @@ export const StaffTable: React.FC = () => {
                     <th>{t("staffTable.email")}</th>
                     <th>{t("staffTable.role")}</th>
                     <th>{t("staffTable.copyId")}</th>
-                    <th>{t("dashboardCommon.delete")}</th>
+                    {isAdmin && <th>{t("dashboardCommon.delete")}</th>}
                 </tr>
                 </thead>
                 <tbody>
@@ -169,11 +176,13 @@ export const StaffTable: React.FC = () => {
                                 {copiedId === s._id ? t("dashboardCommon.copied") : t("dashboardCommon.copy")}
                             </button>
                         </td>
-                        <td>
-                            <button className="delete-btn" onClick={() => handleDelete(s._id)}>
-                                {t("dashboardCommon.delete")}
-                            </button>
-                        </td>
+                        {isAdmin && (
+                            <td>
+                                <button className="delete-btn" onClick={() => handleDelete(s._id)}>
+                                    {t("dashboardCommon.delete")}
+                                </button>
+                            </td>
+                        )}
                     </tr>
                 ))}
                 </tbody>
@@ -182,8 +191,8 @@ export const StaffTable: React.FC = () => {
             {/* Pagination */}
             <Pagination page={page} setPage={setPage} total={filteredStaff.length} />
 
-            {/* Add Staff Modal */}
-            {showModal && (
+            {/* Add Staff Modal - Only show if admin */}
+            {isAdmin && showModal && (
                 <div className="modal-overlay" onMouseDown={(e) => {
                     if (e.target === e.currentTarget) closeModal();
                 }}>

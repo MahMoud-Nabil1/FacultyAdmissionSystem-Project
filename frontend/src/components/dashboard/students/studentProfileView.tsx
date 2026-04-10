@@ -1,18 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
     addStudentToGroup,
     getAllGroups,
     getStudentById,
-    removeStudentFromGroup
+    removeStudentFromGroup,
+    getAllSubjects,
+    getAllStaff,
+    assignAcademicAdvisor
 } from "../../../services/api";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../../context/AuthContext";
 import "./studentProfileView.css"
 
 interface Subject {
     _id: string;
     name: string;
     code: string;
+    creditHours: number;
 }
 
 interface Student {
@@ -23,6 +28,7 @@ interface Student {
     gpa: number;
     completedSubjects: Subject[];
     requestedSubjects: Subject[];
+    academicAdvisor?: { _id: string; name: string; email: string };
 }
 
 interface Group {
@@ -38,33 +44,86 @@ interface Group {
     place: string;
 }
 
+interface StaffMember {
+    _id: string;
+    name: string;
+    email: string;
+    role: string;
+}
+
 const StudentProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [student, setStudent] = useState<Student | null>(null);
     const [groups, setGroups] = useState<Group[]>([]);
     const [loading, setLoading] = useState(true);
+    const [subjects, setSubjects] = useState<Subject[]>([]);
     const [actionLoading, setActionLoading] = useState(false);
+    const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
+    const [showAdvisorModal, setShowAdvisorModal] = useState(false);
+    const [selectedAdvisor, setSelectedAdvisor] = useState("");
+    const isAdmin = user?.role === "admin";
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setLoading(true);
-                const [studentData, groupsData] = await Promise.all([
+                const [studentData, groupsData, subjectsData] = await Promise.all([
                     getStudentById(id!),
-                    getAllGroups()
+                    getAllGroups(),
+                    getAllSubjects()
                 ]);
                 setStudent(studentData);
                 setGroups(groupsData);
+                setSubjects(subjectsData);
             } catch (err) {
                 console.error(err);
-            } finally {
-                setLoading(false);
             }
         };
         fetchData();
     }, [id]);
+
+    useEffect(() => {
+        if (isAdmin && showAdvisorModal) {
+            getAllStaff().then(data => {
+                setStaffMembers(Array.isArray(data) ? data : []);
+            }).catch(console.error);
+        }
+    }, [isAdmin, showAdvisorModal]);
+
+    const handleAssignAdvisor = async () => {
+        if (!selectedAdvisor) return;
+        setActionLoading(true);
+        try {
+            const updatedStudent = await assignAcademicAdvisor(id!, selectedAdvisor);
+            setStudent(updatedStudent);
+            setShowAdvisorModal(false);
+            setSelectedAdvisor("");
+        } catch (err) {
+            console.error(err);
+            alert("Failed to assign academic advisor");
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    // Calculate completed credit hours and student level
+    const completedHours = useMemo(() => {
+        if (!student) return 0;
+        return student.completedSubjects.reduce((sum, s) => {
+            const subject = subjects.find(sub => sub._id === s._id);
+            return sum + (subject?.creditHours || 0);
+        }, 0);
+    }, [student, subjects]);
+
+    const studentLevel = useMemo(() => {
+        if (completedHours === 0) return '1';
+        if (completedHours <= 30) return '1';
+        if (completedHours <= 60) return '2';
+        if (completedHours <= 90) return '3';
+        return '4';
+    }, [completedHours]);
 
     if (!student) return <p>{t("studentProfile.loadingStudent")}</p>;
 
@@ -150,6 +209,32 @@ const StudentProfile: React.FC = () => {
                     <span className="info-label">{t("studentProfile.gpaLabel")}</span>
                     <span className="info-value">{student.gpa}</span>
                 </div>
+                <div className="info-card info-card-level">
+                    <span className="info-label">{t("registration.studentLevel")}</span>
+                    <span className={`level-badge level-${studentLevel}`}>
+                        {t(`registration.level${studentLevel}`)}
+                    </span>
+                    <span className="info-value-sub" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                        ({completedHours} {t("academicHistory.creditHours")})
+                    </span>
+                </div>
+                {student.academicAdvisor && (
+                    <div className="info-card">
+                        <span className="info-label">Academic Advisor</span>
+                        <span className="info-value" style={{ fontSize: '0.85rem' }}>{student.academicAdvisor.name}</span>
+                        <span className="info-value-sub" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{student.academicAdvisor.email}</span>
+                    </div>
+                )}
+                {isAdmin && (
+                    <div className="info-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <button
+                            className="btn btn-add"
+                            onClick={() => setShowAdvisorModal(true)}
+                        >
+                            {student.academicAdvisor ? "Change Advisor" : "Assign Advisor"}
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Subjects Sections */}
@@ -264,6 +349,65 @@ const StudentProfile: React.FC = () => {
                     </table>
                 )}
             </div>
+
+            {/* Assign Academic Advisor Modal */}
+            {isAdmin && showAdvisorModal && (
+                <div className="modal-overlay" onMouseDown={(e) => {
+                    if (e.target === e.currentTarget) {
+                        setShowAdvisorModal(false);
+                        setSelectedAdvisor("");
+                    }
+                }}>
+                    <div className="modal-content" style={{ maxWidth: "500px" }}>
+                        <div className="modal-header">
+                            <h3>{student.academicAdvisor ? "Change Academic Advisor" : "Assign Academic Advisor"}</h3>
+                            <button className="modal-close" onClick={() => {
+                                setShowAdvisorModal(false);
+                                setSelectedAdvisor("");
+                            }} type="button">×</button>
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>Select Academic Advisor</label>
+                                <select
+                                    value={selectedAdvisor}
+                                    onChange={(e) => setSelectedAdvisor(e.target.value)}
+                                    style={{ width: "100%", padding: "8px", border: "1px solid #ccc", borderRadius: "4px" }}
+                                >
+                                    <option value="">Select an advisor...</option>
+                                    {staffMembers
+                                        .filter(s => s.role === "academic_guide")
+                                        .map(s => (
+                                            <option key={s._id} value={s._id}>
+                                                {s.name} ({s.email})
+                                            </option>
+                                        ))}
+                                </select>
+                            </div>
+                            <div className="modal-footer">
+                                <button
+                                    type="button"
+                                    className="cancel-btn"
+                                    onClick={() => {
+                                        setShowAdvisorModal(false);
+                                        setSelectedAdvisor("");
+                                    }}
+                                >
+                                    {t("dashboardCommon.cancel")}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="submit-btn"
+                                    onClick={handleAssignAdvisor}
+                                    disabled={actionLoading || !selectedAdvisor}
+                                >
+                                    {actionLoading ? "Assigning..." : "Assign"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

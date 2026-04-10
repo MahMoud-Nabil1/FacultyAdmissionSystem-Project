@@ -64,7 +64,6 @@ export default function TabsLayout() {
                         <Ionicons name="create-outline" size={size} color={color} />
                     ),
                     ...tabVisibility(isAdmin),
-                    paddingTop: 200,
                 }}
             />
 
@@ -91,6 +90,14 @@ export default function TabsLayout() {
                         <Ionicons name="headset" size={size} color={color} />
                     ),
                     ...tabVisibility(isStudent),
+                }}
+            />
+
+            {/* ── Register Subjects — student only (hidden from tab bar, accessed via home) ── */}
+            <Tabs.Screen
+                name="register-subjects"
+                options={{
+                    href: null,
                 }}
             />
         </Tabs>

@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { AdminDashboardContext } from "./AdminDashboardLayout";
+import { useAuth } from "../../context/AuthContext";
 import WithDrawlPanel from "./panels/withDrawlPanel.tsx";
 import AnnouncementsPanel from "./panels/createAnnouncementsPanel.tsx";
 import RegistrationControlPanel from "./panels/RegistrationControlPanel.tsx";
@@ -8,21 +9,33 @@ import "./css/adminDashboard.css";
 import { useTranslation } from "react-i18next";
 
 const AdminDashboard = () => {
-    const { userName } = useContext(AdminDashboardContext);
+    const { userName, userRole } = useContext(AdminDashboardContext);
+    const { user } = useAuth(); // Also get from auth to be safe
     const { t } = useTranslation();
+
+    // Use role from auth context (more reliable) or fallback to context
+    const role = user?.role || userRole;
+    const isAdmin = role === "admin";
+    const isAcademicGuide = role === "academic_guide";
 
     return (
         <>
-            <h1 className="eduadmin-page-title">{t("adminDashboard.welcome", { name: userName || "Admin" })}</h1>
+            <h1 className="eduadmin-page-title">
+                {t("adminDashboard.welcome", { name: userName || user?.name || "Admin" })}
+            </h1>
             <div className="dashboard-grid">
                 <div className="dashboard-column">
-                    <RegistrationControlPanel />
+                    {/* academic_guide can only see Announcements */}
+                    {!isAcademicGuide && <SettingsPanel />}
                     <AnnouncementsPanel />
                 </div>
-                <div className="dashboard-column">
-                    <SettingsPanel />
-                    <WithDrawlPanel />
-                </div>
+
+                {isAdmin && (
+                    <div className="dashboard-column">
+                        <RegistrationControlPanel />
+                        <WithDrawlPanel />
+                    </div>
+                )}
             </div>
         </>
     );
