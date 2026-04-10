@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../../context/AuthContext";
 import Pagination from "../pagination";
 import { PAGE_SIZE } from "../../../services/constants";
-import { getAllSubjects, apiGet, apiPost, apiPut, apiDelete } from "../../../services/api";
+import { getAllSubjects, getAllPlaces, apiGet, apiPost, apiPut, apiDelete } from "../../../services/api";
 
 interface Group {
     _id?: string;
@@ -14,9 +15,12 @@ interface Group {
     to: number;
     capacity: number;
     students?: string[];
+    place: string;
 }
 
 const GroupPanel: React.FC = () => {
+    const { user } = useAuth();
+    const isAdmin = user?.role === "admin";
 
     const [groups, setGroups] = useState<Group[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -29,6 +33,10 @@ const GroupPanel: React.FC = () => {
     const [loadingSubjects, setLoadingSubjects] = useState(false);
     const [subjectsError, setSubjectsError] = useState<string | null>(null);
 
+    // --- Places state management ---
+    const [places, setPlaces] = useState<Array<{_id: string, name: string, capacity: number}>>([]);
+    const [loadingPlaces, setLoadingPlaces] = useState(false);
+
     // --- Modal state ---
     const [showModal, setShowModal] = useState(false);
 
@@ -40,6 +48,7 @@ const GroupPanel: React.FC = () => {
     const [from, setFrom] = useState<number | "">("");
     const [to, setTo] = useState<number | "">("");
     const [capacity, setCapacity] = useState<number | "">(30);
+    const [place, setPlace] = useState("");
 
     // --- Corequisite fields ---
     const [hasCoreq, setHasCoreq] = useState(false);
@@ -86,6 +95,21 @@ const GroupPanel: React.FC = () => {
     }, []);
 
     useEffect(() => {
+        fetchPlaces();
+    }, []);
+
+    // Auto-fill capacity when place is selected
+    useEffect(() => {
+        if (place && !editingId) {
+            const selectedPlace = places.find(p => p._id === place);
+            if (selectedPlace) {
+                setCapacity(selectedPlace.capacity);
+                setCoReqCapacity(selectedPlace.capacity);
+            }
+        }
+    }, [place, places, editingId]);
+
+    useEffect(() => {
         setPage(0);
     }, [searchTerm]);
 
@@ -115,6 +139,18 @@ const GroupPanel: React.FC = () => {
         }
     };
 
+    const fetchPlaces = async () => {
+        setLoadingPlaces(true);
+        try {
+            const data = await getAllPlaces();
+            setPlaces(Array.isArray(data) ? data : []);
+        } catch (err) {
+            console.error("Failed to fetch places", err);
+        } finally {
+            setLoadingPlaces(false);
+        }
+    };
+
     const validateForm = () => {
         const errors: {[key: string]: string} = {};
 
@@ -125,6 +161,7 @@ const GroupPanel: React.FC = () => {
         if (!from) errors.from = "Start time is required";
         if (!to) errors.to = "End time is required";
         if (!capacity) errors.capacity = "Capacity is required";
+        if (!place) errors.place = "Place is required";
         if (from && to && Number(from) >= Number(to)) errors.time = "End time must be after start time";
 
         if (hasCoreq) {
@@ -149,6 +186,7 @@ const GroupPanel: React.FC = () => {
         from: Number(from),
         to: Number(to),
         capacity: Number(capacity),
+        place: place,
         ...overrides
     });
 
@@ -218,6 +256,7 @@ const GroupPanel: React.FC = () => {
         setFrom("");
         setTo("");
         setCapacity(30);
+        setPlace("");
         setHasCoreq(false);
         setCoReqType("lab");
         setCoReqDay("");
@@ -255,6 +294,7 @@ const GroupPanel: React.FC = () => {
         setFrom(group.from);
         setTo(group.to);
         setCapacity(group.capacity);
+        setPlace((group as any).place?._id || group.place || "");
         setHasCoreq(false);
         setFormErrors({});
         setShowModal(true);
@@ -295,15 +335,24 @@ const GroupPanel: React.FC = () => {
         t("groupPanel.columnDay"),
         t("groupPanel.columnFrom"),
         t("groupPanel.columnTo"),
+        "Place",
     ];
+
+    const placeMap = useMemo(() => {
+        const map = new Map<string, string>();
+        places.forEach(p => map.set(p._id, p.name));
+        return map;
+    }, [places]);
 
     return (
         <div className="dashboard-container">
             <div className="table-header">
                 <h2>{t("groupPanel.tableTitle", { count: groups.length })}</h2>
-                <button className="add-btn" onClick={() => setShowModal(true)}>
-                    + {t("groupPanel.addBtn")}
-                </button>
+                {isAdmin && (
+                    <button className="add-btn" onClick={() => setShowModal(true)}>
+                        + {t("groupPanel.addBtn")}
+                    </button>
+                )}
             </div>
 
             {/* Search Bar */}
@@ -328,10 +377,10 @@ const GroupPanel: React.FC = () => {
                 </thead>
                 <tbody>
                     {paginatedGroups.map(group => (
-                        <tr 
+                        <tr
                             key={group._id}
-                            onClick={() => handleEdit(group)}
-                            style={{ cursor: "pointer" }}
+                            onClick={() => isAdmin && handleEdit(group)}
+                            style={{ cursor: isAdmin ? "pointer" : "default" }}
                         >
                             <td>{group.subject.toUpperCase()}</td>
                             <td>{group.number}</td>
@@ -343,6 +392,7 @@ const GroupPanel: React.FC = () => {
                             <td>{formatDay(group.day)}</td>
                             <td>{numberToTime(group.from)}</td>
                             <td>{numberToTime(group.to)}</td>
+                            <td>{placeMap.get((group as any).place) || (group as any).place || "—"}</td>
                         </tr>
                     ))}
                     {paginatedGroups.length === 0 && (
@@ -473,6 +523,26 @@ const GroupPanel: React.FC = () => {
                                     <div className="error">{formErrors.time}</div>
                                 )}
 
+                                {/* Place */}
+                                <div className="form-group">
+                                    <label>Place *</label>
+                                    <select
+                                        value={place}
+                                        onChange={e => { setPlace(e.target.value); setFormErrors(f => ({...f, place: ""})); }}
+                                        disabled={loadingPlaces}
+                                    >
+                                        <option value="">
+                                            {loadingPlaces ? "Loading places..." : "Select place"}
+                                        </option>
+                                        {places.filter(p => p.name).map(p => (
+                                            <option key={p._id} value={p._id}>
+                                                {p.name} (Capacity: {p.capacity})
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {formErrors.place && <span className="error">{formErrors.place}</span>}
+                                </div>
+
                                 {/* Capacity */}
                                 <div className="form-group">
                                     <label>{t("groupPanel.capacityLabel")} *</label>
@@ -480,8 +550,14 @@ const GroupPanel: React.FC = () => {
                                         type="number"
                                         min="1"
                                         value={capacity}
-                                        onChange={e => { setCapacity(Number(e.target.value)); setFormErrors(f => ({...f, capacity: ""})); }}
+                                        disabled
+                                        style={{ backgroundColor: 'var(--color-surface-hover)', cursor: 'not-allowed' }}
                                     />
+                                    {place && !editingId && (
+                                        <small style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginTop: '4px', display: 'block' }}>
+                                            Capacity is automatically set from the selected place
+                                        </small>
+                                    )}
                                     {formErrors.capacity && <span className="error">{formErrors.capacity}</span>}
                                 </div>
 
@@ -551,7 +627,8 @@ const GroupPanel: React.FC = () => {
                                                     type="number"
                                                     min="1"
                                                     value={coReqCapacity}
-                                                    onChange={e => { setCoReqCapacity(Number(e.target.value)); setFormErrors(f => ({...f, coReqCapacity: ""})); }}
+                                                    disabled
+                                                    style={{ backgroundColor: 'var(--color-surface-hover)', cursor: 'not-allowed' }}
                                                 />
                                                 {formErrors.coReqCapacity && <span className="error">{formErrors.coReqCapacity}</span>}
                                             </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from '../../context/AuthContext';
-import { apiGet, getSystemSettings } from '../../services/api';
+import { apiGet, getSystemSettings, getAllPlaces } from '../../services/api';
 import "./Groups.css";
 
 // --- Constants ---
@@ -25,6 +25,7 @@ interface Group {
     day: string;
     capacity: number;
     students: string[]; // IDs of enrolled students
+    place: string;
 }
 
 const Groups: React.FC = () => {
@@ -47,6 +48,19 @@ const Groups: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [showModal, setShowModal] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+
+    // Form state
+    const [formSubject, setFormSubject] = useState("");
+    const [formNumber, setFormNumber] = useState("");
+    const [formType, setFormType] = useState("lecture");
+    const [formDay, setFormDay] = useState("");
+    const [formFrom, setFormFrom] = useState<number | "">("");
+    const [formTo, setFormTo] = useState<number | "">("");
+    const [formCapacity, setFormCapacity] = useState("30");
+    const [formPlace, setFormPlace] = useState("");
+    const [places, setPlaces] = useState<Array<{_id: string, name: string}>>([]);
+    const [loadingPlaces, setLoadingPlaces] = useState(false);
+    const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
     const fetchData = useCallback(async () => {
         setLoading(true);
@@ -76,6 +90,21 @@ const Groups: React.FC = () => {
     }, [t, isStudent]);
 
     useEffect(() => { fetchData(); }, [fetchData]);
+
+    useEffect(() => {
+        const loadPlaces = async () => {
+            setLoadingPlaces(true);
+            try {
+                const data = await getAllPlaces();
+                setPlaces(Array.isArray(data) ? data.filter((p: any) => p.isActive) : []);
+            } catch (err) {
+                console.error("Failed to fetch places", err);
+            } finally {
+                setLoadingPlaces(false);
+            }
+        };
+        loadPlaces();
+    }, []);
 
     const handleJoin = async (groupId: string) => {
         try {
@@ -119,6 +148,71 @@ const Groups: React.FC = () => {
         } catch (err) {
             console.error("Cancel failed", err);
         }
+    };
+
+    const validateForm = () => {
+        const errors: {[key: string]: string} = {};
+        if (!formSubject.trim()) errors.formSubject = "Subject is required";
+        if (!formNumber) errors.formNumber = "Group number is required";
+        if (!formType) errors.formType = "Type is required";
+        if (!formDay) errors.formDay = "Day is required";
+        if (!formFrom) errors.formFrom = "Start time is required";
+        if (!formTo) errors.formTo = "End time is required";
+        if (!formCapacity) errors.formCapacity = "Capacity is required";
+        if (!formPlace.trim()) errors.formPlace = "Place is required";
+        if (formFrom && formTo && Number(formFrom) >= Number(formTo)) errors.formTime = "End time must be after start time";
+        setFormErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
+    const handleSubmitGroup = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+        setSubmitting(true);
+        try {
+            const res = await fetch('/api/groups', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    subject: formSubject.trim().toLowerCase(),
+                    number: Number(formNumber),
+                    type: formType.toLowerCase(),
+                    day: formDay.toLowerCase(),
+                    from: Number(formFrom),
+                    to: Number(formTo),
+                    capacity: Number(formCapacity),
+                    place: formPlace.trim(),
+                })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert('Group added successfully!');
+                closeModal();
+                fetchData();
+            } else {
+                alert(data.error || 'Failed to add group');
+            }
+        } catch (err) {
+            alert('Error adding group');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+        setFormSubject("");
+        setFormNumber("");
+        setFormType("lecture");
+        setFormDay("");
+        setFormFrom("");
+        setFormTo("");
+        setFormCapacity("30");
+        setFormPlace("");
+        setFormErrors({});
     };
 
     // Helpers
@@ -306,6 +400,136 @@ const Groups: React.FC = () => {
             {filteredGroups.length === 0 && (
                 <div className="groupsEmptyState">
                     {t("groupPanel.noGroupsMessage")}
+                </div>
+            )}
+
+            {/* Add Group Modal */}
+            {showModal && (
+                <div className="modal-overlay" onMouseDown={(e) => {
+                    if (e.target === e.currentTarget) closeModal();
+                }}>
+                    <div className="modal-content" style={{ maxWidth: "700px" }}>
+                        <div className="modal-header">
+                            <h3>{t("groupsSchedule.addNew")}</h3>
+                            <button className="modal-close" onClick={closeModal} type="button">×</button>
+                        </div>
+                        <div className="modal-body">
+                            <form onSubmit={handleSubmitGroup}>
+                                {/* Subject */}
+                                <div className="form-group">
+                                    <label>Subject **</label>
+                                    <select
+                                        value={formSubject}
+                                        onChange={e => { setFormSubject(e.target.value); setFormErrors(f => ({...f, formSubject: ""})); }}
+                                    >
+                                        <option value="">Select subject</option>
+                                        {subjects.map(s => (
+                                            <option key={s._id} value={s.code.toLowerCase()}>
+                                                {s.code.toUpperCase()} - {s.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {formErrors.formSubject && <span className="error">{formErrors.formSubject}</span>}
+                                </div>
+
+                                {/* Group Number & Type */}
+                                <div className="settings-form-row">
+                                    <div className="form-group" style={{ flex: 1 }}>
+                                        <label>Group # **</label>
+                                        <input
+                                            type="number"
+                                            placeholder="1"
+                                            value={formNumber}
+                                            onChange={e => { setFormNumber(e.target.value); setFormErrors(f => ({...f, formNumber: ""})); }}
+                                        />
+                                        {formErrors.formNumber && <span className="error">{formErrors.formNumber}</span>}
+                                    </div>
+                                    <div className="form-group" style={{ flex: 1 }}>
+                                        <label>Type **</label>
+                                        <select value={formType} onChange={e => { setFormType(e.target.value); setFormErrors(f => ({...f, formType: ""})); }}>
+                                            <option value="lecture">Lecture</option>
+                                            <option value="lab">Lab</option>
+                                            <option value="tutorial">Tutorial</option>
+                                            <option value="seminar">Seminar</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {/* Day & Time */}
+                                <div className="settings-form-row">
+                                    <div className="form-group" style={{ flex: 1 }}>
+                                        <label>Day **</label>
+                                        <select value={formDay} onChange={e => { setFormDay(e.target.value); setFormErrors(f => ({...f, formDay: ""})); }}>
+                                            <option value="">Select day</option>
+                                            {DAYS.map(d => (
+                                                <option key={d} value={d}>{d.charAt(0).toUpperCase() + d.slice(1)}</option>
+                                            ))}
+                                        </select>
+                                        {formErrors.formDay && <span className="error">{formErrors.formDay}</span>}
+                                    </div>
+                                    <div className="form-group" style={{ flex: 1 }}>
+                                        <label>From **</label>
+                                        <select value={formFrom} onChange={e => { setFormFrom(e.target.value === "" ? "" : Number(e.target.value)); setFormErrors(f => ({...f, formFrom: "", formTime: ""})); }}>
+                                            <option value="">Select</option>
+                                            {HOURS.map(h => <option key={h} value={h}>{h <= 12 ? h : h - 12} {h >= 12 ? 'PM' : 'AM'}</option>)}
+                                        </select>
+                                        {formErrors.formFrom && <span className="error">{formErrors.formFrom}</span>}
+                                    </div>
+                                    <div className="form-group" style={{ flex: 1 }}>
+                                        <label>To **</label>
+                                        <select value={formTo} onChange={e => { setFormTo(e.target.value === "" ? "" : Number(e.target.value)); setFormErrors(f => ({...f, formTo: "", formTime: ""})); }}>
+                                            <option value="">Select</option>
+                                            {HOURS.map(h => <option key={h} value={h}>{h <= 12 ? h : h - 12} {h >= 12 ? 'PM' : 'AM'}</option>)}
+                                        </select>
+                                        {formErrors.formTo && <span className="error">{formErrors.formTo}</span>}
+                                    </div>
+                                </div>
+
+                                {formErrors.formTime && <div className="error">{formErrors.formTime}</div>}
+
+                                {/* Capacity */}
+                                <div className="form-group">
+                                    <label>Capacity **</label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={formCapacity}
+                                        onChange={e => { setFormCapacity(e.target.value); setFormErrors(f => ({...f, formCapacity: ""})); }}
+                                    />
+                                    {formErrors.formCapacity && <span className="error">{formErrors.formCapacity}</span>}
+                                </div>
+
+                                {/* Place */}
+                                <div className="form-group">
+                                    <label>Place **</label>
+                                    <select
+                                        value={formPlace}
+                                        onChange={e => { setFormPlace(e.target.value); setFormErrors(f => ({...f, formPlace: ""})); }}
+                                        disabled={loadingPlaces}
+                                    >
+                                        <option value="">
+                                            {loadingPlaces ? "Loading places..." : "Select place"}
+                                        </option>
+                                        {places.filter(p => p.name).map(p => (
+                                            <option key={p._id} value={p._id}>
+                                                {p.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {formErrors.formPlace && <span className="error">{formErrors.formPlace}</span>}
+                                </div>
+
+                                <div className="modal-footer">
+                                    <button type="button" className="cancel-btn" onClick={closeModal}>
+                                        Cancel
+                                    </button>
+                                    <button type="submit" className="submit-btn" disabled={submitting}>
+                                        {submitting ? "Saving..." : "Save"}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

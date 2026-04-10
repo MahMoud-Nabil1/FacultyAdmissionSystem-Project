@@ -14,7 +14,7 @@ export interface IGroup extends Document {
     capacity: number;
     createdAt: Date;
     updatedAt: Date;
-    place: string;
+    place: mongoose.Types.ObjectId;
 }
 
 const groupSchema = new Schema<IGroup>({
@@ -57,10 +57,18 @@ const groupSchema = new Schema<IGroup>({
     }
     ,
     place: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: 'Place',
+        required: [true, 'Place is required'],
     }
 }, {
     timestamps: true
+});
+
+// Unique constraint: place must be unique per (day, from, to) combination
+groupSchema.index({ day: 1, from: 1, to: 1, place: 1 }, {
+    unique: true,
+    partialFilterExpression: { place: { $type: "objectId" } }
 });
 
 export const Group = mongoose.model<IGroup>('Group', groupSchema);
