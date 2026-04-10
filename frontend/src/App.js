@@ -15,6 +15,10 @@ import SupportContact from "./components/support/SupportContact.jsx";
 import Announcements from "./components/common/announcements.jsx";
 import AdminDashboardTable from "./components/dashboard/tables/table.tsx";
 import GroupPanel from "./components/dashboard/panels/groupPanel.tsx";
+import PlacesPanel from "./components/dashboard/panels/placesPanel.tsx";
+import AnnouncementsPage from "./components/dashboard/panels/announcementsPage.tsx";
+import RegistrationPage from "./components/dashboard/panels/registrationPage.tsx";
+import AcademicRequestsPage from "./components/dashboard/panels/academicRequestsPage.tsx";
 import Groups from "./components/groups/Groups.tsx";
 import Home from "./components/common/home.tsx";
 import AdminAnalysis from "./components/dashboard/AdminAnalysis/AdminAnalysis.tsx";
@@ -75,9 +79,13 @@ function App() {
                             </ProtectedRoute>
                         }
                     >
-                        <Route index element={<AdminDashboard/>}/>
+                        <Route index element={<Navigate to="/admin-dashboard/registration" replace/>}/>
+                        <Route path="announcements" element={<AnnouncementsPage/>}/>
+                        <Route path="registration" element={<RegistrationPage/>}/>
+                        <Route path="requests" element={<AcademicRequestsPage/>}/>
                         <Route path="table" element={<AdminDashboardTable/>}/>
                         <Route path="groups" element={<GroupPanel/>}/>
+                        <Route path="places" element={<PlacesPanel/>}/>
                     </Route>
                     <Route path="/login" element={
                         <GuestRoute>
