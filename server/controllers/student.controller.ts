@@ -31,7 +31,7 @@ export const getAllStudents = async (_req: Request, res: Response): Promise<void
     try {
         const students = await Student
             .find()
-            .populate('department completedSubjects requestedSubjects');
+            .populate('department completedSubjects requestedSubjects academicAdvisor', 'name email');
 
         res.json(students);
     } catch (err: any) {
@@ -61,6 +61,10 @@ export const getStudentById = async (req: Request, res: Response): Promise<void>
             .populate({
                 path: "department",
                 select: "name"
+            })
+            .populate({
+                path: "academicAdvisor",
+                select: "name email"
             });
 
         if (!student) {
@@ -201,7 +205,7 @@ export const getRegistrationStats = async (_req: Request, res: Response): Promis
 export const getMyAcademicHistory = async (req: Request, res: Response): Promise<void> => {
     try {
         const user = getUser(req);
-        
+
 
         const student = await Student
             .findOne({ studentId: Number(user.id) })
@@ -213,6 +217,32 @@ export const getMyAcademicHistory = async (req: Request, res: Response): Promise
         }
 
         res.json(student.completedSubjects);
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const assignAcademicAdvisor = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { advisorId } = req.body;
+
+        if (!advisorId) {
+            res.status(400).json({ error: "Academic advisor ID is required" });
+            return;
+        }
+
+        const student = await Student.findByIdAndUpdate(
+            req.params.id,
+            { academicAdvisor: advisorId },
+            { new: true }
+        ).populate('academicAdvisor', 'name email');
+
+        if (!student) {
+            res.status(404).json({ error: "Student not found" });
+            return;
+        }
+
+        res.json(student);
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }

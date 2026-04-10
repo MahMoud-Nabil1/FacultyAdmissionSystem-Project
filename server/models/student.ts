@@ -12,6 +12,7 @@ export interface IStudent {
     requestedSubjects: Types.ObjectId[];
     department?: Types.ObjectId;
     currentSessionId?: string | null;
+    academicAdvisor?: Types.ObjectId;
     _password?: string;
     verifyPassword(password: string): Promise<boolean>;
 }
@@ -72,6 +73,11 @@ const studentSchema = new Schema<IStudent>(
         },
         currentSessionId: {
             type: String,
+            default: null,
+        },
+        academicAdvisor: {
+            type: Schema.Types.ObjectId,
+            ref: "Staff",
             default: null,
         },
     },
