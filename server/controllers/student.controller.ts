@@ -191,9 +191,33 @@ export const contactAdmin = async (req: Request, res: Response): Promise<void> =
 export const getRegistrationStats = async (_req: Request, res: Response): Promise<void> => {
     try {
         const totalStudents = await Student.countDocuments();
-        const finishedRegistration = await Student.countDocuments({
-            requestedSubjects: { $exists: true, $not: { $size: 0 } }
-        });
+
+        // Count students who have requested subjects with 14+ credit hours
+        const studentsWith14PlusHours = await Student.aggregate([
+            {
+                $lookup: {
+                    from: "subjects",
+                    localField: "requestedSubjects",
+                    foreignField: "_id",
+                    as: "requestedSubjectsDetails"
+                }
+            },
+            {
+                $addFields: {
+                    totalCreditHours: { $sum: "$requestedSubjectsDetails.creditHours" }
+                }
+            },
+            {
+                $match: {
+                    totalCreditHours: { $gte: 14 }
+                }
+            },
+            {
+                $count: "count"
+            }
+        ]);
+
+        const finishedRegistration = studentsWith14PlusHours.length > 0 ? studentsWith14PlusHours[0].count : 0;
         const didNotFinishRegistration = totalStudents - finishedRegistration;
 
         res.json({ totalStudents, finishedRegistration, didNotFinishRegistration });
