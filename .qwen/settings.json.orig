@@ -1,7 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(type *)"
+      "Bash(\"c:\\program files\\nodejs\\npm.cmd\" *)"
     ]
   }
 }

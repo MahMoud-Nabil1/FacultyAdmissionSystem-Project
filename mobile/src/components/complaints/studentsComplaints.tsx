@@ -11,7 +11,9 @@ import {
     RefreshControl,
 } from 'react-native';
 import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { API_BASE } from '../../services/api';
 
 interface Complaint {
@@ -40,6 +42,7 @@ interface AuthUser {
 
 const StudentComplaintPage: React.FC = () => {
     const { token, user: authUser, logout } = useAuth();
+    const { t, locale } = useLanguage();
     const [complaints, setComplaints] = useState<Complaint[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -48,6 +51,8 @@ const StudentComplaintPage: React.FC = () => {
     const [editAdditional, setEditAdditional] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [activeTab, setActiveTab] = useState<'submit' | 'view'>('submit');
+
+    const align = locale === 'ar' ? 'right' : 'left';
 
     // Extract user data safely
     const userData = {
@@ -119,7 +124,7 @@ const StudentComplaintPage: React.FC = () => {
             setComplaints(userComplaints);
         } catch (err) {
             console.error('Error fetching complaints:', err);
-            Alert.alert('خطأ', 'فشل في تحميل الطلبات');
+            Alert.alert(t('common.error'), t('complaints.fetchError'));
         } finally {
             setLoading(false);
         }
@@ -133,12 +138,12 @@ const StudentComplaintPage: React.FC = () => {
 
     const handleSubmit = async () => {
         if (!formData.requestType || !formData.courseName || !formData.problemDescription) {
-            Alert.alert('تنبيه', 'الرجاء تعبئة جميع الحقول المطلوبة');
+            Alert.alert(t('common.warning'), t('complaints.fillRequired'));
             return;
         }
 
         if (!formData.studentId) {
-            Alert.alert('خطأ', 'لم يتم العثور على الرقم الجامعي. الرجاء تسجيل الخروج وإعادة التسجيل');
+            Alert.alert(t('common.error'), t('complaints.studentIdMissing'));
             return;
         }
 
@@ -169,7 +174,7 @@ const StudentComplaintPage: React.FC = () => {
             const data = await response.json();
 
             if (response.ok) {
-                Alert.alert('نجاح', 'تم تقديم الطلب بنجاح!');
+                Alert.alert(t('common.success'), t('complaints.submittedSuccessfully'));
                 setFormData({
                     ...formData,
                     requestType: '',
@@ -181,11 +186,11 @@ const StudentComplaintPage: React.FC = () => {
                 setActiveTab('view');
             } else {
                 console.error('Submit error:', data);
-                Alert.alert('خطأ', data.message || data.error || 'فشل في تقديم الطلب');
+                Alert.alert(t('common.error'), data.message || data.error || t('complaints.submitFailed'));
             }
         } catch (err) {
             console.error('Submit error:', err);
-            Alert.alert('خطأ', 'فشل في الاتصال بالخادم');
+            Alert.alert(t('common.error'), t('complaints.networkError'));
         } finally {
             setSubmitting(false);
         }
@@ -206,16 +211,16 @@ const StudentComplaintPage: React.FC = () => {
             });
 
             if (response.ok) {
-                Alert.alert('نجاح', 'تم تحديث الطلب بنجاح');
+                Alert.alert(t('common.success'), t('complaints.updatedSuccessfully'));
                 await fetchComplaints();
                 setEditingId(null);
                 setEditDescription('');
                 setEditAdditional('');
             } else {
-                Alert.alert('خطأ', 'فشل في تحديث الطلب');
+                Alert.alert(t('common.error'), t('complaints.updateFailed'));
             }
         } catch (err) {
-            Alert.alert('خطأ', 'فشل في تحديث الطلب');
+            Alert.alert(t('common.error'), t('complaints.updateFailed'));
         }
     };
 
@@ -231,10 +236,10 @@ const StudentComplaintPage: React.FC = () => {
 
     const getStatusText = (status: string): string => {
         switch(status) {
-            case 'pending': return '⏳ قيد الانتظار';
-            case 'under_review': return '🔍 قيد المراجعة';
-            case 'approved': return '✓ تمت الموافقة';
-            case 'rejected': return '✗ مرفوض';
+            case 'pending': return t('complaints.statusPending');
+            case 'under_review': return t('complaints.statusUnderReview');
+            case 'approved': return t('complaints.statusApproved');
+            case 'rejected': return t('complaints.statusRejected');
             default: return status;
         }
     };
@@ -249,16 +254,11 @@ const StudentComplaintPage: React.FC = () => {
         });
     };
 
-    const handleLogout = async () => {
-        await logout();
-        router.replace('/(auth)/login');
-    };
-
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#4CAF50" />
-                <Text style={styles.loadingText}>جاري التحميل...</Text>
+                <ActivityIndicator size="large" color="#1a73e8" />
+                <Text style={styles.loadingText}>{t('common.loading')}</Text>
             </View>
         );
     }
@@ -266,11 +266,11 @@ const StudentComplaintPage: React.FC = () => {
     if (!token) {
         return (
             <View style={styles.errorContainer}>
-                <Text style={styles.errorEmoji}>🔐</Text>
-                <Text style={styles.errorTitle}>غير مصرح</Text>
-                <Text style={styles.errorText}>الرجاء تسجيل الدخول أولاً</Text>
+                <Ionicons name="lock-closed-outline" size={64} color="#c0392b" />
+                <Text style={styles.errorTitle}>{t('complaints.unauthorizedTitle')}</Text>
+                <Text style={styles.errorText}>{t('complaints.unauthorizedMessage')}</Text>
                 <TouchableOpacity style={styles.retryButton} onPress={() => router.replace('/(auth)/login')}>
-                    <Text style={styles.retryButtonText}>تسجيل الدخول</Text>
+                    <Text style={styles.retryButtonText}>{t('complaints.loginButton')}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -279,14 +279,14 @@ const StudentComplaintPage: React.FC = () => {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.title}>🎓 نظام الطلبات الأكاديمية</Text>
+                <View style={styles.headerContent}>
+                    <Ionicons name="document-text-outline" size={28} color="#fff" />
+                    <Text style={styles.headerTitle}>{t('complaints.appTitle')}</Text>
+                </View>
                 <Text style={styles.welcomeText}>
-                    مرحباً, <Text style={styles.boldText}>{userData.name || userData.studentId}</Text> | الرقم الجامعي:{' '}
+                    {t('complaints.welcome')}, <Text style={styles.boldText}>{userData.name || userData.studentId}</Text> | {t('complaints.studentIdLabel')}:{' '}
                     <Text style={styles.boldText}>{userData.studentId}</Text>
                 </Text>
-                <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                    <Text style={styles.logoutText}>تسجيل خروج</Text>
-                </TouchableOpacity>
             </View>
 
             <View style={styles.tabContainer}>
@@ -294,8 +294,13 @@ const StudentComplaintPage: React.FC = () => {
                     style={[styles.tab, activeTab === 'submit' && styles.activeTab]}
                     onPress={() => setActiveTab('submit')}
                 >
+                    <Ionicons 
+                        name={activeTab === 'submit' ? "create" : "create-outline"} 
+                        size={20} 
+                        color={activeTab === 'submit' ? '#1a73e8' : '#6b7280'} 
+                    />
                     <Text style={[styles.tabText, activeTab === 'submit' && styles.activeTabText]}>
-                        📝 تقديم طلب جديد
+                        {t('complaints.newRequestTab')}
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -305,77 +310,85 @@ const StudentComplaintPage: React.FC = () => {
                         await fetchComplaints();
                     }}
                 >
+                    <Ionicons 
+                        name={activeTab === 'view' ? "list" : "list-outline"} 
+                        size={20} 
+                        color={activeTab === 'view' ? '#1a73e8' : '#6b7280'} 
+                    />
                     <Text style={[styles.tabText, activeTab === 'view' && styles.activeTabText]}>
-                        📋 طلباتي ({complaints.length})
+                        {t('complaints.myRequestsTab')} ({complaints.length})
                     </Text>
                 </TouchableOpacity>
             </View>
 
             {activeTab === 'submit' ? (
-                <ScrollView style={styles.formContainer} showsVerticalScrollIndicator={false}>
-                    <Text style={styles.sectionTitle}>تقديم طلب أكاديمي</Text>
+                <ScrollView style={styles.formContainer} showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 20, paddingTop: 20 }}>
+                    <View style={styles.sectionHeader}>
+                        <Ionicons name="create-outline" size={22} color="#004a99" />
+                        <Text style={styles.sectionTitle}>{t('complaints.submitTitle')}</Text>
+                    </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>الاسم الكامل *</Text>
+                        <Text style={styles.label}>{t('complaints.fullNameLabel')} *</Text>
                         <View style={styles.disabledInput}>
-                            <Text style={styles.disabledText}>{formData.studentName || 'غير متوفر'}</Text>
+                            <Text style={styles.disabledText}>{formData.studentName || t('complaints.notAvailable')}</Text>
                         </View>
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>الرقم الجامعي *</Text>
+                        <Text style={styles.label}>{t('complaints.studentIdLabel')} *</Text>
                         <View style={styles.disabledInput}>
                             <Text style={styles.disabledText}>{formData.studentId}</Text>
                         </View>
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>نوع الطلب *</Text>
+                        <Text style={styles.label}>{t('complaints.requestTypeLabel')} *</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder="مثال: انسحاب من مادة، تسجيل مادة من سنة أعلى، تعديل جدول"
+                            placeholder={t('complaints.requestTypePlaceholder')}
                             value={formData.requestType}
                             onChangeText={(text) => setFormData({ ...formData, requestType: text })}
-                            placeholderTextColor="#999"
+                            placeholderTextColor="#9ca3af"
                         />
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>اسم المادة *</Text>
+                        <Text style={styles.label}>{t('complaints.courseNameLabel')} *</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder="اسم المادة"
+                            placeholder={t('complaints.courseNamePlaceholder')}
                             value={formData.courseName}
                             onChangeText={(text) => setFormData({ ...formData, courseName: text })}
-                            placeholderTextColor="#999"
+                            placeholderTextColor="#9ca3af"
                         />
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>وصف المشكلة *</Text>
+                        <Text style={styles.label}>{t('complaints.problemDescriptionLabel')} *</Text>
                         <TextInput
                             style={[styles.input, styles.textArea]}
-                            placeholder="وصف المشكلة بالتفصيل"
+                            placeholder={t('complaints.problemDescriptionPlaceholder')}
                             value={formData.problemDescription}
                             onChangeText={(text) => setFormData({ ...formData, problemDescription: text })}
                             multiline
                             numberOfLines={4}
                             textAlignVertical="top"
-                            placeholderTextColor="#999"
+                            placeholderTextColor="#9ca3af"
                         />
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>تفاصيل إضافية (اختياري)</Text>
+                        <Text style={styles.label}>{t('complaints.additionalDetailsLabel')}</Text>
                         <TextInput
                             style={[styles.input, styles.textArea]}
-                            placeholder="تفاصيل إضافية"
+                            placeholder={t('complaints.additionalDetailsPlaceholder')}
                             value={formData.additionalDetails}
                             onChangeText={(text) => setFormData({ ...formData, additionalDetails: text })}
                             multiline
                             numberOfLines={3}
                             textAlignVertical="top"
-                            placeholderTextColor="#999"
+                            placeholderTextColor="#9ca3af"
                         />
                     </View>
 
@@ -385,31 +398,37 @@ const StudentComplaintPage: React.FC = () => {
                         disabled={submitting}
                     >
                         <Text style={styles.submitButtonText}>
-                            {submitting ? 'جاري الإرسال...' : 'إرسال الطلب'}
+                            {submitting ? t('common.sending') : t('complaints.submitButton')}
                         </Text>
                     </TouchableOpacity>
                 </ScrollView>
             ) : (
                 <ScrollView
                     style={styles.complaintsList}
+                    contentContainerStyle={{ padding: 20 }}
                     refreshControl={
                         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                     }
                 >
                     {complaints.length === 0 ? (
                         <View style={styles.emptyContainer}>
-                            <Text style={styles.emptyEmoji}>📭</Text>
-                            <Text style={styles.emptyTitle}>لا توجد طلبات</Text>
-                            <Text style={styles.emptyText}>لم تقم بتقديم أي طلبات حتى الآن.</Text>
+                            <Ionicons name="mail-outline" size={64} color="#9ca3af" />
+                            <Text style={styles.emptyTitle}>{t('complaints.noRequestsTitle')}</Text>
+                            <Text style={styles.emptyText}>{t('complaints.noRequestsMessage')}</Text>
                             <TouchableOpacity
                                 style={styles.emptyButton}
                                 onPress={() => setActiveTab('submit')}
                             >
-                                <Text style={styles.emptyButtonText}>تقديم طلب</Text>
+                                <Text style={styles.emptyButtonText}>{t('complaints.submitRequestButton')}</Text>
                             </TouchableOpacity>
                         </View>
                     ) : (
-                        complaints.map((complaint) => (
+                        <>
+                            <View style={styles.sectionHeader}>
+                                <Ionicons name="list-outline" size={22} color="#004a99" />
+                                <Text style={styles.sectionTitle}>{t('complaints.myRequestsTab')}</Text>
+                            </View>
+                            {complaints.map((complaint) => (
                             <View key={complaint._id} style={styles.complaintCard}>
                                 <View style={styles.cardHeader}>
                                     <View>
@@ -431,8 +450,8 @@ const StudentComplaintPage: React.FC = () => {
                                             onChangeText={setEditDescription}
                                             multiline
                                             numberOfLines={4}
-                                            placeholder="وصف المشكلة"
-                                            placeholderTextColor="#999"
+                                            placeholder={t('complaints.problemDescriptionPlaceholder')}
+                                            placeholderTextColor="#9ca3af"
                                         />
                                         <TextInput
                                             style={[styles.input, styles.textArea]}
@@ -440,15 +459,15 @@ const StudentComplaintPage: React.FC = () => {
                                             onChangeText={setEditAdditional}
                                             multiline
                                             numberOfLines={3}
-                                            placeholder="تفاصيل إضافية"
-                                            placeholderTextColor="#999"
+                                            placeholder={t('complaints.additionalDetailsPlaceholder')}
+                                            placeholderTextColor="#9ca3af"
                                         />
                                         <View style={styles.editButtons}>
                                             <TouchableOpacity
                                                 style={[styles.editButton, styles.saveButton]}
                                                 onPress={() => handleUpdate(complaint._id, editDescription, editAdditional)}
                                             >
-                                                <Text style={styles.buttonText}>حفظ</Text>
+                                                <Text style={styles.buttonText}>{t('common.save')}</Text>
                                             </TouchableOpacity>
                                             <TouchableOpacity
                                                 style={[styles.editButton, styles.cancelButton]}
@@ -458,17 +477,17 @@ const StudentComplaintPage: React.FC = () => {
                                                     setEditAdditional('');
                                                 }}
                                             >
-                                                <Text style={styles.buttonText}>إلغاء</Text>
+                                                <Text style={styles.buttonText}>{t('common.cancel')}</Text>
                                             </TouchableOpacity>
                                         </View>
                                     </View>
                                 ) : (
                                     <View style={styles.descriptionContainer}>
-                                        <Text style={styles.descriptionLabel}>وصف المشكلة:</Text>
+                                        <Text style={styles.descriptionLabel}>{t('complaints.problemDescriptionLabel')}:</Text>
                                         <Text style={styles.descriptionText}>{complaint.problemDescription}</Text>
                                         {complaint.additionalDetails && (
                                             <>
-                                                <Text style={styles.descriptionLabel}>تفاصيل إضافية:</Text>
+                                                <Text style={styles.descriptionLabel}>{t('complaints.additionalDetailsLabel')}:</Text>
                                                 <Text style={styles.descriptionText}>{complaint.additionalDetails}</Text>
                                             </>
                                         )}
@@ -481,7 +500,8 @@ const StudentComplaintPage: React.FC = () => {
                                                     setEditAdditional(complaint.additionalDetails || '');
                                                 }}
                                             >
-                                                <Text style={styles.editIconText}>✏️ تعديل</Text>
+                                                <Ionicons name="create-outline" size={16} color="#1a73e8" />
+                                                <Text style={styles.editIconText}>{t('common.edit')}</Text>
                                             </TouchableOpacity>
                                         )}
                                     </View>
@@ -489,22 +509,31 @@ const StudentComplaintPage: React.FC = () => {
 
                                 {complaint.adminResponse && (
                                     <View style={styles.responseContainer}>
-                                        <Text style={styles.responseLabel}>📨 رد الإدارة:</Text>
+                                        <Text style={styles.responseLabel}>
+                                            <Ionicons name="mail-unread-outline" size={16} color="#1a73e8" /> {t('complaints.adminResponse')}
+                                        </Text>
                                         <Text style={styles.responseText}>{complaint.adminResponse}</Text>
                                         {complaint.reviewedBy && (
                                             <Text style={styles.reviewInfo}>
-                                                تمت المراجعة بواسطة: {complaint.reviewedBy} في {formatDate(complaint.reviewedAt)}
+                                                {t('complaints.reviewedBy')}: {complaint.reviewedBy} {t('complaints.reviewedAt')} {formatDate(complaint.reviewedAt)}
                                             </Text>
                                         )}
                                     </View>
                                 )}
 
                                 <View style={styles.cardFooter}>
-                                    <Text style={styles.footerText}>📅 {formatDate(complaint.createdAt)}</Text>
-                                    <Text style={styles.footerText}>🆔 {complaint._id.slice(-6)}</Text>
+                                    <View style={styles.footerItem}>
+                                        <Ionicons name="calendar-outline" size={14} color="#9ca3af" />
+                                        <Text style={styles.footerText}>{formatDate(complaint.createdAt)}</Text>
+                                    </View>
+                                    <View style={styles.footerItem}>
+                                        <Ionicons name="information-circle-outline" size={14} color="#9ca3af" />
+                                        <Text style={styles.footerText}>{complaint._id.slice(-6)}</Text>
+                                    </View>
                                 </View>
                             </View>
-                        ))
+                        ))}
+                        </>
                     )}
                 </ScrollView>
             )}
@@ -515,29 +544,25 @@ const StudentComplaintPage: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#eef6ff',
     },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#eef6ff',
     },
     loadingText: {
         marginTop: 10,
         fontSize: 16,
-        color: '#666',
+        color: '#6b7280',
     },
     errorContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#eef6ff',
         padding: 20,
-    },
-    errorEmoji: {
-        fontSize: 64,
-        marginBottom: 20,
     },
     errorTitle: {
         fontSize: 24,
@@ -547,15 +572,15 @@ const styles = StyleSheet.create({
     },
     errorText: {
         fontSize: 16,
-        color: '#666',
+        color: '#6b7280',
         textAlign: 'center',
         marginBottom: 20,
     },
     retryButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#004a99',
         paddingHorizontal: 30,
         paddingVertical: 12,
-        borderRadius: 8,
+        borderRadius: 10,
     },
     retryButtonText: {
         color: '#fff',
@@ -563,69 +588,74 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     header: {
-        backgroundColor: '#fff',
-        padding: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
+        backgroundColor: '#004a99',
+        paddingTop: 50,
+        paddingBottom: 18,
+        paddingHorizontal: 20,
     },
-    title: {
-        fontSize: 24,
+    headerContent: {
+        flexDirection: 'row-reverse',
+        alignItems: 'center',
+        gap: 10,
+    },
+    headerTitle: {
+        fontSize: 20,
         fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 10,
+        color: '#fff',
     },
     welcomeText: {
         textAlign: 'center',
-        color: '#666',
+        color: '#e5e7eb',
         fontSize: 14,
+        marginTop: 10,
     },
     boldText: {
         fontWeight: 'bold',
-        color: '#333',
-    },
-    logoutButton: {
-        position: 'absolute',
-        top: 20,
-        right: 20,
-        padding: 8,
-    },
-    logoutText: {
-        color: '#e74c3c',
-        fontSize: 14,
+        color: '#fff',
     },
     tabContainer: {
         flexDirection: 'row',
         backgroundColor: '#fff',
         paddingHorizontal: 20,
         paddingTop: 10,
-        borderBottomWidth: 2,
-        borderBottomColor: '#e0e0e0',
+        borderBottomWidth: 1,
+        borderBottomColor: '#e5e7eb',
+        gap: 10,
     },
     tab: {
         flex: 1,
-        paddingVertical: 12,
+        flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        paddingVertical: 12,
     },
     activeTab: {
-        borderBottomWidth: 3,
-        borderBottomColor: '#4CAF50',
+        borderBottomWidth: 2,
+        borderBottomColor: '#1a73e8',
     },
     tabText: {
-        fontSize: 16,
-        color: '#666',
+        fontSize: 14,
+        color: '#6b7280',
+        fontWeight: '500',
     },
     activeTabText: {
-        color: '#4CAF50',
+        color: '#1a73e8',
         fontWeight: 'bold',
     },
     formContainer: {
         flex: 1,
-        padding: 20,
+    },
+    sectionHeader: {
+        flexDirection: 'row-reverse',
+        alignItems: 'center',
+        gap: 10,
+        marginBottom: 20,
     },
     sectionTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        marginBottom: 20,
+        color: '#1f2937',
     },
     inputGroup: {
         marginBottom: 15,
@@ -633,16 +663,17 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 14,
         fontWeight: '500',
-        marginBottom: 5,
-        color: '#333',
+        marginBottom: 8,
+        color: '#374151',
     },
     input: {
         borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
+        borderColor: '#d1d5db',
+        borderRadius: 10,
         padding: 12,
         fontSize: 16,
         backgroundColor: '#fff',
+        color: '#1f2937',
     },
     textArea: {
         minHeight: 100,
@@ -650,24 +681,25 @@ const styles = StyleSheet.create({
     },
     disabledInput: {
         borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
+        borderColor: '#d1d5db',
+        borderRadius: 10,
         padding: 12,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#f3f4f6',
     },
     disabledText: {
-        color: '#666',
+        color: '#6b7280',
+        fontSize: 16,
     },
     submitButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#1a73e8',
         padding: 15,
-        borderRadius: 8,
+        borderRadius: 10,
         alignItems: 'center',
         marginTop: 10,
         marginBottom: 30,
     },
     disabledButton: {
-        backgroundColor: '#ccc',
+        backgroundColor: '#d1d5db',
     },
     submitButtonText: {
         color: '#fff',
@@ -676,37 +708,39 @@ const styles = StyleSheet.create({
     },
     complaintsList: {
         flex: 1,
-        padding: 20,
     },
     complaintCard: {
         backgroundColor: '#fff',
-        borderRadius: 12,
-        padding: 15,
-        marginBottom: 15,
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 16,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 3,
+        borderLeftWidth: 4,
+        borderLeftColor: '#1a73e8',
     },
     cardHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 15,
+        marginBottom: 12,
     },
     courseName: {
         fontSize: 18,
         fontWeight: 'bold',
+        color: '#1f2937',
     },
     requestType: {
         fontSize: 14,
-        color: '#2196f3',
+        color: '#1a73e8',
         marginTop: 4,
     },
     statusBadge: {
         paddingHorizontal: 12,
-        paddingVertical: 4,
+        paddingVertical: 6,
         borderRadius: 20,
     },
     statusText: {
@@ -714,27 +748,33 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     descriptionContainer: {
-        backgroundColor: '#f8f9fa',
+        backgroundColor: '#f9fafb',
         padding: 15,
-        borderRadius: 8,
-        marginBottom: 15,
+        borderRadius: 10,
+        marginBottom: 12,
     },
     descriptionLabel: {
-        fontWeight: 'bold',
-        marginBottom: 5,
+        fontWeight: '600',
+        marginBottom: 6,
         fontSize: 14,
+        color: '#374151',
     },
     descriptionText: {
         marginBottom: 10,
-        lineHeight: 20,
+        lineHeight: 22,
+        color: '#4b5563',
     },
     editIconButton: {
         marginTop: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
         alignSelf: 'flex-start',
     },
     editIconText: {
-        color: '#2196f3',
-        fontSize: 12,
+        color: '#1a73e8',
+        fontSize: 14,
+        fontWeight: '500',
     },
     editContainer: {
         marginBottom: 15,
@@ -746,79 +786,88 @@ const styles = StyleSheet.create({
     },
     editButton: {
         flex: 1,
-        padding: 10,
-        borderRadius: 6,
+        padding: 12,
+        borderRadius: 10,
         alignItems: 'center',
     },
     saveButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#1a73e8',
     },
     cancelButton: {
-        backgroundColor: '#9e9e9e',
+        backgroundColor: '#9ca3af',
     },
     buttonText: {
         color: '#fff',
         fontWeight: 'bold',
+        fontSize: 14,
     },
     responseContainer: {
         marginTop: 15,
         padding: 15,
-        backgroundColor: '#e8f5e9',
-        borderRadius: 8,
-        borderRightWidth: 4,
-        borderRightColor: '#4CAF50',
+        backgroundColor: '#eff6ff',
+        borderRadius: 10,
+        borderLeftWidth: 4,
+        borderLeftColor: '#1a73e8',
     },
     responseLabel: {
         fontWeight: 'bold',
         marginBottom: 8,
+        fontSize: 14,
+        color: '#1f2937',
     },
     responseText: {
         marginBottom: 8,
-        lineHeight: 20,
+        lineHeight: 22,
+        color: '#4b5563',
     },
     reviewInfo: {
         fontSize: 12,
-        color: '#666',
+        color: '#6b7280',
         marginTop: 8,
     },
     cardFooter: {
         marginTop: 15,
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    footerItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
     },
     footerText: {
         fontSize: 12,
-        color: '#999',
+        color: '#9ca3af',
     },
     emptyContainer: {
         alignItems: 'center',
         padding: 60,
-        backgroundColor: '#f9f9f9',
-        borderRadius: 12,
-    },
-    emptyEmoji: {
-        fontSize: 48,
-        marginBottom: 16,
+        backgroundColor: '#fff',
+        borderRadius: 16,
     },
     emptyTitle: {
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 8,
+        color: '#1f2937',
     },
     emptyText: {
-        color: '#666',
+        color: '#6b7280',
         marginBottom: 20,
         textAlign: 'center',
+        fontSize: 14,
     },
     emptyButton: {
-        backgroundColor: '#f39c12',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderRadius: 6,
+        backgroundColor: '#1a73e8',
+        paddingHorizontal: 24,
+        paddingVertical: 12,
+        borderRadius: 10,
     },
     emptyButtonText: {
         color: '#fff',
         fontWeight: 'bold',
+        fontSize: 16,
     },
 });
 
