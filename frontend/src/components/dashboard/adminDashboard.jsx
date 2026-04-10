@@ -7,6 +7,7 @@ import RegistrationControlPanel from "./panels/RegistrationControlPanel.tsx";
 import SettingsPanel from "./panels/settingsPanel.tsx";
 import "./css/adminDashboard.css";
 import { useTranslation } from "react-i18next";
+import ReporterPanel from "./panels/reporterPanel.tsx";
 
 const AdminDashboard = () => {
     const { userName, userRole } = useContext(AdminDashboardContext);
@@ -16,6 +17,7 @@ const AdminDashboard = () => {
     // Use role from auth context (more reliable) or fallback to context
     const role = user?.role || userRole;
     const isAdmin = role === "admin";
+    const isReporter = role === "reporter";
     const isAcademicGuide = role === "academic_guide";
 
     return (
@@ -35,7 +37,13 @@ const AdminDashboard = () => {
                         <RegistrationControlPanel />
                         <WithDrawlPanel />
                     </div>
-                )}
+                )}                                                       
+                {/* reporter بس */}
+            {isReporter && (
+                <div className="dashboard-column">
+                    <ReporterPanel />
+                </div>  
+                  )}
             </div>
         </>
     );
