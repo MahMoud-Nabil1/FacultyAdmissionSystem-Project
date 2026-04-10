@@ -265,5 +265,80 @@
       "lab": "معمل",
       "tutorial": "سيكشن"
     }
+  },
+  "register": {
+    "title": "تسجيل المواد",
+    "subtitle": "حدد جدولك الدراسي للفصل القادم",
+    "selectedCredits": "عدد الساعات المسجلة:",
+    "hrs": "ساعة",
+    "loading": "جارٍ تحميل بيانات التسجيل...",
+    "closed": "التسجيل مغلق",
+    "closedMessage": "التسجيل مغلق حالياً. لا يمكنك طلب مجموعات جديدة في الوقت الحالي.",
+    "registeredTitle": "الجدول الخاص بي",
+    "myRequestsTitle": "طلباتي",
+    "availableTitle": "المواد المتاحة",
+    "chooseSubject": "اختر المادة",
+    "selectPlaceholder": "اختر مادة...",
+    "corequisiteNotice": "متطلبات متزامنة مطلوبة",
+    "noGroupsForSubject": "لا توجد مجموعات متاحة لهذه المادة.",
+    "colSubject": "المادة",
+    "colGroup": "المجموعة",
+    "colType": "النوع",
+    "colStatus": "الحالة",
+    "colActions": "إجراءات",
+    "status": {
+      "pending": "قيد الانتظار",
+      "approved": "مقبول",
+      "rejected": "مرفوض",
+      "enrolled": "مسجل"
+    },
+    "errors": {
+      "maxHoursExceeded": "تجاوز الحد الأقصى للساعات المعتمدة.",
+      "corequisitesRequired": "يجب تسجيل: {{subjects}}"
+    },
+    "removeBtn": "إزالة",
+    "cancelRequestBtn": "إلغاء الطلب",
+    "requestBtn": "تسجيل",
+    "success": "تم إرسال الطلب بنجاح",
+    "cancelSuccess": "تم إلغاء الطلب",
+    "removeSuccess": "تمت الإزالة بنجاح",
+    "failed": "فشلت العملية",
+    "noRegistered": "لا توجد مواد مسجلة."
+  },
+  "groupsSchedule": {
+    "groupNumber": "مجموعة {{number}}",
+    "am": "ص",
+    "pm": "م",
+    "typeValues": {
+      "lecture": "محاضرة",
+      "lab": "معمل",
+      "tutorial": "سيكشن"
+    }
+  },
+  "groupsScreen": {
+    "title": "المجموعات",
+    "groupNumber": "مجموعة {{number}}",
+    "empty": {
+      "title": "لا توجد مجموعات",
+      "subtitle": "لم يتم تسجيلك في أي مجموعة بعد."
+    },
+    "errors": {
+      "fetchFailed": "تعذّر تحميل المجموعات"
+    },
+    "days": {
+      "monday": "الاثنين",
+      "tuesday": "الثلاثاء",
+      "wednesday": "الأربعاء",
+      "thursday": "الخميس",
+      "friday": "الجمعة",
+      "saturday": "السبت",
+      "sunday": "الأحد"
+    },
+    "types": {
+      "lecture": "محاضرة",
+      "lab": "معمل",
+      "tutorial": "تمرين",
+      "seminar": "سيمينار"
+    }
   }
 }
