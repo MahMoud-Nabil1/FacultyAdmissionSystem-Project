@@ -14,10 +14,11 @@ function tabVisibility(visible: boolean) {
 }
 
 export default function TabsLayout() {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
     const { t } = useLanguage();
     const isAdmin = user?.role === 'admin';
     const isStudent = user?.role === 'student';
+    const isAcademicGuide = user?.role === 'academic_guide' || user?.role === 'academic_guide_coordinator';
 
     return (
         <Tabs
@@ -101,6 +102,11 @@ export default function TabsLayout() {
                 }}
             />
 
+            {/* ── Advisor — academic guide only (hidden from tab bar, accessed via home) ── */}
+            <Tabs.Screen
+                name="advisor"
+                options={{
+                    href: null,
             {/* ── Register — student only ── */}
             <Tabs.Screen
                 name="register"

@@ -20,6 +20,8 @@
     "groups": "المجموعات",
     "support": "الدعم",
     "register": "تسجيل المواد",
+    "profile": "الملف الشخصي",
+    "advisor": "المرشد الأكاديمي"
     "complaints": "الشكاوى",
     "profile": "الملف الشخصي"
   },
@@ -272,7 +274,78 @@
     "typeValues": {
       "lecture": "محاضرة",
       "lab": "معمل",
-      "tutorial": "سيكشن"
+      "tutorial": "سكشن"
+    }
+  },
+  "advisor": {
+    "title": "المرشد الأكاديمي",
+    "subtitle": "إدارة الطلاب المسندين وتتبع تقدمهم الأكاديمي",
+    "totalStudents": "إجمالي الطلاب",
+    "activeStudents": "نشط",
+    "probationStudents": "تحت المراقبة",
+    "avgGpa": "متوسط المعدل",
+    "searchPlaceholder": "البحث بالاسم أو الكود أو البريد...",
+    "myAdvisees": "طلابي المسندين",
+    "noStudentsFound": "لم يتم العثور على طلاب",
+    "noAdvisees": "لا يوجد طلاب مساندين",
+    "hours": "ساعات",
+    "level": "المستوى",
+    "status": {
+      "active": "نشط",
+      "probation": "تحت المراقبة",
+      "graduated": "متخرج",
+      "suspended": "مفصول"
+    },
+    "studentNotFound": "لم يتم العثور على الطالب",
+    "goBack": "الرجوع",
+    "academicOverview": "نظرة عامة أكاديمية",
+    "gpa": "المعدل التراكمي",
+    "completedHours": "الساعات المكتملة",
+    "registeredHours": "الساعات المسجلة",
+    "totalSubjects": "إجمالي المواد",
+    "currentSubjects": "المواد الحالية",
+    "subjectStatus": {
+      "enrolled": "مسجل",
+      "completed": "مكتمل",
+      "failed": "راسب",
+      "withdrawn": "منسحب"
+    },
+    "creditHours": "ساعات معتمدة",
+    "grade": "التقدير",
+    "academicHistory": "السجل الأكاديمي",
+    "subjects": "مواد",
+    "actions": "إجراءات",
+    "sendEmail": "إرسال بريد إلكتروني",
+    "generateReport": "إنشاء تقرير",
+    "studentSchedule": "جدول الطالب",
+    "noSchedule": "لا يوجد جدول متاح",
+    "registerSubject": "تسجيل مادة",
+    "selectSubject": "اختر مادة",
+    "availableGroups": "مجموعات",
+    "seats": "مقاعد",
+    "groupFull": "المجموعة ممتلئة",
+    "register": "تسجيل",
+    "registerSuccess": "تم تسجيل الطالب بنجاح",
+    "registerFailed": "فشل التسجيل",
+    "fetchGroupsFailed": "فشل في جلب المجموعات المتاحة"
+  },
+  "schedule": {
+    "am": "ص",
+    "pm": "م",
+    "days": {
+      "saturday": "السبت",
+      "sunday": "الأحد",
+      "monday": "الإثنين",
+      "tuesday": "الثلاثاء",
+      "wednesday": "الأربعاء",
+      "thursday": "الخميس",
+      "friday": "الجمعة"
+    },
+    "type": {
+      "lecture": "محاضرة",
+      "lab": "معمل",
+      "tutorial": "سيكشن",
+      "seminar": "ندوة"
     }
   },
   "register": {
