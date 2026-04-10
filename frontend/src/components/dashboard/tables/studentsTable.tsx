@@ -12,6 +12,7 @@ interface Student {
     name: string;
     email: string;
     gpa: string;
+    academicAdvisor?: string | { _id: string; name: string };
 }
 
 interface StudentForm {
@@ -45,10 +46,20 @@ const StudentsTable: React.FC = () => {
 
     // Check if user has admin role
     const isAdmin = user?.role === "admin";
+    const isAcademicGuide = user?.role === "academic_guide";
 
     const loadStudents = async () => {
         try {
-            const data = await getAllStudents();
+            let data = await getAllStudents();
+            // Filter students by assigned advisor for academic_guide
+            if (isAcademicGuide && user?.id) {
+                data = data.filter((s: Student) =>
+                    s.academicAdvisor && (
+                        (typeof s.academicAdvisor === "string" && s.academicAdvisor === user.id) ||
+                        (typeof s.academicAdvisor === "object" && s.academicAdvisor._id === user.id)
+                    )
+                );
+            }
             setStudents(data);
         } catch {
             setError(t("studentPanel.errorGeneric"));

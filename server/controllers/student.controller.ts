@@ -31,7 +31,7 @@ export const getAllStudents = async (_req: Request, res: Response): Promise<void
     try {
         const students = await Student
             .find()
-            .populate('department completedSubjects requestedSubjects');
+            .populate('department completedSubjects requestedSubjects academicAdvisor', 'name email');
 
         res.json(students);
     } catch (err: any) {
@@ -61,6 +61,10 @@ export const getStudentById = async (req: Request, res: Response): Promise<void>
             .populate({
                 path: "department",
                 select: "name"
+            })
+            .populate({
+                path: "academicAdvisor",
+                select: "name email"
             });
 
         if (!student) {
@@ -187,9 +191,33 @@ export const contactAdmin = async (req: Request, res: Response): Promise<void> =
 export const getRegistrationStats = async (_req: Request, res: Response): Promise<void> => {
     try {
         const totalStudents = await Student.countDocuments();
-        const finishedRegistration = await Student.countDocuments({
-            requestedSubjects: { $exists: true, $not: { $size: 0 } }
-        });
+
+        // Count students who have requested subjects with 14+ credit hours
+        const studentsWith14PlusHours = await Student.aggregate([
+            {
+                $lookup: {
+                    from: "subjects",
+                    localField: "requestedSubjects",
+                    foreignField: "_id",
+                    as: "requestedSubjectsDetails"
+                }
+            },
+            {
+                $addFields: {
+                    totalCreditHours: { $sum: "$requestedSubjectsDetails.creditHours" }
+                }
+            },
+            {
+                $match: {
+                    totalCreditHours: { $gte: 14 }
+                }
+            },
+            {
+                $count: "count"
+            }
+        ]);
+
+        const finishedRegistration = studentsWith14PlusHours.length > 0 ? studentsWith14PlusHours[0].count : 0;
         const didNotFinishRegistration = totalStudents - finishedRegistration;
 
         res.json({ totalStudents, finishedRegistration, didNotFinishRegistration });
@@ -201,7 +229,7 @@ export const getRegistrationStats = async (_req: Request, res: Response): Promis
 export const getMyAcademicHistory = async (req: Request, res: Response): Promise<void> => {
     try {
         const user = getUser(req);
-        
+
 
         const student = await Student
             .findOne({ studentId: Number(user.id) })
@@ -213,6 +241,32 @@ export const getMyAcademicHistory = async (req: Request, res: Response): Promise
         }
 
         res.json(student.completedSubjects);
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const assignAcademicAdvisor = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { advisorId } = req.body;
+
+        if (!advisorId) {
+            res.status(400).json({ error: "Academic advisor ID is required" });
+            return;
+        }
+
+        const student = await Student.findByIdAndUpdate(
+            req.params.id,
+            { academicAdvisor: advisorId },
+            { new: true }
+        ).populate('academicAdvisor', 'name email');
+
+        if (!student) {
+            res.status(404).json({ error: "Student not found" });
+            return;
+        }
+
+        res.json(student);
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }

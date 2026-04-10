@@ -35,6 +35,26 @@ async function canManageStudent(staff: IStaff, studentId: string): Promise<boole
 
 export const createGroup = async (req: Request, res: Response): Promise<void> => {
     try {
+        const { day, from, to, place } = req.body;
+
+        // Check for place time collision
+        if (place && day && from !== undefined && to !== undefined) {
+            const collision = await Group.findOne({
+                place,
+                day: day.toLowerCase(),
+                $or: [
+                    { from: { $lt: Number(to) }, to: { $gt: Number(from) } },
+                ],
+            });
+
+            if (collision) {
+                const placeDoc = await import('../models/place').then(m => m.Place.findById(place));
+                const placeName = placeDoc ? placeDoc.name : 'this place';
+                res.status(400).json({ error: `Place "${placeName}" is already reserved on ${day} from ${collision.from}:00 to ${collision.to}:00` });
+                return;
+            }
+        }
+
         const group = new Group(req.body);
         await group.save();
         res.status(201).json(group);
@@ -67,6 +87,28 @@ export const getGroupById = async (req: Request, res: Response): Promise<void> =
 
 export const updateGroup = async (req: Request, res: Response): Promise<void> => {
     try {
+        const { day, from, to, place } = req.body;
+
+        // Check for place time collision (excluding current group)
+        if (place && day && from !== undefined && to !== undefined) {
+            const currentId = new mongoose.Types.ObjectId(String(Array.isArray(req.params.id) ? req.params.id[0] : req.params.id));
+            const collision = await Group.findOne({
+                _id: { $ne: currentId },
+                place,
+                day: day.toLowerCase(),
+                $or: [
+                    { from: { $lt: Number(to) }, to: { $gt: Number(from) } },
+                ],
+            });
+
+            if (collision) {
+                const placeDoc = await import('../models/place').then(m => m.Place.findById(place));
+                const placeName = placeDoc ? placeDoc.name : 'this place';
+                res.status(400).json({ error: `Place "${placeName}" is already reserved on ${day} from ${collision.from}:00 to ${collision.to}:00` });
+                return;
+            }
+        }
+
         const group = await Group.findByIdAndUpdate(
             req.params.id,
             req.body,

@@ -18,6 +18,7 @@ const AdminDashboard = () => {
     const role = user?.role || userRole;
     const isAdmin = role === "admin";
     const isReporter = role === "reporter";
+    const isAcademicGuide = role === "academic_guide";
 
     return (
         <>
@@ -26,7 +27,8 @@ const AdminDashboard = () => {
             </h1>
             <div className="dashboard-grid">
                 <div className="dashboard-column">
-                    <SettingsPanel />
+                    {/* academic_guide can only see Announcements */}
+                    {!isAcademicGuide && <SettingsPanel />}
                     <AnnouncementsPanel />
                 </div>
 

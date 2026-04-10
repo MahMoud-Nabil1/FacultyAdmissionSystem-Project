@@ -123,6 +123,12 @@ export async function deleteStudent(id) {
     return data;
 }
 
+export async function assignAcademicAdvisor(studentId, advisorId) {
+    const {res, data} = await apiPut(`/students/${studentId}/assign-advisor`, { advisorId });
+    if (!res.ok) throw new Error(data.error || "Failed to assign academic advisor");
+    return data;
+}
+
 export async function getRegistrationStats() {
     const {res, data} = await apiGet("/students/stats");
     if (!res.ok) throw new Error(data.error || "Failed to fetch stats");
@@ -213,6 +219,18 @@ export async function updateSystemSettings(settings) {
     return data;
 }
 
+export async function getAnnouncementSettings() {
+    const {res, data} = await apiGet("/announcements/settings");
+    if (!res.ok) throw new Error(data.error || "Failed to fetch announcement settings");
+    return data;
+}
+
+export async function updateAnnouncementSettings(settings) {
+    const {res, data} = await apiPut("/announcements/settings", settings);
+    if (!res.ok) throw new Error(data.error || "Failed to update announcement settings");
+    return data;
+}
+
 export const getStudentById = async (id) => {
     const res = await apiGet(`/students/${id}`);
     return res.data;
@@ -231,4 +249,35 @@ export const addStudentToGroup = async (groupId, studentId) => {
 export const removeStudentFromGroup = async (groupId, studentId) => {
     const res = await apiDelete(`/groups/${groupId}/students?studentId=${studentId}`);
     return res.data;
+};
+
+// Places API
+export const getAllPlaces = async () => {
+    const { res, data } = await apiGet("/places", false);
+    if (!res.ok) throw new Error(data.error || "Failed to fetch places");
+    return data;
+};
+
+export const getPlaceById = async (id) => {
+    const { res, data } = await apiGet(`/places/${id}`);
+    if (!res.ok) throw new Error(data.error || "Failed to fetch place");
+    return data;
+};
+
+export const createPlace = async (data) => {
+    const { res, data: body } = await apiPost("/places", data);
+    if (!res.ok) throw new Error(body.error || "Failed to create place");
+    return body;
+};
+
+export const updatePlace = async (id, data) => {
+    const { res, data: body } = await apiPut(`/places/${id}`, data);
+    if (!res.ok) throw new Error(body.error || "Failed to update place");
+    return body;
+};
+
+export const deletePlace = async (id) => {
+    const { res, data } = await apiDelete(`/places/${id}`);
+    if (!res.ok) throw new Error(data.error || "Failed to delete place");
+    return data;
 };

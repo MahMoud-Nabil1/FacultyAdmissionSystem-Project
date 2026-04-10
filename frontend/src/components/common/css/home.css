@@ -99,6 +99,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
     background-color: var(--color-primary);
     color: var(--color-text-inverse);
     border: 2px solid var(--color-primary);
@@ -109,6 +110,10 @@
     cursor: pointer;
     transition: var(--transition);
     min-height: 50px;
+}
+
+.btn svg {
+    flex-shrink: 0;
 }
 
 .btn:hover {

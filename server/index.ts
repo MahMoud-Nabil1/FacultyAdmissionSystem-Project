@@ -14,6 +14,7 @@ import subjectRoutes from "./routes/subject.routes";
 import announcementRoutes from "./routes/announcement.routes";
 import groupRoutes from "./routes/group.routes";
 import systemSettingRoutes from "./routes/systemSetting.routes";
+import placeRoutes from "./routes/place.routes";
 
 const app = express();
 
@@ -41,6 +42,7 @@ import "./models/staff";
 import "./models/passwordResetToken";
 import "./models/announcement";
 import "./models/group";
+import "./models/place";
 
 app.use("/api/auth", authRoutes);
 app.use("/api/complaints", complaintRoutes);
@@ -50,6 +52,7 @@ app.use("/api/subjects", subjectRoutes);
 app.use("/api/announcements", announcementRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/settings", systemSettingRoutes);
+app.use("/api/places", placeRoutes);
 
 app.use((req: Request, res: Response) => {
     res.status(404).json({ message: "Route not found" });
