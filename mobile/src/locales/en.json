@@ -267,6 +267,80 @@
       "tutorial": "Tutorial"
     }
   },
+  "register": {
+    "title": "Register Subjects",
+    "subtitle": "Select your schedule for the upcoming semester",
+    "selectedCredits": "Selected Credits:",
+    "hrs": "hrs",
+    "loading": "Loading registration data...",
+    "closed": "Registration Closed",
+    "closedMessage": "Registration is currently closed. You cannot request new groups at this time.",
+    "registeredTitle": "My Schedule",
+    "myRequestsTitle": "My Requests",
+    "availableTitle": "Available Subjects",
+    "chooseSubject": "Choose Subject",
+    "selectPlaceholder": "Select a subject...",
+    "corequisiteNotice": "Co-requisites required",
+    "noGroupsForSubject": "No available groups for this subject.",
+    "colSubject": "Subject",
+    "colGroup": "Group",
+    "colType": "Type",
+    "colStatus": "Status",
+    "colActions": "Actions",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "enrolled": "Enrolled"
+    },
+    "errors": {
+      "maxHoursExceeded": "Maximum credit hours exceeded.",
+      "corequisitesRequired": "Must also register for: {{subjects}}"
+    },
+    "removeBtn": "Remove",
+    "cancelRequestBtn": "Cancel Request",
+    "requestBtn": "Request",
+    "success": "Request sent successfully",
+    "cancelSuccess": "Request cancelled",
+    "removeSuccess": "Removed successfully",
+    "failed": "Action failed",
+    "noRegistered": "No registered subjects."
+  },
+  "groupsSchedule": {
+    "groupNumber": "Group {{number}}",
+    "am": "AM",
+    "pm": "PM",
+    "typeValues": {
+      "lecture": "Lecture",
+      "lab": "Lab",
+      "tutorial": "Tutorial"
+    }
+  },
+  "groupsScreen": {
+    "title": "Groups",
+    "groupNumber": "Group {{number}}",
+    "empty": {
+      "title": "No groups found",
+      "subtitle": "You haven't been registered in any groups yet."
+    },
+    "errors": {
+      "fetchFailed": "Failed to load groups"
+    },
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "types": {
+      "lecture": "Lecture",
+      "lab": "Lab",
+      "tutorial": "Tutorial",
+      "seminar": "Seminar"
+    }
   "academicHistory": {
     "title": "Academic History",
     "loading": "Loading academic history...",
