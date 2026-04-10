@@ -1,9 +1,6 @@
 import React, { useState, useEffect, FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { getSystemSettings, updateSystemSettings } from "../../../services/api";
-
-const API_URL = "http://localhost:5000/api";
-const token = sessionStorage.getItem("token");
+import { getSystemSettings, updateSystemSettings, getAnnouncementSettings, updateAnnouncementSettings } from "../../../services/api";
 
 const RegistrationPage: React.FC = () => {
     const { t } = useTranslation();
@@ -21,14 +18,17 @@ const RegistrationPage: React.FC = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const data = await getSystemSettings();
+                const [systemData, announcementData] = await Promise.all([
+                    getSystemSettings(),
+                    getAnnouncementSettings()
+                ]);
                 setSettings({
-                    registrationOpen: data.registrationOpen,
-                    withdrawalOpen: data.withdrawalOpen
+                    registrationOpen: systemData.registrationOpen,
+                    withdrawalOpen: systemData.withdrawalOpen
                 });
-                setGpaMin(data.gpaMin ?? 2.5);
-                setGpaMax(data.gpaMax ?? 5);
-                setSelectedLevels(Array.isArray(data.level) ? data.level : [data.level || "1"]);
+                setGpaMin(announcementData.gpaMin ?? 2.5);
+                setGpaMax(announcementData.gpaMax ?? 5);
+                setSelectedLevels(Array.isArray(announcementData.level) ? announcementData.level : [announcementData.level || "1"]);
             } catch (err) {
                 console.error("Failed to fetch settings:", err);
             } finally {
@@ -81,11 +81,19 @@ const RegistrationPage: React.FC = () => {
         if (gpaError || selectedLevels.length === 0) return;
         setSavingSettings(true);
         try {
+            // Save registration/withdrawal settings
             await updateSystemSettings({
-                gpaMin, gpaMax, level: selectedLevels,
                 registrationOpen: settings.registrationOpen,
                 withdrawalOpen: settings.withdrawalOpen
             });
+            
+            // Save GPA & Level settings
+            await updateAnnouncementSettings({
+                gpaMin, 
+                gpaMax, 
+                level: selectedLevels
+            });
+            
             alert("Settings saved successfully!");
         } catch (err) {
             console.error(err);

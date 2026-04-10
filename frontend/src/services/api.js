@@ -219,6 +219,18 @@ export async function updateSystemSettings(settings) {
     return data;
 }
 
+export async function getAnnouncementSettings() {
+    const {res, data} = await apiGet("/announcements/settings");
+    if (!res.ok) throw new Error(data.error || "Failed to fetch announcement settings");
+    return data;
+}
+
+export async function updateAnnouncementSettings(settings) {
+    const {res, data} = await apiPut("/announcements/settings", settings);
+    if (!res.ok) throw new Error(data.error || "Failed to update announcement settings");
+    return data;
+}
+
 export const getStudentById = async (id) => {
     const res = await apiGet(`/students/${id}`);
     return res.data;
