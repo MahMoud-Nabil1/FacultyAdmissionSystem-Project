@@ -40,13 +40,13 @@ const RegistrationPage: React.FC = () => {
 
     useEffect(() => {
         if (gpaMin >= gpaMax) {
-            setGpaError("Min GPA must be less than Max GPA");
+            setGpaError(t("settingsPanel.errorMinMax"));
         } else if (gpaMin < 0 || gpaMin > 5 || gpaMax < 0 || gpaMax > 5) {
-            setGpaError("GPA must be between 0 and 5");
+            setGpaError(t("settingsPanel.errorRange"));
         } else {
             setGpaError(null);
         }
-    }, [gpaMin, gpaMax]);
+    }, [gpaMin, gpaMax, t]);
 
     const handleToggle = async (field: 'registrationOpen' | 'withdrawalOpen') => {
         setUpdating(true);
@@ -59,7 +59,7 @@ const RegistrationPage: React.FC = () => {
             });
         } catch (err) {
             console.error("Failed to update settings:", err);
-            alert("Failed to update settings");
+            alert(t("settingsPanel.saveError"));
         } finally {
             setUpdating(false);
         }
@@ -94,26 +94,26 @@ const RegistrationPage: React.FC = () => {
                 level: selectedLevels
             });
             
-            alert("Settings saved successfully!");
+            alert(t("settingsPanel.saveSuccess"));
         } catch (err) {
             console.error(err);
-            alert("Failed to save settings");
+            alert(t("settingsPanel.saveError"));
         } finally {
             setSavingSettings(false);
         }
     };
 
-    if (loading) return <div>Loading settings...</div>;
+    if (loading) return <div>{t("settingsPanel.loading")}</div>;
 
     return (
         <div className="dashboard-container">
             {/* Registration / Withdrawal Controls */}
-            <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Registration Control</h2>
+            <h2 style={{ textAlign: "center", marginBottom: "20px" }}>{t("settingsPanel.controlPanelTitle")}</h2>
             <div className="control-panel-grid" style={{ display: 'grid', gap: '1rem', marginBottom: '2rem' }}>
                 <div className="control-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'var(--bg-secondary)', borderRadius: '8px' }}>
-                    <span>Registration Status:
+                    <span>{t("settingsPanel.registrationStatus")}: 
                         <strong style={{ marginLeft: '8px', color: settings.registrationOpen ? 'var(--success-color)' : 'var(--error-color)' }}>
-                            {settings.registrationOpen ? 'Open' : 'Closed'}
+                            {settings.registrationOpen ? t("settingsPanel.open") : t("settingsPanel.closed")}
                         </strong>
                     </span>
                     <button
@@ -122,14 +122,14 @@ const RegistrationPage: React.FC = () => {
                         disabled={updating}
                         style={{ width: 'auto', padding: '10px 20px', margin: 0 }}
                     >
-                        {settings.registrationOpen ? 'Close' : 'Open'}
+                        {settings.registrationOpen ? t("settingsPanel.closeRegistration") : t("settingsPanel.openRegistration")}
                     </button>
                 </div>
 
                 <div className="control-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'var(--bg-secondary)', borderRadius: '8px' }}>
-                    <span>Withdrawal Status:
+                    <span>{t("settingsPanel.withdrawalStatus")}: 
                         <strong style={{ marginLeft: '8px', color: settings.withdrawalOpen ? 'var(--success-color)' : 'var(--error-color)' }}>
-                            {settings.withdrawalOpen ? 'Open' : 'Closed'}
+                            {settings.withdrawalOpen ? t("settingsPanel.open") : t("settingsPanel.closed")}
                         </strong>
                     </span>
                     <button
@@ -138,13 +138,13 @@ const RegistrationPage: React.FC = () => {
                         disabled={updating}
                         style={{ width: 'auto', padding: '10px 20px', margin: 0 }}
                     >
-                        {settings.withdrawalOpen ? 'Close' : 'Open'}
+                        {settings.withdrawalOpen ? t("settingsPanel.closeWithdrawal") : t("settingsPanel.openWithdrawal")}
                     </button>
                 </div>
             </div>
 
             {/* GPA & Level Settings */}
-            <h2 style={{ textAlign: "center", marginBottom: "20px" }}>GPA & Level Settings</h2>
+            <h2 style={{ textAlign: "center", marginBottom: "20px" }}>{t("settingsPanel.title")}</h2>
             {gpaError && <p className="error">{gpaError}</p>}
             <form onSubmit={handleSaveSettings} className="form">
                 <div className="form-group">
@@ -190,7 +190,7 @@ const RegistrationPage: React.FC = () => {
                 </div>
 
                 <button className="panel-btn" disabled={savingSettings || !!gpaError || selectedLevels.length === 0} style={{ width: '100%' }}>
-                    {savingSettings ? "Saving..." : "Save Settings"}
+                    {savingSettings ? t("settingsPanel.savingBtn") : t("settingsPanel.saveBtn")}
                 </button>
             </form>
         </div>

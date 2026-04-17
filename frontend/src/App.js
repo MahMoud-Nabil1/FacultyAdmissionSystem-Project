@@ -5,6 +5,7 @@ import {ThemeProvider} from './context/ThemeContext';
 import './styles/themeVariables.css';
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 import GuestRoute from './components/auth/GuestRoute.jsx';
+import { useAuth } from './context/AuthContext';
 import ResetPassword from './components/auth/ResetPassword.jsx';
 import Login from './components/auth/Login.jsx';
 import ForgotPassword from './components/auth/ForgotPassword.jsx';
@@ -30,6 +31,12 @@ import StudentComplaintPage from "./components/complaints/studentsComplaints.tsx
 
 function App() {
     const {t} = useTranslation();
+    const { user } = useAuth();
+
+    const AdminDashboardIndex = () => {
+        return <Navigate to="/admin-dashboard/announcements" replace />;
+    };
+
     return (
         <ThemeProvider>
             <div className="App">
@@ -79,13 +86,37 @@ function App() {
                             </ProtectedRoute>
                         }
                     >
-                        <Route index element={<Navigate to="/admin-dashboard/registration" replace/>}/>
-                        <Route path="announcements" element={<AnnouncementsPage/>}/>
-                        <Route path="registration" element={<RegistrationPage/>}/>
-                        <Route path="requests" element={<AcademicRequestsPage/>}/>
-                        <Route path="table" element={<AdminDashboardTable/>}/>
-                        <Route path="groups" element={<GroupPanel/>}/>
-                        <Route path="places" element={<PlacesPanel/>}/>
+                        <Route index element={<AdminDashboardIndex/>}/>
+                        <Route path="announcements" element={
+                            <ProtectedRoute allowedRoles={['admin', 'academic_guide', 'academic_guide_coordinator', 'reporter']}>
+                                <AnnouncementsPage/>
+                            </ProtectedRoute>
+                        }/>
+                        <Route path="registration" element={
+                            <ProtectedRoute allowedRoles={['admin', 'academic_guide', 'academic_guide_coordinator']}>
+                                <RegistrationPage/>
+                            </ProtectedRoute>
+                        }/>
+                        <Route path="requests" element={
+                            <ProtectedRoute allowedRoles={['admin', 'academic_guide', 'academic_guide_coordinator']}>
+                                <AcademicRequestsPage/>
+                            </ProtectedRoute>
+                        }/>
+                        <Route path="table" element={
+                            <ProtectedRoute allowedRoles={['admin', 'academic_guide', 'academic_guide_coordinator', 'reporter']}>
+                                <AdminDashboardTable/>
+                            </ProtectedRoute>
+                        }/>
+                        <Route path="groups" element={
+                            <ProtectedRoute allowedRoles={['admin', 'academic_guide', 'academic_guide_coordinator', 'reporter']}>
+                                <GroupPanel/>
+                            </ProtectedRoute>
+                        }/>
+                        <Route path="places" element={
+                            <ProtectedRoute allowedRoles={['admin', 'academic_guide', 'academic_guide_coordinator']}>
+                                <PlacesPanel/>
+                            </ProtectedRoute>
+                        }/>
                     </Route>
                     <Route path="/login" element={
                         <GuestRoute>

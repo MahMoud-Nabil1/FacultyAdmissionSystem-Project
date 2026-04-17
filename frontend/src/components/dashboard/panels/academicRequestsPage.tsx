@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Complaint {
     _id: string;
@@ -22,6 +23,7 @@ const AcademicRequestsPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const token = sessionStorage.getItem("token");
+    const { t } = useTranslation();
 
     const fetchComplaints = async () => {
         try {
@@ -34,7 +36,7 @@ const AcademicRequestsPage: React.FC = () => {
             setError('');
         } catch (err) {
             console.error('Error fetching complaints:', err);
-            setError('Failed to fetch requests');
+            setError(t('complaints.fetchError'));
         } finally {
             setLoading(false);
         }
@@ -46,7 +48,7 @@ const AcademicRequestsPage: React.FC = () => {
 
     const updateComplaint = async (id: string, status: string) => {
         if (!adminResponse.trim()) {
-            alert('Please enter a response');
+            alert(t('complaints.enterResponse'));
             return;
         }
 
@@ -66,33 +68,35 @@ const AcademicRequestsPage: React.FC = () => {
             });
 
             if (response.ok) {
-                alert(`Request ${status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : 'marked under review'} successfully`);
+                alert(t('complaints.updateSuccess'));
                 fetchComplaints();
                 setSelectedComplaint(null);
                 setAdminResponse('');
             } else {
-                alert('Failed to update');
+                alert(t('complaints.updateError'));
             }
         } catch (err) {
-            alert('Error updating request');
+            alert(t('complaints.updateError'));
         }
     };
 
     const deleteComplaint = async (id: string) => {
-        if (window.confirm('Are you sure you want to delete this request?')) {
-            try {
-                const response = await fetch(`http://localhost:5000/api/complaints/${id}`, {
-                    method: 'DELETE',
-                    headers: { "Authorization": `Bearer ${token}` }
-                });
-                if (response.ok) {
-                    alert('Request deleted');
-                    fetchComplaints();
-                    if (selectedComplaint?._id === id) setSelectedComplaint(null);
-                }
-            } catch (err) {
-                alert('Error deleting');
+        if (!window.confirm(t('complaints.confirmDeleteRequest'))) return;
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/complaints/${id}`, {
+                method: 'DELETE',
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (response.ok) {
+                alert(t('complaints.deleteSuccess'));
+                fetchComplaints();
+                if (selectedComplaint?._id === id) setSelectedComplaint(null);
+            } else {
+                alert(t('complaints.deleteError'));
             }
+        } catch (err) {
+            alert(t('complaints.deleteError'));
         }
     };
 
@@ -108,50 +112,50 @@ const AcademicRequestsPage: React.FC = () => {
 
     const getStatusText = (status: string) => {
         switch (status) {
-            case 'pending': return 'Pending';
-            case 'under_review': return 'Under Review';
-            case 'approved': return 'Approved';
-            case 'rejected': return 'Rejected';
+            case 'pending': return t('complaints.pending');
+            case 'under_review': return t('complaints.underReview');
+            case 'approved': return t('complaints.approved');
+            case 'rejected': return t('complaints.rejected');
             default: return status;
         }
     };
 
     const formatDate = (date: string) => new Date(date).toLocaleDateString();
 
-    if (loading) return <div style={{ padding: '20px', textAlign: 'center' }}>Loading requests...</div>;
+    if (loading) return <div style={{ padding: '20px', textAlign: 'center' }}>{t('complaints.loading')}</div>;
     if (error) return <div style={{ padding: '20px', textAlign: 'center', color: 'red' }}>{error}</div>;
 
     return (
         <div className="dashboard-container" style={{ direction: 'ltr' }}>
-            <h2 style={{ textAlign: "center", marginBottom: "20px" }}>🎓 Academic Requests Management</h2>
+            <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>🎓 {t('complaints.adminPanelTitle')}</h2>
 
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
                 <div style={{ background: '#f0f0f0', padding: '10px 20px', borderRadius: '8px' }}>
-                    <strong>Total:</strong> {complaints.length}
+                    <strong>{t('complaints.total')}</strong> {complaints.length}
                 </div>
                 <div style={{ background: '#f0f0f0', padding: '10px 20px', borderRadius: '8px' }}>
-                    <strong>Pending:</strong> {complaints.filter(c => c.status === 'pending').length}
+                    <strong>{t('complaints.pending')}</strong> {complaints.filter(c => c.status === 'pending').length}
                 </div>
                 <div style={{ background: '#f0f0f0', padding: '10px 20px', borderRadius: '8px' }}>
-                    <strong>Under Review:</strong> {complaints.filter(c => c.status === 'under_review').length}
+                    <strong>{t('complaints.underReview')}</strong> {complaints.filter(c => c.status === 'under_review').length}
                 </div>
                 <div style={{ background: '#f0f0f0', padding: '10px 20px', borderRadius: '8px' }}>
-                    <strong>Approved:</strong> {complaints.filter(c => c.status === 'approved').length}
+                    <strong>{t('complaints.approved')}</strong> {complaints.filter(c => c.status === 'approved').length}
                 </div>
                 <div style={{ background: '#f0f0f0', padding: '10px 20px', borderRadius: '8px' }}>
-                    <strong>Rejected:</strong> {complaints.filter(c => c.status === 'rejected').length}
+                    <strong>{t('complaints.rejected')}</strong> {complaints.filter(c => c.status === 'rejected').length}
                 </div>
             </div>
 
             {complaints.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px', background: '#f9f9f9', borderRadius: '8px' }}>
-                    <h3>No Requests</h3>
-                    <p style={{ color: '#666', fontSize: '0.95rem' }}>No requests have been submitted yet.</p>
+                    <h3>{t('complaints.noComplaints')}</h3>
+                    <p style={{ color: '#666', fontSize: '0.95rem' }}>{t('complaints.noComplaintsDesc')}</p>
                 </div>
             ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                     <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', maxHeight: '500px', overflowY: 'auto' }}>
-                        <h3 style={{ marginBottom: '15px', textAlign: 'center' }}>Requests ({complaints.length})</h3>
+                        <h3 style={{ marginBottom: '15px', textAlign: 'center' }}>{t('complaints.requestsListTitle', { count: complaints.length })}</h3>
                         {complaints.map(c => (
                             <div
                                 key={c._id}
@@ -172,8 +176,8 @@ const AcademicRequestsPage: React.FC = () => {
                                         {getStatusText(c.status)}
                                     </span>
                                 </div>
-                                <div style={{ fontSize: '12px', color: '#666' }}>{c.studentId} - {c.courseName}</div>
-                                <div style={{ fontSize: '12px', color: '#2196f3' }}>{c.requestType}</div>
+                                <div style={{ fontSize: '12px', color: '#666' }}>{t('complaints.studentId')}: {c.studentId} • {t('complaints.courseName')}: {c.courseName}</div>
+                                <div style={{ fontSize: '12px', color: '#2196f3' }}>{t('complaints.requestType')}: {c.requestType}</div>
                                 <div style={{ fontSize: '12px', marginTop: '8px' }}>{c.problemDescription.substring(0, 80)}...</div>
                                 <div style={{ fontSize: '10px', color: '#999', marginTop: '8px' }}>{formatDate(c.createdAt)}</div>
                             </div>
@@ -183,23 +187,23 @@ const AcademicRequestsPage: React.FC = () => {
                     <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px' }}>
                         {selectedComplaint ? (
                             <>
-                                <h3 style={{ marginBottom: '15px', textAlign: 'center' }}>Respond to Request</h3>
+                                <h3 style={{ marginBottom: '15px', textAlign: 'center' }}>{t('complaints.respondToRequest')}</h3>
                                 <div style={{ marginBottom: '15px', padding: '10px', background: '#f5f5f5', borderRadius: '8px' }}>
-                                    <p><strong>Student:</strong> {selectedComplaint.studentName}</p>
-                                    <p><strong>ID:</strong> {selectedComplaint.studentId}</p>
-                                    <p><strong>Type:</strong> {selectedComplaint.requestType}</p>
-                                    <p><strong>Course:</strong> {selectedComplaint.courseName}</p>
-                                    <p><strong>Problem:</strong> {selectedComplaint.problemDescription}</p>
+                                    <p><strong>{t('complaints.studentName')}:</strong> {selectedComplaint.studentName}</p>
+                                    <p><strong>{t('complaints.studentId')}:</strong> {selectedComplaint.studentId}</p>
+                                    <p><strong>{t('complaints.requestType')}:</strong> {selectedComplaint.requestType}</p>
+                                    <p><strong>{t('complaints.courseName')}:</strong> {selectedComplaint.courseName}</p>
+                                    <p><strong>{t('complaints.problemDescription')}:</strong> {selectedComplaint.problemDescription}</p>
                                     {selectedComplaint.additionalDetails && (
-                                        <p><strong>Details:</strong> {selectedComplaint.additionalDetails}</p>
+                                        <p><strong>{t('complaints.additionalDetails')}:</strong> {selectedComplaint.additionalDetails}</p>
                                     )}
                                 </div>
 
                                 <div className="form-group">
-                                    <label>Admin Response</label>
+                                    <label>{t('complaints.adminResponse')}</label>
                                     <textarea
                                         rows={4}
-                                        placeholder="Enter your response..."
+                                        placeholder={t('complaints.responsePlaceholder')}
                                         value={adminResponse}
                                         onChange={(e) => setAdminResponse(e.target.value)}
                                     />
@@ -210,31 +214,31 @@ const AcademicRequestsPage: React.FC = () => {
                                         className="panel-btn"
                                         onClick={() => updateComplaint(selectedComplaint._id, 'under_review')}
                                     >
-                                        Under Review
+                                        {t('complaints.markUnderReviewBtn')}
                                     </button>
                                     <button
                                         className="panel-btn"
                                         onClick={() => updateComplaint(selectedComplaint._id, 'approved')}
                                     >
-                                        Approve
+                                        {t('complaints.approveBtn')}
                                     </button>
                                     <button
                                         className="panel-btn"
                                         onClick={() => updateComplaint(selectedComplaint._id, 'rejected')}
                                     >
-                                        Reject
+                                        {t('complaints.rejectBtn')}
                                     </button>
                                     <button
                                         className="panel-btn"
                                         onClick={() => deleteComplaint(selectedComplaint._id)}
                                     >
-                                        Delete
+                                        {t('dashboardCommon.delete')}
                                     </button>
                                 </div>
                             </>
                         ) : (
                             <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                                <p style={{ fontSize: '1.1rem' }}>Select a request to respond</p>
+                                <p style={{ fontSize: '1.1rem' }}>{t('complaints.selectRequestToRespond')}</p>
                             </div>
                         )}
                     </div>

@@ -14,7 +14,7 @@ interface Group {
     from: number;
     to: number;
     capacity: number;
-    students?: string[];
+    students?: any[];
     place: string;
 }
 
@@ -39,6 +39,8 @@ const GroupPanel: React.FC = () => {
 
     // --- Modal state ---
     const [showModal, setShowModal] = useState(false);
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
 
     // --- Lecture (main group) fields ---
     const [subject, setSubject] = useState("");
@@ -300,6 +302,15 @@ const GroupPanel: React.FC = () => {
         setShowModal(true);
     };
 
+    const handleRowClick = (group: Group) => {
+        if (isAdmin) {
+            handleEdit(group);
+            return;
+        }
+        setSelectedGroup(group);
+        setShowDetailsModal(true);
+    };
+
     const getTypeStyle = (type: string) => {
         switch (type.toLowerCase()) {
             case "lecture": return { backgroundColor: "var(--color-info-bg)", color: "var(--color-info)" };
@@ -308,6 +319,34 @@ const GroupPanel: React.FC = () => {
             case "seminar": return { backgroundColor: "var(--color-success-bg)", color: "var(--color-success)" };
             default: return { backgroundColor: "var(--color-border)", color: "var(--color-text-muted)" };
         }
+    };
+
+    const exportStudentsCsv = () => {
+        if (!selectedGroup?.students?.length) return;
+
+        const rows = [
+            ["studentId", "name"],
+            ...selectedGroup.students.map((student: any) => [
+                student.studentId || student.id || student._id || "",
+                student.name || "",
+            ]),
+        ];
+
+        const csvContent = rows
+            .map(row => row
+                .map(field => `"${String(field).replace(/"/g, '""')}"`)
+                .join(","))
+            .join("\r\n");
+
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `group-${selectedGroup.subject || "group"}-${selectedGroup.number || "list"}-students.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     };
 
     const filteredGroups = useMemo(() => {
@@ -379,8 +418,8 @@ const GroupPanel: React.FC = () => {
                     {paginatedGroups.map(group => (
                         <tr
                             key={group._id}
-                            onClick={() => isAdmin && handleEdit(group)}
-                            style={{ cursor: isAdmin ? "pointer" : "default" }}
+                            onClick={() => handleRowClick(group)}
+                            style={{ cursor: "pointer" }}
                         >
                             <td>{group.subject.toUpperCase()}</td>
                             <td>{group.number}</td>
@@ -649,6 +688,57 @@ const GroupPanel: React.FC = () => {
                                     </button>
                                 </div>
                             </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showDetailsModal && selectedGroup && (
+                <div className="modal-overlay" onMouseDown={(e) => {
+                    if (e.target === e.currentTarget) {
+                        setShowDetailsModal(false);
+                        setSelectedGroup(null);
+                    }
+                }}>
+                    <div className="modal-content" style={{ maxWidth: "700px" }}>
+                        <div className="modal-header">
+                            <h3>{t("groupPanel.detailsHeader")}</h3>
+                            <button className="modal-close" onClick={() => { setShowDetailsModal(false); setSelectedGroup(null); }} type="button">×</button>
+                        </div>
+                        <div className="modal-body">
+                            <div style={{ marginBottom: "16px" }}>
+                                <p><strong>{t("groupPanel.columnSubject")}:</strong> {selectedGroup.subject.toUpperCase()}</p>
+                                <p><strong>{t("groupPanel.columnGroupNumber")}:</strong> {selectedGroup.number}</p>
+                                <p><strong>{t("groupPanel.columnType")}:</strong> {selectedGroup.type}</p>
+                                <p><strong>{t("groupPanel.columnDay")}:</strong> {formatDay(selectedGroup.day)}</p>
+                                <p><strong>{t("groupPanel.columnFrom")}:</strong> {numberToTime(selectedGroup.from)}</p>
+                                <p><strong>{t("groupPanel.columnTo")}:</strong> {numberToTime(selectedGroup.to)}</p>
+                                <p><strong>{t("groupPanel.placeLabel") || "Place"}:</strong> {placeMap.get((selectedGroup as any).place) || (selectedGroup as any).place || "—"}</p>
+                                <p><strong>{t("groupPanel.capacityLabel")}:</strong> {selectedGroup.capacity}</p>
+                                <p><strong>{t("groupPanel.studentsLabel") || "Enrolled Students"}:</strong> {selectedGroup.students?.length ?? 0}</p>
+                            </div>
+                            <div>
+                                <p>
+                                    <strong>{t("groupPanel.studentsLabel") || "Students"}:</strong>
+                                    {` ${selectedGroup.students?.length ?? 0}`}
+                                </p>
+                                <button
+                                    type="button"
+                                    className="add-btn"
+                                    onClick={exportStudentsCsv}
+                                    disabled={!selectedGroup.students?.length}
+                                >
+                                    {t("groupPanel.exportStudentsBtn")}
+                                </button>
+                                {!selectedGroup.students?.length && (
+                                    <p>{t("groupPanel.noStudents") || "No students are enrolled in this group."}</p>
+                                )}
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="cancel-btn" onClick={() => { setShowDetailsModal(false); setSelectedGroup(null); }}>
+                                {t("dashboardCommon.close") || "Close"}
+                            </button>
                         </div>
                     </div>
                 </div>

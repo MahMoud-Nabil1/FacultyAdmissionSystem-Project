@@ -10,17 +10,18 @@ import {
 import { useLanguage } from "../src/context/LanguageContext";
 import { apiGet } from "../src/services/api";
 
-type CompletedSubject = {
-  _id: string;
-  code: string;
-  name: string;
-  level: string;
-  creditHours: number;
+type AcademicHistoryRecord = {
+  s_code: string;
+  s_name: string;
+  c_hours: number;
+  degree: number;
+  rate: string;
+  gpa: number;
 };
 
 export default function AcademicHistoryScreen() {
   const { t } = useLanguage();
-  const [data, setData] = useState<CompletedSubject[]>([]);
+  const [data, setData] = useState<AcademicHistoryRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +30,7 @@ export default function AcademicHistoryScreen() {
       try {
         setLoading(true);
         setError(null);
-        const response = await apiGet<CompletedSubject[]>(
+        const response = await apiGet<AcademicHistoryRecord[]>(
           "/students/my-academic-history"
         );
         setData(response.data);
@@ -73,7 +74,7 @@ export default function AcademicHistoryScreen() {
         <Text style={[styles.headerText, styles.codeHeader]}>{t("academicHistory.code")}</Text>
         <Text style={[styles.headerText, styles.nameHeader]}>{t("academicHistory.name")}</Text>
         <Text style={[styles.headerText, styles.creditHeader]}>{t("academicHistory.creditHours")}</Text>
-        <Text style={[styles.headerText, styles.levelHeader]}>{t("academicHistory.level")}</Text>
+        <Text style={[styles.headerText, styles.degreeHeader]}>{t("academicHistory.degree")}</Text>
       </View>
 
       {data.length === 0 ? (
@@ -85,17 +86,17 @@ export default function AcademicHistoryScreen() {
       ) : (
         <View style={styles.tableBody}>
           {data.map((subject, index) => (
-            <View 
+            <View
               style={[
-                styles.row, 
+                styles.row,
                 index % 2 === 0 ? styles.rowEven : styles.rowOdd
-              ]} 
-              key={subject._id}
+              ]}
+              key={`${subject.s_code}-${index}`}
             >
-              <Text style={[styles.cell, styles.codeCell]} numberOfLines={1}>{subject.code}</Text>
-              <Text style={[styles.cell, styles.nameCell]} numberOfLines={1}>{subject.name}</Text>
-              <Text style={[styles.cell, styles.creditCell]}>{subject.creditHours}</Text>
-              <Text style={[styles.cell, styles.levelCell]}>{subject.level}</Text>
+              <Text style={[styles.cell, styles.codeCell]} numberOfLines={1}>{subject.s_code}</Text>
+              <Text style={[styles.cell, styles.nameCell]} numberOfLines={1}>{subject.s_name}</Text>
+              <Text style={[styles.cell, styles.creditCell]}>{subject.c_hours}</Text>
+              <Text style={[styles.cell, styles.degreeCell]}>{subject.rate} ({subject.degree})</Text>
             </View>
           ))}
         </View>
@@ -154,8 +155,8 @@ const styles = StyleSheet.create({
   creditHeader: {
     flex: 1,
   },
-  levelHeader: {
-    flex: 1,
+  degreeHeader: {
+    flex: 1.2,
   },
   tableBody: {
     borderRadius: 12,
@@ -190,9 +191,11 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
   },
-  levelCell: {
-    flex: 1,
+  degreeCell: {
+    flex: 1.2,
     textAlign: 'center',
+    fontWeight: '600',
+    color: '#1a73e8',
   },
   loadingText: {
     marginTop: 16,

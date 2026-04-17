@@ -9,6 +9,10 @@ export interface IStudent {
     salt?: string;
     gpa: number;
     completedSubjects: Types.ObjectId[];
+    academicHistory: {
+        subject: Types.ObjectId;
+        degree: number;
+    }[];
     requestedSubjects: Types.ObjectId[];
     department?: Types.ObjectId;
     currentSessionId?: string | null;
@@ -61,6 +65,13 @@ const studentSchema = new Schema<IStudent>(
 
         completedSubjects: [
             { type: Schema.Types.ObjectId, ref: "Subject" },
+        ],
+
+        academicHistory: [
+            {
+                subject: { type: Schema.Types.ObjectId, ref: "Subject" },
+                degree: { type: Number, required: true, min: 0, max: 100 },
+            }
         ],
 
         requestedSubjects: [

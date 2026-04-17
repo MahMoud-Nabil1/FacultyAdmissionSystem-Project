@@ -229,19 +229,65 @@ export const getRegistrationStats = async (_req: Request, res: Response): Promis
 export const getMyAcademicHistory = async (req: Request, res: Response): Promise<void> => {
     try {
         const user = getUser(req);
-
+        console.log("getMyAcademicHistory - User:", user);
+        console.log("getMyAcademicHistory - User ID:", user.id);
 
         const student = await Student
             .findOne({ studentId: Number(user.id) })
-            .populate('completedSubjects');
+            .populate({
+                path: 'academicHistory.subject',
+                select: 'code name creditHours'
+            });
+
+        console.log("getMyAcademicHistory - Student found:", student ? 'Yes' : 'No');
+        console.log("getMyAcademicHistory - Academic History length:", student?.academicHistory?.length || 0);
 
         if (!student) {
             res.status(404).json({ error: "Student not found" });
             return;
         }
 
-        res.json(student.completedSubjects);
+        // Helper function to convert degree to grade letter
+        const getGrade = (degree: number): string => {
+            if (degree >= 90) return 'A+';
+            if (degree >= 85) return 'A';
+            if (degree >= 80) return 'B+';
+            if (degree >= 75) return 'B';
+            if (degree >= 70) return 'C+';
+            if (degree >= 65) return 'C';
+            if (degree >= 60) return 'D+';
+            if (degree >= 50) return 'D';
+            return 'F';
+        };
+
+        // Helper function to convert degree to GPA (4.0 scale)
+        const getGPA = (degree: number): number => {
+            if (degree >= 90) return 4.0;
+            if (degree >= 85) return 3.7;
+            if (degree >= 80) return 3.3;
+            if (degree >= 75) return 3.0;
+            if (degree >= 70) return 2.7;
+            if (degree >= 65) return 2.3;
+            if (degree >= 60) return 2.0;
+            if (degree >= 50) return 1.0;
+            return 0.0;
+        };
+
+        // Transform academic history to match frontend expectations
+        const academicHistory = student.academicHistory.map((entry: any) => ({
+            s_code: entry.subject?.code || 'Unknown',
+            s_name: entry.subject?.name || 'Unknown',
+            c_hours: entry.subject?.creditHours || 0,
+            degree: entry.degree,
+            rate: getGrade(entry.degree),
+            gpa: getGPA(entry.degree),
+        }));
+
+        console.log("getMyAcademicHistory - Returning", academicHistory.length, "records");
+        res.json(academicHistory);
     } catch (err: any) {
+        console.error("getMyAcademicHistory - ERROR:", err);
+        console.error("getMyAcademicHistory - Stack:", err.stack);
         res.status(500).json({ error: err.message });
     }
 };

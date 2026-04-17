@@ -1,14 +1,21 @@
 .academicHistoryPage {
-  padding: 24px;
+  padding: 40px 24px;
   background: #f7f9fc;
   min-height: 100vh;
+  width: 100%;
+}
+
+.academicHistoryPage .dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .academicHistoryHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .academicHistoryTitle {
@@ -21,8 +28,8 @@
 .academicHistoryTableCard {
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
@@ -32,8 +39,8 @@
   align-items: center;
   gap: 12px;
   padding: 20px 24px;
-  border-bottom: 1px solid #eef2f7;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-bottom: 1px solid #e5e7eb;
+  background: #fafafa;
 }
 
 .academicHistorySectionTitle {
@@ -83,12 +90,16 @@
   padding: 16px 24px;
   font-size: 14px;
   color: #1f2937;
-  border-bottom: 1px solid #eef2f7;
+  border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
 }
 
+.academicHistoryTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
 .academicHistoryTable tbody tr:hover {
-  background: #fafcff;
+  background: #f8fafc;
 }
 
 .academicHistoryCodeCell {
@@ -115,11 +126,29 @@
   padding: 32px 24px !important;
 }
 
+.academicHistoryLoading,
+.academicHistoryError {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.academicHistoryLoading p,
+.academicHistoryError p {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.academicHistoryError p {
+  color: #dc2626;
+}
+
 [dir="rtl"] .academicHistoryTable thead th,
 [dir="rtl"] .academicHistoryTable tbody td {
   text-align: right;
 }
 
+/* Mobile Styles */
 @media (max-width: 768px) {
   .academicHistoryPage {
     padding: 16px;
@@ -136,5 +165,94 @@
   .academicHistoryTable thead th,
   .academicHistoryTable tbody td {
     padding: 14px 16px;
+  }
+
+  /* Hide table on mobile, show cards instead */
+  .desktop-view {
+    display: none;
+  }
+
+  .mobile-view {
+    display: block;
+  }
+
+  .academicHistoryCardWrapper {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .academicHistoryCard {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.2s ease;
+  }
+
+  .academicHistoryCard:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .academicHistoryCardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .academicHistoryCardCode {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .academicHistoryCardGrade {
+    display: flex;
+    align-items: center;
+  }
+
+  .academicHistoryCardBody {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .academicHistoryCardRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  .academicHistoryCardLabel {
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .academicHistoryCardValue {
+    color: #1f2937;
+    font-weight: 600;
+  }
+
+  .academicHistoryCardGPA {
+    color: #4338ca;
+    font-size: 16px;
+    font-weight: 700;
+  }
+}
+
+/* Desktop: show table, hide cards */
+@media (min-width: 769px) {
+  .desktop-view {
+    display: block;
+  }
+
+  .mobile-view {
+    display: none;
   }
 }
