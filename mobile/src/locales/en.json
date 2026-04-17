@@ -20,6 +20,8 @@
     "groups": "Groups",
     "support": "Support",
     "register": "Register Subjects",
+    "profile": "Profile",
+    "advisor": "Advisor"
     "complaints": "Complaints",
     "profile": "Profile"
   },
@@ -275,6 +277,64 @@
       "tutorial": "Tutorial"
     }
   },
+  "advisor": {
+    "title": "Academic Advisor",
+    "subtitle": "Manage your advisees and track their academic progress",
+    "totalStudents": "Total Students",
+    "activeStudents": "Active",
+    "probationStudents": "On Probation",
+    "avgGpa": "Average GPA",
+    "searchPlaceholder": "Search by name, ID, or email...",
+    "myAdvisees": "My Advisees",
+    "noStudentsFound": "No students found",
+    "noAdvisees": "No advisees assigned to you",
+    "hours": "hours",
+    "level": "Level",
+    "status": {
+      "active": "Active",
+      "probation": "Probation",
+      "graduated": "Graduated",
+      "suspended": "Suspended"
+    },
+    "studentNotFound": "Student not found",
+    "goBack": "Go Back",
+    "academicOverview": "Academic Overview",
+    "gpa": "GPA",
+    "completedHours": "Completed Hours",
+    "registeredHours": "Registered Hours",
+    "totalSubjects": "Total Subjects",
+    "currentSubjects": "Current Subjects",
+    "subjectStatus": {
+      "enrolled": "Enrolled",
+      "completed": "Completed",
+      "failed": "Failed",
+      "withdrawn": "Withdrawn"
+    },
+    "creditHours": "credit hours",
+    "grade": "Grade",
+    "academicHistory": "Academic History",
+    "subjects": "subjects",
+    "actions": "Actions",
+    "sendEmail": "Send Email",
+    "generateReport": "Generate Report",
+    "studentSchedule": "Student Schedule",
+    "noSchedule": "No schedule available",
+    "registerSubject": "Register Subject",
+    "selectSubject": "Select a subject",
+    "availableGroups": "groups",
+    "seats": "seats",
+    "groupFull": "Group Full",
+    "register": "Register",
+    "registerSuccess": "Student registered successfully",
+    "registerFailed": "Registration failed",
+    "fetchGroupsFailed": "Failed to fetch available groups"
+  },
+  "schedule": {
+    "am": "AM",
+    "pm": "PM",
+    "days": {
+      "saturday": "Saturday",
+      "sunday": "Sunday",
   "register": {
     "title": "Register Subjects",
     "subtitle": "Select your schedule for the upcoming semester",
@@ -339,6 +399,9 @@
       "tuesday": "Tuesday",
       "wednesday": "Wednesday",
       "thursday": "Thursday",
+      "friday": "Friday"
+    },
+    "type": {
       "friday": "Friday",
       "saturday": "Saturday",
       "sunday": "Sunday"

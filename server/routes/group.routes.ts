@@ -17,6 +17,13 @@ router.post(
 );
 
 router.get(
+    '/student/:studentId',
+    authenticate,
+    requireRole(['admin', 'academic_guide', 'academic_guide_coordinator']),
+    groupController.getStudentGroups
+);
+
+router.get(
     '/',
     authenticate,
     groupController.getAllGroups

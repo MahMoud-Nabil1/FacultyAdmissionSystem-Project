@@ -72,7 +72,25 @@ export const getStudentById = async (req: Request, res: Response): Promise<void>
             return;
         }
 
-        res.json(student);
+        // Calculate derived fields
+        const completedHours = student.completedSubjects
+            .reduce((sum: number, subj: any) => sum + (subj.creditHours || 0), 0);
+
+        const registeredHours = student.requestedSubjects
+            .reduce((sum: number, subj: any) => sum + (subj.creditHours || 0), 0);
+
+        // Calculate level based on completed hours
+        let level = '1';
+        if (completedHours >= 90) level = '4';
+        else if (completedHours >= 60) level = '3';
+        else if (completedHours >= 30) level = '2';
+
+        res.json({
+            ...student.toObject(),
+            completedHours,
+            registeredHours,
+            level,
+        });
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }
@@ -313,6 +331,49 @@ export const assignAcademicAdvisor = async (req: Request, res: Response): Promis
         }
 
         res.json(student);
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const getMyAdvisees = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = getUser(req);
+
+        if (!user?.id) {
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
+
+        const students = await Student
+            .find({ academicAdvisor: user.id })
+            .populate('completedSubjects', 'creditHours')
+            .populate('department', 'name')
+            .sort({ name: 1 });
+
+        // Calculate derived fields for each student
+        const result = students.map(student => {
+            const completedHours = student.completedSubjects
+                .reduce((sum: number, subj: any) => sum + (subj.creditHours || 0), 0);
+
+            // Calculate level based on completed hours
+            let level = '1';
+            if (completedHours >= 90) level = '4';
+            else if (completedHours >= 60) level = '3';
+            else if (completedHours >= 30) level = '2';
+
+            return {
+                _id: student._id,
+                studentId: student.studentId,
+                name: student.name,
+                email: student.email,
+                gpa: student.gpa,
+                completedHours,
+                level,
+            };
+        });
+
+        res.json(result);
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }

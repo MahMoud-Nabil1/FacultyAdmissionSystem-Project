@@ -16,9 +16,11 @@ async function canManageStudent(staff: IStaff, studentId: string): Promise<boole
     // Admins can manage anyone
     if (staff.role === 'admin') return true;
 
-    // Academic guide: only assigned students
+    // Academic guide: check if student's academicAdvisor is this staff member
     if (staff.role === 'academic_guide') {
-        return staff.students.some(sId => sId.toString() === studentId.toString());
+        const student = await Student.findById(studentId);
+        if (!student) return false;
+        return student.academicAdvisor?.toString() === staff._id.toString();
     }
 
     // Academic guide coordinator: all students in coordinator's departments
@@ -66,6 +68,21 @@ export const createGroup = async (req: Request, res: Response): Promise<void> =>
 export const getAllGroups = async (_req: Request, res: Response): Promise<void> => {
     try {
         const groups = await Group.find().populate('students');
+        res.json(groups);
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const getStudentGroups = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { studentId } = req.params;
+
+        // Find all groups where this student is enrolled
+        const groups = await Group.find({ students: studentId })
+            .populate('place', 'name building room')
+            .sort({ day: 1, from: 1 });
+
         res.json(groups);
     } catch (err: any) {
         res.status(500).json({ error: err.message });
