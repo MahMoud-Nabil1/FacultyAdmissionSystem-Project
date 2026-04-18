@@ -3,141 +3,72 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../src/context/AuthContext';
 import { useLanguage } from '../../src/context/LanguageContext';
 
-/** Returns tab visibility options — hides tab button when condition is false */
-function tabVisibility(visible: boolean) {
-    return visible
-        ? {}
-        : {
-            tabBarButton: () => null,
-            tabBarItemStyle: { display: 'none' as const },
-        };
-}
-
 export default function TabsLayout() {
-    const { user, loading } = useAuth();
+    const { user } = useAuth();
     const { t } = useLanguage();
-    const isAdmin = user?.role === 'admin';
-    const isCoordinator = user?.role === 'academic_guide_coordinator';
+
     const isStudent = user?.role === 'student';
-    const isAcademicGuide = user?.role === 'academic_guide' || user?.role === 'academic_guide_coordinator';
-    const isReporter = user?.role === 'reporter';
 
     return (
         <Tabs
             screenOptions={{
                 headerShown: false,
-                headerTitle: '',
-                headerShadowVisible: false,
-                headerStyle: { backgroundColor: '#ffffff' },
                 tabBarActiveTintColor: '#1a73e8',
                 tabBarInactiveTintColor: '#9ca3af',
                 tabBarStyle: {
                     backgroundColor: '#ffffff',
                     borderTopWidth: 1,
                     borderTopColor: '#e5e7eb',
-                    height: 60,
-                    paddingBottom: 8,
-                    paddingTop: 4,
+                    height: 62,
+                    paddingBottom: 10,
+                    paddingTop: 6,
+                    elevation: 12,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: -3 },
+                    shadowOpacity: 0.08,
+                    shadowRadius: 8,
                 },
                 tabBarLabelStyle: {
-                    fontSize: 12,
-                    fontWeight: '600',
+                    fontSize: 11,
+                    fontWeight: '700',
+                    letterSpacing: 0.2,
                 },
             }}
         >
-            {/* ── Home — visible to everyone ── */}
+            {/* ── Home — always visible ── */}
             <Tabs.Screen
                 name="home"
                 options={{
                     title: t('tabs.home'),
                     tabBarLabel: t('tabs.home'),
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="home" size={size} color={color} />
+                    tabBarIcon: ({ color, size, focused }) => (
+                        <Ionicons name={focused ? 'home' : 'home-outline'} size={size} color={color} />
                     ),
                 }}
             />
 
-            {/* ── Edit — admin only ── */}
-            <Tabs.Screen
-                name="edit"
-                options={{
-                    title: t('tabs.edit'),
-                    tabBarLabel: t('tabs.edit'),
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="create-outline" size={size} color={color} />
-                    ),
-                    ...tabVisibility(isAdmin || isCoordinator),
-                }}
-            />
-
-            {/* ── Groups — student only ── */}
+            {/* ── Groups — student only, visible in tab bar ── */}
             <Tabs.Screen
                 name="groups"
                 options={{
                     title: t('tabs.groups'),
                     tabBarLabel: t('tabs.groups'),
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="people" size={size} color={color} />
+                    tabBarIcon: ({ color, size, focused }) => (
+                        <Ionicons name={focused ? 'people' : 'people-outline'} size={size} color={color} />
                     ),
-                    ...tabVisibility(isStudent),
+                    // hide for non-students
+                    tabBarButton: isStudent ? undefined : () => null,
+                    tabBarItemStyle: isStudent ? {} : { display: 'none' as const },
                 }}
             />
 
-            {/* ── Support — student only ── */}
-            <Tabs.Screen
-                name="support"
-                options={{
-                    title: t('tabs.support'),
-                    tabBarLabel: t('tabs.support'),
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="headset" size={size} color={color} />
-                    ),
-                    ...tabVisibility(isStudent),
-                }}
-            />
-
-            {/* ── Register Subjects — student only (hidden from tab bar, accessed via home) ── */}
-            <Tabs.Screen
-                name="register-subjects"
-                options={{
-                    href: null,
-                }}
-            />
-
-            {/* ── Advisor — academic guide only (hidden from tab bar, accessed via home) ── */}
-            <Tabs.Screen
-                name="advisor"
-                options={{
-                    href: null,
-                }}
-            />
-
-            {/* ── Register — student only ── */}
-            <Tabs.Screen
-                name="register"
-                options={{
-                    title: t('tabs.register'),
-                    tabBarLabel: t('tabs.register'),
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="document-text" size={size} color={color} />
-                    ),
-                    ...tabVisibility(isStudent),
-                }}
-            />
-
-            {/* ── Complaints — student only ── */}
-            <Tabs.Screen
-                name="complaints"
-                options={{
-                    title: t('tabs.complaints'),
-                    tabBarLabel: t('tabs.complaints'),
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="chatbubble-ellipses" size={size} color={color} />
-                    ),
-                    ...tabVisibility(isStudent),
-                }}
-            />
+            {/* ── Hidden screens — reachable from home screen cards ── */}
+            <Tabs.Screen name="edit"               options={{ href: null }} />
+            <Tabs.Screen name="support"            options={{ href: null }} />
+            <Tabs.Screen name="register"           options={{ href: null }} />
+            <Tabs.Screen name="register-subjects"  options={{ href: null }} />
+            <Tabs.Screen name="complaints"         options={{ href: null }} />
+            <Tabs.Screen name="advisor"            options={{ href: null }} />
         </Tabs>
     );
 }
-

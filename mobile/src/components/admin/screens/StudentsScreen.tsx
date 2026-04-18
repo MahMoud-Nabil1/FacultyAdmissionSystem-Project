@@ -5,7 +5,8 @@ import {
     KeyboardAvoidingView, Platform, RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import CustomHeader from '../../common/CustomHeader';
+import ScreenContainer from '../../common/ScreenContainer';
 import { getAllStudents, createStudent, deleteStudent } from '../../../services/api';
 import { useLanguage } from '../../../context/LanguageContext';
 import { useAuth } from '../../../context/AuthContext';
@@ -96,23 +97,15 @@ export default function StudentsScreen() {
     };
 
     return (
-        <ScrollView
-            style={styles.container}
-            contentContainerStyle={styles.content}
-            refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#1a73e8']} tintColor="#1a73e8" />
-            }
-        >
-            {/* Back Button */}
-            <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => router.back()}
-                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        <ScreenContainer>
+            <CustomHeader title={t('students.title')} />
+            <ScrollView
+                style={styles.scroll}
+                contentContainerStyle={styles.content}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#1a73e8']} tintColor="#1a73e8" />
+                }
             >
-                <Ionicons name="arrow-back" size={24} color="#1a73e8" />
-            </TouchableOpacity>
-
-            <Text style={styles.title}>👨‍🎓 {t('students.title')}</Text>
 
             {!readOnly && (
                 <TouchableOpacity
@@ -206,20 +199,22 @@ export default function StudentsScreen() {
                             <Text style={styles.rowSub}>{s.studentId} • {t('students.rowGpa', { gpa: s.gpa })}</Text>
                             <Text style={styles.rowSub}>{s.email}</Text>
                         </View>
-                        <TouchableOpacity onPress={() => handleDelete(s)} style={styles.deleteBtn}>
-                            <Ionicons name="trash-outline" size={20} color="#ef4444" />
-                        </TouchableOpacity>
+                        {!readOnly && (
+                            <TouchableOpacity onPress={() => handleDelete(s)} style={styles.deleteBtn}>
+                                <Ionicons name="trash-outline" size={20} color="#ef4444" />
+                            </TouchableOpacity>
+                        )}
                     </View>
                 ))
             )}
         </ScrollView>
+        </ScreenContainer>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f0f4ff' },
-    content: { padding: 20, paddingTop: 90, paddingBottom: 40 },
-    title: { fontSize: 22, fontWeight: '800', color: '#1a73e8', marginBottom: 16, textAlign: 'center' },
+    scroll: { flex: 1 },
+    content: { padding: 20, paddingBottom: 40 },
     btn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#1a73e8', borderRadius: 10, padding: 13, justifyContent: 'center', marginBottom: 16 },
     btnOutline: { backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#1a73e8' },
     btnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
@@ -272,11 +267,4 @@ const styles = StyleSheet.create({
     rowName: { fontSize: 15, fontWeight: '700', color: '#111' },
     rowSub: { fontSize: 12, color: '#6b7280', marginTop: 2 },
     deleteBtn: { padding: 6 },
-    backButton: {
-        position: 'absolute',
-        top: 50,
-        left: 20,
-        zIndex: 10,
-        padding: 4,
-    },
 });

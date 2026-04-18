@@ -12,6 +12,7 @@ export default function EditLayout() {
             <Stack.Screen name="staff" />
             <Stack.Screen name="subjects" />
             <Stack.Screen name="groups" />
+            <Stack.Screen name="places" />
             <Stack.Screen name="announcements" />
             <Stack.Screen name="profile" />
             <Stack.Screen name="registration" />

@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { useLanguage } from "../src/context/LanguageContext";
 import { apiGet } from "../src/services/api";
+import CustomHeader from "../src/components/common/CustomHeader";
+import ScreenContainer from "../src/components/common/ScreenContainer";
 
 type AcademicHistoryRecord = {
   s_code: string;
@@ -48,29 +50,36 @@ export default function AcademicHistoryScreen() {
 
   if (loading) {
     return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#1a73e8" />
-        <Text style={styles.loadingText}>
-          {t("academicHistory.loading")}
-        </Text>
-      </View>
+      <ScreenContainer>
+        <CustomHeader title={t("academicHistory.title")} />
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#1a73e8" />
+          <Text style={styles.loadingText}>
+            {t("academicHistory.loading")}
+          </Text>
+        </View>
+      </ScreenContainer>
     );
   }
 
   if (error && data.length === 0) {
     return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.errorText}>{error}</Text>
-      </View>
+      <ScreenContainer>
+        <CustomHeader title={t("academicHistory.title")} />
+        <View style={styles.centerContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      </ScreenContainer>
     );
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>{t("academicHistory.title")}</Text>
+    <ScreenContainer>
+      <CustomHeader title={t("academicHistory.title")} />
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
 
-      {/* Header Row */}
-      <View style={styles.headerRow}>
+        {/* Header Row */}
+        <View style={styles.headerRow}>
         <Text style={[styles.headerText, styles.codeHeader]}>{t("academicHistory.code")}</Text>
         <Text style={[styles.headerText, styles.nameHeader]}>{t("academicHistory.name")}</Text>
         <Text style={[styles.headerText, styles.creditHeader]}>{t("academicHistory.creditHours")}</Text>
@@ -101,18 +110,15 @@ export default function AcademicHistoryScreen() {
           ))}
         </View>
       )}
-    </ScrollView>
+      </ScrollView>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f0f4ff',
-  },
+  scroll: { flex: 1 },
   content: {
     padding: 20,
-    paddingTop: 90,
     paddingBottom: 40,
   },
   centerContainer: {
@@ -120,7 +126,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    backgroundColor: '#f0f4ff',
   },
   title: {
     fontSize: 24,

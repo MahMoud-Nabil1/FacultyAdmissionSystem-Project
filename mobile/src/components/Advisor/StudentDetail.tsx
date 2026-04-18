@@ -14,6 +14,8 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../../context/LanguageContext';
 import { apiGet, getStudentSchedule, registerStudentToGroup, getAllGroupsForAdvisor, ISubject } from '../../services/api';
+import CustomHeader from '../common/CustomHeader';
+import ScreenContainer from '../common/ScreenContainer';
 
 interface StudentDetail {
     _id: string;
@@ -171,17 +173,11 @@ const StudentDetail: React.FC = () => {
     }
 
     return (
-        <View style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity style={styles.backButtonHeader} onPress={() => router.back()}>
-                    <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1a73e8" />
-                </TouchableOpacity>
-                <View style={styles.headerInfo}>
-                    <Text style={styles.headerTitle}>{student.name}</Text>
-                    <Text style={styles.headerSubtitle}>{student.studentId}</Text>
-                </View>
-            </View>
+        <ScreenContainer>
+            <CustomHeader
+                title={student.name}
+                subtitle={student.studentId}
+            />
 
             <ScrollView
                 style={styles.content}
@@ -431,14 +427,13 @@ const StudentDetail: React.FC = () => {
                     </View>
                 </View>
             </Modal>
-        </View>
+        </ScreenContainer>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f0f4ff',
     },
     center: {
         flex: 1,

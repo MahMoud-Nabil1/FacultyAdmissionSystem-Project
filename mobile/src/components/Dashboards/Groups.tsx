@@ -18,6 +18,8 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useLanguage } from '../../context/LanguageContext';
 import { getAllGroups } from '../../services/api';
+import CustomHeader from '../common/CustomHeader';
+import ScreenContainer from '../common/ScreenContainer';
 
 type GroupType = 'lecture' | 'lab' | 'tutorial' | 'seminar';
 type WeekDay = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
@@ -137,14 +139,8 @@ export default function Groups() {
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()}>
-                    <Ionicons name="arrow-forward" size={26} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>{t('groupsScreen.title')}</Text>
-                <View style={{ width: 26 }} />
-            </View>
+        <ScreenContainer>
+            <CustomHeader title={t('groupsScreen.title')} showBack={false} />
 
             <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
                 {groups.length === 0 ? (
@@ -263,23 +259,13 @@ export default function Groups() {
                     </View>
                 </View>
             </Modal>
-        </View>
+        </ScreenContainer>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f8f9ff' },
+    container: { flex: 1 },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    header: {
-        backgroundColor: '#1a73e8',
-        paddingTop: 50,
-        paddingBottom: 18,
-        paddingHorizontal: 20,
-        flexDirection: 'row-reverse',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
     scroll: { padding: 20, paddingBottom: 40 },
     card: {
         backgroundColor: '#fff',

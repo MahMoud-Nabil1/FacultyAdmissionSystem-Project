@@ -6,6 +6,8 @@ import { Picker } from '@react-native-picker/picker';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { API_BASE } from '../../services/api';
+import CustomHeader from '../common/CustomHeader';
+import ScreenContainer from '../common/ScreenContainer';
 
 /* ── Types ── */
 interface SubjectData {
@@ -314,21 +316,27 @@ export default function RegisterSubjects() {
 
     if (loading) {
         return (
-            <View style={styles.center}>
-                <ActivityIndicator size="large" color="#1a73e8" />
-                <Text style={{ marginTop: 12, color: '#6b7280' }}>{t('register.loading')}</Text>
-            </View>
+            <ScreenContainer>
+                <CustomHeader title={t('register.title')} />
+                <View style={styles.center}>
+                    <ActivityIndicator size="large" color="#1a73e8" />
+                    <Text style={{ marginTop: 12, color: '#6b7280' }}>{t('register.loading')}</Text>
+                </View>
+            </ScreenContainer>
         );
     }
 
     if (error) {
         return (
-            <View style={styles.center}>
-                <Text style={styles.errorText}>{error}</Text>
-                <TouchableOpacity style={styles.retryBtn} onPress={fetchAll}>
-                    <Text style={styles.retryBtnText}>{t('common.error')}</Text>
-                </TouchableOpacity>
-            </View>
+            <ScreenContainer>
+                <CustomHeader title={t('register.title')} />
+                <View style={styles.center}>
+                    <Text style={styles.errorText}>{error}</Text>
+                    <TouchableOpacity style={styles.retryBtn} onPress={fetchAll}>
+                        <Text style={styles.retryBtnText}>{t('common.error')}</Text>
+                    </TouchableOpacity>
+                </View>
+            </ScreenContainer>
         );
     }
 
@@ -345,20 +353,16 @@ export default function RegisterSubjects() {
 
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-            {/* Header */}
-            <View style={styles.header}>
-                <Text style={[styles.title, { textAlign: textDir }]}>{t('register.title')}</Text>
-                <Text style={[styles.subtitle, { textAlign: textDir }]}>{t('register.subtitle')}</Text>
-            </View>
-
-            <View style={styles.creditCounter}>
-                <Text style={styles.creditLabel}>{t('register.selectedCredits')}</Text>
-                <Text style={styles.creditValue}>{enrolledHours} / {MAX_HOURS}</Text>
-                <View style={styles.progressBarBg}>
-                    <View style={[styles.progressBarFill, { width: `${Math.min((enrolledHours / MAX_HOURS) * 100, 100)}%` }]} />
+        <ScreenContainer>
+            <CustomHeader title={t('register.title')} />
+            <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+                <View style={styles.creditCounter}>
+                    <Text style={styles.creditLabel}>{t('register.selectedCredits')}</Text>
+                    <Text style={styles.creditValue}>{enrolledHours} / {MAX_HOURS}</Text>
+                    <View style={styles.progressBarBg}>
+                        <View style={[styles.progressBarFill, { width: `${Math.min((enrolledHours / MAX_HOURS) * 100, 100)}%` }]} />
+                    </View>
                 </View>
-            </View>
 
             {!registrationOpen && (
                 <View style={styles.alertBox}>
@@ -529,7 +533,8 @@ export default function RegisterSubjects() {
                     </View>
                 );
             })}
-        </ScrollView>
+            </ScrollView>
+        </ScreenContainer>
     );
 }
 
@@ -539,7 +544,7 @@ const styles = StyleSheet.create({
     retryBtn: { padding: 12, backgroundColor: '#1a73e8', borderRadius: 8 },
     retryBtnText: { color: '#fff', fontWeight: 'bold' },
 
-    container: { flex: 1, backgroundColor: '#f9fafb' },
+    scroll: { flex: 1 },
     content: { padding: 16, paddingBottom: 40 },
 
     header: { marginBottom: 16 },

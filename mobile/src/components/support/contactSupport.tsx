@@ -11,10 +11,11 @@ import {
     KeyboardAvoidingView,
     Platform,
 } from 'react-native';
-import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import CustomHeader from '../common/CustomHeader';
+import ScreenContainer from '../common/ScreenContainer';
 
 interface FormData {
     studentCode: string;
@@ -68,19 +69,13 @@ export default function SupportContact() {
     };
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.container}
-        >
+        <ScreenContainer>
+            <CustomHeader title={t('supportContact.titleIT')} />
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.flex1}
+            >
             <ScrollView contentContainerStyle={styles.scroll}>
-                {/* Back Button */}
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => router.back()}
-                    hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                >
-                    <Ionicons name="arrow-back" size={24} color="#1a73e8" />
-                </TouchableOpacity>
 
                 <View style={styles.card}>
                     <Text style={styles.headerIcon}>{isIT ? '👨‍💻' : '🏛️'}</Text>
@@ -155,13 +150,14 @@ export default function SupportContact() {
                     </View>
                 </View>
             </ScrollView>
-        </KeyboardAvoidingView>
+            </KeyboardAvoidingView>
+        </ScreenContainer>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f0f4ff' },
-    scroll: { padding: 20, paddingTop: 90, paddingBottom: 80 },
+    flex1: { flex: 1 },
+    scroll: { padding: 20, paddingTop: 24, paddingBottom: 80 },
     card: {
         backgroundColor: '#fff',
         borderRadius: 20,
@@ -199,11 +195,4 @@ const styles = StyleSheet.create({
     itBtn: { backgroundColor: '#1a73e8' },
     adminBtn: { backgroundColor: '#4b5563' },
     submitText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-    backButton: {
-        position: 'absolute',
-        top: 50,
-        left: 20,
-        zIndex: 10,
-        padding: 4,
-    },
 });

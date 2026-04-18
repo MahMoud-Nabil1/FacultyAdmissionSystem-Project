@@ -5,9 +5,11 @@ import {
     KeyboardAvoidingView, Platform, RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import CustomHeader from '../../common/CustomHeader';
+import ScreenContainer from '../../common/ScreenContainer';
 import { apiGet, apiPost, apiDelete } from '../../../services/api';
 import { useLanguage } from '../../../context/LanguageContext';
+import { useAuth } from '../../../context/AuthContext';
 
 interface Announcement { _id: string; title: string; content: string; createdAt: string; }
 
@@ -83,40 +85,31 @@ export default function AnnouncementsScreen() {
     };
 
     return (
-        <ScrollView
-            style={styles.container}
-            contentContainerStyle={styles.content}
-            refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#1a73e8']} tintColor="#1a73e8" />
-            }
-        >
-            {/* Back Button */}
-            <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => router.back()}
-                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        <ScreenContainer>
+            <CustomHeader title={t('announcements.title')} />
+            <ScrollView
+                style={styles.scroll}
+                contentContainerStyle={styles.content}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#1a73e8']} tintColor="#1a73e8" />
+                }
             >
-                <Ionicons name="arrow-back" size={24} color="#1a73e8" />
-            </TouchableOpacity>
+                <TouchableOpacity
+                    style={[styles.btn, showForm && styles.btnOutline]}
+                    onPress={() => {
+                        if (showForm) return closeModal();
+                        setForm(EMPTY);
+                        setError('');
+                        setShowForm(true);
+                    }}
+                >
+                    <Ionicons name={showForm ? 'close' : 'megaphone-outline'} size={18} color={showForm ? '#ef4444' : '#fff'} />
+                    <Text style={[styles.btnText, showForm && styles.btnTextOutline]}>
+                        {showForm ? t('common.cancel') : t('announcements.addNew')}
+                    </Text>
+                </TouchableOpacity>
 
-            <Text style={styles.title}>📣 {t('announcements.title')}</Text>
-
-            <TouchableOpacity
-                style={[styles.btn, showForm && styles.btnOutline]}
-                onPress={() => {
-                    if (showForm) return closeModal();
-                    setForm(EMPTY);
-                    setError('');
-                    setShowForm(true);
-                }}
-            >
-                <Ionicons name={showForm ? 'close' : 'megaphone-outline'} size={18} color={showForm ? '#ef4444' : '#fff'} />
-                <Text style={[styles.btnText, showForm && styles.btnTextOutline]}>
-                    {showForm ? t('common.cancel') : t('announcements.addNew')}
-                </Text>
-            </TouchableOpacity>
-
-            <Modal
+                <Modal
                 visible={showForm}
                 animationType="fade"
                 transparent
@@ -180,7 +173,7 @@ export default function AnnouncementsScreen() {
             </Modal>
 
             {loading ? (
-                <ActivityIndicator color="#ef4444" style={{ marginTop: 32 }} />
+                <ActivityIndicator color="#1a73e8" style={{ marginTop: 32 }} />
             ) : announcements.length === 0 ? (
                 <Text style={styles.empty}>{t('announcements.empty')}</Text>
             ) : (
@@ -199,13 +192,14 @@ export default function AnnouncementsScreen() {
                     </View>
                 ))
             )}
-        </ScrollView>
+            </ScrollView>
+        </ScreenContainer>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f0f4ff' },
-    content: { padding: 20, paddingTop: 90, paddingBottom: 40 },
+    scroll: { flex: 1 },
+    content: { padding: 20, paddingBottom: 40 },
     title: { fontSize: 22, fontWeight: '800', color: '#1a73e8', marginBottom: 16, textAlign: 'center' },
     btn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#1a73e8', borderRadius: 10, padding: 13, justifyContent: 'center', marginBottom: 16 },
     btnOutline: { backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#1a73e8' },

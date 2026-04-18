@@ -15,6 +15,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { getAdvisees, getAllStudents } from '../../services/api';
+import CustomHeader from '../common/CustomHeader';
+import ScreenContainer from '../common/ScreenContainer';
 
 interface Student {
     _id: string;
@@ -83,27 +85,20 @@ const AdvisorDashboard: React.FC = () => {
 
     if (loading) {
         return (
-            <View style={styles.center}>
-                <ActivityIndicator size="large" color="#1a73e8" />
-            </View>
+            <ScreenContainer>
+                <CustomHeader title={t('advisor.title')} showBack={false} />
+                <View style={styles.center}>
+                    <ActivityIndicator size="large" color="#1a73e8" />
+                </View>
+            </ScreenContainer>
         );
     }
 
     const totalStudents = students.length;
 
     return (
-        <View style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity style={styles.backButton} onPress={() => router.push('/home')}>
-                    <Ionicons name={isRTL ? 'chevron-forward' : 'chevron-back'} size={24} color="#1a73e8" />
-                </TouchableOpacity>
-                <View style={styles.headerText}>
-                    <Text style={styles.headerTitle}>{t('advisor.title')}</Text>
-                    <Text style={styles.headerSubtitle}>{t('advisor.subtitle')}</Text>
-                </View>
-            </View>
-
+        <ScreenContainer>
+            <CustomHeader title={t('advisor.title')} showBack={false} />
             <ScrollView
                 style={styles.content}
                 contentContainerStyle={styles.scrollContent}
@@ -111,7 +106,7 @@ const AdvisorDashboard: React.FC = () => {
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#1a73e8']} />
                 }
             >
-                {/* Total Students Text */}
+                {/* Total Students */}
                 <View style={styles.totalStudentsCard}>
                     <Text style={styles.totalStudentsText}>
                         {t('advisor.totalStudents')}: {totalStudents}
@@ -163,6 +158,7 @@ const AdvisorDashboard: React.FC = () => {
                                     <Text style={styles.studentName}>{student.name}</Text>
                                     <Text style={styles.studentId}>{student.studentId}</Text>
                                 </View>
+                                <Ionicons name="chevron-forward" size={18} color="#9ca3af" />
                             </View>
                             <View style={styles.studentDetails}>
                                 <View style={styles.detailItem}>
@@ -194,46 +190,15 @@ const AdvisorDashboard: React.FC = () => {
                     ))
                 )}
             </ScrollView>
-        </View>
+        </ScreenContainer>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f0f4ff',
-    },
     center: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    header: {
-        backgroundColor: '#ffffff',
-        paddingTop: 60,
-        paddingBottom: 20,
-        paddingHorizontal: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e5e7eb',
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-    },
-    backButton: {
-        padding: 8,
-    },
-    headerText: {
-        flex: 1,
-    },
-    headerTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#1f2937',
-    },
-    headerSubtitle: {
-        fontSize: 14,
-        color: '#6b7280',
-        marginTop: 4,
     },
     content: {
         flex: 1,

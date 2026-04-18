@@ -311,6 +311,24 @@ export async function getAllPlaces() {
     return data;
 }
 
+export async function createPlace(form: { name: string; type: string; capacity: number; building?: string; floor?: number }) {
+    const { res, data } = await apiPost('/places', form);
+    if (!res.ok) throw new Error((data as any).error || 'Failed to create place');
+    return data;
+}
+
+export async function updatePlace(id: string, form: { name?: string; type?: string; capacity?: number; building?: string; floor?: number; isActive?: boolean }) {
+    const { res, data } = await apiPut(`/places/${id}`, form);
+    if (!res.ok) throw new Error((data as any).error || 'Failed to update place');
+    return data;
+}
+
+export async function deletePlace(id: string) {
+    const { res, data } = await apiDelete(`/places/${id}`);
+    if (!res.ok) throw new Error((data as any).error || 'Failed to delete place');
+    return data;
+}
+
 // ── Announcements (staff) ────────────────────────────────────────────────────
 
 export interface IAnnouncement {

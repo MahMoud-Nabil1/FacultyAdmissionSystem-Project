@@ -12,11 +12,12 @@
     "edit": "Edit",
     "loading": "Loading...",
     "sending": "Sending...",
-    "logout": "Logout"
+    "logout": "Logout",
+    "viewOnly": "View Only"
   },
   "tabs": {
     "home": "Home",
-    "edit": "Edit",
+    "edit": "View",
     "groups": "Groups",
     "support": "Support",
     "register": "Register Subjects",
@@ -101,13 +102,14 @@
     "gpa": "GPA",
     "hours": "Hours",
     "servicesTitle": "Available services",
-    "registerSubjects": "Course registration",
+    "registerSubjects": "Course Registration",
     "academicHistory": "Academic History",
-    "studentsList": "My students list",
+    "studentsList": "My Students",
     "statistics": "Statistics",
     "complaints": "Complaints",
     "announcements": "Announcements",
-    "groupsManagement": "Groups Management",
+    "groupsManagement": "Groups",
+    "support": "Support",
     "logout": "Sign out"
   },
   "registerSubjects": {
@@ -130,6 +132,7 @@
     "staff": "Staff",
     "subjects": "Subjects",
     "groups": "Groups",
+    "places": "Places",
     "announcements": "Announcements",
     "registration": "Registration Control"
   },
@@ -139,6 +142,10 @@
     "announcements": "Announcements",
     "groups": "Groups",
     "students": "Students"
+  },
+  "advisorPanel": {
+    "title": "Advisor Panel",
+    "subtitle": "Choose a section to view"
   },
   "registration": {
     "title": "Registration Control",
@@ -239,6 +246,30 @@
       "academic_guide": "Academic guide",
       "academic_guide_coordinator": "Academic guide coordinator",
       "reporter": "Data reviewer"
+    }
+  },
+  "places": {
+    "title": "Places",
+    "addPlace": "Add new place",
+    "editPlace": "Edit place",
+    "nameRequired": "Place name is required",
+    "capacityRequired": "Capacity is required",
+    "deleteTitle": "Delete place",
+    "deleteMessage": "Delete {{name}}?",
+    "empty": "No places yet",
+    "capacity": "Capacity",
+    "floor": "Floor",
+    "placeholders": {
+      "name": "Place name",
+      "capacity": "Capacity",
+      "building": "Building",
+      "floor": "Floor"
+    },
+    "types": {
+      "hall": "Hall",
+      "room": "Room",
+      "lab": "Lab",
+      "lecture_hall": "Lecture Hall"
     }
   },
   "announcements": {
@@ -479,5 +510,8 @@
     "responseRequired": "Please enter a response message",
     "responseSent": "Response sent successfully!",
     "responseFailed": "Failed to send response"
+  },
+  "reports": {
+    "title": "Reports & Statistics"
   }
 }

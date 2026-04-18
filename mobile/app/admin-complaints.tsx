@@ -12,12 +12,12 @@ import {
     RefreshControl,
     Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../src/context/LanguageContext';
 import { useAuth } from '../src/context/AuthContext';
 import { getAllComplaints, respondToComplaint, IComplaint } from '../src/services/api';
+import CustomHeader from '../src/components/common/CustomHeader';
+import ScreenContainer from '../src/components/common/ScreenContainer';
 
 export default function AdminComplaintsScreen() {
     const { t, locale } = useLanguage();
@@ -112,27 +112,21 @@ export default function AdminComplaintsScreen() {
 
     if (loading) {
         return (
-            <SafeAreaView style={styles.safeArea}>
+            <ScreenContainer>
+                <CustomHeader title={t('home.complaints')} />
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#1a73e8" />
                     <Text style={styles.loadingText}>{t('common.loading')}</Text>
                 </View>
-            </SafeAreaView>
+            </ScreenContainer>
         );
     }
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Ionicons name={isRTL ? "arrow-back" : "arrow-back"} size={24} color="#111827" />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>{t('home.complaints')}</Text>
-                <View style={styles.placeholder} />
-            </View>
-
+        <ScreenContainer>
+            <CustomHeader title={t('home.complaints')} />
             <ScrollView
-                style={styles.container}
+                style={styles.scroll}
                 contentContainerStyle={styles.scrollContent}
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -219,7 +213,7 @@ export default function AdminComplaintsScreen() {
                         ))}
                     </View>
                 )}
-            </ScrollView>
+        </ScrollView>
 
             <Modal
                 visible={modalVisible}
@@ -302,45 +296,12 @@ export default function AdminComplaintsScreen() {
                     </View>
                 </View>
             </Modal>
-        </SafeAreaView>
+        </ScreenContainer>
     );
 }
 
 const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: '#f0f4ff',
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingVertical: 15,
-        backgroundColor: '#fff',
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-    },
-    backButton: {
-        width: 40,
-        height: 40,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#1f2937',
-    },
-    placeholder: {
-        width: 40,
-    },
-    container: {
-        flex: 1,
-    },
+    scroll: { flex: 1 },
     scrollContent: {
         padding: 20,
     },

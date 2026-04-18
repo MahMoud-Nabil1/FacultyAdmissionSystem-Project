@@ -12,11 +12,12 @@
     "edit": "تعديل",
     "loading": "جاري التحميل...",
     "sending": "جاري الإرسال...",
-    "logout": "تسجيل خروج"
+    "logout": "تسجيل خروج",
+    "viewOnly": "عرض فقط"
   },
   "tabs": {
     "home": "الرئيسية",
-    "edit": "تعديل",
+    "edit": "عرض",
     "groups": "المجموعات",
     "support": "الدعم",
     "register": "تسجيل المواد",
@@ -102,12 +103,13 @@
     "hours": "ساعة",
     "servicesTitle": "الخدمات المتاحة",
     "registerSubjects": "تسجيل المواد",
-    "academicHistory": "التاريخ الأكاديمي",
-    "studentsList": "قائمة طلابي",
+    "academicHistory": "السجل الأكاديمي",
+    "studentsList": "طلابي",
     "statistics": "الإحصائيات",
     "complaints": "الشكاوى",
     "announcements": "الإعلانات",
-    "groupsManagement": "إدارة المجموعات",
+    "groupsManagement": "المجموعات",
+    "support": "الدعم الفني",
     "logout": "تسجيل الخروج"
   },
   "registerSubjects": {
@@ -130,6 +132,7 @@
     "staff": "الموظفين",
     "subjects": "المقررات",
     "groups": "المجموعات",
+    "places": "القاعات",
     "announcements": "الإعلانات",
     "registration": "التحكم في التسجيل"
   },
@@ -139,6 +142,10 @@
     "announcements": "الإعلانات",
     "groups": "المجموعات",
     "students": "الطلاب"
+  },
+  "advisorPanel": {
+    "title": "لوحة المرشد",
+    "subtitle": "اختر القسم الذي تريد عرضه"
   },
   "registration": {
     "title": "التحكم في التسجيل",
@@ -239,6 +246,30 @@
       "academic_guide": "مرشد أكاديمى",
       "academic_guide_coordinator": "منسق الإرشاد الأكاديمى",
       "reporter": "مُراجع بيانات"
+    }
+  },
+  "places": {
+    "title": "القاعات",
+    "addPlace": "إضافة قاعة جديدة",
+    "editPlace": "تعديل القاعة",
+    "nameRequired": "اسم القاعة مطلوب",
+    "capacityRequired": "السعة مطلوبة",
+    "deleteTitle": "حذف القاعة",
+    "deleteMessage": "هل تريد حذف {{name}}؟",
+    "empty": "لا توجد قاعات حتى الآن",
+    "capacity": "السعة",
+    "floor": "الدور",
+    "placeholders": {
+      "name": "اسم القاعة",
+      "capacity": "السعة",
+      "building": "المبنى",
+      "floor": "الدور"
+    },
+    "types": {
+      "hall": "قاعة",
+      "room": "غرفة",
+      "lab": "مختبر",
+      "lecture_hall": "قاعة محاضرات"
     }
   },
   "announcements": {
@@ -525,5 +556,8 @@
     "responseRequired": "الرجاء إدخال رسالة رد",
     "responseSent": "تم إرسال الرد بنجاح!",
     "responseFailed": "فشل في إرسال الرد"
+  },
+  "reports": {
+    "title": "التقارير والإحصائيات"
   }
 }

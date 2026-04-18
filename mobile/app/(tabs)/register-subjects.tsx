@@ -9,13 +9,15 @@ import {
     TouchableOpacity,
     FlatList,
 } from 'react-native';
-import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 import { useAuth } from '../../src/context/AuthContext';
 import { useLanguage } from '../../src/context/LanguageContext';
 import { getEligibleSubjects, getAllGroups, apiPost, ISubject } from '../../src/services/api';
 import { IGroup } from '../../src/components/Dashboards/Groups';
+import CustomHeader from '../../src/components/common/CustomHeader';
+import ScreenContainer from '../../src/components/common/ScreenContainer';
 
 export default function RegisterSubjects() {
     const { token } = useAuth();
@@ -149,22 +151,18 @@ export default function RegisterSubjects() {
 
     if (loading) {
         return (
-            <View style={styles.center}>
-                <ActivityIndicator size="large" color="#1a73e8" />
-            </View>
+            <ScreenContainer>
+                <CustomHeader title={t('registerSubjects.title')} />
+                <View style={styles.center}>
+                    <ActivityIndicator size="large" color="#1a73e8" />
+                </View>
+            </ScreenContainer>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()}>
-                    <Ionicons name="arrow-forward" size={26} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>{t('registerSubjects.title')}</Text>
-                <View style={{ width: 26 }} />
-            </View>
-
+        <ScreenContainer>
+            <CustomHeader title={t('registerSubjects.title')} />
             <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
                 {eligibleSubjects.length === 0 ? (
                     <View style={styles.emptyState}>
@@ -184,26 +182,15 @@ export default function RegisterSubjects() {
                     />
                 )}
             </ScrollView>
-        </View>
+        </ScreenContainer>
     );
 }
 
-const BRAND_BLUE = '#004a99';
-const BRAND_LIGHT_BG = '#eef6ff';
+const ACCENT = '#1a73e8';
+const LIGHT_BG = '#f0f4ff';
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: BRAND_LIGHT_BG },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    header: {
-        backgroundColor: BRAND_BLUE,
-        paddingTop: 50,
-        paddingBottom: 18,
-        paddingHorizontal: 20,
-        flexDirection: 'row-reverse',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
     scroll: { padding: 20, paddingBottom: 40 },
     listContainer: { paddingBottom: 20 },
     subjectCard: {
@@ -212,7 +199,7 @@ const styles = StyleSheet.create({
         padding: 18,
         marginBottom: 14,
         borderLeftWidth: 4,
-        borderLeftColor: BRAND_BLUE,
+        borderLeftColor: ACCENT,
         elevation: 3,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -223,17 +210,17 @@ const styles = StyleSheet.create({
         borderLeftColor: '#10b981',
     },
     subjectHeader: {
-        flexDirection: 'row-reverse',
+        flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
     subjectInfo: { flex: 1 },
-    subjectCode: { fontSize: 16, fontWeight: '700', color: '#1f2937', textAlign: 'right' },
-    subjectName: { fontSize: 14, color: '#6b7280', textAlign: 'right', marginTop: 4 },
-    subjectCredits: { fontSize: 12, color: BRAND_BLUE, fontWeight: '600', textAlign: 'right', marginTop: 4 },
+    subjectCode: { fontSize: 16, fontWeight: '700', color: '#1f2937' },
+    subjectName: { fontSize: 14, color: '#6b7280', marginTop: 4 },
+    subjectCredits: { fontSize: 12, color: ACCENT, fontWeight: '600', marginTop: 4 },
     groupsContainer: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: '#f0f0f0' },
     groupItem: {
-        flexDirection: 'row-reverse',
+        flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingVertical: 12,
@@ -241,13 +228,13 @@ const styles = StyleSheet.create({
         borderBottomColor: '#f0f0f0',
     },
     groupInfo: { flex: 1 },
-    groupNumber: { fontSize: 14, fontWeight: '600', color: '#1f2937', textAlign: 'right' },
-    groupType: { fontSize: 12, color: '#6b7280', textAlign: 'right', marginTop: 2 },
-    groupDay: { fontSize: 12, color: '#6b7280', textAlign: 'right', marginTop: 2 },
-    groupTime: { fontSize: 12, color: BRAND_BLUE, fontWeight: '500', textAlign: 'right', marginTop: 2 },
-    groupPlace: { fontSize: 11, color: '#9ca3af', textAlign: 'right', marginTop: 2 },
+    groupNumber: { fontSize: 14, fontWeight: '600', color: '#1f2937' },
+    groupType: { fontSize: 12, color: '#6b7280', marginTop: 2 },
+    groupDay: { fontSize: 12, color: '#6b7280', marginTop: 2 },
+    groupTime: { fontSize: 12, color: ACCENT, fontWeight: '500', marginTop: 2 },
+    groupPlace: { fontSize: 11, color: '#9ca3af', marginTop: 2 },
     requestButton: {
-        backgroundColor: BRAND_BLUE,
+        backgroundColor: ACCENT,
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 8,

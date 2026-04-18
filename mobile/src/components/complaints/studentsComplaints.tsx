@@ -15,6 +15,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { API_BASE } from '../../services/api';
+import CustomHeader from '../common/CustomHeader';
+import ScreenContainer from '../common/ScreenContainer';
 
 interface Complaint {
     _id: string;
@@ -277,17 +279,11 @@ const StudentComplaintPage: React.FC = () => {
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <View style={styles.headerContent}>
-                    <Ionicons name="document-text-outline" size={28} color="#fff" />
-                    <Text style={styles.headerTitle}>{t('complaints.appTitle')}</Text>
-                </View>
-                <Text style={styles.welcomeText}>
-                    {t('complaints.welcome')}, <Text style={styles.boldText}>{userData.name || userData.studentId}</Text> | {t('complaints.studentIdLabel')}:{' '}
-                    <Text style={styles.boldText}>{userData.studentId}</Text>
-                </Text>
-            </View>
+        <ScreenContainer>
+            <CustomHeader
+                title={t('complaints.appTitle')}
+                subtitle={`${userData.name || userData.studentId}`}
+            />
 
             <View style={styles.tabContainer}>
                 <TouchableOpacity
@@ -537,20 +533,18 @@ const StudentComplaintPage: React.FC = () => {
                     )}
                 </ScrollView>
             )}
-        </View>
+        </ScreenContainer>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#eef6ff',
     },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#eef6ff',
     },
     loadingText: {
         marginTop: 10,
@@ -587,32 +581,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    header: {
-        backgroundColor: '#004a99',
-        paddingTop: 50,
-        paddingBottom: 18,
-        paddingHorizontal: 20,
-    },
-    headerContent: {
-        flexDirection: 'row-reverse',
-        alignItems: 'center',
-        gap: 10,
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#fff',
-    },
-    welcomeText: {
-        textAlign: 'center',
-        color: '#e5e7eb',
-        fontSize: 14,
-        marginTop: 10,
-    },
-    boldText: {
-        fontWeight: 'bold',
-        color: '#fff',
-    },
+
     tabContainer: {
         flexDirection: 'row',
         backgroundColor: '#fff',
