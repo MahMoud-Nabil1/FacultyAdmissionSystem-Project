@@ -4,41 +4,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../../context/LanguageContext';
 
 const SECTIONS = [
-    {
-        titleKey: 'editPanel.students' as const,
-        icon: 'school-outline' as const,
-        color: '#3b82f6',
-        bg: '#eff6ff',
-        route: '/(tabs)/edit/students',
-    },
-    {
-        titleKey: 'editPanel.staff' as const,
-        icon: 'people-outline' as const,
-        color: '#3b82f6',
-        bg: '#eff6ff',
-        route: '/(tabs)/edit/staff',
-    },
-    {
-        titleKey: 'editPanel.subjects' as const,
-        icon: 'book-outline' as const,
-        color: '#3b82f6',
-        bg: '#eff6ff',
-        route: '/(tabs)/edit/subjects',
-    },
-    {
-        titleKey: 'editPanel.groups' as const,
-        icon: 'grid-outline' as const,
-        color: '#3b82f6',
-        bg: '#eff6ff',
-        route: '/(tabs)/edit/groups',
-    },
-    {
-        titleKey: 'editPanel.announcements' as const,
-        icon: 'megaphone-outline' as const,
-        color: '#3b82f6',
-        bg: '#eff6ff',
-        route: '/(tabs)/edit/announcements',
-    },
+    { titleKey: 'editPanel.students' as const,     icon: 'school-outline' as const,    color: '#1a73e8', bg: '#eff6ff', route: '/(tabs)/edit/students' },
+    { titleKey: 'editPanel.staff' as const,        icon: 'people-outline' as const,    color: '#1a73e8', bg: '#eff6ff', route: '/(tabs)/edit/staff' },
+    { titleKey: 'editPanel.subjects' as const,     icon: 'book-outline' as const,      color: '#1a73e8', bg: '#eff6ff', route: '/(tabs)/edit/subjects' },
+    { titleKey: 'editPanel.groups' as const,       icon: 'grid-outline' as const,      color: '#1a73e8', bg: '#eff6ff', route: '/(tabs)/edit/groups' },
+    { titleKey: 'editPanel.announcements' as const,icon: 'megaphone-outline' as const, color: '#1a73e8', bg: '#eff6ff', route: '/(tabs)/edit/announcements' },
+    { titleKey: 'editPanel.registration' as const, icon: 'toggle-outline' as const,    color: '#1a73e8', bg: '#eff6ff', route: '/(tabs)/edit/registration' },
 ] as const;
 
 export default function EditPanel() {

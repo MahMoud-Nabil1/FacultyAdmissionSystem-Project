@@ -20,8 +20,6 @@
     "groups": "Groups",
     "support": "Support",
     "register": "Register Subjects",
-    "profile": "Profile",
-    "advisor": "Advisor"
     "complaints": "Complaints",
     "profile": "Profile"
   },
@@ -108,6 +106,8 @@
     "studentsList": "My students list",
     "statistics": "Statistics",
     "complaints": "Complaints",
+    "announcements": "Announcements",
+    "groupsManagement": "Groups Management",
     "logout": "Sign out"
   },
   "registerSubjects": {
@@ -130,7 +130,35 @@
     "staff": "Staff",
     "subjects": "Subjects",
     "groups": "Groups",
-    "announcements": "Announcements"
+    "announcements": "Announcements",
+    "registration": "Registration Control"
+  },
+  "coordinatorPanel": {
+    "title": "Coordinator Panel",
+    "subtitle": "Choose a section to manage",
+    "announcements": "Announcements",
+    "groups": "Groups",
+    "students": "Students"
+  },
+  "registration": {
+    "title": "Registration Control",
+    "subtitle": "Toggle student registration and withdrawal windows",
+    "registrationStatus": "Course Registration",
+    "withdrawalStatus": "Course Withdrawal",
+    "open": "Open",
+    "closed": "Closed",
+    "updateFailed": "Failed to update setting",
+    "infoNote": "Changes take effect immediately for all students.",
+    "gpaRange": "GPA Range for Registration",
+    "gpaMin": "Minimum GPA",
+    "gpaMax": "Maximum GPA",
+    "gpaInvalid": "Please enter valid GPA values.",
+    "gpaMinMax": "Minimum GPA must be less than maximum.",
+    "gpaRange2": "GPA values must be between 0 and 5.",
+    "gpaSaved": "GPA settings saved successfully.",
+    "saveGpa": "Save GPA & Levels",
+    "availableLevels": "Available Registration Levels",
+    "level": "Level"
   },
   "groups": {
     "title": "Groups",
@@ -286,6 +314,7 @@
     "avgGpa": "Average GPA",
     "searchPlaceholder": "Search by name, ID, or email...",
     "myAdvisees": "My Advisees",
+    "allStudents": "All Students",
     "noStudentsFound": "No students found",
     "noAdvisees": "No advisees assigned to you",
     "hours": "hours",
@@ -335,53 +364,17 @@
     "days": {
       "saturday": "Saturday",
       "sunday": "Sunday",
-  "register": {
-    "title": "Register Subjects",
-    "subtitle": "Select your schedule for the upcoming semester",
-    "selectedCredits": "Selected Credits:",
-    "hrs": "hrs",
-    "loading": "Loading registration data...",
-    "closed": "Registration Closed",
-    "closedMessage": "Registration is currently closed. You cannot request new groups at this time.",
-    "registeredTitle": "My Schedule",
-    "myRequestsTitle": "My Requests",
-    "availableTitle": "Available Subjects",
-    "chooseSubject": "Choose Subject",
-    "selectPlaceholder": "Select a subject...",
-    "corequisiteNotice": "Co-requisites required",
-    "noGroupsForSubject": "No available groups for this subject.",
-    "colSubject": "Subject",
-    "colGroup": "Group",
-    "colType": "Type",
-    "colStatus": "Status",
-    "colActions": "Actions",
-    "status": {
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "enrolled": "Enrolled"
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday"
     },
-    "errors": {
-      "maxHoursExceeded": "Maximum credit hours exceeded.",
-      "corequisitesRequired": "Must also register for: {{subjects}}"
-    },
-    "removeBtn": "Remove",
-    "cancelRequestBtn": "Cancel Request",
-    "requestBtn": "Request",
-    "success": "Request sent successfully",
-    "cancelSuccess": "Request cancelled",
-    "removeSuccess": "Removed successfully",
-    "failed": "Action failed",
-    "noRegistered": "No registered subjects."
-  },
-  "groupsSchedule": {
-    "groupNumber": "Group {{number}}",
-    "am": "AM",
-    "pm": "PM",
-    "typeValues": {
+    "type": {
       "lecture": "Lecture",
       "lab": "Lab",
-      "tutorial": "Tutorial"
+      "tutorial": "Tutorial",
+      "seminar": "Seminar"
     }
   },
   "groupsScreen": {
@@ -411,7 +404,19 @@
       "lab": "Lab",
       "tutorial": "Tutorial",
       "seminar": "Seminar"
-    }
+    },
+    "detailsTitle": "Group details",
+    "subject": "Subject",
+    "groupNumberLabel": "Group",
+    "type": "Type",
+    "schedule": "Schedule",
+    "place": "Place",
+    "noPlace": "No place assigned",
+    "capacity": "Capacity",
+    "enrolled": "Enrolled",
+    "studentAnonymous": "Student",
+    "noStudents": "No students enrolled yet.",
+    "downloadCsv": "Download CSV"
   },
   "academicHistory": {
     "title": "Academic History",

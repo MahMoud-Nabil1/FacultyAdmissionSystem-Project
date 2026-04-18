@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { getAllSubjects, createSubject, updateSubject, deleteSubject } from '../../../services/api';
 import { useLanguage } from '../../../context/LanguageContext';
+import { useAuth } from '../../../context/AuthContext';
 
 interface Subject { _id: string; code: string; name: string; creditHours: number; }
 
@@ -15,6 +16,8 @@ const EMPTY = { code: '', name: '', creditHours: '' };
 
 export default function SubjectsScreen() {
     const { t } = useLanguage();
+    const { user } = useAuth();
+    const readOnly = user?.role === 'academic_guide_coordinator';
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -103,18 +106,20 @@ export default function SubjectsScreen() {
 
             <Text style={styles.title}>📚 {t('subjects.title')}</Text>
 
-            <TouchableOpacity
-                style={[styles.btn, showForm && !editingId && styles.btnOutline]}
-                onPress={() => {
-                    if (showForm) return closeModal();
-                    return openAdd();
-                }}
-            >
-                <Ionicons name={showForm && !editingId ? 'close' : 'add-circle-outline'} size={18} color={showForm && !editingId ? '#10b981' : '#fff'} />
-                <Text style={[styles.btnText, showForm && !editingId && styles.btnTextOutline]}>
-                    {showForm && !editingId ? t('subjects.cancel') : t('subjects.addSubject')}
-                </Text>
-            </TouchableOpacity>
+            {!readOnly && (
+                <TouchableOpacity
+                    style={[styles.btn, showForm && !editingId && styles.btnOutline]}
+                    onPress={() => {
+                        if (showForm) return closeModal();
+                        return openAdd();
+                    }}
+                >
+                    <Ionicons name={showForm && !editingId ? 'close' : 'add-circle-outline'} size={18} color={showForm && !editingId ? '#10b981' : '#fff'} />
+                    <Text style={[styles.btnText, showForm && !editingId && styles.btnTextOutline]}>
+                        {showForm && !editingId ? t('subjects.cancel') : t('subjects.addSubject')}
+                    </Text>
+                </TouchableOpacity>
+            )}
 
             <Modal
                 visible={showForm}

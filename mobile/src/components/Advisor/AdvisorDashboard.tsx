@@ -14,7 +14,7 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { getAdvisees, apiGet } from '../../services/api';
+import { getAdvisees, getAllStudents } from '../../services/api';
 
 interface Student {
     _id: string;
@@ -30,6 +30,7 @@ const AdvisorDashboard: React.FC = () => {
     const { user } = useAuth();
     const { t, locale } = useLanguage();
     const isRTL = locale === 'ar';
+    const isCoordinator = user?.role === 'academic_guide_coordinator';
     const [students, setStudents] = useState<Student[]>([]);
     const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -37,17 +38,20 @@ const AdvisorDashboard: React.FC = () => {
     const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
-        fetchAdvisees();
+        fetchStudents();
     }, []);
 
-    const fetchAdvisees = async () => {
+    const fetchStudents = async () => {
         try {
             setLoading(true);
-            const data = await getAdvisees();
+            // Coordinators see all students; guides see only their assigned advisees
+            const data = isCoordinator
+                ? await getAllStudents()
+                : await getAdvisees();
             setStudents(data as unknown as Student[]);
             setFilteredStudents(data as unknown as Student[]);
         } catch (error) {
-            const message = error instanceof Error ? error.message : 'Failed to fetch advisees';
+            const message = error instanceof Error ? error.message : 'Failed to fetch students';
             Alert.alert(t('common.error'), message);
         } finally {
             setLoading(false);
@@ -56,7 +60,7 @@ const AdvisorDashboard: React.FC = () => {
 
     const onRefresh = async () => {
         setRefreshing(true);
-        await fetchAdvisees();
+        await fetchStudents();
         setRefreshing(false);
     };
 
@@ -132,7 +136,9 @@ const AdvisorDashboard: React.FC = () => {
                 </View>
 
                 {/* Students List */}
-                <Text style={styles.sectionTitle}>{t('advisor.myAdvisees')}</Text>
+                <Text style={styles.sectionTitle}>
+                    {isCoordinator ? t('advisor.allStudents') : t('advisor.myAdvisees')}
+                </Text>
                 {filteredStudents.length === 0 ? (
                     <View style={styles.emptyContainer}>
                         <Ionicons name="people-outline" size={64} color="#d1d5db" />

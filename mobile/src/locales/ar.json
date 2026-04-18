@@ -20,8 +20,6 @@
     "groups": "المجموعات",
     "support": "الدعم",
     "register": "تسجيل المواد",
-    "profile": "الملف الشخصي",
-    "advisor": "المرشد الأكاديمي"
     "complaints": "الشكاوى",
     "profile": "الملف الشخصي"
   },
@@ -108,6 +106,8 @@
     "studentsList": "قائمة طلابي",
     "statistics": "الإحصائيات",
     "complaints": "الشكاوى",
+    "announcements": "الإعلانات",
+    "groupsManagement": "إدارة المجموعات",
     "logout": "تسجيل الخروج"
   },
   "registerSubjects": {
@@ -130,7 +130,35 @@
     "staff": "الموظفين",
     "subjects": "المقررات",
     "groups": "المجموعات",
-    "announcements": "الإعلانات"
+    "announcements": "الإعلانات",
+    "registration": "التحكم في التسجيل"
+  },
+  "coordinatorPanel": {
+    "title": "لوحة المنسق",
+    "subtitle": "اختر القسم الذي تريد تعديله",
+    "announcements": "الإعلانات",
+    "groups": "المجموعات",
+    "students": "الطلاب"
+  },
+  "registration": {
+    "title": "التحكم في التسجيل",
+    "subtitle": "تفعيل أو تعطيل نوافذ تسجيل الطلاب والانسحاب",
+    "registrationStatus": "تسجيل المواد",
+    "withdrawalStatus": "الانسحاب من المواد",
+    "open": "مفتوح",
+    "closed": "مغلق",
+    "updateFailed": "فشل تحديث الإعداد",
+    "infoNote": "تسري التغييرات فورًا على جميع الطلاب.",
+    "gpaRange": "نطاق المعدل للتسجيل",
+    "gpaMin": "الحد الأدنى للمعدل",
+    "gpaMax": "الحد الأقصى للمعدل",
+    "gpaInvalid": "يرجى إدخال قيم معدل صحيحة.",
+    "gpaMinMax": "يجب أن يكون الحد الأدنى أقل من الحد الأقصى.",
+    "gpaRange2": "يجب أن تكون قيم المعدل بين 0 و 5.",
+    "gpaSaved": "تم حفظ إعدادات المعدل بنجاح.",
+    "saveGpa": "حفظ المعدل والمستويات",
+    "availableLevels": "مستويات التسجيل المتاحة",
+    "level": "مستوى"
   },
   "groups": {
     "title": "المجموعات",
@@ -286,6 +314,7 @@
     "avgGpa": "متوسط المعدل",
     "searchPlaceholder": "البحث بالاسم أو الكود أو البريد...",
     "myAdvisees": "طلابي المسندين",
+    "allStudents": "جميع الطلاب",
     "noStudentsFound": "لم يتم العثور على طلاب",
     "noAdvisees": "لا يوجد طلاب مساندين",
     "hours": "ساعات",
@@ -421,7 +450,19 @@
       "lab": "معمل",
       "tutorial": "تمرين",
       "seminar": "سيمينار"
-    }
+    },
+    "detailsTitle": "تفاصيل المجموعة",
+    "subject": "المادة",
+    "groupNumberLabel": "المجموعة",
+    "type": "النوع",
+    "schedule": "الجدول",
+    "place": "المكان",
+    "noPlace": "لا يوجد مكان",
+    "capacity": "السعة",
+    "enrolled": "الطلاب المسجلون",
+    "studentAnonymous": "طالب",
+    "noStudents": "لا يوجد طلاب مسجلين حتى الآن.",
+    "downloadCsv": "تحميل CSV"
   },
   "academicHistory": {
     "title": "السجل الأكاديمي",

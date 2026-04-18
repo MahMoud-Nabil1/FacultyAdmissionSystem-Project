@@ -21,7 +21,7 @@ router.post(
 router.put(
     '/settings',
     authenticate,
-    requireRole(['admin']),
+    requireRole(['admin', 'academic_guide_coordinator']),
     adminCtrl.updateSettings
 );
 

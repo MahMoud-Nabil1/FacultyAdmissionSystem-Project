@@ -9,6 +9,7 @@ import { router } from 'expo-router';
 import { Picker } from '@react-native-picker/picker';
 import { getAllStaff, createStaff, deleteStaff } from '../../../services/api';
 import { useLanguage } from '../../../context/LanguageContext';
+import { useAuth } from '../../../context/AuthContext';
 
 const STAFF_ROLE_KEYS = ['admin', 'academic_guide', 'academic_guide_coordinator', 'reporter'] as const;
 
@@ -18,6 +19,8 @@ interface Staff { _id: string; name: string; email: string; role: string; }
 
 export default function StaffScreen() {
     const { t } = useLanguage();
+    const { user } = useAuth();
+    const readOnly = user?.role === 'academic_guide_coordinator';
     const [staff, setStaff] = useState<Staff[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -87,18 +90,20 @@ export default function StaffScreen() {
 
             <Text style={styles.title}>👨‍💼 {t('staff.title')}</Text>
 
-            <TouchableOpacity
-                style={[styles.btn, showForm && styles.btnOutline]}
-                onPress={() => {
-                    if (showForm) return closeModal();
-                    setError('');
-                    setForm(EMPTY);
-                    setShowForm(true);
-                }}
-            >
-                <Ionicons name={showForm ? 'close' : 'person-add-outline'} size={18} color={showForm ? '#8b5cf6' : '#fff'} />
-                <Text style={[styles.btnText, showForm && styles.btnTextOutline]}>{showForm ? t('staff.cancel') : t('staff.addStaff')}</Text>
-            </TouchableOpacity>
+            {!readOnly && (
+                <TouchableOpacity
+                    style={[styles.btn, showForm && styles.btnOutline]}
+                    onPress={() => {
+                        if (showForm) return closeModal();
+                        setError('');
+                        setForm(EMPTY);
+                        setShowForm(true);
+                    }}
+                >
+                    <Ionicons name={showForm ? 'close' : 'person-add-outline'} size={18} color={showForm ? '#8b5cf6' : '#fff'} />
+                    <Text style={[styles.btnText, showForm && styles.btnTextOutline]}>{showForm ? t('staff.cancel') : t('staff.addStaff')}</Text>
+                </TouchableOpacity>
+            )}
 
             <Modal
                 visible={showForm}

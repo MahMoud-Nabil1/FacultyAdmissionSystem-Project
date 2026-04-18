@@ -284,9 +284,69 @@ export async function registerStudentToGroup(groupId: string, studentId: string)
     return data;
 }
 
+
 export async function getAllGroupsForAdvisor() {
     const { res, data } = await apiGet('/groups');
     if (!res.ok) throw new Error((data as { error?: string }).error || 'Failed to fetch groups');
+    return data;
+}
+
+export async function updateGroup(id: string, form: Record<string, unknown>) {
+    const { res, data } = await apiPut(`/groups/${id}`, form);
+    if (!res.ok) throw new Error((data as any).error || 'Failed to update group');
+    return data;
+}
+
+// ── Places ───────────────────────────────────────────────────────────────────
+
+export interface IPlace {
+    _id: string;
+    name: string;
+    capacity: number;
+}
+
+export async function getAllPlaces() {
+    const { res, data } = await apiGet<IPlace[]>('/places');
+    if (!res.ok) throw new Error((data as any).error || 'Failed to fetch places');
+    return data;
+}
+
+// ── Announcements (staff) ────────────────────────────────────────────────────
+
+export interface IAnnouncement {
+    _id: string;
+    title: string;
+    content: string;
+    author: string;
+    createdAt: string;
+}
+
+export async function getAllAnnouncements() {
+    const { res, data } = await apiGet<IAnnouncement[]>('/announcements');
+    if (!res.ok) throw new Error((data as any).error || 'Failed to fetch announcements');
+    return data;
+}
+
+export async function createAnnouncement(form: { title: string; content: string; author?: string }) {
+    const { res, data } = await apiPost('/announcements', { ...form, author: form.author ?? 'Admin' });
+    if (!res.ok) throw new Error((data as any).error || 'Failed to create announcement');
+    return data;
+}
+
+export async function updateAnnouncement(id: string, form: { title: string; content: string }) {
+    const { res, data } = await apiPut(`/announcements/${id}`, form);
+    if (!res.ok) throw new Error((data as any).error || 'Failed to update announcement');
+    return data;
+}
+
+export async function deleteAnnouncement(id: string) {
+    const { res, data } = await apiDelete(`/announcements/${id}`);
+    if (!res.ok) throw new Error((data as any).error || 'Failed to delete announcement');
+    return data;
+}
+
+// ── Complaints ───────────────────────────────────────────────────────────────
+
 export interface IComplaint {
     _id: string;
     studentName: string;
@@ -314,5 +374,19 @@ export async function respondToComplaint(id: string, response: string, status: s
         status: status
     });
     if (!res.ok) throw new Error((data as any).error || 'Failed to respond to complaint');
+    return data;
+}
+
+// ── System Settings ───────────────────────────────────────────────────────────
+
+export async function getAnnouncementSettings() {
+    const { res, data } = await apiGet('/announcements/settings');
+    if (!res.ok) throw new Error((data as any).error || 'Failed to fetch announcement settings');
+    return data as { gpaMin: number; gpaMax: number; level: string[] };
+}
+
+export async function updateAnnouncementSettings(settings: { gpaMin: number; gpaMax: number; level: string[] }) {
+    const { res, data } = await apiPut('/announcements/settings', settings as unknown as Record<string, unknown>);
+    if (!res.ok) throw new Error((data as any).error || 'Failed to update announcement settings');
     return data;
 }

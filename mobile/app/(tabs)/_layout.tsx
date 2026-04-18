@@ -17,8 +17,10 @@ export default function TabsLayout() {
     const { user, loading } = useAuth();
     const { t } = useLanguage();
     const isAdmin = user?.role === 'admin';
+    const isCoordinator = user?.role === 'academic_guide_coordinator';
     const isStudent = user?.role === 'student';
     const isAcademicGuide = user?.role === 'academic_guide' || user?.role === 'academic_guide_coordinator';
+    const isReporter = user?.role === 'reporter';
 
     return (
         <Tabs
@@ -64,7 +66,7 @@ export default function TabsLayout() {
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons name="create-outline" size={size} color={color} />
                     ),
-                    ...tabVisibility(isAdmin),
+                    ...tabVisibility(isAdmin || isCoordinator),
                 }}
             />
 
@@ -107,6 +109,9 @@ export default function TabsLayout() {
                 name="advisor"
                 options={{
                     href: null,
+                }}
+            />
+
             {/* ── Register — student only ── */}
             <Tabs.Screen
                 name="register"

@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { getAllStudents, createStudent, deleteStudent } from '../../../services/api';
 import { useLanguage } from '../../../context/LanguageContext';
+import { useAuth } from '../../../context/AuthContext';
 
 interface Student {
     _id: string;
@@ -21,6 +22,8 @@ const EMPTY = { studentId: '', name: '', email: '', password: '', gpa: '' };
 
 export default function StudentsScreen() {
     const { t } = useLanguage();
+    const { user } = useAuth();
+    const readOnly = user?.role === 'academic_guide_coordinator';
     const [students, setStudents] = useState<Student[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -52,7 +55,7 @@ export default function StudentsScreen() {
     const handleSubmit = async () => {
         setError('');
         if (!form.studentId || !form.name || !form.email || !form.password) {
-            setError('يرجى ملء جميع الحقول');
+            setError(t('students.fillAll'));
             return;
         }
         setSaving(true);
@@ -69,16 +72,21 @@ export default function StudentsScreen() {
     };
 
     const handleDelete = (s: Student) => {
-        Alert.alert('حذف طالب', `هل تريد حذف ${s.name}؟`, [
-            { text: 'إلغاء', style: 'cancel' },
-            {
-                text: 'حذف', style: 'destructive',
-                onPress: async () => {
-                    try { await deleteStudent(s._id); await load(); }
-                    catch (e: any) { Alert.alert('خطأ', e.message); }
+        Alert.alert(
+            t('students.deleteTitle'),
+            t('students.deleteMessage', { name: s.name }),
+            [
+                { text: t('common.cancel'), style: 'cancel' },
+                {
+                    text: t('common.delete'),
+                    style: 'destructive',
+                    onPress: async () => {
+                        try { await deleteStudent(s._id); await load(); }
+                        catch (e: any) { Alert.alert(t('common.error'), e.message); }
+                    },
                 },
-            },
-        ]);
+            ],
+        );
     };
 
     const closeModal = () => {
@@ -106,20 +114,22 @@ export default function StudentsScreen() {
 
             <Text style={styles.title}>👨‍🎓 {t('students.title')}</Text>
 
-            <TouchableOpacity
-                style={[styles.btn, showForm && styles.btnOutline]}
-                onPress={() => {
-                    if (showForm) return closeModal();
-                    setError('');
-                    setForm(EMPTY);
-                    setShowForm(true);
-                }}
-            >
-                <Ionicons name={showForm ? 'close' : 'person-add-outline'} size={18} color={showForm ? '#1a73e8' : '#fff'} />
-                <Text style={[styles.btnText, showForm && styles.btnTextOutline]}>
-                    {showForm ? t('students.cancel') : t('students.addStudent')}
-                </Text>
-            </TouchableOpacity>
+            {!readOnly && (
+                <TouchableOpacity
+                    style={[styles.btn, showForm && styles.btnOutline]}
+                    onPress={() => {
+                        if (showForm) return closeModal();
+                        setError('');
+                        setForm(EMPTY);
+                        setShowForm(true);
+                    }}
+                >
+                    <Ionicons name={showForm ? 'close' : 'person-add-outline'} size={18} color={showForm ? '#1a73e8' : '#fff'} />
+                    <Text style={[styles.btnText, showForm && styles.btnTextOutline]}>
+                        {showForm ? t('students.cancel') : t('students.addStudent')}
+                    </Text>
+                </TouchableOpacity>
+            )}
 
             <Modal
                 visible={showForm}

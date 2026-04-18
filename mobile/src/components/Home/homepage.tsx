@@ -85,9 +85,19 @@ const Homepage = () => {
 
             <View style={styles.menuGrid}>
 
+                {/* ── Universal: Announcements (all users) ── */}
+                <TouchableOpacity
+                    style={styles.menuCard}
+                    onPress={() => router.push('/announcements-view' as any)}
+                >
+                    <Ionicons name="megaphone-outline" size={32} color="#1a73e8" />
+                    <Text style={styles.menuLabel}>{t('home.announcements')}</Text>
+                </TouchableOpacity>
+
+                {/* ── Student ── */}
                 {role === 'student' && (
                     <TouchableOpacity
-                        style={[styles.menuCard, { borderBottomColor: '#1a73e8' }]}
+                        style={styles.menuCard}
                         onPress={() => router.push('/(tabs)/register')}
                     >
                         <Ionicons name="book" size={32} color="#1a73e8" />
@@ -97,7 +107,7 @@ const Homepage = () => {
 
                 {role === 'student' && (
                     <TouchableOpacity
-                        style={[styles.menuCard, { borderBottomColor: '#1a73e8' }]}
+                        style={styles.menuCard}
                         onPress={() => router.push('/academic-history')}
                     >
                         <Ionicons name="school-outline" size={32} color="#1a73e8" />
@@ -105,9 +115,10 @@ const Homepage = () => {
                     </TouchableOpacity>
                 )}
 
+                {/* ── Academic Guide & Coordinator ── */}
                 {(role === 'academic_guide' || role === 'academic_guide_coordinator') && (
                     <TouchableOpacity
-                        style={[styles.menuCard, { borderBottomColor: '#1a73e8' }]}
+                        style={styles.menuCard}
                         onPress={() => router.push('/advisor')}
                     >
                         <Ionicons name="people" size={32} color="#1a73e8" />
@@ -115,9 +126,41 @@ const Homepage = () => {
                     </TouchableOpacity>
                 )}
 
-                {(role === 'reporter' || role === 'admin') && (
+                {role === 'academic_guide_coordinator' && (
                     <TouchableOpacity
-                        style={[styles.menuCard, { borderBottomColor: '#1a73e8' }]}
+                        style={styles.menuCard}
+                        onPress={() => router.push('/(tabs)/edit/groups' as any)}
+                    >
+                        <Ionicons name="grid-outline" size={32} color="#1a73e8" />
+                        <Text style={styles.menuLabel}>{t('home.groupsManagement')}</Text>
+                    </TouchableOpacity>
+                )}
+
+                {role === 'academic_guide_coordinator' && (
+                    <TouchableOpacity
+                        style={styles.menuCard}
+                        onPress={() => router.push('/admin-complaints' as any)}
+                    >
+                        <Ionicons name="mail-unread-outline" size={32} color="#1a73e8" />
+                        <Text style={styles.menuLabel}>{t('home.complaints')}</Text>
+                    </TouchableOpacity>
+                )}
+
+                {/* ── Reporter ── */}
+                {role === 'reporter' && (
+                    <TouchableOpacity
+                        style={styles.menuCard}
+                        onPress={() => router.push('/(tabs)/groups')}
+                    >
+                        <Ionicons name="people" size={32} color="#1a73e8" />
+                        <Text style={styles.menuLabel}>{t('tabs.groups')}</Text>
+                    </TouchableOpacity>
+                )}
+
+                {/* ── Admin ── */}
+                {role === 'admin' && (
+                    <TouchableOpacity
+                        style={styles.menuCard}
                         onPress={() => router.push('/reports')}
                     >
                         <Ionicons name="stats-chart" size={32} color="#1a73e8" />
@@ -125,9 +168,9 @@ const Homepage = () => {
                     </TouchableOpacity>
                 )}
 
-                {(role === 'reporter' || role === 'admin') && (
+                {role === 'admin' && (
                     <TouchableOpacity
-                        style={[styles.menuCard, { borderBottomColor: '#1a73e8' }]}
+                        style={styles.menuCard}
                         onPress={() => router.push('/admin-complaints')}
                     >
                         <Ionicons name="mail-unread" size={32} color="#1a73e8" />
@@ -161,7 +204,7 @@ const styles = StyleSheet.create({
     statDivider: { width: 1, backgroundColor: '#f0f0f0' },
     sectionTitle: { fontSize: 18, fontWeight: 'bold', marginVertical: 20, textAlign: 'right' },
     menuGrid: { flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'space-between' },
-    menuCard: { backgroundColor: '#fff', width: (width - 55) / 2, padding: 20, borderRadius: 18, alignItems: 'center', marginBottom: 15, borderBottomWidth: 4, elevation: 2 },
+    menuCard: { backgroundColor: '#fff', width: (width - 55) / 2, padding: 20, borderRadius: 18, alignItems: 'center', marginBottom: 15, borderBottomWidth: 4, borderBottomColor: '#1a73e8', elevation: 2 },
     menuLabel: { fontSize: 14, fontWeight: 'bold', color: '#4b5563', marginTop: 10 },
     logoutButton: { marginTop: 20, flexDirection: 'row-reverse', justifyContent: 'center', alignItems: 'center', padding: 15 },
     logoutButtonText: { color: '#ef4444', fontWeight: 'bold', fontSize: 16 }

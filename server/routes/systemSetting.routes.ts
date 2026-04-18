@@ -8,7 +8,7 @@ const router = Router();
 // Publicly available so frontend can adjust UI
 router.get('/', settingsCtrl.getSettings);
 
-// Only admins can update
-router.put('/', authenticate, requireRole('admin'), settingsCtrl.updateSettings);
+// Only admins and coordinators can update
+router.put('/', authenticate, requireRole(['admin', 'academic_guide_coordinator']), settingsCtrl.updateSettings);
 
 export default router;

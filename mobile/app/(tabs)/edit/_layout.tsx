@@ -14,6 +14,7 @@ export default function EditLayout() {
             <Stack.Screen name="groups" />
             <Stack.Screen name="announcements" />
             <Stack.Screen name="profile" />
+            <Stack.Screen name="registration" />
         </Stack>
     );
 }

@@ -7,11 +7,15 @@ import {
     ActivityIndicator,
     Alert,
     TouchableOpacity,
+    Modal,
+    Share,
+    Platform,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+// expo-file-system / expo-sharing removed — not linked on Android managed builds.
+// CSV sharing is handled via RN's built-in Share API on mobile.
 
-import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { getAllGroups } from '../../services/api';
 
@@ -28,6 +32,11 @@ export interface IGroup {
     day: WeekDay;
     place?: string;
     capacity: number;
+    students?: Array<{
+        _id?: string;
+        studentId?: string;
+        name?: string;
+    } | string>;
 }
 
 const TYPE_STYLE: Record<GroupType, { bg: string; color: string; icon: keyof typeof Ionicons.glyphMap }> = {
@@ -41,18 +50,38 @@ function formatTime(h: number): string {
     return `${String(h).padStart(2, '0')}:00`;
 }
 
+function normalizeStudent(student: { _id?: string; studentId?: string; name?: string } | string) {
+    if (typeof student === 'string') {
+        return { id: student, name: '' };
+    }
+    return {
+        id: student.studentId || student._id || '',
+        name: student.name || '',
+    };
+}
+
+function buildCsv(group: IGroup) {
+    const rows = [["studentId", "name"]];
+    (group.students ?? []).forEach(student => {
+        const normalized = normalizeStudent(student);
+        rows.push([
+            normalized.id || '',
+            normalized.name || '',
+        ]);
+    });
+    return rows.map(row => row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+}
+
 export default function Groups() {
-    const { token } = useAuth();
     const { t } = useLanguage();
     const [groups, setGroups] = useState<IGroup[]>([]);
     const [loading, setLoading] = useState(true);
-
-    const API_BASE = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://10.0.2.2:5000/api';
+    const [selectedGroup, setSelectedGroup] = useState<IGroup | null>(null);
+    const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
         const fetchGroups = async () => {
             try {
-
                 const data = await getAllGroups();
                 setGroups(data);
             } catch (err: any) {
@@ -64,6 +93,40 @@ export default function Groups() {
 
         fetchGroups();
     }, []);
+
+    const openGroupDetails = (group: IGroup) => {
+        setSelectedGroup(group);
+        setModalVisible(true);
+    };
+
+    const handleDownloadCsv = async (group: IGroup) => {
+        const csv = buildCsv(group);
+        const sanitizedFilename = `${group.subject}-${group.number}-students.csv`.replace(/[^a-zA-Z0-9._-]/g, '_');
+
+        try {
+            if (Platform.OS === 'web') {
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = sanitizedFilename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                return;
+            }
+
+            // On Android / iOS: share the CSV text directly via the OS share sheet.
+            // This requires no native linking and works in Expo managed workflow.
+            await Share.share({
+                title: sanitizedFilename,
+                message: csv,
+            });
+        } catch (error: any) {
+            Alert.alert(t('common.error'), error?.message || 'Unable to share CSV');
+        }
+    };
 
     if (loading) {
         return (
@@ -94,10 +157,16 @@ export default function Groups() {
                     groups.map((group) => {
                         const badge = TYPE_STYLE[group.type] || TYPE_STYLE.lecture;
                         return (
-                            <View key={group._id} style={styles.card}>
+                            <TouchableOpacity
+                                key={group._id}
+                                style={styles.card}
+                                activeOpacity={0.85}
+                                onPress={() => openGroupDetails(group)}
+                            >
                                 <View style={styles.topRow}>
                                     <Text style={styles.groupName}>{t('groupsScreen.groupNumber', { number: group.number })}</Text>
-                                    <View style={[styles.badge, { backgroundColor: badge.bg }]}>
+                                    <View style={[styles.badge, { backgroundColor: badge.bg }]}
+                                    >
                                         <Ionicons name={badge.icon} size={13} color={badge.color} style={{ marginLeft: 4 }} />
                                         <Text style={[styles.badgeText, { color: badge.color }]}>
                                             {t(`groupsScreen.types.${group.type}`)}
@@ -122,11 +191,78 @@ export default function Groups() {
                                         <Text style={styles.metaText}>{group.place}</Text>
                                     </View>
                                 )}
-                            </View>
+                            </TouchableOpacity>
                         );
                     })
                 )}
             </ScrollView>
+
+            <Modal
+                visible={modalVisible}
+                animationType="slide"
+                transparent
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>{t('groupsScreen.detailsTitle') || 'Group details'}</Text>
+                            <TouchableOpacity onPress={() => setModalVisible(false)}>
+                                <Ionicons name="close" size={24} color="#374151" />
+                            </TouchableOpacity>
+                        </View>
+
+                        {selectedGroup ? (
+                            <View>
+                                <Text style={styles.modalLabel}>{t('groupsScreen.subject') || 'Subject'}:</Text>
+                                <Text style={styles.modalValue}>{selectedGroup.subject}</Text>
+
+                                <Text style={styles.modalLabel}>{t('groupsScreen.groupNumberLabel') || 'Group'}:</Text>
+                                <Text style={styles.modalValue}>{selectedGroup.number}</Text>
+
+                                <Text style={styles.modalLabel}>{t('groupsScreen.type') || 'Type'}:</Text>
+                                <Text style={styles.modalValue}>{t(`groupsScreen.types.${selectedGroup.type}`)}</Text>
+
+                                <Text style={styles.modalLabel}>{t('groupsScreen.schedule') || 'Schedule'}:</Text>
+                                <Text style={styles.modalValue}>{`${t(`groupsScreen.days.${selectedGroup.day}`)} • ${formatTime(selectedGroup.from)} - ${formatTime(selectedGroup.to)}`}</Text>
+
+                                <Text style={styles.modalLabel}>{t('groupsScreen.place') || 'Place'}:</Text>
+                                <Text style={styles.modalValue}>{selectedGroup.place || t('groupsScreen.noPlace') || 'N/A'}</Text>
+
+                                <Text style={styles.modalLabel}>{t('groupsScreen.capacity') || 'Capacity'}:</Text>
+                                <Text style={styles.modalValue}>{selectedGroup.capacity}</Text>
+
+                                <Text style={styles.modalLabel}>{t('groupsScreen.enrolled') || 'Enrolled students'}:</Text>
+                                <Text style={styles.modalValue}>{(selectedGroup.students ?? []).length}</Text>
+
+                                {(selectedGroup.students ?? []).length > 0 ? (
+                                    <View style={styles.studentsList}>
+                                        {(selectedGroup.students ?? []).map((student, index) => {
+                                            const normalized = normalizeStudent(student);
+                                            return (
+                                                <View key={`${normalized.id}-${index}`} style={styles.studentRow}>
+                                                    <Text style={styles.studentName}>{normalized.name || normalized.id || t('groupsScreen.studentAnonymous') || 'Student'}</Text>
+                                                    {normalized.id ? <Text style={styles.studentId}>{normalized.id}</Text> : null}
+                                                </View>
+                                            );
+                                        })}
+                                    </View>
+                                ) : (
+                                    <Text style={styles.emptySubtitle}>{t('groupsScreen.noStudents') || 'No students enrolled yet.'}</Text>
+                                )}
+
+                                <TouchableOpacity
+                                    style={styles.downloadButton}
+                                    onPress={() => selectedGroup && handleDownloadCsv(selectedGroup)}
+                                >
+                                    <Ionicons name="download-outline" size={18} color="#fff" />
+                                    <Text style={styles.downloadButtonText}>{t('groupsScreen.downloadCsv') || 'Download CSV'}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        ) : null}
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -169,4 +305,74 @@ const styles = StyleSheet.create({
     emptyState: { alignItems: 'center', paddingTop: 80 },
     emptyTitle: { fontSize: 18, fontWeight: 'bold', color: '#4b5563', marginTop: 10 },
     emptySubtitle: { fontSize: 14, color: '#9ca3af', textAlign: 'center', marginTop: 5 },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(15, 23, 42, 0.6)',
+        justifyContent: 'center',
+        padding: 20,
+    },
+    modalContent: {
+        backgroundColor: '#fff',
+        borderRadius: 24,
+        padding: 20,
+        maxHeight: '90%',
+    },
+    modalHeader: {
+        flexDirection: 'row-reverse',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 16,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#111827',
+    },
+    modalLabel: {
+        fontSize: 12,
+        color: '#6b7280',
+        marginTop: 12,
+    },
+    modalValue: {
+        fontSize: 15,
+        color: '#111827',
+        fontWeight: '600',
+    },
+    studentsList: {
+        marginTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: '#e5e7eb',
+        paddingTop: 12,
+    },
+    studentRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f3f4f6',
+    },
+    studentName: {
+        fontSize: 14,
+        color: '#111827',
+    },
+    studentId: {
+        fontSize: 12,
+        color: '#6b7280',
+    },
+    downloadButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#1a73e8',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        borderRadius: 14,
+        marginTop: 20,
+    },
+    downloadButtonText: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: '700',
+        marginLeft: 8,
+    },
 });
