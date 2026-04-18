@@ -126,7 +126,7 @@ export default function Groups() {
                 message: csv,
             });
         } catch (error: any) {
-            Alert.alert(t('common.error'), error?.message || 'Unable to share CSV');
+            Alert.alert(t('common.error'), error?.message || t('groupsScreen.shareCsvFailed'));
         }
     };
 
@@ -202,7 +202,7 @@ export default function Groups() {
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
                         <View style={styles.modalHeader}>
-                            <Text style={styles.modalTitle}>{t('groupsScreen.detailsTitle') || 'Group details'}</Text>
+                            <Text style={styles.modalTitle}>{t('groupsScreen.detailsTitle')}</Text>
                             <TouchableOpacity onPress={() => setModalVisible(false)}>
                                 <Ionicons name="close" size={24} color="#374151" />
                             </TouchableOpacity>
@@ -210,25 +210,25 @@ export default function Groups() {
 
                         {selectedGroup ? (
                             <View>
-                                <Text style={styles.modalLabel}>{t('groupsScreen.subject') || 'Subject'}:</Text>
+                                <Text style={styles.modalLabel}>{t('groupsScreen.subject')}:</Text>
                                 <Text style={styles.modalValue}>{selectedGroup.subject}</Text>
 
-                                <Text style={styles.modalLabel}>{t('groupsScreen.groupNumberLabel') || 'Group'}:</Text>
+                                <Text style={styles.modalLabel}>{t('groupsScreen.groupNumberLabel')}:</Text>
                                 <Text style={styles.modalValue}>{selectedGroup.number}</Text>
 
-                                <Text style={styles.modalLabel}>{t('groupsScreen.type') || 'Type'}:</Text>
+                                <Text style={styles.modalLabel}>{t('groupsScreen.type')}:</Text>
                                 <Text style={styles.modalValue}>{t(`groupsScreen.types.${selectedGroup.type}`)}</Text>
 
-                                <Text style={styles.modalLabel}>{t('groupsScreen.schedule') || 'Schedule'}:</Text>
+                                <Text style={styles.modalLabel}>{t('groupsScreen.schedule')}:</Text>
                                 <Text style={styles.modalValue}>{`${t(`groupsScreen.days.${selectedGroup.day}`)} • ${formatTime(selectedGroup.from)} - ${formatTime(selectedGroup.to)}`}</Text>
 
-                                <Text style={styles.modalLabel}>{t('groupsScreen.place') || 'Place'}:</Text>
-                                <Text style={styles.modalValue}>{selectedGroup.place || t('groupsScreen.noPlace') || 'N/A'}</Text>
+                                <Text style={styles.modalLabel}>{t('groupsScreen.place')}:</Text>
+                                <Text style={styles.modalValue}>{selectedGroup.place || t('groupsScreen.noPlace')}</Text>
 
-                                <Text style={styles.modalLabel}>{t('groupsScreen.capacity') || 'Capacity'}:</Text>
+                                <Text style={styles.modalLabel}>{t('groupsScreen.capacity')}:</Text>
                                 <Text style={styles.modalValue}>{selectedGroup.capacity}</Text>
 
-                                <Text style={styles.modalLabel}>{t('groupsScreen.enrolled') || 'Enrolled students'}:</Text>
+                                <Text style={styles.modalLabel}>{t('groupsScreen.enrolled')}:</Text>
                                 <Text style={styles.modalValue}>{(selectedGroup.students ?? []).length}</Text>
 
                                 {(selectedGroup.students ?? []).length > 0 ? (
@@ -237,14 +237,14 @@ export default function Groups() {
                                             const normalized = normalizeStudent(student);
                                             return (
                                                 <View key={`${normalized.id}-${index}`} style={styles.studentRow}>
-                                                    <Text style={styles.studentName}>{normalized.name || normalized.id || t('groupsScreen.studentAnonymous') || 'Student'}</Text>
+                                                    <Text style={styles.studentName}>{normalized.name || normalized.id || t('groupsScreen.studentAnonymous')}</Text>
                                                     {normalized.id ? <Text style={styles.studentId}>{normalized.id}</Text> : null}
                                                 </View>
                                             );
                                         })}
                                     </View>
                                 ) : (
-                                    <Text style={styles.emptySubtitle}>{t('groupsScreen.noStudents') || 'No students enrolled yet.'}</Text>
+                                    <Text style={styles.emptySubtitle}>{t('groupsScreen.noStudents')}</Text>
                                 )}
 
                                 <TouchableOpacity
@@ -252,7 +252,7 @@ export default function Groups() {
                                     onPress={() => selectedGroup && handleDownloadCsv(selectedGroup)}
                                 >
                                     <Ionicons name="download-outline" size={18} color="#fff" />
-                                    <Text style={styles.downloadButtonText}>{t('groupsScreen.downloadCsv') || 'Download CSV'}</Text>
+                                    <Text style={styles.downloadButtonText}>{t('groupsScreen.downloadCsv')}</Text>
                                 </TouchableOpacity>
                             </View>
                         ) : null}

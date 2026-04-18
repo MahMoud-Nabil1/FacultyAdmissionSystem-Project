@@ -68,7 +68,7 @@ const StudentDetail: React.FC = () => {
             const response = await apiGet(`/students/${studentId}`);
             setStudent(response.data as unknown as StudentDetail);
         } catch (error) {
-            const message = error instanceof Error ? error.message : 'Failed to fetch student details';
+            const message = error instanceof Error ? error.message : t('advisor.studentNotFound');
             Alert.alert(t('common.error'), message);
         } finally {
             setLoading(false);
@@ -195,7 +195,7 @@ const StudentDetail: React.FC = () => {
                     <View style={styles.infoRow}>
                         <Ionicons name="layers-outline" size={20} color="#6b7280" />
                         <Text style={styles.infoText}>
-                            Level {student.level}
+                            {t('advisor.level')} {student.level}
                         </Text>
                     </View>
                 </View>
@@ -268,15 +268,15 @@ const StudentDetail: React.FC = () => {
                                 <View style={styles.scheduleHeader}>
                                     <View>
                                         <Text style={styles.scheduleSubject}>
-                                            {group.subject || 'N/A'}
+                                            {group.subject || t('groupsScreen.noSubject')}
                                         </Text>
                                         <Text style={styles.scheduleGroup}>
-                                            Group #{group.number}
+                                            {t('groupsScreen.groupNumberLabel')} #{group.number}
                                         </Text>
                                     </View>
                                     <View style={styles.scheduleBadge}>
                                         <Text style={styles.scheduleBadgeText}>
-                                            {t(`schedule.type.${group.type}`) || group.type}
+                                            {t(`schedule.type.${group.type}`)}
                                         </Text>
                                     </View>
                                 </View>
@@ -378,13 +378,13 @@ const StudentDetail: React.FC = () => {
                                             <View key={group._id} style={styles.groupCard}>
                                                 <View style={styles.groupCardHeader}>
                                                     <Text style={styles.groupCardTitle}>
-                                                        Group #{group.number}
+                                                        {t('groupsScreen.groupNumberLabel')} #{group.number}
                                                     </Text>
                                                     <Text style={[
                                                         styles.groupCardType,
                                                         { backgroundColor: isFull ? '#fee2e2' : '#e0e7ff' }
                                                     ]}>
-                                                        {t(`schedule.type.${group.type}`) || group.type}
+                                                        {t(`schedule.type.${group.type}`)}
                                                     </Text>
                                                 </View>
                                                 <View style={styles.groupCardDetails}>

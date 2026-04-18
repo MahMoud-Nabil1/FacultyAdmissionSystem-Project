@@ -443,11 +443,13 @@
     "schedule": "Schedule",
     "place": "Place",
     "noPlace": "No place assigned",
+    "noSubject": "Unknown subject",
     "capacity": "Capacity",
     "enrolled": "Enrolled",
     "studentAnonymous": "Student",
     "noStudents": "No students enrolled yet.",
-    "downloadCsv": "Download CSV"
+    "downloadCsv": "Download CSV",
+    "shareCsvFailed": "Unable to share CSV"
   },
   "academicHistory": {
     "title": "Academic History",
@@ -500,6 +502,7 @@
     "fetchError": "Failed to load requests",
     "noComplaintsTitle": "No Complaints",
     "noComplaintsMessage": "There are no complaints to review.",
+    "complaintsCount": "{{count}} request(s)",
     "respond": "Respond",
     "updateResponse": "Update Response",
     "respondToComplaint": "Respond to Complaint",

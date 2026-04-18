@@ -489,11 +489,13 @@
     "schedule": "الجدول",
     "place": "المكان",
     "noPlace": "لا يوجد مكان",
+    "noSubject": "مادة غير معروفة",
     "capacity": "السعة",
     "enrolled": "الطلاب المسجلون",
     "studentAnonymous": "طالب",
     "noStudents": "لا يوجد طلاب مسجلين حتى الآن.",
-    "downloadCsv": "تحميل CSV"
+    "downloadCsv": "تحميل CSV",
+    "shareCsvFailed": "تعذّر مشاركة الملف"
   },
   "academicHistory": {
     "title": "السجل الأكاديمي",
@@ -546,6 +548,7 @@
     "fetchError": "فشل في تحميل الطلبات",
     "noComplaintsTitle": "لا توجد شكاوى",
     "noComplaintsMessage": "لا توجد شكاوى لمراجعتها.",
+    "complaintsCount": "{{count}} طلب",
     "respond": "الرد",
     "updateResponse": "تحديث الرد",
     "respondToComplaint": "الرد على الشكوى",

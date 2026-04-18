@@ -141,7 +141,7 @@ export default function AdminComplaintsScreen() {
                 ) : (
                     <View style={styles.complaintsList}>
                         <Text style={styles.complaintsCount}>
-                            {complaints.length} {locale === 'ar' ? 'طلب' : 'request(s)'}
+                            {t('complaints.complaintsCount', { count: complaints.length })}
                         </Text>
                         {complaints.map((complaint) => (
                             <View key={complaint._id} style={styles.complaintCard}>

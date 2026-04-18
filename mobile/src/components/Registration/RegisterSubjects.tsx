@@ -102,7 +102,7 @@ export default function RegisterSubjects() {
         };
         const res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'API Error');
+        if (!res.ok) throw new Error(data.error || t('common.error'));
         return data;
     };
 
@@ -110,7 +110,7 @@ export default function RegisterSubjects() {
         try {
             setLoading(true);
             setError(null);
-            if (!token) throw new Error("No token");
+            if (!token) throw new Error(t('login.loginFailed'));
 
             const [meData, subData, grpData, reqData, settingsData] = await Promise.all([
                 apiFetch('/auth/me'),
@@ -384,7 +384,7 @@ export default function RegisterSubjects() {
                         return (
                             <View key={day} style={styles.dayGroup}>
                                 <Text style={[styles.dayTitle, { textAlign: textDir }]}>
-                                    {t(`groups.${day}`) || day.toUpperCase()}
+                                    {t(`schedule.days.${day}`)}
                                 </Text>
                                 {dayGroups.map(g => {
                                     const color = subjectColorMap.get(g.subject.toLowerCase()) || TIMETABLE_COLORS[0];
@@ -507,14 +507,14 @@ export default function RegisterSubjects() {
                             {lecture && (
                                 <View style={styles.groupSlot}>
                                     <View style={styles.badge}><Text style={styles.badgeText}>{t('groupsSchedule.typeValues.lecture')}</Text></View>
-                                    <Text style={styles.slotText}>📅 {t(`groups.${lecture.day}`) || lecture.day}</Text>
+                                    <Text style={styles.slotText}>📅 {t(`schedule.days.${lecture.day}`)}</Text>
                                     <Text style={styles.slotText}>🕐 {formatTime(lecture.from, t)} - {formatTime(lecture.to, t)}</Text>
                                 </View>
                             )}
                             {coreq && (
                                 <View style={styles.groupSlot}>
                                     <View style={styles.badge}><Text style={styles.badgeText}>{t(`groupsSchedule.typeValues.${coreq.type.toLowerCase()}`)}</Text></View>
-                                    <Text style={styles.slotText}>📅 {t(`groups.${coreq.day}`) || coreq.day}</Text>
+                                    <Text style={styles.slotText}>📅 {t(`schedule.days.${coreq.day}`)}</Text>
                                     <Text style={styles.slotText}>🕐 {formatTime(coreq.from, t)} - {formatTime(coreq.to, t)}</Text>
                                 </View>
                             )}
