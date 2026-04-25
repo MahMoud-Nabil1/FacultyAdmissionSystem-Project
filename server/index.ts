@@ -24,7 +24,8 @@ app.use(
             "http://localhost:3000",
             "http://localhost:3001",
             "http://127.0.0.1:3000",
-        ],
+            process.env.FRONTEND_URL as string
+        ].filter(Boolean),
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],

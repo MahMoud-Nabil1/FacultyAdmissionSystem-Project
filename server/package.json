@@ -6,6 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specif-ied\" && exit 1",
     "start": "nodemon --exec ts-node index.ts",
+    "build": "tsc",
+    "start:prod": "node dist/index.js",
     "seed:subjects": "ts-node seed/subjects.ts",
     "seed:fix-groups": "ts-node seed/fix-groups.ts",
     "seed:students": "ts-node seed/students.ts"
