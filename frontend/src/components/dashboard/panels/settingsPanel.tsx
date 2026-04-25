@@ -1,7 +1,7 @@
 import React, { useState, useEffect, FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = `${process.env.REACT_APP_API_BASE_URL || `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}`}`;
 
 interface GPASettings {
     gpaMin: number;

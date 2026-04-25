@@ -10,7 +10,7 @@ const ReporterPanel = () => {
   const [students, setStudents] = useState<Student[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/student", {
+    fetch(`${process.env.REACT_APP_API_BASE_URL || `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}`}/student`, {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("token"),
       },

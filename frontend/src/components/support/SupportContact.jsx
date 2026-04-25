@@ -56,8 +56,8 @@ const SupportContact = ({ target = 'it' }) => {
         setStatus({ type: '', text: '' });
 
         const endpoint = isIT
-            ? 'http://localhost:5000/api/students/contact-it'
-            : 'http://localhost:5000/api/students/contact-admin';
+            ? `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}/students/contact-it`
+            : `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}/students/contact-admin`;
 
         try {
             const response = await fetch(endpoint, {

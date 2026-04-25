@@ -30,10 +30,10 @@ const Home = () => {
                 }
 
                 const [userRes, subjectsRes] = await Promise.all([
-                    fetch("http://localhost:5000/api/auth/me", {
+                    fetch(`${process.env.REACT_APP_API_BASE_URL || `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}`}/auth/me`, {
                         headers: { Authorization: `Bearer ${token}` },
                     }),
-                    fetch("http://localhost:5000/api/subjects", {
+                    fetch(`${process.env.REACT_APP_API_BASE_URL || `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}`}/subjects`, {
                         headers: { Authorization: `Bearer ${token}` },
                     }),
                 ]);
@@ -87,7 +87,7 @@ const Home = () => {
 
         try {
             const token = sessionStorage.getItem("token");
-            const res = await fetch("http://localhost:5000/api/auth/change-password", {
+            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL || `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}`}/auth/change-password`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

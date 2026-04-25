@@ -126,7 +126,7 @@ const RegisterSubjects = () => {
             }
 
             const [meRes, subRes, eligibleRes, grpRes, reqRes, settingsRes] = await Promise.all([
-                fetch("http://localhost:5000/api/auth/me", {
+                fetch(`${process.env.REACT_APP_API_BASE_URL || `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}`}/auth/me`, {
                     headers: { Authorization: `Bearer ${token}` },
                 }),
                 apiGet("/subjects"),

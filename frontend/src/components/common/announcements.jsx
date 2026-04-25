@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './css/announcements.css';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}`;
 
 const Announcements = () => {
     const navigate = useNavigate();

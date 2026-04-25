@@ -27,7 +27,7 @@ function AcademicHistory() {
       return;
     }
 
-    fetch("http://localhost:5000/api/students/my-academic-history", {
+    fetch(`${process.env.REACT_APP_API_BASE_URL || `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}`}/students/my-academic-history`, {
       headers: {
         Authorization: "Bearer " + token
       }

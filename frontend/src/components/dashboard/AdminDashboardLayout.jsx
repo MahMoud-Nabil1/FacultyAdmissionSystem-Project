@@ -12,7 +12,7 @@ const AdminDashboardLayout = () => {
         const fetchUser = async () => {
             try {
                 const token = sessionStorage.getItem("token");
-                const res = await fetch("http://localhost:5000/api/auth/me", {
+                const res = await fetch(`${process.env.REACT_APP_API_BASE_URL || `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}`}/auth/me`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (!res.ok) throw new Error("Unauthorized");
