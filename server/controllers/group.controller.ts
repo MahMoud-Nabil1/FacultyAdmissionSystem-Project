@@ -25,8 +25,14 @@ async function canManageStudent(staff: IStaff, studentId: string): Promise<boole
 
     // Academic guide coordinator: all students in coordinator's departments
     if (staff.role === 'academic_guide_coordinator') {
+        // If coordinator has no specific departments assigned, allow managing all
+        if (!staff.departments || staff.departments.length === 0) return true;
+
         const student = await Student.findById(studentId);
-        if (!student || !student.department) return false;
+        if (!student) return false;
+        
+        // If student has no department, allow managing
+        if (!student.department) return true;
 
         // Check if student's department is in the staff's departments list
         return staff.departments.some(depId => depId.toString() === student.department?.toString());

@@ -1,22 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(type *)",
-      "Bash(findstr *)",
-      "Bash(netstat *)",
-      "Bash(npm run *)",
-      "Bash(node *)",
-      "Bash(npx *)",
-      "Bash(expo *)"
-      "Bash(\"c:\\program files\\nodejs\\npm.cmd\" *)",
-      "Bash(del *)",
-      "Bash(npx *)",
-      "Bash(timeout *)",
-      "Bash(tasklist *)",
-      "Bash(taskkill *)",
-      "WebSearch",
-      "Bash(node *)",
-      "Bash(npm run *)"
+      "Bash(\"c:\\program files\\nodejs\\npm.cmd\" *)"
     ]
   },
   "$version": 3
