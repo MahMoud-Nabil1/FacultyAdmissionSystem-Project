@@ -31,6 +31,7 @@ export interface AuthUser {
     id: string;
     role: string;
     name?: string;
+    avatar?: string | null;
 }
 
 interface AuthContextValue {
@@ -40,6 +41,7 @@ interface AuthContextValue {
     loading: boolean;
     login: (token: string) => Promise<void>;
     logout: () => Promise<void>;
+    updateUser: (userData: AuthUser) => void;
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -49,6 +51,7 @@ const AuthContext = createContext<AuthContextValue>({
     loading: true,
     login: async () => { },
     logout: async () => { },
+    updateUser: () => { },
 });
 
 export const useAuth = (): AuthContextValue => useContext(AuthContext);
@@ -98,8 +101,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
     };
 
+    const updateUser = (userData: AuthUser) => setUser(userData);
+
     return (
-        <AuthContext.Provider value={{ user, token, isAuthenticated: !!token, loading, login, logout }}>
+        <AuthContext.Provider value={{ user, token, isAuthenticated: !!token, loading, login, logout, updateUser }}>
             {children}
         </AuthContext.Provider>
     );
