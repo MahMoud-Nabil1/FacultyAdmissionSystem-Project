@@ -8,8 +8,10 @@ import {
     ActivityIndicator,
     Alert,
     Dimensions,
+    Image,
 } from 'react-native';
 import { router } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -75,12 +77,13 @@ const MENUS: Record<string, MenuEntry[]> = {
 
 /* ─────────── component ─────────── */
 const Homepage = () => {
-    const { token, logout, user } = useAuth();
+    const { token, logout, user, updateUser } = useAuth();
     const { t, locale }           = useLanguage();
     const isRTL                   = locale === 'ar';
 
     const [fullData, setFullData] = useState<any>(null);
     const [loading,  setLoading]  = useState(true);
+    const [uploading, setUploading] = useState(false);
 
     const API_BASE = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://10.0.2.2:5000/api';
 
@@ -93,7 +96,10 @@ const Homepage = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const data = await res.json();
-                if (res.ok) setFullData(data);
+                if (res.ok) {
+                    setFullData(data);
+                    updateUser(data);
+                }
             } catch {
                 Alert.alert(t('common.error'), t('home.serverError'));
             } finally {
@@ -101,6 +107,58 @@ const Homepage = () => {
             }
         })();
     }, [token]);
+
+    const handleAvatarUpload = async () => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert(t('common.error'), t('home.cameraPermissionError') || 'Camera roll permissions are required to upload an avatar.');
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.5,
+            base64: true,
+        });
+
+        if (!result.canceled) {
+            const asset = result.assets[0];
+            if (!asset.base64) {
+                Alert.alert(t('common.error'), t('home.avatarError'));
+                return;
+            }
+
+            const base64Image = `data:image/jpeg;base64,${asset.base64}`;
+            setUploading(true);
+            try {
+                const res = await fetch(`${API_BASE}/users/avatar`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ avatar: base64Image }),
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    const updatedUser = { ...fullData, avatar: data.avatarUrl };
+                    setFullData(updatedUser);
+                    updateUser(updatedUser);
+                    Alert.alert(t('common.success'), t('home.avatarUpdated'));
+                } else {
+                    Alert.alert(t('common.error'), data.error || t('home.avatarError'));
+                }
+            } catch (err) {
+                console.error("Avatar upload failed:", err);
+                Alert.alert(t('common.error'), t('home.avatarError'));
+            } finally {
+                setUploading(false);
+            }
+        }
+    };
 
     /* logout dialog */
     const handleLogout = () =>
@@ -160,14 +218,37 @@ const Homepage = () => {
                 {/* ── Profile card ── */}
                 <View style={s.profileCard}>
                     {/* avatar */}
-                    <View style={s.avatar}>
-                        <Text style={s.avatarLetter}>
-                            {name.trim() ? name.trim()[0].toUpperCase() : '?'}
-                        </Text>
-                    </View>
+                    <TouchableOpacity 
+                        style={s.avatar} 
+                        onPress={handleAvatarUpload}
+                        disabled={uploading}
+                    >
+                        {uploading ? (
+                            <ActivityIndicator size="small" color="#fff" />
+                        ) : (
+                            fullData?.avatar ? (
+                                <Image 
+                                    source={{ uri: fullData.avatar }} 
+                                    style={s.avatarImage} 
+                                />
+                            ) : (
+                                <Text style={s.avatarLetter}>
+                                    {name.trim() ? name.trim()[0].toUpperCase() : '?'}
+                                </Text>
+                            )
+                        )}
+                        <View style={s.cameraBadge}>
+                            <Ionicons name="camera" size={12} color="#fff" />
+                        </View>
+                    </TouchableOpacity>
 
                     {/* name */}
                     <Text style={s.profileName}>{name}</Text>
+                    <TouchableOpacity onPress={handleAvatarUpload} disabled={uploading}>
+                        <Text style={s.uploadText}>
+                            {uploading ? t('home.loading') : t('home.uploadAvatar')}
+                        </Text>
+                    </TouchableOpacity>
 
                     {/* student stats */}
                     {role === 'student' && (
@@ -281,6 +362,26 @@ const s = StyleSheet.create({
         marginBottom: 10,
     },
     avatarLetter: { color: '#fff', fontSize: 28, fontWeight: '800' },
+    avatarImage: { width: 70, height: 70, borderRadius: 35 },
+    cameraBadge: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: ACCENT,
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: '#fff',
+    },
+    uploadText: {
+        fontSize: 12,
+        color: ACCENT,
+        fontWeight: '600',
+        marginTop: 4,
+    },
     profileName:  { fontSize: 17, fontWeight: '700', color: '#1f2937', textAlign: 'center' },
 
     statsRow: {
