@@ -101,7 +101,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
     };
 
-    const updateUser = (userData: AuthUser) => setUser(userData);
+    const updateUser = (userData: AuthUser) => {
+        setUser(prev => {
+            if (prev && userData && !userData.avatar && prev.avatar) {
+                return { ...userData, avatar: prev.avatar };
+            }
+            return userData;
+        });
+    };
 
     return (
         <AuthContext.Provider value={{ user, token, isAuthenticated: !!token, loading, login, logout, updateUser }}>

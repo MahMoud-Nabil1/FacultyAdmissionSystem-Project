@@ -31,10 +31,10 @@ const Home = () => {
                 }
 
                 const [userRes, subjectsRes] = await Promise.all([
-                    fetch(`${process.env.REACT_APP_API_BASE_URL || `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}`}/auth/me`, {
+                    fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}/auth/me`, {
                         headers: {Authorization: `Bearer ${token}`},
                     }),
-                    fetch(`${process.env.REACT_APP_API_BASE_URL || `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}`}/subjects`, {
+                    fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}/subjects`, {
                         headers: {Authorization: `Bearer ${token}`},
                     }),
                 ]);
