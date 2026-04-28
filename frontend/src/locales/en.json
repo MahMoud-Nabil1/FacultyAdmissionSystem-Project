@@ -408,6 +408,10 @@
     "registerSubjects": "Register Subjects",
     "academicHistory": "Academic History",
     "complaints": "Student Complaints",
+    "uploadAvatar": "Upload Avatar",
+    "avatarUpdated": "Avatar updated successfully",
+    "avatarError": "Failed to update avatar",
+    "invalidImage": "Invalid image format. Only JPEG, PNG, and WebP are allowed.",
     "changePasswordTitle": "Change Password",
     "currentPasswordPlaceholder": "Current Password",
     "newPasswordPlaceholder": "New Password",
@@ -481,6 +485,7 @@
     "staff": "Staff",
     "subjects": "Subjects",
     "groups": "Groups",
+    "returnHome": "Return Home",
     "signOut": "Sign out",
     "user": "User",
     "deanRole": "Dean of Admissions"
