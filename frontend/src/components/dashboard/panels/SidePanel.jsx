@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../../context/AuthContext";
 import "../css/adminDashboard.css";
@@ -10,6 +10,7 @@ const SidePanel = ({ userName = "", onSignOut }) => {
     const { t } = useTranslation();
     const { user } = useAuth();
     const location = useLocation();
+    const navigate = useNavigate();
     const [collapsed, setCollapsed] = useState(() => {
         try {
             return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true";
@@ -185,6 +186,13 @@ const SidePanel = ({ userName = "", onSignOut }) => {
                 )}
             </nav>
             <div className="eduadmin-sidebar-footer">
+                <button type="button" className="eduadmin-btn-home" onClick={() => navigate("/")} title={t("sidePanel.returnHome")}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
+                    <span className="eduadmin-nav-label">{t("sidePanel.returnHome")}</span>
+                </button>
                 <button type="button" className="eduadmin-btn-signout" onClick={onSignOut} title={t("sidePanel.signOut")}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -195,7 +203,15 @@ const SidePanel = ({ userName = "", onSignOut }) => {
                 </button>
                 <div className="eduadmin-sidebar-user">
                     <div className="eduadmin-user-avatar">
-                        {userName ? userName.charAt(0).toUpperCase() : "U"}
+                        {user?.avatar ? (
+                            <img 
+                                src={user.avatar} 
+                                alt="Avatar" 
+                                style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+                            />
+                        ) : (
+                            userName ? userName.charAt(0).toUpperCase() : "U"
+                        )}
                     </div>
                     <div className="eduadmin-user-info">
                         <span className="eduadmin-user-name">{userName || t("sidePanel.user")}</span>

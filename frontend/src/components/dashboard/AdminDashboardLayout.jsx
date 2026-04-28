@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import SidePanel from "./panels/SidePanel";
+import { useAuth } from "../../context/AuthContext";
 import "./css/adminDashboard.css";
 
 export const AdminDashboardContext = React.createContext({ userName: "" });
 
 const AdminDashboardLayout = () => {
     const [userName, setUserName] = useState("");
+    const { updateUser } = useAuth();
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -18,12 +20,13 @@ const AdminDashboardLayout = () => {
                 if (!res.ok) throw new Error("Unauthorized");
                 const data = await res.json();
                 setUserName(data.name);
+                updateUser(data);
             } catch (err) {
                 console.error(err);
             }
         };
         fetchUser();
-    }, []);
+    }, [updateUser]);
 
     const handleSignOut = () => {
         sessionStorage.removeItem("token");

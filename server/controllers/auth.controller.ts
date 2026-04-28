@@ -229,11 +229,13 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
         }
         const userPayload = req.user as UserPayload;
         if (userPayload.role !== "student") {
+            const staff = await Staff.findById(userPayload.id);
             res.json({
                 id: userPayload.id,
                 role: userPayload.role,
                 name: userPayload.name,
-                department: userPayload.department
+                department: userPayload.department,
+                avatar: staff?.avatar || null
             });
             return;
         }
@@ -257,6 +259,7 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
             name: student.name,
             department: student.department,
             gpa: student.gpa,
+            avatar: student.avatar || null,
             registeredHours,
             completedHours,
             completedSubjects: (student.completedSubjects as any[]).map(s => s._id.toString())

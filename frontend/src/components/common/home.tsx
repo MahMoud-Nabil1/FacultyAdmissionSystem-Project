@@ -8,7 +8,7 @@ import { useAuth } from "../../context/AuthContext";
 
 const Home = () => {
     const navigate = useNavigate();
-    const { logout } = useAuth();
+    const { logout, updateUser } = useAuth();
     const { t, i18n } = useTranslation();
     const isRTL = i18n.language === "ar";
     const [user, setUser] = useState<any>(null);
@@ -19,6 +19,7 @@ const Home = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [currentPassword, setCurrentPassword] = useState("");
     const [resetMessage, setResetMessage] = useState("");
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -48,6 +49,7 @@ const Home = () => {
 
                 const userData = await userRes.json();
                 setUser(userData);
+                updateUser(userData);
 
                 if (subjectsRes.ok) {
                     const subjectsData = await subjectsRes.json();
@@ -87,7 +89,7 @@ const Home = () => {
 
         try {
             const token = sessionStorage.getItem("token");
-            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL || `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}`}/auth/change-password`, {
+            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}/auth/change-password`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -115,6 +117,41 @@ const Home = () => {
         }
     };
 
+    const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("avatar", file);
+
+        setUploading(true);
+        try {
+            const token = sessionStorage.getItem("token");
+            const res = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}/users/avatar`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                const updatedUser = { ...user, avatar: data.avatarUrl };
+                setUser(updatedUser);
+                updateUser(updatedUser);
+                alert(t("home.avatarUpdated"));
+            } else {
+                alert(data.error || t("home.avatarError"));
+            }
+        } catch (err) {
+            console.error("Avatar upload failed:", err);
+            alert(t("home.avatarError"));
+        } finally {
+            setUploading(false);
+        }
+    };
+
     const closeModal = () => {
         setShowReset(false);
         setCurrentPassword("");
@@ -131,6 +168,17 @@ const Home = () => {
 
             <div className="home-content">
                 <div className="info-card info-card-home">
+                    <div className="avatar-section">
+                        <img 
+                            src={user?.avatar ? user.avatar : "/default-avatar.png"} 
+                            alt="Avatar" 
+                            className="home-avatar"
+                        />
+                        <label className="upload-label">
+                            {uploading ? t("home.loading") : t("home.uploadAvatar")}
+                            <input type="file" accept="image/*" onChange={handleAvatarUpload} disabled={uploading} style={{ display: 'none' }} />
+                        </label>
+                    </div>
                     {user?.role === "student" && studentLevel && (
                         <div className="home-level-badge">
                             <strong>{t("registration.studentLevel")}</strong>{" "}
