@@ -44,6 +44,10 @@ router.post('/avatar', authenticate, (req: any, res: Response) => {
             // Convert to Base64 data URL
             const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
 
+            if (base64Image.length > 3 * 1024 * 1024) { // Roughly 3MB limit
+                return res.status(400).json({ error: 'Image is too large after processing' });
+            }
+
             let user;
             if (role === 'student') {
                 user = await Student.findOneAndUpdate({ studentId: userId }, { avatar: base64Image }, { new: true });
@@ -63,6 +67,31 @@ router.post('/avatar', authenticate, (req: any, res: Response) => {
             res.status(500).json({ error: 'Internal server error' });
         }
     });
+});
+
+router.get('/avatar/:userId', async (req: Request, res: Response) => {
+    try {
+        const { userId } = req.params;
+        let user;
+        
+        // Try staff first, then student
+        user = await Staff.findById(userId).select('avatar');
+        if (!user || !user.avatar) {
+            const studentId = Number(userId);
+            if (!isNaN(studentId)) {
+                user = await Student.findOne({ studentId }).select('avatar');
+            }
+        }
+
+        if (!user || !user.avatar) {
+            return res.status(404).json({ error: 'Avatar not found' });
+        }
+
+        // Return the avatar string
+        res.json({ avatar: user.avatar });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 export default router;
