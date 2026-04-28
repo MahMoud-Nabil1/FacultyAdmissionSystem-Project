@@ -10,24 +10,30 @@ interface Message {
 }
 
 const AiChatBox: React.FC = () => {
-    const { user } = useAuth();
+    const { user, isAuthenticated } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [inputMessage, setInputMessage] = useState('');
     const [messages, setMessages] = useState<Message[]>([]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    // Get storage key based on user (different key for each user)
+    // Get user ID from various possible fields
+    const getUserId = () => {
+        return user?.id || user?._id || user?.studentId || null;
+    };
+
+    // Get storage key based on user
     const getStorageKey = () => {
-        if (user?.id) {
-            return `aiChatMessages_${user.id}`;
+        const userId = getUserId();
+        if (userId) {
+            return `aiChatMessages_${userId}`;
         }
         return null;
     };
 
     // Load messages from localStorage on mount or when user changes
     useEffect(() => {
-        if (user?.id) {
+        if (isAuthenticated && getUserId()) {
             const storageKey = getStorageKey();
             const savedMessages = localStorage.getItem(storageKey);
             if (savedMessages) {
@@ -46,20 +52,19 @@ const AiChatBox: React.FC = () => {
                 setDefaultMessages();
             }
         } else {
-            // No user logged in, clear messages
             setMessages([]);
         }
-    }, [user]);
+    }, [user, isAuthenticated]);
 
-    // Save messages to localStorage whenever they change (only if user is logged in)
+    // Save messages to localStorage
     useEffect(() => {
-        if (user?.id && messages.length > 0) {
+        if (isAuthenticated && getUserId() && messages.length > 0) {
             const storageKey = getStorageKey();
             if (storageKey) {
                 localStorage.setItem(storageKey, JSON.stringify(messages));
             }
         }
-    }, [messages, user]);
+    }, [messages, isAuthenticated]);
 
     const setDefaultMessages = () => {
         const defaultMessages = [
@@ -71,7 +76,7 @@ const AiChatBox: React.FC = () => {
             }
         ];
         setMessages(defaultMessages);
-        if (user?.id) {
+        if (isAuthenticated && getUserId()) {
             const storageKey = getStorageKey();
             if (storageKey) {
                 localStorage.setItem(storageKey, JSON.stringify(defaultMessages));
@@ -99,7 +104,7 @@ const AiChatBox: React.FC = () => {
         setMessages(prev => [...prev, userMessage]);
         setInputMessage('');
 
-        // Simulate AI response (replace with actual API later)
+        // Simulate AI response
         setTimeout(() => {
             const aiResponse: Message = {
                 id: (Date.now() + 1).toString(),
@@ -111,7 +116,6 @@ const AiChatBox: React.FC = () => {
         }, 500);
     };
 
-    // Temporary auto-response function
     const getAutoResponse = (message: string): string => {
         const lowerMsg = message.toLowerCase();
         if (lowerMsg.includes('مرحب') || lowerMsg.includes('hello')) {
@@ -149,30 +153,25 @@ const AiChatBox: React.FC = () => {
         return date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
     };
 
-    // Don't render chat if user is not logged in
-    if (!user?.id) {
+    // Don't render chat if user is not authenticated
+    if (!isAuthenticated || !getUserId()) {
         return null;
     }
 
     return (
         <>
-            {/* Floating Circle Button */}
             <button
                 className={`ai-chat-circle ${isOpen ? 'open' : ''}`}
                 onClick={() => setIsOpen(!isOpen)}
             >
-                {isOpen ? '✕' : '🤖'}
-                {messages.length > 0 && !isOpen && (
-                    <span className="chat-badge">{messages.length}</span>
-                )}
+                {isOpen ? '✕' : '💬'}
             </button>
 
-            {/* Small Floating Chat Window */}
             {isOpen && (
                 <div className="ai-chat-window">
                     <div className="ai-chat-header">
                         <div className="header-info">
-                            <span className="header-icon">🤖</span>
+                            <span className="header-icon">💬</span>
                             <span className="header-title">المساعد الذكي</span>
                         </div>
                         <div className="header-actions">
