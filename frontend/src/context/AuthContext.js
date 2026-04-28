@@ -10,6 +10,13 @@ export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Helper function to clear chat history for a user
+    const clearChatHistory = (userId) => {
+        if (userId) {
+            localStorage.removeItem(`aiChatMessages_${userId}`);
+        }
+    };
+
     useEffect(() => {
         const checkAuth = () => {
             const savedToken = sessionStorage.getItem('token');
@@ -43,7 +50,6 @@ export const AuthProvider = ({ children }) => {
 
         checkAuth();
 
-        // Polling to check for token removal in the same tab
         const interval = setInterval(() => {
             const currentToken = sessionStorage.getItem('token');
             if (!currentToken && token) {
@@ -70,6 +76,11 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
+        // Clear chat history for the current user before logging out
+        const userId = user?.id || user?._id || user?.studentId;
+        if (userId) {
+            clearChatHistory(userId);
+        }
         sessionStorage.removeItem('token');
         setToken(null);
         setUser(null);
