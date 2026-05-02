@@ -9,6 +9,21 @@ interface Message {
     timestamp: Date;
 }
 
+interface StudentData {
+    id?: string;
+    name?: string;
+    email?: string;
+    role?: string;
+    studentId?: string;
+    gpa?: number;
+    department?: string;
+    level?: string;
+    registeredHours?: number;
+    completedHours?: number;
+    completedSubjects?: string[];
+    registeredSubjects?: string[];
+}
+
 const AiChatBox: React.FC = () => {
     const { user, isAuthenticated } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +31,24 @@ const AiChatBox: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+
+    // Get full student data
+    const getStudentData = (): StudentData => {
+        return {
+            id: user?.id || user?._id,
+            name: user?.name,
+            email: user?.email,
+            role: user?.role,
+            studentId: user?.studentId,
+            gpa: user?.gpa,
+            department: user?.department,
+            level: user?.level,
+            registeredHours: user?.registeredHours,
+            completedHours: user?.completedHours,
+            completedSubjects: user?.completedSubjects,
+            registeredSubjects: user?.registeredSubjects
+        };
+    };
 
     // Get user ID from various possible fields
     const getUserId = () => {
@@ -104,11 +137,17 @@ const AiChatBox: React.FC = () => {
         setMessages(prev => [...prev, userMessage]);
         setInputMessage('');
 
-        // Simulate AI response
+        // Get full student data to send with the message
+        const studentData = getStudentData();
+
+        // Log all student data (for debugging)
+        console.log('Sending message with student data:', studentData);
+
+        // Simulate AI response with student data context
         setTimeout(() => {
             const aiResponse: Message = {
                 id: (Date.now() + 1).toString(),
-                text: getAutoResponse(inputMessage),
+                text: getAutoResponse(inputMessage, studentData),
                 sender: 'ai',
                 timestamp: new Date()
             };
@@ -116,24 +155,69 @@ const AiChatBox: React.FC = () => {
         }, 500);
     };
 
-    const getAutoResponse = (message: string): string => {
+    // Enhanced AI response with student data
+    const getAutoResponse = (message: string, studentData: StudentData): string => {
         const lowerMsg = message.toLowerCase();
-        if (lowerMsg.includes('مرحب') || lowerMsg.includes('hello')) {
-            return 'أهلاً بك! كيف يمكنني مساعدتك اليوم؟';
+
+        // Personal info responses
+        if (lowerMsg.includes('اسمي') || lowerMsg.includes('من انا') || lowerMsg.includes('عرفني')) {
+            return `أنت ${studentData.name || 'طالب'}${studentData.studentId ? ` برقم جامعي ${studentData.studentId}` : ''}${studentData.department ? ` في قسم ${studentData.department}` : ''}. كيف يمكنني مساعدتك اليوم؟`;
         }
+
+        if (lowerMsg.includes('رقمي') || lowerMsg.includes('الرقم الجامعي')) {
+            return studentData.studentId ? `رقمك الجامعي هو: ${studentData.studentId}` : 'لم يتم العثور على رقمك الجامعي في النظام.';
+        }
+
+        if (lowerMsg.includes('معدلي') || lowerMsg.includes('gpa') || lowerMsg.includes('المعدل')) {
+            return studentData.gpa ? `معدلك التراكمي الحالي هو: ${studentData.gpa}` : 'لم يتم العثور على معدلك التراكمي في النظام.';
+        }
+
+        if (lowerMsg.includes('المستوى') || lowerMsg.includes('level')) {
+            return studentData.level ? `أنت في المستوى: ${studentData.level}` : 'لم يتم تحديد مستواك الدراسي بعد.';
+        }
+
+        if (lowerMsg.includes('ساعات') || lowerMsg.includes('credits')) {
+            let response = '';
+            if (studentData.registeredHours) {
+                response += `عدد الساعات المسجلة: ${studentData.registeredHours}\n`;
+            }
+            if (studentData.completedHours) {
+                response += `عدد الساعات المكتملة: ${studentData.completedHours}`;
+            }
+            return response || 'لم يتم العثور على معلومات الساعات الدراسية.';
+        }
+
+        if (lowerMsg.includes('القسم') || lowerMsg.includes('department')) {
+            return studentData.department ? `قسمك هو: ${studentData.department}` : 'لم يتم تحديد قسمك بعد.';
+        }
+
+        // General responses
+        if (lowerMsg.includes('مرحب') || lowerMsg.includes('hello') || lowerMsg.includes('السلام')) {
+            return `أهلاً بك ${studentData.name || 'عزيزي الطالب'}! كيف يمكنني مساعدتك اليوم؟`;
+        }
+
         if (lowerMsg.includes('شكر')) {
             return 'العفو! أنا هنا لمساعدتك في أي وقت.';
         }
-        if (lowerMsg.includes('تسجيل') || lowerMsg.includes('مواد')) {
-            return 'يمكنك تسجيل المواد من خلال الذهاب إلى صفحة "تسجيل المواد" في القائمة الرئيسية.';
+
+        if (lowerMsg.includes('تسجيل') || lowerMsg.includes('مواد') || lowerMsg.includes('register')) {
+            return `يمكنك تسجيل المواد من خلال الذهاب إلى صفحة "تسجيل المواد" في القائمة الرئيسية.${studentData.gpa ? `\n\nمعلومة: معدلك الحالي ${studentData.gpa}` : ''}`;
         }
-        if (lowerMsg.includes('جدول') || lowerMsg.includes('مجموعات')) {
-            return 'لعرض الجدول الدراسي، اذهب إلى صفحة "المجموعات" لمشاهدة جميع المجموعات المتاحة.';
+
+        if (lowerMsg.includes('جدول') || lowerMsg.includes('مجموعات') || lowerMsg.includes('schedule')) {
+            return 'لعرض الجدول الدراسي، اذهب إلى صفحة "المجموعات" لمشاهدة جميع المجموعات المتاحة وتفاصيلها.';
         }
-        if (lowerMsg.includes('شكوى') || lowerMsg.includes('طلب')) {
+
+        if (lowerMsg.includes('شكوى') || lowerMsg.includes('طلب') || lowerMsg.includes('complaint')) {
             return 'لتقديم شكوى، استخدم صفحة "الشكاوى" حيث يمكنك إنشاء طلب جديد ومتابعة حالته.';
         }
-        return 'شكراً لسؤالك. هل يمكنك توضيح أكثر؟ أنا هنا لمساعدتك في الاستفسارات المتعلقة بالنظام الأكاديمي.';
+
+        if (lowerMsg.includes('مساعدة') || lowerMsg.includes('help')) {
+            return `أهلاً ${studentData.name || 'عزيزي الطالب'}! يمكنني مساعدتك في:\n- معرفة معلوماتك الشخصية (الرقم الجامعي، المعدل، المستوى)\n- تسجيل المواد\n- عرض الجدول الدراسي\n- تقديم الشكاوى\n- معلومات عن النظام\n\nما الذي تريد معرفته؟`;
+        }
+
+        // Default response with personal touch
+        return `شكراً لسؤالك ${studentData.name || 'عزيزي الطالب'}. هل يمكنك توضيح أكثر؟ أنا هنا لمساعدتك في الاستفسارات المتعلقة بالنظام الأكاديمي.`;
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
