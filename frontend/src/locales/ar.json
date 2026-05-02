@@ -306,6 +306,13 @@
   "dashboardTable": {
     "backToAdminDashboard": "العودة إلى لوحة الإدارة"
   },
+  "adminAnalysis": {
+    "title": "تحليلات الطلاب",
+    "loading": "جاري التحميل...",
+    "totalStudents": "إجمالي الطلاب",
+    "finishedRegistration": "أتموا التسجيل",
+    "didNotFinish": "لم يتموا التسجيل"
+  },
   "studentsTable": {
     "title": "جدول الطلاب",
     "addNew": "إضافة طالب جديد",
@@ -480,6 +487,7 @@
     "staff": "الموظفين",
     "subjects": "المقررات",
     "groups": "المجموعات",
+    "adminAnalysis": "احصائيات",
     "returnHome": "العودة للرئيسية",
     "signOut": "تسجيل الخروج",
     "user": "مستخدم",

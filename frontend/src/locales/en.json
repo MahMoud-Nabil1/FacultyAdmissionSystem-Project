@@ -310,6 +310,13 @@
   "dashboardTable": {
     "backToAdminDashboard": "Back to Admin Dashboard"
   },
+  "adminAnalysis": {
+    "title": "Student Analytics",
+    "loading": "Loading...",
+    "totalStudents": "Total Students",
+    "finishedRegistration": "Finished Registration",
+    "didNotFinish": "Did Not Finish Registration"
+  },
   "studentsTable": {
     "title": "Students Table",
     "addNew": "Add New Student",
@@ -485,6 +492,7 @@
     "staff": "Staff",
     "subjects": "Subjects",
     "groups": "Groups",
+    "adminAnalysis": "Admin Analysis",
     "returnHome": "Return Home",
     "signOut": "Sign out",
     "user": "User",
