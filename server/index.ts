@@ -15,6 +15,7 @@ import announcementRoutes from "./routes/announcement.routes";
 import groupRoutes from "./routes/group.routes";
 import systemSettingRoutes from "./routes/systemSetting.routes";
 import placeRoutes from "./routes/place.routes";
+import userRoutes from "./routes/user.routes";
 
 const app = express();
 
@@ -32,8 +33,8 @@ app.use(
     })
 );
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // Register models
 import "./models/department";
@@ -54,6 +55,7 @@ app.use("/api/announcements", announcementRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/settings", systemSettingRoutes);
 app.use("/api/places", placeRoutes);
+app.use("/api/users", userRoutes);
 
 app.use((req: Request, res: Response) => {
     res.status(404).json({ message: "Route not found" });

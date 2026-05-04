@@ -404,6 +404,10 @@
     "registerSubjects": "تسجيل المواد",
     "academicHistory": "التاريخ الأكاديمي",
     "complaints": "طلبات الطلاب",
+    "uploadAvatar": "رفع صورة الشخصية",
+    "avatarUpdated": "تم تحديث الصورة الشخصية بنجاح",
+    "avatarError": "فشل تحديث الصورة الشخصية",
+    "invalidImage": "تنسيق صورة غير صالح. مسموح فقط بـ JPEG و PNG و WebP.",
     "changePasswordTitle": "تغيير كلمة السر",
     "currentPasswordPlaceholder": "كلمة السر الحالية",
     "newPasswordPlaceholder": "كلمة السر الجديدة",
@@ -476,6 +480,7 @@
     "staff": "الموظفين",
     "subjects": "المقررات",
     "groups": "المجموعات",
+    "returnHome": "العودة للرئيسية",
     "signOut": "تسجيل الخروج",
     "user": "مستخدم",
     "deanRole": "عميد القبول"

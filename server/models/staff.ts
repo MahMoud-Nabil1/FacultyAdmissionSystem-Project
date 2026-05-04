@@ -10,6 +10,7 @@ export interface IStaff extends Document {
     departments: mongoose.Types.ObjectId[];
     students: mongoose.Types.ObjectId[];
     currentSessionId?: string | null;
+    avatar?: string | null;
     createdAt: Date;
     updatedAt: Date;
 
@@ -55,6 +56,10 @@ const staffSchema = new Schema<IStaff>({
         ref: 'Student'
     }],
     currentSessionId: {
+        type: String,
+        default: null
+    },
+    avatar: {
         type: String,
         default: null
     }
