@@ -10,15 +10,13 @@
     },
     "preview": {
       "android": {
-        "buildType": "apk",
-        "resourceClass": "large"
+        "buildType": "apk"
       },
       "distribution": "internal"
     },
     "production": {
       "android": {
-        "buildType": "app-bundle",
-        "resourceClass": "large"
+        "buildType": "app-bundle"
       }
     }
   },
