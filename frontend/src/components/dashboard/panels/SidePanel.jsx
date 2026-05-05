@@ -38,6 +38,8 @@ const SidePanel = ({ userName = "", onSignOut }) => {
     // academic_guide can only see: Announcements, Students, Groups, Subjects, Places
     const isAcademicGuide = user?.role === "academic_guide";
     const isReporter = user?.role === "reporter";
+    const isAdmin = user?.role === "admin";
+    const isAcademicGuideCoordinator = user?.role === "academic_guide_coordinator";
 
     return (
         <aside className={`eduadmin-sidebar ${collapsed ? "collapsed" : ""}`}>
@@ -182,6 +184,20 @@ const SidePanel = ({ userName = "", onSignOut }) => {
                             <circle cx="12" cy="10" r="3" />
                         </svg>
                         <span className="eduadmin-nav-label">{t("sidePanel.places")}</span>
+                    </Link>
+                )}
+                {(isAdmin || isAcademicGuideCoordinator) && (
+                    <Link
+                        to="/admin-dashboard/analysis"
+                        className={`eduadmin-nav-item ${location.pathname.includes("/analysis") ? "active" : ""}`}
+                        title={t("sidePanel.adminAnalysis")}
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10" />
+                            <line x1="12" y1="20" x2="12" y2="4" />
+                            <line x1="6" y1="20" x2="6" y2="14" />
+                        </svg>
+                        <span className="eduadmin-nav-label">{t("sidePanel.adminAnalysis")}</span>
                     </Link>
                 )}
             </nav>
