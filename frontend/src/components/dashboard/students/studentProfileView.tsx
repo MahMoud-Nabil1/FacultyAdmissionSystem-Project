@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
     addStudentToGroup,
     getAllGroups,
+    getAllPlaces,
     getStudentById,
     removeStudentFromGroup,
     getAllSubjects,
@@ -41,7 +42,7 @@ interface Group {
     to: number;
     students: (string | { _id: string })[];
     capacity: number;
-    place: string;
+    place: string | { _id: string; name?: string };
 }
 
 interface StaffMember {
@@ -60,6 +61,7 @@ const StudentProfile: React.FC = () => {
     const [groups, setGroups] = useState<Group[]>([]);
     const [loading, setLoading] = useState(true);
     const [subjects, setSubjects] = useState<Subject[]>([]);
+    const [places, setPlaces] = useState<Array<{ _id: string; name: string }>>([]);
     const [actionLoading, setActionLoading] = useState(false);
     const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
     const [showAdvisorModal, setShowAdvisorModal] = useState(false);
@@ -69,14 +71,16 @@ const StudentProfile: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [studentData, groupsData, subjectsData] = await Promise.all([
+                const [studentData, groupsData, subjectsData, placesData] = await Promise.all([
                     getStudentById(id!),
                     getAllGroups(),
-                    getAllSubjects()
+                    getAllSubjects(),
+                    getAllPlaces()
                 ]);
                 setStudent(studentData);
                 setGroups(groupsData);
                 setSubjects(subjectsData);
+                setPlaces(Array.isArray(placesData) ? placesData : []);
             } catch (err) {
                 console.error(err);
             }
@@ -124,6 +128,18 @@ const StudentProfile: React.FC = () => {
         if (completedHours <= 90) return '3';
         return '4';
     }, [completedHours]);
+
+    const placeMap = useMemo(() => {
+        const map = new Map<string, string>();
+        places.forEach(place => map.set(place._id, place.name));
+        return map;
+    }, [places]);
+
+    const getPlaceName = (place: Group["place"]) => {
+        if (!place) return "-";
+        if (typeof place === "object") return place.name || place._id || "-";
+        return placeMap.get(place) || place;
+    };
 
     if (!student) return <p>{t("studentProfile.loadingStudent")}</p>;
 
@@ -290,7 +306,7 @@ const StudentProfile: React.FC = () => {
                                 <td>{g.number}</td>
                                 <td>{g.day}</td>
                                 <td>{g.from}-{g.to}</td>
-                                <td>{g.place}</td>
+                                <td>{getPlaceName(g.place)}</td>
                                 <td>
                                     <button
                                         className="btn btn-remove"
@@ -333,7 +349,7 @@ const StudentProfile: React.FC = () => {
                                 <td>{g.number}</td>
                                 <td>{g.day}</td>
                                 <td>{g.from}-{g.to}</td>
-                                <td>{g.place}</td>
+                                <td>{getPlaceName(g.place)}</td>
                                 <td>
                                     <button
                                         className="btn btn-add"

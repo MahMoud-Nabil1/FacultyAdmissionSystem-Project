@@ -113,7 +113,7 @@ export default function AdminComplaintsScreen() {
     if (loading) {
         return (
             <ScreenContainer>
-                <CustomHeader title={t('home.complaints')} />
+                <CustomHeader title={t('complaints.adminPanelTitle')} />
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#1a73e8" />
                     <Text style={styles.loadingText}>{t('common.loading')}</Text>
@@ -124,7 +124,7 @@ export default function AdminComplaintsScreen() {
 
     return (
         <ScreenContainer>
-            <CustomHeader title={t('home.complaints')} />
+            <CustomHeader title={t('complaints.adminPanelTitle')} />
             <ScrollView
                 style={styles.scroll}
                 contentContainerStyle={styles.scrollContent}

@@ -49,7 +49,7 @@ const GroupPanel: React.FC = () => {
     const [day, setDay] = useState("");
     const [from, setFrom] = useState<number | "">("");
     const [to, setTo] = useState<number | "">("");
-    const [capacity, setCapacity] = useState<number | "">(30);
+    const [capacity, setCapacity] = useState<number | "">("");
     const [place, setPlace] = useState("");
 
     // --- Corequisite fields ---
@@ -58,7 +58,7 @@ const GroupPanel: React.FC = () => {
     const [coReqDay, setCoReqDay] = useState("");
     const [coReqFrom, setCoReqFrom] = useState<number | "">("");
     const [coReqTo, setCoReqTo] = useState<number | "">("");
-    const [coReqCapacity, setCoReqCapacity] = useState<number | "">(30);
+    const [coReqCapacity, setCoReqCapacity] = useState<number | "">("");
 
     const [editingId, setEditingId] = useState<string | null>(null);
     const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
@@ -88,6 +88,21 @@ const GroupPanel: React.FC = () => {
     const formatDay = (day: string): string =>
         day.charAt(0).toUpperCase() + day.slice(1);
 
+    const selectedPlace = useMemo(
+        () => places.find(p => p._id === place) ?? null,
+        [places, place]
+    );
+
+    const normalizeCapacityForPlace = (value: number | "", maxCapacity?: number): number | "" => {
+        if (!maxCapacity) return value;
+        if (value === "") return maxCapacity;
+
+        const numericValue = Number(value);
+        if (Number.isNaN(numericValue) || numericValue < 1) return maxCapacity;
+
+        return Math.min(numericValue, maxCapacity);
+    };
+
     useEffect(() => {
         fetchGroups();
     }, []);
@@ -100,16 +115,12 @@ const GroupPanel: React.FC = () => {
         fetchPlaces();
     }, []);
 
-    // Auto-fill capacity when place is selected
     useEffect(() => {
-        if (place && !editingId) {
-            const selectedPlace = places.find(p => p._id === place);
-            if (selectedPlace) {
-                setCapacity(selectedPlace.capacity);
-                setCoReqCapacity(selectedPlace.capacity);
-            }
-        }
-    }, [place, places, editingId]);
+        if (!selectedPlace || editingId) return;
+
+        setCapacity(currentValue => normalizeCapacityForPlace(currentValue, selectedPlace.capacity));
+        setCoReqCapacity(currentValue => normalizeCapacityForPlace(currentValue, selectedPlace.capacity));
+    }, [selectedPlace, editingId]);
 
     useEffect(() => {
         setPage(0);
@@ -165,6 +176,9 @@ const GroupPanel: React.FC = () => {
         if (!capacity) errors.capacity = "Capacity is required";
         if (!place) errors.place = "Place is required";
         if (from && to && Number(from) >= Number(to)) errors.time = "End time must be after start time";
+        if (selectedPlace && capacity && Number(capacity) > selectedPlace.capacity) {
+            errors.capacity = t("groupPanel.placeCapacityExceeded", { capacity: selectedPlace.capacity });
+        }
 
         if (hasCoreq) {
             if (!coReqType) errors.coReqType = "Corequisite type is required";
@@ -174,6 +188,9 @@ const GroupPanel: React.FC = () => {
             if (!coReqCapacity) errors.coReqCapacity = "Corequisite capacity is required";
             if (coReqFrom && coReqTo && Number(coReqFrom) >= Number(coReqTo))
                 errors.coReqTime = "Corequisite end time must be after start time";
+            if (selectedPlace && coReqCapacity && Number(coReqCapacity) > selectedPlace.capacity) {
+                errors.coReqCapacity = t("groupPanel.placeCapacityExceeded", { capacity: selectedPlace.capacity });
+            }
         }
 
         setFormErrors(errors);
@@ -257,14 +274,14 @@ const GroupPanel: React.FC = () => {
         setDay("");
         setFrom("");
         setTo("");
-        setCapacity(30);
+        setCapacity("");
         setPlace("");
         setHasCoreq(false);
         setCoReqType("lab");
         setCoReqDay("");
         setCoReqFrom("");
         setCoReqTo("");
-        setCoReqCapacity(30);
+        setCoReqCapacity("");
         setFormErrors({});
     };
 
@@ -374,7 +391,7 @@ const GroupPanel: React.FC = () => {
         t("groupPanel.columnDay"),
         t("groupPanel.columnFrom"),
         t("groupPanel.columnTo"),
-        "Place",
+        t("groupPanel.placeLabel"),
     ];
 
     const placeMap = useMemo(() => {
@@ -564,18 +581,18 @@ const GroupPanel: React.FC = () => {
 
                                 {/* Place */}
                                 <div className="form-group">
-                                    <label>Place *</label>
+                                    <label>{t("groupPanel.placeLabel")} *</label>
                                     <select
                                         value={place}
                                         onChange={e => { setPlace(e.target.value); setFormErrors(f => ({...f, place: ""})); }}
                                         disabled={loadingPlaces}
                                     >
                                         <option value="">
-                                            {loadingPlaces ? "Loading places..." : "Select place"}
+                                            {loadingPlaces ? t("groupPanel.placeLoading") : t("groupPanel.placeSelectPlaceholder")}
                                         </option>
                                         {places.filter(p => p.name).map(p => (
                                             <option key={p._id} value={p._id}>
-                                                {p.name} (Capacity: {p.capacity})
+                                                {t("groupPanel.placeOption", { name: p.name, capacity: p.capacity })}
                                             </option>
                                         ))}
                                     </select>
@@ -588,13 +605,17 @@ const GroupPanel: React.FC = () => {
                                     <input
                                         type="number"
                                         min="1"
+                                        max={selectedPlace?.capacity}
                                         value={capacity}
-                                        disabled
-                                        style={{ backgroundColor: 'var(--color-surface-hover)', cursor: 'not-allowed' }}
+                                        onChange={e => {
+                                            const value = e.target.value;
+                                            setCapacity(value === "" ? "" : Number(value));
+                                            setFormErrors(f => ({...f, capacity: ""}));
+                                        }}
                                     />
-                                    {place && !editingId && (
+                                    {selectedPlace && (
                                         <small style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginTop: '4px', display: 'block' }}>
-                                            Capacity is automatically set from the selected place
+                                            {t("groupPanel.placeCapacityHint", { capacity: selectedPlace.capacity })}
                                         </small>
                                     )}
                                     {formErrors.capacity && <span className="error">{formErrors.capacity}</span>}
@@ -665,10 +686,19 @@ const GroupPanel: React.FC = () => {
                                                 <input
                                                     type="number"
                                                     min="1"
+                                                    max={selectedPlace?.capacity}
                                                     value={coReqCapacity}
-                                                    disabled
-                                                    style={{ backgroundColor: 'var(--color-surface-hover)', cursor: 'not-allowed' }}
+                                                    onChange={e => {
+                                                        const value = e.target.value;
+                                                        setCoReqCapacity(value === "" ? "" : Number(value));
+                                                        setFormErrors(f => ({...f, coReqCapacity: ""}));
+                                                    }}
                                                 />
+                                                {selectedPlace && (
+                                                    <small style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginTop: '4px', display: 'block' }}>
+                                                        {t("groupPanel.placeCapacityHint", { capacity: selectedPlace.capacity })}
+                                                    </small>
+                                                )}
                                                 {formErrors.coReqCapacity && <span className="error">{formErrors.coReqCapacity}</span>}
                                             </div>
                                         </div>

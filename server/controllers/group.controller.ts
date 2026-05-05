@@ -8,6 +8,7 @@ import { UserPayload } from '../middleware/authMiddleware';
 import mongoose from "mongoose";
 import { ensureSubjectRequested, hasTimeCollision, checkPrerequisites, checkGpaRange, checkSubjectLevel } from '../utils/enrollment.utils';
 import SystemSetting from '../models/systemSetting';
+import { Place } from '../models/place';
 
 /**
  * canManageStudent is true when staff has write permissions for a specific student
@@ -41,9 +42,31 @@ async function canManageStudent(staff: IStaff, studentId: string): Promise<boole
     return false;
 }
 
+async function validateGroupCapacityForPlace(placeId: unknown, requestedCapacity: unknown): Promise<string | null> {
+    if (!placeId || requestedCapacity === undefined || requestedCapacity === null || requestedCapacity === '') {
+        return null;
+    }
+
+    const numericCapacity = Number(requestedCapacity);
+    if (Number.isNaN(numericCapacity)) {
+        return "Capacity must be a valid number";
+    }
+
+    const place = await Place.findById(placeId);
+    if (!place) {
+        return "Selected place was not found";
+    }
+
+    if (numericCapacity > place.capacity) {
+        return `Group capacity cannot exceed ${place.capacity} for place "${place.name}"`;
+    }
+
+    return null;
+}
+
 export const createGroup = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { day, from, to, place } = req.body;
+        const { day, from, to, place, capacity } = req.body;
 
         // Check for place time collision
         if (place && day && from !== undefined && to !== undefined) {
@@ -61,6 +84,12 @@ export const createGroup = async (req: Request, res: Response): Promise<void> =>
                 res.status(400).json({ error: `Place "${placeName}" is already reserved on ${day} from ${collision.from}:00 to ${collision.to}:00` });
                 return;
             }
+        }
+
+        const capacityError = await validateGroupCapacityForPlace(place, capacity);
+        if (capacityError) {
+            res.status(400).json({ error: capacityError });
+            return;
         }
 
         const group = new Group(req.body);
@@ -110,7 +139,7 @@ export const getGroupById = async (req: Request, res: Response): Promise<void> =
 
 export const updateGroup = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { day, from, to, place } = req.body;
+        const { day, from, to, place, capacity } = req.body;
 
         // Check for place time collision (excluding current group)
         if (place && day && from !== undefined && to !== undefined) {
@@ -130,6 +159,12 @@ export const updateGroup = async (req: Request, res: Response): Promise<void> =>
                 res.status(400).json({ error: `Place "${placeName}" is already reserved on ${day} from ${collision.from}:00 to ${collision.to}:00` });
                 return;
             }
+        }
+
+        const capacityError = await validateGroupCapacityForPlace(place, capacity);
+        if (capacityError) {
+            res.status(400).json({ error: capacityError });
+            return;
         }
 
         const group = await Group.findByIdAndUpdate(
