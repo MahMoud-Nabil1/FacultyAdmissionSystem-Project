@@ -280,17 +280,10 @@ export const getMyAcademicHistory = async (req: Request, res: Response): Promise
 
         // Helper function to convert degree to GPA (4.0 scale)
         const getGPA = (degree: number): number => {
-            // (degree - 50) / 10
-            // if (gpa < 1) degree
-            if (degree >= 90) return 4.0;
-            if (degree >= 85) return 3.7;
-            if (degree >= 80) return 3.3;
-            if (degree >= 75) return 3.0;
-            if (degree >= 70) return 2.7;
-            if (degree >= 65) return 2.3;
-            if (degree >= 60) return 2.0;
-            if (degree >= 50) return 1.0;
-            return 0.0;
+            let gpa = (degree - 50) / 10
+            if (gpa < 0) gpa = 0;
+            if (gpa > 5) gpa = 5;
+            return gpa;
         };
 
         // Transform academic history to match frontend expectations
