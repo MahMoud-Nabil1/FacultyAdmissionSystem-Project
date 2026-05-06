@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getAllPlaces, createPlace, updatePlace, deletePlace } from "../../../services/api";
+import { createPlace, deletePlace, getAllPlaces, updatePlace } from "../../../services/api";
 import { useAuth } from "../../../context/AuthContext";
 
 interface Place {
     _id: string;
     name: string;
-    type: 'hall' | 'room' | 'lab' | 'lecture_hall';
+    type: "hall" | "room" | "lab" | "lecture_hall";
     capacity: number;
     building?: string;
     floor?: number;
@@ -16,21 +16,20 @@ interface Place {
 const PlacesPanel: React.FC = () => {
     const { t } = useTranslation();
     const { user } = useAuth();
-    const isAdmin = user?.role === 'admin';
+    const isAdmin = user?.role === "admin";
     const [places, setPlaces] = useState<Place[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [showModal, setShowModal] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
 
-    // Form state
     const [formName, setFormName] = useState("");
-    const [formType, setFormType] = useState<'hall' | 'room' | 'lab' | 'lecture_hall'>("lecture_hall");
+    const [formType, setFormType] = useState<"hall" | "room" | "lab" | "lecture_hall">("lecture_hall");
     const [formCapacity, setFormCapacity] = useState("");
     const [formBuilding, setFormBuilding] = useState("");
     const [formFloor, setFormFloor] = useState("");
     const [formIsActive, setFormIsActive] = useState(true);
-    const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
+    const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
     useEffect(() => {
         fetchPlaces();
@@ -46,10 +45,14 @@ const PlacesPanel: React.FC = () => {
     };
 
     const validateForm = () => {
-        const errors: {[key: string]: string} = {};
-        if (!formName.trim()) errors.formName = "Name is required";
-        if (!formCapacity) errors.formCapacity = "Capacity is required";
-        if (formCapacity && Number(formCapacity) < 1) errors.formCapacity = "Capacity must be at least 1";
+        const errors: { [key: string]: string } = {};
+
+        if (!formName.trim()) errors.formName = t("placesPanel.validation.nameRequired");
+        if (!formCapacity) errors.formCapacity = t("placesPanel.validation.capacityRequired");
+        if (formCapacity && Number(formCapacity) < 1) {
+            errors.formCapacity = t("placesPanel.validation.capacityMin");
+        }
+
         setFormErrors(errors);
         return Object.keys(errors).length === 0;
     };
@@ -57,6 +60,7 @@ const PlacesPanel: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validateForm()) return;
+
         setSubmitting(true);
         try {
             const payload: any = {
@@ -65,21 +69,23 @@ const PlacesPanel: React.FC = () => {
                 capacity: Number(formCapacity),
                 isActive: formIsActive,
             };
+
             if (formBuilding.trim()) payload.building = formBuilding.trim();
             if (formFloor) payload.floor = Number(formFloor);
 
             if (editingId) {
                 const updated = await updatePlace(editingId, payload);
-                setPlaces(places.map(p => p._id === editingId ? updated : p));
-                alert("Place updated successfully!");
+                setPlaces(places.map(place => (place._id === editingId ? updated : place)));
+                alert(t("placesPanel.messages.updateSuccess"));
             } else {
                 const created = await createPlace(payload);
                 setPlaces([...places, created]);
-                alert("Place added successfully!");
+                alert(t("placesPanel.messages.createSuccess"));
             }
+
             closeModal();
         } catch (err: any) {
-            alert(err.message || "Error saving place");
+            alert(err.message || t("placesPanel.messages.saveError"));
         } finally {
             setSubmitting(false);
         }
@@ -114,39 +120,32 @@ const PlacesPanel: React.FC = () => {
     };
 
     const handleDelete = async (id: string) => {
-        if (!window.confirm("Are you sure you want to delete this place?")) return;
+        if (!window.confirm(t("placesPanel.messages.confirmDelete"))) return;
+
         try {
             await deletePlace(id);
-            setPlaces(places.filter(p => p._id !== id));
-            alert("Place deleted successfully!");
+            setPlaces(places.filter(place => place._id !== id));
+            alert(t("placesPanel.messages.deleteSuccess"));
         } catch (err: any) {
-            alert(err.message || "Error deleting place");
+            alert(err.message || t("placesPanel.messages.deleteError"));
         }
     };
 
-    const getTypeLabel = (type: string) => {
-        const labels: Record<string, string> = {
-            hall: "Hall",
-            room: "Room",
-            lab: "Lab",
-            lecture_hall: "Lecture Hall"
-        };
-        return labels[type] || type;
-    };
+    const getTypeLabel = (type: string) => t(`placesPanel.types.${type}`, type);
 
-    const filteredPlaces = places.filter(p =>
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        getTypeLabel(p.type).toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (p.building || "").toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredPlaces = places.filter(place =>
+        place.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        getTypeLabel(place.type).toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (place.building || "").toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
         <div className="dashboard-container">
             <div className="table-header">
-                <h2>Places Management ({places.length})</h2>
+                <h2>{t("placesPanel.title", { count: places.length })}</h2>
                 {isAdmin && (
                     <button className="add-btn" onClick={() => setShowModal(true)}>
-                        + Add Place
+                        + {t("placesPanel.addBtn")}
                     </button>
                 )}
             </div>
@@ -154,7 +153,7 @@ const PlacesPanel: React.FC = () => {
             <div style={{ display: "flex", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
                 <input
                     type="text"
-                    placeholder="Search places..."
+                    placeholder={t("placesPanel.searchPlaceholder")}
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                     style={{ padding: "8px", flex: "1 1 200px" }}
@@ -164,12 +163,12 @@ const PlacesPanel: React.FC = () => {
             <table className="staff-table">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Capacity</th>
-                        <th>Building</th>
-                        <th>Floor</th>
-                        <th>Status</th>
+                        <th>{t("placesPanel.columns.name")}</th>
+                        <th>{t("placesPanel.columns.type")}</th>
+                        <th>{t("placesPanel.columns.capacity")}</th>
+                        <th>{t("placesPanel.columns.building")}</th>
+                        <th>{t("placesPanel.columns.floor")}</th>
+                        <th>{t("placesPanel.columns.status")}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -181,16 +180,16 @@ const PlacesPanel: React.FC = () => {
                         >
                             <td>{place.name}</td>
                             <td>
-                                <span className={`badge badge-${place.type === 'hall' ? 'success' : place.type === 'lecture_hall' ? 'info' : place.type === 'lab' ? 'primary' : 'warning'}`}>
+                                <span className={`badge badge-${place.type === "hall" ? "success" : place.type === "lecture_hall" ? "info" : place.type === "lab" ? "primary" : "warning"}`}>
                                     {getTypeLabel(place.type)}
                                 </span>
                             </td>
                             <td>{place.capacity}</td>
-                            <td>{place.building || "—"}</td>
-                            <td>{place.floor !== undefined ? place.floor : "—"}</td>
+                            <td>{place.building || "-"}</td>
+                            <td>{place.floor !== undefined ? place.floor : "-"}</td>
                             <td>
-                                <span className={`badge badge-${place.isActive ? 'success' : 'danger'}`}>
-                                    {place.isActive ? "Active" : "Inactive"}
+                                <span className={`badge badge-${place.isActive ? "success" : "danger"}`}>
+                                    {place.isActive ? t("placesPanel.status.active") : t("placesPanel.status.inactive")}
                                 </span>
                             </td>
                         </tr>
@@ -198,21 +197,23 @@ const PlacesPanel: React.FC = () => {
                     {filteredPlaces.length === 0 && (
                         <tr>
                             <td colSpan={6} style={{ textAlign: "center" }}>
-                                No places found
+                                {t("placesPanel.empty")}
                             </td>
                         </tr>
                     )}
                 </tbody>
             </table>
 
-            {/* Add/Edit Modal - Only for Admin */}
             {isAdmin && showModal && (
-                <div className="modal-overlay" onMouseDown={(e) => {
-                    if (e.target === e.currentTarget) closeModal();
-                }}>
+                <div
+                    className="modal-overlay"
+                    onMouseDown={e => {
+                        if (e.target === e.currentTarget) closeModal();
+                    }}
+                >
                     <div className="modal-content" style={{ maxWidth: "600px" }}>
                         <div className="modal-header">
-                            <h3>{editingId ? "Edit Place" : "Add Place"}</h3>
+                            <h3>{editingId ? t("placesPanel.modal.editTitle") : t("placesPanel.modal.addTitle")}</h3>
                             <button className="modal-close" onClick={closeModal} type="button">×</button>
                         </div>
                         <div className="modal-body">
@@ -223,77 +224,82 @@ const PlacesPanel: React.FC = () => {
                                             type="button"
                                             className="delete-btn"
                                             onClick={() => {
-                                                if (editingId && window.confirm("Are you sure you want to delete this place?")) {
+                                                if (editingId && window.confirm(t("placesPanel.messages.confirmDelete"))) {
                                                     handleDelete(editingId);
                                                     closeModal();
                                                 }
                                             }}
                                         >
-                                            Delete
+                                            {t("placesPanel.buttons.delete")}
                                         </button>
                                     </div>
                                 )}
 
-                                {/* Name */}
                                 <div className="form-group">
-                                    <label>Name *</label>
+                                    <label>{t("placesPanel.form.nameLabel")} *</label>
                                     <input
                                         type="text"
-                                        placeholder="e.g. Hall A, Room 101"
+                                        placeholder={t("placesPanel.placeholders.name")}
                                         value={formName}
-                                        onChange={e => { setFormName(e.target.value); setFormErrors(f => ({...f, formName: ""})); }}
+                                        onChange={e => {
+                                            setFormName(e.target.value);
+                                            setFormErrors(errors => ({ ...errors, formName: "" }));
+                                        }}
                                     />
                                     {formErrors.formName && <span className="error">{formErrors.formName}</span>}
                                 </div>
 
-                                {/* Type & Capacity */}
                                 <div className="settings-form-row">
                                     <div className="form-group" style={{ flex: 1 }}>
-                                        <label>Type *</label>
-                                        <select value={formType} onChange={e => setFormType(e.target.value as any)}>
-                                            <option value="lecture_hall">Lecture Hall</option>
-                                            <option value="hall">Hall</option>
-                                            <option value="room">Room</option>
-                                            <option value="lab">Lab</option>
+                                        <label>{t("placesPanel.form.typeLabel")} *</label>
+                                        <select value={formType} onChange={e => setFormType(e.target.value as typeof formType)}>
+                                            <option value="lecture_hall">{t("placesPanel.types.lecture_hall")}</option>
+                                            <option value="hall">{t("placesPanel.types.hall")}</option>
+                                            <option value="room">{t("placesPanel.types.room")}</option>
+                                            <option value="lab">{t("placesPanel.types.lab")}</option>
                                         </select>
                                     </div>
                                     <div className="form-group" style={{ flex: 1 }}>
-                                        <label>Capacity *</label>
+                                        <label>{t("placesPanel.form.capacityLabel")} *</label>
                                         <input
                                             type="number"
                                             min="1"
-                                            placeholder="50"
+                                            placeholder={t("placesPanel.placeholders.capacity")}
                                             value={formCapacity}
-                                            onChange={e => { setFormCapacity(e.target.value); setFormErrors(f => ({...f, formCapacity: ""})); }}
+                                            onChange={e => {
+                                                setFormCapacity(e.target.value);
+                                                setFormErrors(errors => ({ ...errors, formCapacity: "" }));
+                                            }}
                                         />
                                         {formErrors.formCapacity && <span className="error">{formErrors.formCapacity}</span>}
                                     </div>
                                 </div>
 
-                                {/* Building & Floor */}
                                 <div className="settings-form-row">
                                     <div className="form-group" style={{ flex: 1 }}>
-                                        <label>Building</label>
+                                        <label>{t("placesPanel.form.buildingLabel")}</label>
                                         <input
                                             type="text"
-                                            placeholder="e.g. Main Building"
+                                            placeholder={t("placesPanel.placeholders.building")}
                                             value={formBuilding}
                                             onChange={e => setFormBuilding(e.target.value)}
                                         />
                                     </div>
                                     <div className="form-group" style={{ flex: 1 }}>
-                                        <label>Floor</label>
+                                        <label>{t("placesPanel.form.floorLabel")}</label>
                                         <input
                                             type="number"
-                                            placeholder="1"
+                                            placeholder={t("placesPanel.placeholders.floor")}
                                             value={formFloor}
                                             onChange={e => setFormFloor(e.target.value)}
                                         />
                                     </div>
                                 </div>
 
-                                {/* Active toggle */}
-                                <label className="settings-level-option" style={{ marginTop: "8px", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
+                                <label
+                                    className="settings-level-option"
+                                    style={{ marginTop: "8px", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+                                >
                                     <input
                                         type="checkbox"
                                         checked={formIsActive}
@@ -301,16 +307,20 @@ const PlacesPanel: React.FC = () => {
                                         style={{ width: "16px", height: "16px", cursor: "pointer" }}
                                     />
                                     <span style={{ fontSize: "14px", fontWeight: 600, color: "var(--color-text)" }}>
-                                        Active
+                                        {t("placesPanel.form.activeLabel")}
                                     </span>
                                 </label>
 
                                 <div className="modal-footer">
                                     <button type="button" className="cancel-btn" onClick={closeModal}>
-                                        Cancel
+                                        {t("placesPanel.buttons.cancel")}
                                     </button>
                                     <button type="submit" className="submit-btn" disabled={submitting}>
-                                        {submitting ? "Saving..." : editingId ? "Update" : "Save"}
+                                        {submitting
+                                            ? t("placesPanel.buttons.saving")
+                                            : editingId
+                                                ? t("placesPanel.buttons.update")
+                                                : t("placesPanel.buttons.save")}
                                     </button>
                                 </div>
                             </form>

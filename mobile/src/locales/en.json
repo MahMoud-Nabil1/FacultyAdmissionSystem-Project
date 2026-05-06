@@ -463,6 +463,7 @@
     "noData": "No academic history available"
   },
   "complaints": {
+    "adminPanelTitle": "Academic Requests Admin Panel",
     "appTitle": "Academic Requests System",
     "welcome": "Welcome",
     "studentIdLabel": "Student ID",

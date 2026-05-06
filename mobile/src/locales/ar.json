@@ -463,6 +463,7 @@
     "noData": "لا يوجد سجل أكاديمي متاح"
   },
   "complaints": {
+    "adminPanelTitle": "لوحة إدارة الطلبات الأكاديمية",
     "appTitle": "نظام الطلبات الأكاديمية",
     "welcome": "مرحباً",
     "studentIdLabel": "الرقم الجامعي",

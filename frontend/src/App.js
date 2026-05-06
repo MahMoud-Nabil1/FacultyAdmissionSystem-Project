@@ -120,6 +120,11 @@ function App() {
                                 <PlacesPanel/>
                             </ProtectedRoute>
                         }/>
+                        <Route path="analysis" element={
+                            <ProtectedRoute allowedRoles={['admin', 'academic_guide_coordinator']}>
+                                <AdminAnalysis/>
+                            </ProtectedRoute>
+                        }/>
                     </Route>
                     <Route path="/login" element={
                         <GuestRoute>
@@ -165,9 +170,8 @@ function App() {
                     }/>
 
 
-                    <Route path="/test-analysis" element={
-                        <AdminAnalysis/>
-                    }/>
+
+
 
                     <Route path="*" element={<Navigate to="/announcements" replace/>}/>
                 </Routes>
