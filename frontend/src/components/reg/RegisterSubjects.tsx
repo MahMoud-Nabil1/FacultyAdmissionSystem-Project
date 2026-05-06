@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { apiGet, apiPost, apiDelete, getEligibleSubjects } from "../../services/api";
+import React, {useEffect, useMemo, useState} from "react";
+import {useTranslation} from "react-i18next";
+import {apiGet, apiPost, apiDelete, getEligibleSubjects} from "../../services/api";
 import "./RegisterSubjects.css";
 
 /* ── Types ── */
@@ -8,7 +8,7 @@ interface SubjectData {
     _id: string;
     code: string;
     name: string;
-    level: '1' | '2' | '3' | '4';
+    level: '1' | '2' | '3' | '4'[];
     creditHours: number;
     prerequisites: { _id: string; code: string; name: string }[];
     corequisites: { _id: string; code: string; name: string }[];
@@ -71,10 +71,14 @@ const formatHour = (h: number) => {
 
 const getTypeClass = (type: string) => {
     switch (type.toLowerCase()) {
-        case "lecture":  return "regBadge regBadgeLecture";
-        case "lab":      return "regBadge regBadgeLab";
-        case "tutorial": return "regBadge regBadgeTutorial";
-        default:         return "regBadge regBadgeDefault";
+        case "lecture":
+            return "regBadge regBadgeLecture";
+        case "lab":
+            return "regBadge regBadgeLab";
+        case "tutorial":
+            return "regBadge regBadgeTutorial";
+        default:
+            return "regBadge regBadgeDefault";
     }
 };
 
@@ -82,37 +86,38 @@ const getStudentObjectId = (students: ({ _id: string } | string)[]): string[] =>
     students.map(s => (typeof s === "object" && s !== null ? s._id?.toString() : String(s)));
 
 const DAYS = ["saturday", "sunday", "monday", "tuesday", "wednesday", "thursday"];
-const HOURS_RANGE = Array.from({ length: 13 }, (_, i) => i + 8); // 8 AM to 8 PM
+const HOURS_RANGE = Array.from({length: 13}, (_, i) => i + 8); // 8 AM to 8 PM
 
 const TIMETABLE_COLORS = [
-    { bg: "#e3f2fd", border: "#42a5f5", text: "#1565c0" },
-    { bg: "#fce4ec", border: "#ef5350", text: "#c62828" },
-    { bg: "#e8f5e9", border: "#66bb6a", text: "#2e7d32" },
-    { bg: "#fff3e0", border: "#ffa726", text: "#e65100" },
-    { bg: "#f3e5f5", border: "#ab47bc", text: "#6a1b9a" },
-    { bg: "#e0f7fa", border: "#26c6da", text: "#00695c" },
-    { bg: "#fff9c4", border: "#ffee58", text: "#f57f17" },
-    { bg: "#fbe9e7", border: "#ff7043", text: "#bf360c" },
+    {bg: "#e3f2fd", border: "#42a5f5", text: "#1565c0"},
+    {bg: "#fce4ec", border: "#ef5350", text: "#c62828"},
+    {bg: "#e8f5e9", border: "#66bb6a", text: "#2e7d32"},
+    {bg: "#fff3e0", border: "#ffa726", text: "#e65100"},
+    {bg: "#f3e5f5", border: "#ab47bc", text: "#6a1b9a"},
+    {bg: "#e0f7fa", border: "#26c6da", text: "#00695c"},
+    {bg: "#fff9c4", border: "#ffee58", text: "#f57f17"},
+    {bg: "#fbe9e7", border: "#ff7043", text: "#bf360c"},
 ];
 
 /* ═══════════════════════════════════════════
    Component
    ═══════════════════════════════════════════ */
 const RegisterSubjects = () => {
-    const { t, i18n } = useTranslation();
+    const {t, i18n} = useTranslation();
 
     /* ── State ── */
-    const [student, setStudent]         = useState(null as StudentMe | null);
-    const [subjects, setSubjects]       = useState([] as SubjectData[]);
+    const [student, setStudent] = useState(null as StudentMe | null);
+    const [subjects, setSubjects] = useState([] as SubjectData[]);
     const [eligibleSubjects, setEligibleSubjects] = useState([] as SubjectData[]);
-    const [groups, setGroups]           = useState([] as GroupData[]);
-    const [myRequests, setMyRequests]   = useState([] as EnrollmentRequestData[]);
+    const [groups, setGroups] = useState([] as GroupData[]);
+    const [myRequests, setMyRequests] = useState([] as EnrollmentRequestData[]);
     const [registrationOpen, setRegistrationOpen] = useState(true);
-    const [loading, setLoading]         = useState(true);
-    const [error, setError]             = useState(null as string | null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null as string | null);
     const [selectedSubject, setSelectedSubject] = useState("");
-    const [actionLoading, setActionLoading]     = useState(null as string | null);
-    const [actionMsg, setActionMsg]     = useState(null as { type: "success" | "error"; text: string } | null);
+    const [actionLoading, setActionLoading] = useState(null as string | null);
+    const [allowedLevels, setAllowedLevels] = useState<string[]>([]);
+    const [actionMsg, setActionMsg] = useState(null as { type: "success" | "error"; text: string } | null);
 
     /* ── Fetch all data ── */
     const fetchAll = async () => {
@@ -125,15 +130,16 @@ const RegisterSubjects = () => {
                 return;
             }
 
-            const [meRes, subRes, eligibleRes, grpRes, reqRes, settingsRes] = await Promise.all([
-                fetch(`${process.env.REACT_APP_API_BASE_URL || `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}`}/auth/me`, {
-                    headers: { Authorization: `Bearer ${token}` },
+            const [meRes, subRes, eligibleRes, grpRes, reqRes, systemSettingsRes, academicSettingsRes] = await Promise.all([
+                fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}/auth/me`, {
+                    headers: {Authorization: `Bearer ${token}`},
                 }),
                 apiGet("/subjects"),
                 getEligibleSubjects(),
                 apiGet("/groups"),
                 apiGet("/groups/my-requests"),
-                apiGet("/settings"),
+                apiGet("/settings"),                    // registrationOpen, withdrawalOpen
+                apiGet("/announcements/settings"),      // gpaMin, gpaMax, level
             ]);
 
             if (!meRes.ok) {
@@ -161,8 +167,16 @@ const RegisterSubjects = () => {
                 setMyRequests(reqRes.data as EnrollmentRequestData[]);
             }
 
-            if (settingsRes.res.ok) {
-                setRegistrationOpen((settingsRes.data as any).registrationOpen ?? true);
+            // System settings
+            if (systemSettingsRes.res.ok) {
+                const systemData = systemSettingsRes.data as any;
+                setRegistrationOpen(systemData.registrationOpen ?? true);
+            }
+
+            // Academic settings (contains level array)
+            if (academicSettingsRes.res.ok) {
+                const academicData = academicSettingsRes.data as any;
+                setAllowedLevels(academicData.level ?? []);
             }
         } catch (err: any) {
             setError(err.message || t("registration.errors.fetchFailed"));
@@ -171,7 +185,9 @@ const RegisterSubjects = () => {
         }
     };
 
-    useEffect(() => { fetchAll(); }, []);
+    useEffect(() => {
+        fetchAll();
+    }, []);
 
     /* ── Derived data ── */
     const completedIds = useMemo(
@@ -188,13 +204,16 @@ const RegisterSubjects = () => {
 
     // Groups with request status (combines enrolled + requested groups)
     const myGroupsWithStatus = useMemo(() => {
-        const result: (GroupData & { requestStatus: 'enrolled' | 'pending' | 'approved' | 'rejected', requestId?: string })[] = [];
-        
+        const result: (GroupData & {
+            requestStatus: 'enrolled' | 'pending' | 'approved' | 'rejected',
+            requestId?: string
+        })[] = [];
+
         // Add enrolled groups
         myGroups.forEach((g: GroupData) => {
-            result.push({ ...g, requestStatus: 'enrolled' });
+            result.push({...g, requestStatus: 'enrolled'});
         });
-        
+
         // Add requested groups (that aren't already enrolled)
         myRequests.forEach((req: EnrollmentRequestData) => {
             const reqGroupId = getGroupId(req.group);
@@ -203,10 +222,10 @@ const RegisterSubjects = () => {
                 ? req.group as GroupData
                 : groups.find((g: GroupData) => g._id === reqGroupId);
             if (grp && !myGroups.some((g: GroupData) => g._id === (grp as GroupData)._id)) {
-                result.push({ ...(grp as GroupData), requestStatus: req.status, requestId: req._id });
+                result.push({...(grp as GroupData), requestStatus: req.status, requestId: req._id});
             }
         });
-        
+
         return result;
     }, [myGroups, myRequests, groups]);
 
@@ -335,21 +354,21 @@ const RegisterSubjects = () => {
 
     // Request to join a single group (no fetchAll, used as building block)
     const requestSingle = async (groupId: string): Promise<boolean> => {
-        const { res, data } = await apiPost(`/groups/${groupId}/request`, {});
+        const {res, data} = await apiPost(`/groups/${groupId}/request`, {});
         if (!res.ok) throw new Error((data as any).error || "Failed");
         return true;
     };
 
     // Remove from a single group (no fetchAll, used as building block)
     const removeSingle = async (groupId: string): Promise<boolean> => {
-        const { res, data } = await apiDelete(`/groups/${groupId}/students/me`);
+        const {res, data} = await apiDelete(`/groups/${groupId}/students/me`);
         if (!res.ok) throw new Error((data as any).error || "Failed");
         return true;
     };
 
     // Cancel a pending request
     const cancelRequest = async (requestId: string): Promise<boolean> => {
-        const { res, data } = await apiDelete(`/groups/requests/${requestId}`);
+        const {res, data} = await apiDelete(`/groups/requests/${requestId}`);
         if (!res.ok) throw new Error((data as any).error || "Failed");
         return true;
     };
@@ -369,10 +388,13 @@ const RegisterSubjects = () => {
             });
 
             if (unmet.length > 0) {
-                const names = unmet.map((c: { code: string; name: string }) => formatSubjectCode(c.code || c.name)).join(", ");
+                const names = unmet.map((c: {
+                    code: string;
+                    name: string
+                }) => formatSubjectCode(c.code || c.name)).join(", ");
                 setActionMsg({
                     type: "error",
-                    text: t("registration.errors.corequisitesRequired", { subjects: names }),
+                    text: t("registration.errors.corequisitesRequired", {subjects: names}),
                 });
                 return;
             }
@@ -380,7 +402,7 @@ const RegisterSubjects = () => {
 
         if (sub) {
             if (enrolledHours + sub.creditHours > MAX_HOURS) {
-                setActionMsg({ type: "error", text: t("registration.errors.maxHoursExceeded") });
+                setActionMsg({type: "error", text: t("registration.errors.maxHoursExceeded")});
                 return;
             }
         }
@@ -392,13 +414,13 @@ const RegisterSubjects = () => {
             for (const gId of groupIds) {
                 await requestSingle(gId);
             }
-            setActionMsg({ type: "success", text: t("registration.requestSuccess") });
+            setActionMsg({type: "success", text: t("registration.requestSuccess")});
             await fetchAll();
         } catch (err: any) {
-            const msg = err.message && err.message.startsWith("registration.errors.") 
-                ? t(err.message) 
+            const msg = err.message && err.message.startsWith("registration.errors.")
+                ? t(err.message)
                 : err.message || t("registration.errors.requestFailed");
-            setActionMsg({ type: "error", text: msg });
+            setActionMsg({type: "error", text: msg});
             await fetchAll(); // refresh to show partial state
         } finally {
             setActionLoading(null);
@@ -413,10 +435,10 @@ const RegisterSubjects = () => {
             for (const rId of requestIds) {
                 await cancelRequest(rId);
             }
-            setActionMsg({ type: "success", text: t("registration.cancelSuccess") });
+            setActionMsg({type: "success", text: t("registration.cancelSuccess")});
             await fetchAll();
         } catch (err: any) {
-            setActionMsg({ type: "error", text: err.message || t("registration.errors.cancelFailed") });
+            setActionMsg({type: "error", text: err.message || t("registration.errors.cancelFailed")});
             await fetchAll();
         } finally {
             setActionLoading(null);
@@ -432,10 +454,10 @@ const RegisterSubjects = () => {
             for (const gId of groupIds) {
                 await removeSingle(gId);
             }
-            setActionMsg({ type: "success", text: t("registration.removeSuccess") });
+            setActionMsg({type: "success", text: t("registration.removeSuccess")});
             await fetchAll();
         } catch (err: any) {
-            setActionMsg({ type: "error", text: err.message || t("registration.errors.removeFailed") });
+            setActionMsg({type: "error", text: err.message || t("registration.errors.removeFailed")});
             await fetchAll();
         } finally {
             setActionLoading(null);
@@ -459,7 +481,7 @@ const RegisterSubjects = () => {
                 <h2>{t("registration.title")}</h2>
                 <div className="error">
                     <strong>{t("groupsSchedule.errorPrefix")}</strong> {error}
-                    <button onClick={fetchAll} className="btn-primary" style={{ marginInlineStart: 12 }}>
+                    <button onClick={fetchAll} className="btn-primary" style={{marginInlineStart: 12}}>
                         {t("groupsSchedule.tryAgain")}
                     </button>
                 </div>
@@ -492,7 +514,7 @@ const RegisterSubjects = () => {
                         <div className="regCreditBar">
                             <div
                                 className="regCreditBarFill"
-                                style={{ width: `${Math.min((enrolledHours / MAX_HOURS) * 100, 100)}%` }}
+                                style={{width: `${Math.min((enrolledHours / MAX_HOURS) * 100, 100)}%`}}
                             />
                         </div>
                     </div>
@@ -510,7 +532,7 @@ const RegisterSubjects = () => {
                     color: '#856404'
                 }}>
                     <strong>⚠️ {t("registration.errors.registrationClosed")}</strong>
-                    <p style={{ margin: '8px 0 0 0' }}>{t("registration.closedMessage") || "Registration is currently closed. You cannot request new groups at this time."}</p>
+                    <p style={{margin: '8px 0 0 0'}}>{t("registration.closedMessage") || "Registration is currently closed. You cannot request new groups at this time."}</p>
                 </div>
             )}
 
@@ -528,188 +550,193 @@ const RegisterSubjects = () => {
                    ════════════════════════════════════ */}
                 <div className="regTimetableSection">
                     <h3 className="regSectionTitle">📋 {t("registration.registeredTitle")}</h3>
-                    <div className="regTimetableWrapper" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'} style={{ direction: i18n.language === 'ar' ? 'rtl' : 'ltr' }}>
-                        <table className="regTimetable" style={{ direction: i18n.language === 'ar' ? 'rtl' : 'ltr' }}>
+                    <div className="regTimetableWrapper" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
+                         style={{direction: i18n.language === 'ar' ? 'rtl' : 'ltr'}}>
+                        <table className="regTimetable" style={{direction: i18n.language === 'ar' ? 'rtl' : 'ltr'}}>
                             <thead>
-                                <tr>
-                                    <th className="regTimetableCorner">{t("registration.colTime")}</th>
-                                    {DAYS.map(day => (
-                                        <th key={day} className="regTimetableDayHeader">{getDayDisplay(day)}</th>
-                                    ))}
-                                </tr>
+                            <tr>
+                                <th className="regTimetableCorner">{t("registration.colTime")}</th>
+                                {DAYS.map(day => (
+                                    <th key={day} className="regTimetableDayHeader">{getDayDisplay(day)}</th>
+                                ))}
+                            </tr>
                             </thead>
                             <tbody>
-                                {HOURS_RANGE.map(hour => (
-                                    <tr key={hour}>
-                                        <td className="regTimetableHourCell">{formatHour(hour)}</td>
-                                        {DAYS.map(day => {
-                                            // Find groups in this cell (includes requested groups)
-                                            const cellGroups = myGroupsWithStatus.filter(
-                                                (g) => g.day.toLowerCase() === day && g.from === hour
+                            {HOURS_RANGE.map(hour => (
+                                <tr key={hour}>
+                                    <td className="regTimetableHourCell">{formatHour(hour)}</td>
+                                    {DAYS.map(day => {
+                                        // Find groups in this cell (includes requested groups)
+                                        const cellGroups = myGroupsWithStatus.filter(
+                                            (g) => g.day.toLowerCase() === day && g.from === hour
+                                        );
+                                        if (cellGroups.length === 0) {
+                                            // Check if this cell is spanned by a group starting earlier
+                                            const spanned = myGroupsWithStatus.some(
+                                                (g) => g.day.toLowerCase() === day && g.from < hour && g.to > hour
                                             );
-                                            if (cellGroups.length === 0) {
-                                                // Check if this cell is spanned by a group starting earlier
-                                                const spanned = myGroupsWithStatus.some(
-                                                    (g) => g.day.toLowerCase() === day && g.from < hour && g.to > hour
-                                                );
-                                                if (spanned) return null; // cell is part of a rowspan
-                                                return <td key={day} className="regTimetableCell"></td>;
-                                            }
+                                            if (spanned) return null; // cell is part of a rowspan
+                                            return <td key={day} className="regTimetableCell"></td>;
+                                        }
 
-                                            return cellGroups.map((g) => {
-                                                const span = g.to - g.from;
-                                                const color = subjectColorMap.get(g.subject.toLowerCase()) || TIMETABLE_COLORS[0];
-                                                const sub = subjectForGroup(g);
-                                                const isEnrolled = g.requestStatus === 'enrolled';
-                                                const isPending = g.requestStatus === 'pending';
-                                                const isRejected = g.requestStatus === 'rejected';
+                                        return cellGroups.map((g) => {
+                                            const span = g.to - g.from;
+                                            const color = subjectColorMap.get(g.subject.toLowerCase()) || TIMETABLE_COLORS[0];
+                                            const sub = subjectForGroup(g);
+                                            const isEnrolled = g.requestStatus === 'enrolled';
+                                            const isPending = g.requestStatus === 'pending';
+                                            const isRejected = g.requestStatus === 'rejected';
 
-                                                return (
-                                                    <td
-                                                        key={`${day}-${g._id}-${g.requestStatus}`}
-                                                        className="regTimetableCell regTimetableEvent"
-                                                        rowSpan={span}
-                                                        style={{
-                                                            background: isRejected ? '#f5f5f5' : color.bg,
-                                                            borderLeft: `4px solid ${isRejected ? '#999' : isPending ? '#ffa726' : color.border}`,
-                                                            opacity: isRejected ? 0.6 : 1,
-                                                        }}
-                                                    >
-                                                        <div className="regEventContent">
-                                                            <strong style={{ color: isRejected ? '#666' : color.text }}>
-                                                                {formatSubjectCode(g.subject)}
-                                                            </strong>
-                                                            <span className={getTypeClass(g.type)} style={{ fontSize: '0.65rem', padding: '2px 6px' }}>
-                                                                {t(`groupsSchedule.typeValues.${g.type.toLowerCase()}`, { defaultValue: g.type })}
+                                            return (
+                                                <td
+                                                    key={`${day}-${g._id}-${g.requestStatus}`}
+                                                    className="regTimetableCell regTimetableEvent"
+                                                    rowSpan={span}
+                                                    style={{
+                                                        background: isRejected ? '#f5f5f5' : color.bg,
+                                                        borderLeft: `4px solid ${isRejected ? '#999' : isPending ? '#ffa726' : color.border}`,
+                                                        opacity: isRejected ? 0.6 : 1,
+                                                    }}
+                                                >
+                                                    <div className="regEventContent">
+                                                        <strong style={{color: isRejected ? '#666' : color.text}}>
+                                                            {formatSubjectCode(g.subject)}
+                                                        </strong>
+                                                        <span className={getTypeClass(g.type)}
+                                                              style={{fontSize: '0.65rem', padding: '2px 6px'}}>
+                                                                {t(`groupsSchedule.typeValues.${g.type.toLowerCase()}`, {defaultValue: g.type})}
                                                             </span>
-                                                            {sub && (
-                                                                <span className="regEventName">{sub.name}</span>
-                                                            )}
-                                                            {/* Status badge */}
-                                                            <span className={`regStatusBadge regStatus${g.requestStatus.charAt(0).toUpperCase() + g.requestStatus.slice(1)}`} style={{ fontSize: '0.6rem', marginTop: '2px' }}>
+                                                        {sub && (
+                                                            <span className="regEventName">{sub.name}</span>
+                                                        )}
+                                                        {/* Status badge */}
+                                                        <span
+                                                            className={`regStatusBadge regStatus${g.requestStatus.charAt(0).toUpperCase() + g.requestStatus.slice(1)}`}
+                                                            style={{fontSize: '0.6rem', marginTop: '2px'}}>
                                                                 {t(`registration.status.${g.requestStatus === 'enrolled' ? 'approved' : g.requestStatus}`)}
                                                             </span>
-                                                            {/* Action button */}
-                                                            {isEnrolled && (
-                                                                <button
-                                                                    className="regEventRemoveBtn"
-                                                                    disabled={!!actionLoading}
-                                                                    onClick={async () => {
-                                                                        const pairGroups = myGroups.filter(
-                                                                            (mg: GroupData) => mg.subject.toLowerCase() === g.subject.toLowerCase() && mg.number === g.number
-                                                                        );
-                                                                        await handleRemovePair(pairGroups.map(pg => pg._id));
-                                                                    }}
-                                                                    title={t("registration.removeBtn")}
-                                                                >
-                                                                    ✕
-                                                                </button>
-                                                            )}
-                                                            {isPending && g.requestId && (
-                                                                <button
-                                                                    className="regEventRemoveBtn"
-                                                                    disabled={!!actionLoading}
-                                                                    onClick={() => {
-                                                                        // Find ALL pending request IDs for the same subject + group number pair
-                                                                        const pairRequestIds = myGroupsWithStatus
-                                                                            .filter(mg =>
-                                                                                mg.subject.toLowerCase() === g.subject.toLowerCase() &&
-                                                                                mg.number === g.number &&
-                                                                                mg.requestStatus === 'pending' &&
-                                                                                mg.requestId
-                                                                            )
-                                                                            .map(mg => mg.requestId!)
-                                                                        handleCancelRequest(pairRequestIds);
-                                                                    }}
-                                                                    title={t("registration.cancelRequestBtn")}
-                                                                >
-                                                                    ✕
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                );
-                                            });
-                                        })}
-                                    </tr>
-                                ))}
+                                                        {/* Action button */}
+                                                        {isEnrolled && allowedLevels.includes(studentLevel) && (
+                                                            <button
+                                                                className="regEventRemoveBtn"
+                                                                disabled={!!actionLoading}
+                                                                onClick={async () => {
+                                                                    const pairGroups = myGroups.filter(
+                                                                        (mg: GroupData) => mg.subject.toLowerCase() === g.subject.toLowerCase() && mg.number === g.number
+                                                                    );
+                                                                    await handleRemovePair(pairGroups.map(pg => pg._id));
+                                                                }}
+                                                                title={t("registration.removeBtn")}
+                                                            >
+                                                                ✕
+                                                            </button>
+                                                        )}
+                                                        {isPending && g.requestId && (
+                                                            <button
+                                                                className="regEventRemoveBtn"
+                                                                disabled={!!actionLoading}
+                                                                onClick={() => {
+                                                                    // Find ALL pending request IDs for the same subject + group number pair
+                                                                    const pairRequestIds = myGroupsWithStatus
+                                                                        .filter(mg =>
+                                                                            mg.subject.toLowerCase() === g.subject.toLowerCase() &&
+                                                                            mg.number === g.number &&
+                                                                            mg.requestStatus === 'pending' &&
+                                                                            mg.requestId
+                                                                        )
+                                                                        .map(mg => mg.requestId!)
+                                                                    handleCancelRequest(pairRequestIds);
+                                                                }}
+                                                                title={t("registration.cancelRequestBtn")}
+                                                            >
+                                                                ✕
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            );
+                                        });
+                                    })}
+                                </tr>
+                            ))}
                             </tbody>
                         </table>
                     </div>
 
                     {myGroupsWithStatus.length === 0 && (
-                        <div className="empty-state" style={{ marginTop: 16 }}>
+                        <div className="empty-state" style={{marginTop: 16}}>
                             <p>{t("registration.noRegistered")}</p>
                         </div>
                     )}
 
                     {/* ── My Requests Table ── */}
                     {myRequests.length > 0 && (
-                        <div className="regRequestsSection" style={{ marginTop: 24 }}>
+                        <div className="regRequestsSection" style={{marginTop: 24}}>
                             <h3 className="regSectionTitle">📋 {t("registration.myRequestsTitle")}</h3>
                             <table className="regRequestsTable" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
                                 <thead>
-                                    <tr>
-                                        <th>{t("registration.colSubject")}</th>
-                                        <th>{t("registration.colGroup")}</th>
-                                        <th>{t("registration.colType")}</th>
-                                        <th>{t("registration.colStatus")}</th>
-                                        <th>{t("registration.colActions")}</th>
-                                    </tr>
+                                <tr>
+                                    <th>{t("registration.colSubject")}</th>
+                                    <th>{t("registration.colGroup")}</th>
+                                    <th>{t("registration.colType")}</th>
+                                    <th>{t("registration.colStatus")}</th>
+                                    <th>{t("registration.colActions")}</th>
+                                </tr>
                                 </thead>
                                 <tbody>
-                                    {myRequests.map((req: EnrollmentRequestData) => {
-                                        const reqGroupId = getGroupId(req.group);
-                                        const grp = typeof req.group === 'object' && req.group !== null
-                                            ? req.group as GroupData
-                                            : groups.find((g: GroupData) => g._id === reqGroupId);
-                                        if (!grp) return null;
-                                        const sub = subjectForGroup(grp);
-                                        return (
-                                            <tr key={req._id}>
-                                                <td>
-                                                    <strong>{formatSubjectCode(grp.subject)}</strong>
-                                                    {sub && <span className="regRequestSubName">{sub.name}</span>}
-                                                </td>
-                                                <td>{t("groupsSchedule.groupNumber", { number: grp.number })}</td>
-                                                <td>
+                                {myRequests.map((req: EnrollmentRequestData) => {
+                                    const reqGroupId = getGroupId(req.group);
+                                    const grp = typeof req.group === 'object' && req.group !== null
+                                        ? req.group as GroupData
+                                        : groups.find((g: GroupData) => g._id === reqGroupId);
+                                    if (!grp) return null;
+                                    const sub = subjectForGroup(grp);
+                                    return (
+                                        <tr key={req._id}>
+                                            <td>
+                                                <strong>{formatSubjectCode(grp.subject)}</strong>
+                                                {sub && <span className="regRequestSubName">{sub.name}</span>}
+                                            </td>
+                                            <td>{t("groupsSchedule.groupNumber", {number: grp.number})}</td>
+                                            <td>
                                                     <span className={getTypeClass(grp.type)}>
-                                                        {t(`groupsSchedule.typeValues.${grp.type.toLowerCase()}`, { defaultValue: grp.type })}
+                                                        {t(`groupsSchedule.typeValues.${grp.type.toLowerCase()}`, {defaultValue: grp.type})}
                                                     </span>
-                                                </td>
-                                                <td>
-                                                    <span className={`regStatusBadge regStatus${req.status.charAt(0).toUpperCase() + req.status.slice(1)}`}>
+                                            </td>
+                                            <td>
+                                                    <span
+                                                        className={`regStatusBadge regStatus${req.status.charAt(0).toUpperCase() + req.status.slice(1)}`}>
                                                         {t(`registration.status.${req.status}`)}
                                                     </span>
-                                                </td>
-                                                <td>
-                                                    {req.status === 'pending' && (
-                                                        <button
-                                                            className="btn-danger btn-sm"
-                                                            disabled={!!actionLoading}
-                                                            onClick={() => {
-                                                                // Find ALL pending requests for the same subject + group number pair
-                                                                const pairRequestIds = myRequests
-                                                                    .filter((r: EnrollmentRequestData) => {
-                                                                        if (r.status !== 'pending') return false;
-                                                                        const rGrp = typeof r.group === 'object' && r.group !== null
-                                                                            ? r.group as GroupData
-                                                                            : groups.find((g: GroupData) => g._id === getGroupId(r.group));
-                                                                        return rGrp &&
-                                                                            (rGrp as GroupData).subject.toLowerCase() === grp.subject.toLowerCase() &&
-                                                                            (rGrp as GroupData).number === grp.number;
-                                                                    })
-                                                                    .map((r: EnrollmentRequestData) => r._id);
-                                                                handleCancelRequest(pairRequestIds);
-                                                            }}
-                                                        >
-                                                            {t("registration.cancelRequestBtn")}
-                                                        </button>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
+                                            </td>
+                                            <td>
+                                                {req.status === 'pending' && (
+                                                    <button
+                                                        className="btn-danger btn-sm"
+                                                        disabled={!!actionLoading}
+                                                        onClick={() => {
+                                                            // Find ALL pending requests for the same subject + group number pair
+                                                            const pairRequestIds = myRequests
+                                                                .filter((r: EnrollmentRequestData) => {
+                                                                    if (r.status !== 'pending') return false;
+                                                                    const rGrp = typeof r.group === 'object' && r.group !== null
+                                                                        ? r.group as GroupData
+                                                                        : groups.find((g: GroupData) => g._id === getGroupId(r.group));
+                                                                    return rGrp &&
+                                                                        (rGrp as GroupData).subject.toLowerCase() === grp.subject.toLowerCase() &&
+                                                                        (rGrp as GroupData).number === grp.number;
+                                                                })
+                                                                .map((r: EnrollmentRequestData) => r._id);
+                                                            handleCancelRequest(pairRequestIds);
+                                                        }}
+                                                    >
+                                                        {t("registration.cancelRequestBtn")}
+                                                    </button>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                                 </tbody>
                             </table>
                         </div>
@@ -744,14 +771,17 @@ const RegisterSubjects = () => {
                         if (!sub || !sub.corequisites || sub.corequisites.length === 0) return null;
                         return (
                             <div className="info regCoreqNotice">
-                                ⚠️ {t("registration.corequisiteNotice")}: {sub.corequisites.map((c: { code: string; name: string }) => formatSubjectCode(c.code || c.name)).join(", ")}
+                                ⚠️ {t("registration.corequisiteNotice")}: {sub.corequisites.map((c: {
+                                code: string;
+                                name: string
+                            }) => formatSubjectCode(c.code || c.name)).join(", ")}
                             </div>
                         );
                     })()}
 
                     {/* ── Groups for selected subject ── */}
                     {selectedSubject && groupsForSelected.length === 0 && (
-                        <div className="empty-state" style={{ marginTop: 16 }}>
+                        <div className="empty-state" style={{marginTop: 16}}>
                             <p>{t("registration.noGroupsForSubject")}</p>
                         </div>
                     )}
@@ -768,7 +798,7 @@ const RegisterSubjects = () => {
                             <div className="regGroupCards">
                                 {Array.from(byNumber.entries()).map(([num, pair]) => {
                                     const lecture = pair.find((g: GroupData) => g.type.toLowerCase() === "lecture");
-                                    const coreq  = pair.find((g: GroupData) => g.type.toLowerCase() !== "lecture");
+                                    const coreq = pair.find((g: GroupData) => g.type.toLowerCase() !== "lecture");
                                     const allIds = pair.map((g: GroupData) => g._id);
 
                                     const isEnrolled = student
@@ -786,10 +816,11 @@ const RegisterSubjects = () => {
                                     const hasPendingRequest = pendingRequestIds.length > 0;
 
                                     return (
-                                        <div key={num} className={`regGroupCard ${isEnrolled ? "regGroupCardActive" : ""}`}>
+                                        <div key={num}
+                                             className={`regGroupCard ${isEnrolled ? "regGroupCardActive" : ""}`}>
                                             <div className="regGroupCardHeader">
                                                 <span className="regGroupNumber">
-                                                    {t("groupsSchedule.groupNumber", { number: num })}
+                                                    {t("groupsSchedule.groupNumber", {number: num})}
                                                 </span>
 
                                             </div>
@@ -812,9 +843,13 @@ const RegisterSubjects = () => {
                                                 )}
 
                                                 {coreq && (
-                                                    <div className="regGroupPairBlock" style={{marginTop: 8, paddingTop: 8, borderTop: '1px dashed var(--color-border)'}}>
+                                                    <div className="regGroupPairBlock" style={{
+                                                        marginTop: 8,
+                                                        paddingTop: 8,
+                                                        borderTop: '1px dashed var(--color-border)'
+                                                    }}>
                                                         <span className={getTypeClass(coreq.type)}>
-                                                            {t(`groupsSchedule.typeValues.${coreq.type.toLowerCase()}`, { defaultValue: coreq.type })}
+                                                            {t(`groupsSchedule.typeValues.${coreq.type.toLowerCase()}`, {defaultValue: coreq.type})}
                                                         </span>
                                                         <div className="regGroupDetail">
                                                             <span className="regGroupDetailIcon">📅</span>
