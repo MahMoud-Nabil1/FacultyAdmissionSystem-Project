@@ -170,6 +170,7 @@
     "submittedOn": "Submitted on",
     "requestNumber": "Request Number",
     "loading": "Loading academic requests...",
+    "adminPanelTitle": "Academic Requests Admin Panel",
     "fetchError": "Failed to fetch requests",
     "enterResponse": "Please enter a response.",
     "requestsListTitle": "Requests ({{count}})",
@@ -239,11 +240,78 @@
     "columnStudents": "Students",
     "columnActions": "Actions",
     "placeLabel": "Place",
+    "placeSelectPlaceholder": "Select place",
+    "placeLoading": "Loading places...",
+    "placeOption": "{{name}} (Max: {{capacity}})",
+    "placeCapacityHint": "You can set any group size up to {{capacity}} for this place.",
+    "placeCapacityExceeded": "Capacity cannot exceed {{capacity}} for the selected place",
     "studentsLabel": "Students",
     "enrolledStudents": "Enrolled Students",
     "exportStudentsBtn": "Download student CSV",
     "noStudents": "No students are enrolled in this group.",
     "searchPlaceholder": "Search by subject, number, day..."
+  },
+  "placesPanel": {
+    "title": "Places Management ({{count}})",
+    "addBtn": "Add Place",
+    "searchPlaceholder": "Search places...",
+    "empty": "No places found",
+    "columns": {
+      "name": "Name",
+      "type": "Type",
+      "capacity": "Capacity",
+      "building": "Building",
+      "floor": "Floor",
+      "status": "Status"
+    },
+    "types": {
+      "hall": "Hall",
+      "room": "Room",
+      "lab": "Lab",
+      "lecture_hall": "Lecture Hall"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "modal": {
+      "addTitle": "Add Place",
+      "editTitle": "Edit Place"
+    },
+    "form": {
+      "nameLabel": "Name",
+      "typeLabel": "Type",
+      "capacityLabel": "Capacity",
+      "buildingLabel": "Building",
+      "floorLabel": "Floor",
+      "activeLabel": "Active"
+    },
+    "placeholders": {
+      "name": "e.g. Hall A, Room 101",
+      "capacity": "50",
+      "building": "e.g. Main Building",
+      "floor": "1"
+    },
+    "validation": {
+      "nameRequired": "Name is required",
+      "capacityRequired": "Capacity is required",
+      "capacityMin": "Capacity must be at least 1"
+    },
+    "messages": {
+      "createSuccess": "Place added successfully!",
+      "updateSuccess": "Place updated successfully!",
+      "deleteSuccess": "Place deleted successfully!",
+      "saveError": "Error saving place",
+      "deleteError": "Error deleting place",
+      "confirmDelete": "Are you sure you want to delete this place?"
+    },
+    "buttons": {
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save",
+      "update": "Update",
+      "saving": "Saving..."
+    }
   },
   "roles": {
     "admin": "Admin",
@@ -309,6 +377,13 @@
   },
   "dashboardTable": {
     "backToAdminDashboard": "Back to Admin Dashboard"
+  },
+  "adminAnalysis": {
+    "title": "Student Analytics",
+    "loading": "Loading...",
+    "totalStudents": "Total Students",
+    "finishedRegistration": "Finished Registration",
+    "didNotFinish": "Did Not Finish Registration"
   },
   "studentsTable": {
     "title": "Students Table",
@@ -485,6 +560,7 @@
     "staff": "Staff",
     "subjects": "Subjects",
     "groups": "Groups",
+    "adminAnalysis": "Admin Analysis",
     "returnHome": "Return Home",
     "signOut": "Sign out",
     "user": "User",

@@ -160,6 +160,7 @@
     "errorGeneric": "حدث خطأ"
   },
   "complaints": {
+    "adminPanelTitle": "لوحة إدارة الطلبات الأكاديمية",
     "welcome": "مرحباً",
     "studentId": "الرقم الجامعي",
     "newComplaint": "تقديم طلب جديد",
@@ -204,6 +205,11 @@
     "confirmDeleteRequest": "هل أنت متأكد من حذف هذا الطلب؟"
   },
   "groupPanel": {
+    "placeSelectPlaceholder": "اختر المكان",
+    "placeLoading": "جارٍ تحميل الأماكن...",
+    "placeOption": "{{name}} (الحد الأقصى: {{capacity}})",
+    "placeCapacityHint": "يمكنك تحديد سعة للمجموعة حتى {{capacity}} كحد أقصى لهذا المكان.",
+    "placeCapacityExceeded": "لا يمكن أن تتجاوز السعة {{capacity}} لهذا المكان",
     "title": "المجموعات",
     "addBtn": "إضافة مجموعة جديدة",
     "cancelBtn": "إلغاء",
@@ -244,6 +250,68 @@
     "exportStudentsBtn": "تنزيل CSV الطلاب",
     "noStudents": "لا يوجد طلاب مسجلين في هذه المجموعة.",
     "searchPlaceholder": "ابحث بالمقرر أو رقم المجموعة أو اليوم..."
+  },
+  "placesPanel": {
+    "title": "إدارة الأماكن ({{count}})",
+    "addBtn": "إضافة مكان",
+    "searchPlaceholder": "ابحث عن مكان...",
+    "empty": "لا توجد أماكن",
+    "columns": {
+      "name": "الاسم",
+      "type": "النوع",
+      "capacity": "السعة",
+      "building": "المبنى",
+      "floor": "الدور",
+      "status": "الحالة"
+    },
+    "types": {
+      "hall": "قاعة",
+      "room": "غرفة",
+      "lab": "معمل",
+      "lecture_hall": "قاعة محاضرات"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "modal": {
+      "addTitle": "إضافة مكان",
+      "editTitle": "تعديل مكان"
+    },
+    "form": {
+      "nameLabel": "الاسم",
+      "typeLabel": "النوع",
+      "capacityLabel": "السعة",
+      "buildingLabel": "المبنى",
+      "floorLabel": "الدور",
+      "activeLabel": "نشط"
+    },
+    "placeholders": {
+      "name": "مثال: قاعة أ، غرفة 101",
+      "capacity": "50",
+      "building": "مثال: المبنى الرئيسي",
+      "floor": "1"
+    },
+    "validation": {
+      "nameRequired": "الاسم مطلوب",
+      "capacityRequired": "السعة مطلوبة",
+      "capacityMin": "يجب أن تكون السعة 1 على الأقل"
+    },
+    "messages": {
+      "createSuccess": "تمت إضافة المكان بنجاح!",
+      "updateSuccess": "تم تحديث المكان بنجاح!",
+      "deleteSuccess": "تم حذف المكان بنجاح!",
+      "saveError": "حدث خطأ أثناء حفظ المكان",
+      "deleteError": "حدث خطأ أثناء حذف المكان",
+      "confirmDelete": "هل أنت متأكد من حذف هذا المكان؟"
+    },
+    "buttons": {
+      "delete": "حذف",
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "update": "تحديث",
+      "saving": "جارٍ الحفظ..."
+    }
   },
   "roles": {
     "admin": "ادمن",
@@ -305,6 +373,13 @@
   },
   "dashboardTable": {
     "backToAdminDashboard": "العودة إلى لوحة الإدارة"
+  },
+  "adminAnalysis": {
+    "title": "تحليلات الطلاب",
+    "loading": "جاري التحميل...",
+    "totalStudents": "إجمالي الطلاب",
+    "finishedRegistration": "أتموا التسجيل",
+    "didNotFinish": "لم يتموا التسجيل"
   },
   "studentsTable": {
     "title": "جدول الطلاب",
@@ -480,6 +555,7 @@
     "staff": "الموظفين",
     "subjects": "المقررات",
     "groups": "المجموعات",
+    "adminAnalysis": "احصائيات",
     "returnHome": "العودة للرئيسية",
     "signOut": "تسجيل الخروج",
     "user": "مستخدم",
