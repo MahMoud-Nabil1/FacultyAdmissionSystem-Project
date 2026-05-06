@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import {
     View,
@@ -77,7 +78,7 @@ const AiChatBox: React.FC = () => {
     const getStorageKey = () => {
         const userId = getUserId();
         if (userId) {
-            return aiChatMessages_${userId};
+            return `aiChatMessages_${userId}`;
         }
         return null;
     };
@@ -189,51 +190,51 @@ const AiChatBox: React.FC = () => {
 
         // Personal info responses
         if (lowerMsg.includes('اسمي') || lowerMsg.includes('من انا') || lowerMsg.includes('عرفني')) {
-            return أنت ${data?.name || 'طالب'}${data?.studentId ?  برقم جامعي ${data.studentId}` : ''}. كيف يمكنني مساعدتك اليوم؟`;
+            return `أنت ${data?.name || 'طالب'}${data?.studentId ? ` برقم جامعي ${data.studentId}` : ''}. كيف يمكنني مساعدتك اليوم؟`;
         }
 
         if (lowerMsg.includes('رقمي') || lowerMsg.includes('الرقم الجامعي') || lowerMsg.includes('student id')) {
-            return data?.studentId ? رقمك الجامعي هو: ${data.studentId} : 'لم يتم العثور على رقمك الجامعي في النظام.';
+            return data?.studentId ? `رقمك الجامعي هو: ${data.studentId}` : 'لم يتم العثور على رقمك الجامعي في النظام.';
         }
 
         if (lowerMsg.includes('معدلي') || lowerMsg.includes('gpa') || lowerMsg.includes('المعدل')) {
-            return data?.gpa ? معدلك التراكمي الحالي هو: ${data.gpa} : 'لم يتم العثور على معدلك التراكمي في النظام.';
+            return data?.gpa ? `معدلك التراكمي الحالي هو: ${data.gpa}` : 'لم يتم العثور على معدلك التراكمي في النظام.';
         }
 
         if (lowerMsg.includes('المستوى') || lowerMsg.includes('level') || lowerMsg.includes('مستوى')) {
-            return data?.level ? أنت في المستوى: ${data.level} : 'لم يتم تحديد مستواك الدراسي بعد.';
+            return data?.level ? `أنت في المستوى: ${data.level}` : 'لم يتم تحديد مستواك الدراسي بعد.';
         }
 
         if (lowerMsg.includes('ساعات') || lowerMsg.includes('credits') || lowerMsg.includes('credit')) {
             let response = '';
             if (data?.registeredHours) {
-                response += عدد الساعات المسجلة: ${data.registeredHours}\n;
+                response += `عدد الساعات المسجلة: ${data.registeredHours}\n`;
             }
             if (data?.completedHours) {
-                response += عدد الساعات المكتملة: ${data.completedHours};
+                response += `عدد الساعات المكتملة: ${data.completedHours}`;
             }
             return response || 'لم يتم العثور على معلومات الساعات الدراسية.';
         }
 
         if (lowerMsg.includes('القسم') || lowerMsg.includes('department') || lowerMsg.includes('قسم')) {
-            return data?.department ? قسمك هو: ${data.department} : 'لم يتم تحديد قسمك بعد.';
+            return data?.department ? `قسمك هو: ${data.department}` : 'لم يتم تحديد قسمك بعد.';
         }
 
         if (lowerMsg.includes('بريد') || lowerMsg.includes('email') || lowerMsg.includes('إيميل')) {
-            return data?.email ? بريدك الإلكتروني: ${data.email} : 'لم يتم العثور على بريدك الإلكتروني.';
+            return data?.email ? `بريدك الإلكتروني: ${data.email}` : 'لم يتم العثور على بريدك الإلكتروني.';
         }
 
         // General responses
         if (lowerMsg.includes('مرحب') || lowerMsg.includes('hello') || lowerMsg.includes('السلام') || lowerMsg.includes('hi')) {
-            return أهلاً بك ${data?.name || 'عزيزي الطالب'}! كيف يمكنني مساعدتك اليوم؟;
+            return `أهلاً بك ${data?.name || 'عزيزي الطالب'}! كيف يمكنني مساعدتك اليوم؟`;
         }
 
         if (lowerMsg.includes('شكر')) {
             return 'العفو! أنا هنا لمساعدتك في أي وقت.';
         }
 
-        if (lowerMsg.includes('تسجيل') || lowerMsg.includes('مواد') || lowerMsg.includes('register') || lowerMsg.includes('مواد')) {
-            return يمكنك تسجيل المواد من خلال الذهاب إلى صفحة "تسجيل المواد" في القائمة الرئيسية.${data?.gpa ? `\n\nملاحظة: معدلك الحالي ${data.gpa} : ''}`;
+        if (lowerMsg.includes('تسجيل') || lowerMsg.includes('مواد') || lowerMsg.includes('register')) {
+            return `يمكنك تسجيل المواد من خلال الذهاب إلى صفحة "تسجيل المواد" في القائمة الرئيسية.${data?.gpa ? `\n\nملاحظة: معدلك الحالي ${data.gpa}` : ''}`;
         }
 
         if (lowerMsg.includes('جدول') || lowerMsg.includes('مجموعات') || lowerMsg.includes('schedule') || lowerMsg.includes('groups')) {
@@ -245,7 +246,7 @@ const AiChatBox: React.FC = () => {
         }
 
         if (lowerMsg.includes('مساعدة') || lowerMsg.includes('help') || lowerMsg.includes('مساعده')) {
-            return أهلاً ${data?.name || 'عزيزي الطالب'}! يمكنني مساعدتك في:\n\n📌 معرفة معلوماتك الشخصية (الرقم الجامعي، المعدل، المستوى، القسم)\n📌 تسجيل المواد\n📌 عرض الجدول الدراسي\n📌 تقديم الشكاوى\n📌 معلومات عن النظام\n\nما الذي تريد معرفته؟;
+            return `أهلاً ${data?.name || 'عزيزي الطالب'}! يمكنني مساعدتك في:\n\n📌 معرفة معلوماتك الشخصية (الرقم الجامعي، المعدل، المستوى، القسم)\n📌 تسجيل المواد\n📌 عرض الجدول الدراسي\n📌 تقديم الشكاوى\n📌 معلومات عن النظام\n\nما الذي تريد معرفته؟`;
         }
 
         if (lowerMsg.includes('وداع') || lowerMsg.includes('bye') || lowerMsg.includes('مع السلامة')) {
@@ -253,7 +254,7 @@ const AiChatBox: React.FC = () => {
         }
 
         // Default response
-        return شكراً لسؤالك ${data?.name || 'عزيزي الطالب'}. هل يمكنك توضيح أكثر؟ أنا هنا لمساعدتك في الاستفسارات المتعلقة بالنظام الأكاديمي.;
+        return `شكراً لسؤالك ${data?.name || 'عزيزي الطالب'}. هل يمكنك توضيح أكثر؟ أنا هنا لمساعدتك في الاستفسارات المتعلقة بالنظام الأكاديمي.`;
     };
 
     const clearChatHistory = () => {

@@ -1,11 +1,8 @@
-
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../src/context/AuthContext';
 import { useLanguage } from '../../src/context/LanguageContext';
-import AiChatBox from '../../src/context/AuthContext';
-import { useLanguage } from '../../src/context/LanguageContext';
-import AiChatBox from '../../src/components/common/AiChatBox'; // Add this import
+import AiChatBox from '../../src/components/common/AiChatBox';
 
 export default function TabsLayout() {
     const { user } = useAuth();
@@ -16,7 +13,6 @@ export default function TabsLayout() {
 
     return (
         <>
-            {/* Your existing tabs */}
             <Tabs
                 screenOptions={{
                     headerShown: false,
@@ -42,7 +38,7 @@ export default function TabsLayout() {
                     },
                 }}
             >
-                {/* ── Home — always visible ── */}
+                {/* Home — always visible */}
                 <Tabs.Screen
                     name="home"
                     options={{
@@ -54,7 +50,7 @@ export default function TabsLayout() {
                     }}
                 />
 
-                {/* ── Groups — student only, visible in tab bar ── */}
+                {/* Groups — student only */}
                 <Tabs.Screen
                     name="groups"
                     options={{
@@ -68,7 +64,7 @@ export default function TabsLayout() {
                     }}
                 />
 
-                {/* ── Admin / Staff panel — visible in tab bar for staff ── */}
+                {/* Admin / Staff panel */}
                 <Tabs.Screen
                     name="edit"
                     options={{
@@ -82,17 +78,16 @@ export default function TabsLayout() {
                     }}
                 />
 
-                {/* ── Hidden screens — reachable from home screen cards ── */}
-                <Tabs.Screen name="support"            options={{ href: null }} />
-                <Tabs.Screen name="register"           options={{ href: null }} />
-                <Tabs.Screen name="register-subjects"  options={{ href: null }} />
-                <Tabs.Screen name="complaints"         options={{ href: null }} />
-                <Tabs.Screen name="advisor"            options={{ href: null }} />
+                {/* Hidden screens */}
+                <Tabs.Screen name="support" options={{ href: null }} />
+                <Tabs.Screen name="register" options={{ href: null }} />
+                <Tabs.Screen name="register-subjects" options={{ href: null }} />
+                <Tabs.Screen name="complaints" options={{ href: null }} />
+                <Tabs.Screen name="advisor" options={{ href: null }} />
             </Tabs>
 
-            {/* AI Chat Box - Floating button over everything */}
+            {/* AI Chat Box */}
             <AiChatBox />
         </>
     );
 }
-

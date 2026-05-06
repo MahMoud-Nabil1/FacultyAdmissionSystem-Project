@@ -81,10 +81,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!token) return;
 
         try {
-            const API_BASE = 'http://localhost:5000/api'; // Adjust to your API URL
-            const response = await fetch(${API_BASE}/auth/me, {
+            const API_BASE = 'http://localhost:5000/api';
+            const response = await fetch(`${API_BASE}/auth/me`, {
                 headers: {
-                    'Authorization': Bearer ${token},
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
@@ -181,7 +181,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const userId = user?.id || user?._id || user?.studentId;
         if (userId) {
             try {
-                await AsyncStorage.removeItem(aiChatMessages_${userId});
+                await AsyncStorage.removeItem(`aiChatMessages_${userId}`);
             } catch (error) {
                 console.error('Error clearing chat history:', error);
             }
@@ -217,8 +217,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 export default AuthContext;
-
-
-
-
 
