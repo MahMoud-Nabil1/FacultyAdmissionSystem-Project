@@ -27,7 +27,7 @@ import RegisterSubjects from "./components/reg/RegisterSubjects.tsx";
 import AcademicHistory from "./components/academicHistory/AcademicHistory.tsx";
 import StudentProfileView from "./components/dashboard/students/studentProfileView.tsx";
 import StudentComplaintPage from "./components/complaints/studentsComplaints.tsx";
-
+import AiChatBox from "./components/common/aiChatBox.tsx"; // Add this import
 
 function App() {
     const {t} = useTranslation();
@@ -41,6 +41,9 @@ function App() {
         <ThemeProvider>
             <div className="App">
                 <LanguageFloatingButton/>
+
+                {/* Add AiChatBox here - outside Routes, but NOT wrapped in ProtectedRoute */}
+                <AiChatBox />
 
                 <Routes>
                     {}
