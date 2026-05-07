@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './css/aiChatBox.css';
 import { useAuth } from '../../context/AuthContext';
+import { getAllSubjects, getAllGroups, apiGet } from '../../services/api';
 
 interface Message {
     id: string;
@@ -9,76 +10,187 @@ interface Message {
     timestamp: Date;
 }
 
-interface StudentData {
-    id?: string;
-    name?: string;
-    email?: string;
-    role?: string;
-    studentId?: string;
-    gpa?: number;
-    department?: string;
-    level?: string;
-    registeredHours?: number;
-    completedHours?: number;
-    completedSubjects?: string[];
-    registeredSubjects?: string[];
-}
+const GROQ_API_KEY = process.env.REACT_APP_GROQ_API_KEY;
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
+
+const DAYS_AR: Record<string, string> = {
+    saturday: 'السبت', sunday: 'الأحد', monday: 'الاثنين',
+    tuesday: 'الثلاثاء', wednesday: 'الأربعاء', thursday: 'الخميس', friday: 'الجمعة'
+};
+
+const formatHour = (h: number) => {
+    const suffix = h >= 12 ? 'م' : 'ص';
+    const display = h > 12 ? h - 12 : h === 0 ? 12 : h;
+    return `${display}:00 ${suffix}`;
+};
 
 const AiChatBox: React.FC = () => {
     const { user, isAuthenticated } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [inputMessage, setInputMessage] = useState('');
     const [messages, setMessages] = useState<Message[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [contextLoading, setContextLoading] = useState(false);
+    const [systemPrompt, setSystemPrompt] = useState<string>('');
+    const [contextLoaded, setContextLoaded] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    // Get full student data
-    const getStudentData = (): StudentData => {
-        return {
-            id: user?.id || user?._id,
-            name: user?.name,
-            email: user?.email,
-            role: user?.role,
-            studentId: user?.studentId,
-            gpa: user?.gpa,
-            department: user?.department,
-            level: user?.level,
-            registeredHours: user?.registeredHours,
-            completedHours: user?.completedHours,
-            completedSubjects: user?.completedSubjects,
-            registeredSubjects: user?.registeredSubjects
-        };
-    };
-
-    // Get user ID from various possible fields
-    const getUserId = () => {
-        return user?.id || user?._id || user?.studentId || null;
-    };
-
-    // Get storage key based on user
+    const getUserId = () => user?.id || user?._id || user?.studentId || null;
     const getStorageKey = () => {
         const userId = getUserId();
-        if (userId) {
-            return `aiChatMessages_${userId}`;
-        }
-        return null;
+        return userId ? `aiChatMessages_${userId}` : null;
     };
 
-    // Load messages from localStorage on mount or when user changes
+    // Build a compact but rich system prompt
+    const buildSystemPrompt = (
+        studentMe: any,
+        subjects: any[],
+        groups: any[]
+    ): string => {
+        // Map subject _id → subject object
+        const subjectById = new Map<string, any>();
+        subjects.forEach(s => subjectById.set(s._id?.toString(), s));
+
+        // Map subject code (lowercase) → subject object
+        const subjectByCode = new Map<string, any>();
+        subjects.forEach(s => subjectByCode.set(s.code?.toLowerCase(), s));
+
+        // Find groups the student is enrolled in
+        const studentObjId = studentMe?._id?.toString();
+        const myGroups = groups.filter(g => {
+            const students = g.students || [];
+            return students.some((s: any) =>
+                (typeof s === 'object' ? s._id?.toString() : s?.toString()) === studentObjId
+            );
+        });
+
+        // Resolve completed subject IDs → names
+        const completedIds: string[] = studentMe?.completedSubjects || [];
+        const completedNames = completedIds.map(id => {
+            const sub = subjectById.get(id?.toString());
+            return sub ? `${sub.code?.toUpperCase()}(${sub.creditHours}h)` : null;
+        }).filter(Boolean);
+
+        const completedHours = completedIds.reduce((t, id) => {
+            const sub = subjectById.get(id?.toString());
+            return t + (sub?.creditHours || 0);
+        }, 0);
+
+        let level = '1';
+        if (completedHours > 90) level = '4';
+        else if (completedHours > 60) level = '3';
+        else if (completedHours > 30) level = '2';
+
+        // Helper: format a group to one compact line
+        const fmtGroup = (g: any) => {
+            const sub = subjectByCode.get(g.subject?.toLowerCase());
+            const name = sub?.name || g.subject?.toUpperCase() || '?';
+            const code = g.subject?.toUpperCase() || '?';
+            const day = DAYS_AR[g.day?.toLowerCase()] || g.day || '?';
+            const time = `${formatHour(g.from || 0)}-${formatHour(g.to || 0)}`;
+            const place = g.place || '?';
+            const enrolled = (g.students || []).length;
+            const cap = g.capacity || '?';
+            return `${code}|${name}|G${g.number}|${g.type}|${day}|${time}|${place}|${enrolled}/${cap}`;
+        };
+
+        // My enrolled groups — full detail
+        const myGroupLines = myGroups.map(g => {
+            const sub = subjectByCode.get(g.subject?.toLowerCase());
+            const name = sub?.name || g.subject?.toUpperCase();
+            const day = DAYS_AR[g.day?.toLowerCase()] || g.day;
+            return `  • ${name} | مجموعة ${g.number} | ${g.type} | ${day} ${formatHour(g.from)}-${formatHour(g.to)}${g.place ? ' | ' + g.place : ''}`;
+        }).join('\n') || '  لا توجد مجموعات مسجلة';
+
+        // All subjects — compact one-liners (code | name | hours | prereqs)
+        const subjectLines = subjects.map(s => {
+            const prereqs = (s.prerequisites || []).map((p: any) => p.code || '').filter(Boolean).join(',');
+            return `${s.code?.toUpperCase()}|${s.name}|${s.creditHours}h${prereqs ? '|pre:' + prereqs : ''}`;
+        }).join('\n');
+
+        // All groups — compact one-liners
+        const groupLines = groups.map(fmtGroup).join('\n');
+
+        return `أنت مساعد ذكي لنظام القبول الجامعي. أجب دائماً بالعربية، بشكل مختصر ومفيد.
+
+[بيانات الطالب]
+الاسم: ${studentMe?.name || '?'} | ID: ${studentMe?.id || studentMe?._id || '?'} | GPA: ${studentMe?.gpa ?? '?'} | المستوى: ${level} | الساعات المكتملة: ${completedHours}
+المواد المكتملة: ${completedNames.join(', ') || 'لا توجد'}
+
+[مجموعاتي المسجلة - ${myGroups.length} مجموعة]
+${myGroupLines}
+
+[كل المواد - ${subjects.length} مادة - الصيغة: CODE|الاسم|الساعات|المتطلبات]
+${subjectLines}
+
+[كل المجموعات - ${groups.length} مجموعة - الصيغة: CODE|الاسم|رقم المجموعة|النوع|اليوم|الوقت|القاعة|المقاعد]
+${groupLines}
+
+[تعليمات] أجب بناءً على البيانات أعلاه فقط. إذا سُئلت عن الجدول استخدم "مجموعاتي المسجلة". إذا سُئلت عن مواد متاحة ابحث في قائمة المواد وتحقق من المتطلبات مقابل المواد المكتملة.`;
+    };
+
+    // Fetch all context when chat opens
+    useEffect(() => {
+        if (isOpen && !contextLoaded && isAuthenticated) {
+            fetchContext();
+        }
+    }, [isOpen]);
+
+    const fetchContext = async () => {
+        setContextLoading(true);
+        try {
+            // Fetch from /auth/me for full student profile
+            const [meRes, subjectsRes, groupsRes] = await Promise.allSettled([
+                apiGet('/auth/me'),
+                getAllSubjects(),
+                getAllGroups()
+            ]);
+
+            const studentMe = meRes.status === 'fulfilled' ? meRes.value?.data : user;
+            const subjects = subjectsRes.status === 'fulfilled'
+                ? (Array.isArray(subjectsRes.value) ? subjectsRes.value : []) : [];
+            const groups = groupsRes.status === 'fulfilled'
+                ? (Array.isArray(groupsRes.value) ? groupsRes.value : []) : [];
+
+            console.log('✅ AI Context loaded:', {
+                student: studentMe?.name,
+                subjects: subjects.length,
+                groups: groups.length,
+                myGroups: groups.filter((g: any) =>
+                    (g.students || []).some((s: any) =>
+                        (typeof s === 'object' ? s._id : s)?.toString() === studentMe?._id?.toString()
+                    )
+                ).length
+            });
+            // 🔍 DEBUG: log raw shapes so we can see actual field names
+            if (subjects.length > 0) console.log('📚 Sample subject:', JSON.stringify(subjects[0], null, 2));
+            if (groups.length > 0) console.log('👥 Sample group:', JSON.stringify(groups[0], null, 2));
+            console.log('👤 Student /auth/me:', JSON.stringify(studentMe, null, 2));
+
+            const prompt = buildSystemPrompt(studentMe, subjects, groups);
+            setSystemPrompt(prompt);
+            setContextLoaded(true);
+        } catch (error) {
+            console.error('Failed to load AI context:', error);
+            setSystemPrompt(`أنت مساعد ذكي لنظام القبول الجامعي. اسم الطالب: ${user?.name || 'غير محدد'}. تحدث بالعربية.`);
+            setContextLoaded(true);
+        } finally {
+            setContextLoading(false);
+        }
+    };
+
+    // Load messages from localStorage
     useEffect(() => {
         if (isAuthenticated && getUserId()) {
             const storageKey = getStorageKey();
             const savedMessages = localStorage.getItem(storageKey);
             if (savedMessages) {
                 try {
-                    const parsedMessages = JSON.parse(savedMessages);
-                    const messagesWithDates = parsedMessages.map((msg: any) => ({
-                        ...msg,
-                        timestamp: new Date(msg.timestamp)
-                    }));
-                    setMessages(messagesWithDates);
-                } catch (error) {
-                    console.error('Error loading messages:', error);
+                    const parsed = JSON.parse(savedMessages);
+                    setMessages(parsed.map((msg: any) => ({ ...msg, timestamp: new Date(msg.timestamp) })));
+                } catch {
                     setDefaultMessages();
                 }
             } else {
@@ -89,43 +201,32 @@ const AiChatBox: React.FC = () => {
         }
     }, [user, isAuthenticated]);
 
-    // Save messages to localStorage
     useEffect(() => {
         if (isAuthenticated && getUserId() && messages.length > 0) {
             const storageKey = getStorageKey();
-            if (storageKey) {
-                localStorage.setItem(storageKey, JSON.stringify(messages));
-            }
+            if (storageKey) localStorage.setItem(storageKey, JSON.stringify(messages));
         }
-    }, [messages, isAuthenticated]);
+    }, [messages]);
 
     const setDefaultMessages = () => {
-        const defaultMessages = [
-            {
-                id: '1',
-                text: 'مرحباً! أنا المساعد الذكي. كيف يمكنني مساعدتك؟',
-                sender: 'ai',
-                timestamp: new Date()
-            }
-        ];
-        setMessages(defaultMessages);
-        if (isAuthenticated && getUserId()) {
-            const storageKey = getStorageKey();
-            if (storageKey) {
-                localStorage.setItem(storageKey, JSON.stringify(defaultMessages));
-            }
-        }
+        const defaults: Message[] = [{
+            id: '1',
+            text: `مرحباً ${user?.name ? user.name.split(' ')[0] : ''}! 👋 أنا مساعدك الذكي. يمكنني مساعدتك في معلوماتك الأكاديمية، المواد، المجموعات، وأي استفسار عن النظام.`,
+            sender: 'ai',
+            timestamp: new Date()
+        }];
+        setMessages(defaults);
+        const storageKey = getStorageKey();
+        if (storageKey) localStorage.setItem(storageKey, JSON.stringify(defaults));
     };
 
     useEffect(() => {
-        if (isOpen) {
-            inputRef.current?.focus();
-        }
+        if (isOpen) inputRef.current?.focus();
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [isOpen, messages]);
 
-    const handleSendMessage = () => {
-        if (!inputMessage.trim()) return;
+    const handleSendMessage = async () => {
+        if (!inputMessage.trim() || isLoading || contextLoading) return;
 
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -134,90 +235,62 @@ const AiChatBox: React.FC = () => {
             timestamp: new Date()
         };
 
-        setMessages(prev => [...prev, userMessage]);
+        const updatedMessages = [...messages, userMessage];
+        setMessages(updatedMessages);
         setInputMessage('');
+        setIsLoading(true);
 
-        // Get full student data to send with the message
-        const studentData = getStudentData();
+        try {
+            const chatHistory = updatedMessages
+                .filter(m => m.id !== '1')
+                .map(m => ({
+                    role: m.sender === 'user' ? 'user' : 'assistant',
+                    content: m.text
+                }));
 
-        // Log all student data (for debugging)
-        console.log('Sending message with student data:', studentData);
+            const response = await fetch(GROQ_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${GROQ_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: GROQ_MODEL,
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        ...chatHistory,
+                        { role: 'user', content: inputMessage }
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 600
+                })
+            });
 
-        // Simulate AI response with student data context
-        setTimeout(() => {
-            const aiResponse: Message = {
+            if (!response.ok) {
+                const errBody = await response.json().catch(() => ({}));
+                throw new Error(`Groq error ${response.status}: ${errBody?.error?.message || 'Unknown'}`);
+            }
+
+            const data = await response.json();
+            const aiText = data?.choices?.[0]?.message?.content || 'عذراً، لم أتمكن من الرد. حاول مرة أخرى.';
+
+            setMessages(prev => [...prev, {
                 id: (Date.now() + 1).toString(),
-                text: getAutoResponse(inputMessage, studentData),
+                text: aiText,
                 sender: 'ai',
                 timestamp: new Date()
-            };
-            setMessages(prev => [...prev, aiResponse]);
-        }, 500);
-    };
-
-    // Enhanced AI response with student data
-    const getAutoResponse = (message: string, studentData: StudentData): string => {
-        const lowerMsg = message.toLowerCase();
-
-        // Personal info responses
-        if (lowerMsg.includes('اسمي') || lowerMsg.includes('من انا') || lowerMsg.includes('عرفني')) {
-            return `أنت ${studentData.name || 'طالب'}${studentData.studentId ? ` برقم جامعي ${studentData.studentId}` : ''}${studentData.department ? ` في قسم ${studentData.department}` : ''}. كيف يمكنني مساعدتك اليوم؟`;
+            }]);
+        } catch (error: any) {
+            console.error('❌ Groq call failed:', error?.message);
+            setMessages(prev => [...prev, {
+                id: (Date.now() + 1).toString(),
+                text: `عذراً، حدث خطأ: ${error?.message || 'خطأ غير معروف'}`,
+                sender: 'ai',
+                timestamp: new Date()
+            }]);
+        } finally {
+            setIsLoading(false);
         }
-
-        if (lowerMsg.includes('رقمي') || lowerMsg.includes('الرقم الجامعي')) {
-            return studentData.studentId ? `رقمك الجامعي هو: ${studentData.studentId}` : 'لم يتم العثور على رقمك الجامعي في النظام.';
-        }
-
-        if (lowerMsg.includes('معدلي') || lowerMsg.includes('gpa') || lowerMsg.includes('المعدل')) {
-            return studentData.gpa ? `معدلك التراكمي الحالي هو: ${studentData.gpa}` : 'لم يتم العثور على معدلك التراكمي في النظام.';
-        }
-
-        if (lowerMsg.includes('المستوى') || lowerMsg.includes('level')) {
-            return studentData.level ? `أنت في المستوى: ${studentData.level}` : 'لم يتم تحديد مستواك الدراسي بعد.';
-        }
-
-        if (lowerMsg.includes('ساعات') || lowerMsg.includes('credits')) {
-            let response = '';
-            if (studentData.registeredHours) {
-                response += `عدد الساعات المسجلة: ${studentData.registeredHours}\n`;
-            }
-            if (studentData.completedHours) {
-                response += `عدد الساعات المكتملة: ${studentData.completedHours}`;
-            }
-            return response || 'لم يتم العثور على معلومات الساعات الدراسية.';
-        }
-
-        if (lowerMsg.includes('القسم') || lowerMsg.includes('department')) {
-            return studentData.department ? `قسمك هو: ${studentData.department}` : 'لم يتم تحديد قسمك بعد.';
-        }
-
-        // General responses
-        if (lowerMsg.includes('مرحب') || lowerMsg.includes('hello') || lowerMsg.includes('السلام')) {
-            return `أهلاً بك ${studentData.name || 'عزيزي الطالب'}! كيف يمكنني مساعدتك اليوم؟`;
-        }
-
-        if (lowerMsg.includes('شكر')) {
-            return 'العفو! أنا هنا لمساعدتك في أي وقت.';
-        }
-
-        if (lowerMsg.includes('تسجيل') || lowerMsg.includes('مواد') || lowerMsg.includes('register')) {
-            return `يمكنك تسجيل المواد من خلال الذهاب إلى صفحة "تسجيل المواد" في القائمة الرئيسية.${studentData.gpa ? `\n\nمعلومة: معدلك الحالي ${studentData.gpa}` : ''}`;
-        }
-
-        if (lowerMsg.includes('جدول') || lowerMsg.includes('مجموعات') || lowerMsg.includes('schedule')) {
-            return 'لعرض الجدول الدراسي، اذهب إلى صفحة "المجموعات" لمشاهدة جميع المجموعات المتاحة وتفاصيلها.';
-        }
-
-        if (lowerMsg.includes('شكوى') || lowerMsg.includes('طلب') || lowerMsg.includes('complaint')) {
-            return 'لتقديم شكوى، استخدم صفحة "الشكاوى" حيث يمكنك إنشاء طلب جديد ومتابعة حالته.';
-        }
-
-        if (lowerMsg.includes('مساعدة') || lowerMsg.includes('help')) {
-            return `أهلاً ${studentData.name || 'عزيزي الطالب'}! يمكنني مساعدتك في:\n- معرفة معلوماتك الشخصية (الرقم الجامعي، المعدل، المستوى)\n- تسجيل المواد\n- عرض الجدول الدراسي\n- تقديم الشكاوى\n- معلومات عن النظام\n\nما الذي تريد معرفته؟`;
-        }
-
-        // Default response with personal touch
-        return `شكراً لسؤالك ${studentData.name || 'عزيزي الطالب'}. هل يمكنك توضيح أكثر؟ أنا هنا لمساعدتك في الاستفسارات المتعلقة بالنظام الأكاديمي.`;
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -227,66 +300,56 @@ const AiChatBox: React.FC = () => {
         }
     };
 
-    const clearChatHistory = () => {
-        if (window.confirm('هل تريد مسح سجل المحادثة؟')) {
-            setDefaultMessages();
-        }
-    };
+    const formatTime = (date: Date) =>
+        date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
 
-    const formatTime = (date: Date) => {
-        return date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-    };
+    if (!isAuthenticated || !getUserId()) return null;
 
-    // Don't render chat if user is not authenticated
-    if (!isAuthenticated || !getUserId()) {
-        return null;
-    }
+    const inputDisabled = isLoading || contextLoading;
 
     return (
         <>
             <button
                 className={`ai-chat-circle ${isOpen ? 'open' : ''}`}
                 onClick={() => setIsOpen(!isOpen)}
+                title="المساعد الذكي"
             >
-                {isOpen ? '✕' : '💬'}
+                {isOpen ? '✕' : '🤖'}
             </button>
 
             {isOpen && (
                 <div className="ai-chat-window">
                     <div className="ai-chat-header">
                         <div className="header-info">
-                            <span className="header-icon">💬</span>
-                            <span className="header-title">المساعد الذكي</span>
+                            <div className="header-avatar">🤖</div>
+                            <div className="header-text">
+                                <span className="header-title">المساعد الذكي</span>
+                                <span className="header-subtitle">
+                                    {contextLoading ? '⏳ جاري تحميل بياناتك...' : '🟢 متاح الآن'}
+                                </span>
+                            </div>
                         </div>
-                        <div className="header-actions">
-                            <button
-                                className="clear-button"
-                                onClick={clearChatHistory}
-                                title="مسح المحادثة"
-                            >
-                                🗑️
-                            </button>
-                            <button
-                                className="minimize-button"
-                                onClick={() => setIsOpen(false)}
-                            >
-                                −
-                            </button>
-                        </div>
+                        <button className="minimize-button" onClick={() => setIsOpen(false)} title="إغلاق">✕</button>
                     </div>
 
                     <div className="ai-chat-messages">
                         {messages.map((message) => (
-                            <div
-                                key={message.id}
-                                className={`message ${message.sender === 'user' ? 'user-message' : 'ai-message'}`}
-                            >
+                            <div key={message.id} className={`message ${message.sender === 'user' ? 'user-message' : 'ai-message'}`}>
+                                {message.sender === 'ai' && <div className="message-avatar">🤖</div>}
                                 <div className="message-bubble">
                                     <div className="message-text">{message.text}</div>
                                     <div className="message-time">{formatTime(message.timestamp)}</div>
                                 </div>
                             </div>
                         ))}
+                        {(isLoading || contextLoading) && (
+                            <div className="message ai-message">
+                                <div className="message-avatar">🤖</div>
+                                <div className="message-bubble">
+                                    <div className="typing-indicator"><span></span><span></span><span></span></div>
+                                </div>
+                            </div>
+                        )}
                         <div ref={messagesEndRef} />
                     </div>
 
@@ -297,10 +360,11 @@ const AiChatBox: React.FC = () => {
                             value={inputMessage}
                             onChange={(e) => setInputMessage(e.target.value)}
                             onKeyPress={handleKeyPress}
-                            placeholder="اكتب رسالتك هنا..."
+                            placeholder={contextLoading ? 'جاري تحميل بياناتك...' : 'اكتب رسالتك هنا...'}
+                            disabled={inputDisabled}
                         />
-                        <button onClick={handleSendMessage}>
-                            ➤
+                        <button onClick={handleSendMessage} disabled={inputDisabled || !inputMessage.trim()}>
+                            {isLoading ? '⏳' : '➤'}
                         </button>
                     </div>
                 </div>

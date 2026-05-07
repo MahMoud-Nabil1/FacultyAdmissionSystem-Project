@@ -40,6 +40,10 @@ interface StudentData {
     registeredSubjects?: string[];
 }
 
+const GROQ_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY;
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
+
 const AiChatBox: React.FC = () => {
     const { user, isAuthenticated, token } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
@@ -67,6 +71,31 @@ const AiChatBox: React.FC = () => {
             completedSubjects: user?.completedSubjects,
             registeredSubjects: user?.registeredSubjects
         };
+    };
+
+    // Build system prompt from student data
+    const buildSystemPrompt = (data: StudentData): string => {
+        return `أنت مساعد ذكي لنظام القبول الجامعي. تحدث دائماً باللغة العربية بأسلوب ودود ومهني.
+
+معلومات الطالب الحالي:
+- الاسم: ${data.name || 'غير محدد'}
+- الرقم الجامعي: ${data.studentId || 'غير محدد'}
+- البريد الإلكتروني: ${data.email || 'غير محدد'}
+- القسم: ${data.department || 'غير محدد'}
+- المستوى الدراسي: ${data.level || 'غير محدد'}
+- المعدل التراكمي (GPA): ${data.gpa ?? 'غير محدد'}
+- الساعات المسجلة: ${data.registeredHours ?? 'غير محدد'}
+- الساعات المكتملة: ${data.completedHours ?? 'غير محدد'}
+- المواد المسجلة: ${data.registeredSubjects?.join(', ') || 'لا توجد مواد مسجلة'}
+- المواد المكتملة: ${data.completedSubjects?.join(', ') || 'لا توجد مواد مكتملة'}
+
+يمكنك مساعدة الطالب في:
+- الاستفسار عن معلوماته الشخصية والأكاديمية
+- تسجيل المواد والجدول الدراسي
+- تقديم الشكاوى والطلبات
+- أي سؤال يتعلق بالنظام الأكاديمي
+
+كن مختصراً ومفيداً في إجاباتك.`;
     };
 
     // Get user ID
@@ -153,7 +182,7 @@ const AiChatBox: React.FC = () => {
     };
 
     const sendMessage = async () => {
-        if (!inputMessage.trim()) return;
+        if (!inputMessage.trim() || isLoading) return;
 
         Keyboard.dismiss();
 
@@ -164,97 +193,70 @@ const AiChatBox: React.FC = () => {
             timestamp: new Date()
         };
 
-        setMessages(prev => [...prev, userMessage]);
         const sentMessage = inputMessage;
+        const updatedMessages = [...messages, userMessage];
+        setMessages(updatedMessages);
         setInputMessage('');
         setIsLoading(true);
 
         const studentData = getStudentData();
+        const systemPrompt = buildSystemPrompt(studentData);
 
-        // Local AI response using student data
-        setTimeout(() => {
+        try {
+            // Build OpenAI-format message history for Groq
+            const chatHistory = updatedMessages
+                .filter(m => m.id !== '1')
+                .map(m => ({
+                    role: m.sender === 'user' ? 'user' : 'assistant',
+                    content: m.text
+                }));
+
+            const response = await fetch(GROQ_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${GROQ_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: GROQ_MODEL,
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        ...chatHistory,
+                        { role: 'user', content: sentMessage }
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 500
+                })
+            });
+
+            if (!response.ok) {
+                const errBody = await response.json().catch(() => ({}));
+                console.error('❌ Groq API failed:', response.status, JSON.stringify(errBody));
+                throw new Error(`Groq error ${response.status}: ${errBody?.error?.message || 'Unknown'}`);
+            }
+
+            const data = await response.json();
+            const aiText = data?.choices?.[0]?.message?.content || 'عذراً، لم أتمكن من الرد. حاول مرة أخرى.';
+
             const aiResponse: Message = {
                 id: (Date.now() + 1).toString(),
-                text: getLocalResponse(sentMessage, studentData),
+                text: aiText,
                 sender: 'ai',
                 timestamp: new Date()
             };
             setMessages(prev => [...prev, aiResponse]);
+        } catch (error: any) {
+            console.error('❌ Groq call failed:', error?.message);
+            const errorMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                text: `عذراً، حدث خطأ: ${error?.message || 'خطأ غير معروف'}`,
+                sender: 'ai',
+                timestamp: new Date()
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
             setIsLoading(false);
-        }, 500);
-    };
-
-    // Local AI responses using student data
-    const getLocalResponse = (message: string, data: StudentData): string => {
-        const lowerMsg = message.toLowerCase();
-
-        // Personal info responses
-        if (lowerMsg.includes('اسمي') || lowerMsg.includes('من انا') || lowerMsg.includes('عرفني')) {
-            return `أنت ${data?.name || 'طالب'}${data?.studentId ? ` برقم جامعي ${data.studentId}` : ''}. كيف يمكنني مساعدتك اليوم؟`;
         }
-
-        if (lowerMsg.includes('رقمي') || lowerMsg.includes('الرقم الجامعي') || lowerMsg.includes('student id')) {
-            return data?.studentId ? `رقمك الجامعي هو: ${data.studentId}` : 'لم يتم العثور على رقمك الجامعي في النظام.';
-        }
-
-        if (lowerMsg.includes('معدلي') || lowerMsg.includes('gpa') || lowerMsg.includes('المعدل')) {
-            return data?.gpa ? `معدلك التراكمي الحالي هو: ${data.gpa}` : 'لم يتم العثور على معدلك التراكمي في النظام.';
-        }
-
-        if (lowerMsg.includes('المستوى') || lowerMsg.includes('level') || lowerMsg.includes('مستوى')) {
-            return data?.level ? `أنت في المستوى: ${data.level}` : 'لم يتم تحديد مستواك الدراسي بعد.';
-        }
-
-        if (lowerMsg.includes('ساعات') || lowerMsg.includes('credits') || lowerMsg.includes('credit')) {
-            let response = '';
-            if (data?.registeredHours) {
-                response += `عدد الساعات المسجلة: ${data.registeredHours}\n`;
-            }
-            if (data?.completedHours) {
-                response += `عدد الساعات المكتملة: ${data.completedHours}`;
-            }
-            return response || 'لم يتم العثور على معلومات الساعات الدراسية.';
-        }
-
-        if (lowerMsg.includes('القسم') || lowerMsg.includes('department') || lowerMsg.includes('قسم')) {
-            return data?.department ? `قسمك هو: ${data.department}` : 'لم يتم تحديد قسمك بعد.';
-        }
-
-        if (lowerMsg.includes('بريد') || lowerMsg.includes('email') || lowerMsg.includes('إيميل')) {
-            return data?.email ? `بريدك الإلكتروني: ${data.email}` : 'لم يتم العثور على بريدك الإلكتروني.';
-        }
-
-        // General responses
-        if (lowerMsg.includes('مرحب') || lowerMsg.includes('hello') || lowerMsg.includes('السلام') || lowerMsg.includes('hi')) {
-            return `أهلاً بك ${data?.name || 'عزيزي الطالب'}! كيف يمكنني مساعدتك اليوم؟`;
-        }
-
-        if (lowerMsg.includes('شكر')) {
-            return 'العفو! أنا هنا لمساعدتك في أي وقت.';
-        }
-
-        if (lowerMsg.includes('تسجيل') || lowerMsg.includes('مواد') || lowerMsg.includes('register')) {
-            return `يمكنك تسجيل المواد من خلال الذهاب إلى صفحة "تسجيل المواد" في القائمة الرئيسية.${data?.gpa ? `\n\nملاحظة: معدلك الحالي ${data.gpa}` : ''}`;
-        }
-
-        if (lowerMsg.includes('جدول') || lowerMsg.includes('مجموعات') || lowerMsg.includes('schedule') || lowerMsg.includes('groups')) {
-            return 'لعرض الجدول الدراسي، اذهب إلى صفحة "المجموعات" لمشاهدة جميع المجموعات المتاحة وتفاصيلها.';
-        }
-
-        if (lowerMsg.includes('شكوى') || lowerMsg.includes('طلب') || lowerMsg.includes('complaint') || lowerMsg.includes('شكاوى')) {
-            return 'لتقديم شكوى، استخدم صفحة "الشكاوى" حيث يمكنك إنشاء طلب جديد ومتابعة حالته.';
-        }
-
-        if (lowerMsg.includes('مساعدة') || lowerMsg.includes('help') || lowerMsg.includes('مساعده')) {
-            return `أهلاً ${data?.name || 'عزيزي الطالب'}! يمكنني مساعدتك في:\n\n📌 معرفة معلوماتك الشخصية (الرقم الجامعي، المعدل، المستوى، القسم)\n📌 تسجيل المواد\n📌 عرض الجدول الدراسي\n📌 تقديم الشكاوى\n📌 معلومات عن النظام\n\nما الذي تريد معرفته؟`;
-        }
-
-        if (lowerMsg.includes('وداع') || lowerMsg.includes('bye') || lowerMsg.includes('مع السلامة')) {
-            return 'وداعاً! أتمنى لك يوماً سعيداً. عد في أي وقت تحتاج فيه مساعدة.';
-        }
-
-        // Default response
-        return `شكراً لسؤالك ${data?.name || 'عزيزي الطالب'}. هل يمكنك توضيح أكثر؟ أنا هنا لمساعدتك في الاستفسارات المتعلقة بالنظام الأكاديمي.`;
     };
 
     const clearChatHistory = () => {
@@ -380,9 +382,10 @@ const AiChatBox: React.FC = () => {
                                 autoComplete="off"
                                 autoCorrect={false}
                                 spellCheck={false}
+                                editable={!isLoading}
                             />
                             <TouchableOpacity
-                                style={[styles.sendButton, !inputMessage.trim() && styles.sendButtonDisabled]}
+                                style={[styles.sendButton, (!inputMessage.trim() || isLoading) && styles.sendButtonDisabled]}
                                 onPress={sendMessage}
                                 disabled={!inputMessage.trim() || isLoading}
                             >
