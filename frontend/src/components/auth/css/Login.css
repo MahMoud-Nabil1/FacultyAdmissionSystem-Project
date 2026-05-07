@@ -17,6 +17,31 @@
        - RTL: image on the left */
     flex-direction: row-reverse;
     background-color: var(--color-bg); /* Use a slightly grayish color as requested */
+    position: relative;
+}
+
+.login-lang-switch {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+}
+[dir="rtl"] .login-lang-switch {
+    right: auto;
+    left: 20px;
+}
+.lang-btn {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.lang-btn:hover {
+    background-color: var(--color-bg);
 }
 
 

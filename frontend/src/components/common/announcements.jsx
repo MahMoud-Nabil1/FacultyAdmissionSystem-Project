@@ -220,33 +220,51 @@ const Announcements = () => {
                 )}
             </div>
 
-            {/* GPA Section */}
-            {hasInvalidGpaSettings ? (
-                <div className="gpa-error-section">
-                    <h4>⚠️ تحذير: إعدادات المعدل التراكمي غير صحيحة</h4>
-                    <p>يرجى التواصل مع المسؤول لإصلاح الإعدادات.</p>
-                </div>
-            ) : (
-                <div className="section-box">
-                    <h4 className="section-title">المعدل التراكمي المطلوب للتسجيل في الجدول</h4>
-                    <div className="flex-center-gap">
-                        <div className="gpa-card">
-                            <span className="card-label">من</span>
-                            <span className="card-value">{gpaMin}</span>
+            {/* Combined Requirements Section */}
+            <div className="combined-requirements-box">
+                <h4 className="section-title">شروط التسجيل في الجدول</h4>
+                <div className="requirements-grid">
+                    {/* GPA Requirement */}
+                    <div className="requirement-block">
+                        <div className="requirement-header">
+                            <svg className="requirement-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                            </svg>
+                            المعدل التراكمي
                         </div>
-                        <div className="gpa-card">
-                            <span className="card-label">إلى</span>
-                            <span className="card-value">{gpaMax}</span>
+                        {hasInvalidGpaSettings ? (
+                            <div className="gpa-error-section" style={{margin: 0}}>
+                                <h4>⚠️ تحذير: إعدادات غير صحيحة</h4>
+                            </div>
+                        ) : (
+                            <div className="flex-center-gap">
+                                <div className="gpa-card">
+                                    <span className="card-label">من</span>
+                                    <span className="card-value">{gpaMin}</span>
+                                </div>
+                                <div className="gpa-card">
+                                    <span className="card-label">إلى</span>
+                                    <span className="card-value">{gpaMax}</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="requirement-divider"></div>
+
+                    {/* Level Requirement */}
+                    <div className="requirement-block">
+                        <div className="requirement-header">
+                            <svg className="requirement-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                            </svg>
+                            المستوى الدراسي
+                        </div>
+                        <div className="levels-container">
+                            {renderLevels()}
                         </div>
                     </div>
-                </div>
-            )}
-
-            {/* Level Section */}
-            <div className="section-box">
-                <h4 className="section-title">المستوى المطلوب للتسجيل في الجدول</h4>
-                <div className="levels-container">
-                    {renderLevels()}
                 </div>
             </div>
 

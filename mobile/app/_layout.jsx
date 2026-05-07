@@ -9,7 +9,6 @@ export default function RootLayout() {
         <LanguageProvider>
             <AuthProvider>
                 <StatusBar style="auto" />
-                <LanguageSwitcher floating />
                 <Stack screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="(auth)" />
                     <Stack.Screen name="(tabs)" />

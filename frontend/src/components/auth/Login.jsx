@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 const Login = () => {
     const { login } = useAuth();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [userId, setUserId] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -54,6 +54,13 @@ const Login = () => {
 
     return (
         <div className="login-page">
+            {/* Language Switcher */}
+            <div className="login-lang-switch">
+                <button className="lang-btn" onClick={() => i18n.changeLanguage(i18n.language === 'ar' ? 'en' : 'ar')}>
+                    {i18n.language === 'ar' ? 'English' : 'العربية'}
+                </button>
+            </div>
+
             {}
             <div className="login-image-side">
                 <div className="brand-logo">

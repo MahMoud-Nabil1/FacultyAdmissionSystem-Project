@@ -78,7 +78,7 @@ const MENUS: Record<string, MenuEntry[]> = {
 /* ─────────── component ─────────── */
 const Homepage = () => {
     const { token, logout, user, updateUser } = useAuth();
-    const { t, locale }           = useLanguage();
+    const { t, locale, toggleLocale } = useLanguage();
     const isRTL                   = locale === 'ar';
 
     const [fullData, setFullData] = useState<any>(null);
@@ -313,6 +313,12 @@ const Homepage = () => {
                     </View>
                 ))}
 
+                {/* ── Language Switcher ── */}
+                <TouchableOpacity style={[s.languageRow, isRTL && s.rowReverse]} onPress={toggleLocale}>
+                    <Ionicons name="language-outline" size={17} color="#4b5563" />
+                    <Text style={s.languageLabel}>{locale === 'ar' ? 'English' : 'العربية'}</Text>
+                </TouchableOpacity>
+
                 {/* ── Sign out (secondary) ── */}
                 <TouchableOpacity style={[s.logoutRow, isRTL && s.rowReverse]} onPress={handleLogout}>
                     <Ionicons name="log-out-outline" size={17} color="#ef4444" />
@@ -450,9 +456,17 @@ const s = StyleSheet.create({
     logoutRow: {
         flexDirection: 'row',
         alignItems: 'center', justifyContent: 'center',
-        gap: 6, marginTop: 20, paddingVertical: 10,
+        gap: 6, marginTop: 10, paddingVertical: 10,
     },
     logoutLabel: { color: '#ef4444', fontWeight: '700', fontSize: 14 },
+
+    /* ── Language row ── */
+    languageRow: {
+        flexDirection: 'row',
+        alignItems: 'center', justifyContent: 'center',
+        gap: 6, marginTop: 20, paddingVertical: 10,
+    },
+    languageLabel: { color: '#4b5563', fontWeight: '700', fontSize: 14 },
 
     /* ── RTL helpers ── */
     rowReverse: { flexDirection: 'row-reverse' },

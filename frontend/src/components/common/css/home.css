@@ -72,7 +72,7 @@
 }
 
 .upload-label:hover {
-    background-color: var(--color-primary-dark);
+    background-color: var(--color-primary-hover);
 }
 
 /* Main content wrapper - Full width layout */
@@ -165,6 +165,22 @@
 }
 
 .btn.signout:hover {
+    background-color: var(--color-bg);
+    border-color: var(--color-text-muted);
+    color: var(--color-text);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Language Switch Button - Full width like signout */
+.btn.lang-switch {
+    background-color: transparent;
+    color: var(--color-text-muted);
+    border: 2px solid var(--color-border);
+    grid-column: 1 / -1;
+}
+
+.btn.lang-switch:hover {
     background-color: var(--color-bg);
     border-color: var(--color-text-muted);
     color: var(--color-text);

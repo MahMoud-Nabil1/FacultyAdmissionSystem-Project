@@ -25,7 +25,7 @@ interface LoginPayload {
 
 export default function Login() {
     const { login } = useAuth();
-    const { t } = useLanguage();
+    const { t, locale, toggleLocale } = useLanguage();
     const [userId, setUserId] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -92,6 +92,13 @@ export default function Login() {
                     <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} colors={['#1a73e8']} tintColor="#1a73e8" />
                 }
             >
+                {/* Language Switcher */}
+                <View style={styles.langContainer}>
+                    <TouchableOpacity style={styles.langBtn} onPress={toggleLocale}>
+                        <Text style={styles.langBtnText}>{locale === 'ar' ? 'EN' : 'AR'}</Text>
+                    </TouchableOpacity>
+                </View>
+
                 {/* Header */}
                 <View style={styles.header}>
                     <Text style={styles.logo}>🎓</Text>
@@ -183,6 +190,9 @@ export default function Login() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#f0f4ff' },
     scroll: { flexGrow: 1, padding: 24, paddingBottom: 80, justifyContent: 'center' },
+    langContainer: { width: '100%', alignItems: 'flex-end', marginBottom: 20, marginTop: -20 },
+    langBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: '#e0e7ff' },
+    langBtnText: { color: '#1a73e8', fontWeight: '700', fontSize: 14 },
     header: { alignItems: 'center', marginBottom: 28 },
     logo: { fontSize: 52, marginBottom: 8 },
     university: { fontSize: 13, color: '#6b7280', marginBottom: 12, textAlign: 'center' },

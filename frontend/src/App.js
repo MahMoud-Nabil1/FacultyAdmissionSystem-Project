@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import './App.css';
 import {Navigate, Route, Routes} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
@@ -30,8 +31,15 @@ import StudentComplaintPage from "./components/complaints/studentsComplaints.tsx
 import AiChatBox from "./components/common/aiChatBox.tsx"; // Add this import
 
 function App() {
-    const {t} = useTranslation();
+    const {t, i18n} = useTranslation();
     const { user } = useAuth();
+
+    useEffect(() => {
+        const currentLang = i18n.language || 'ar';
+        const dir = currentLang.startsWith('ar') ? 'rtl' : 'ltr';
+        document.documentElement.lang = currentLang;
+        document.documentElement.dir = dir;
+    }, [i18n.language]);
 
     const AdminDashboardIndex = () => {
         return <Navigate to="/admin-dashboard/announcements" replace />;
@@ -40,8 +48,6 @@ function App() {
     return (
         <ThemeProvider>
             <div className="App">
-                <LanguageFloatingButton/>
-
                 {/* Add AiChatBox here - outside Routes, but NOT wrapped in ProtectedRoute */}
                 <AiChatBox />
 
