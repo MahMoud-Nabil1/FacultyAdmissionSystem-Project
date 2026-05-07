@@ -10,7 +10,6 @@
 }
 
 .announcements-container {
-    direction: rtl;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     width: 100%;
     margin: 0;
@@ -19,149 +18,114 @@
     min-height: 100vh;
 }
 
-/* --- Header Section --- */
-.header-wrapper {
+/* --- Announcements Navbar --- */
+.announcements-navbar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 1.5rem 0;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-    gap: 1rem;
+    justify-content: space-between;
+    background-color: var(--color-text-inverse);
+    padding: 1rem 1.5rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--color-border);
+    gap: 1.5rem;
 }
 
-.logo-img {
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand .logo-img {
     height: 48px;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
 }
 
-/* User controls row */
-.user-controls {
+.navbar-links {
     display: flex;
     align-items: center;
-    gap: 1rem;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.login-btn {
-    background-color: var(--primary);
-    color: white;
-    border: none;
-    padding: 10px 24px;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.login-btn:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-1px);
-}
-
-.user-welcome {
-    color: var(--color-text);
-    font-weight: 500;
-    font-size: 0.95rem;
-    background: #eef2ff;
-    padding: 8px 16px;
-    border-radius: 8px;
-}
-
-/* Logout button - RED */
-.logout-btn {
-    background-color: var(--danger);
-    color: white;
-    border: none;
-    padding: 10px 24px;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.logout-btn:hover {
-    background-color: var(--danger-hover);
-    transform: translateY(-1px);
-}
-
-/* --- Navigation Buttons Row --- */
-.nav-buttons {
-    display: flex;
+    gap: 0.5rem;
+    flex: 1;
     justify-content: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
     flex-wrap: wrap;
 }
 
-.btn {
-    padding: 12px 24px;
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
     border: none;
+    background: transparent;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    background-color: var(--color-bg);
+    color: var(--color-primary);
+}
+
+.nav-link.active-link {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
+}
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--color-bg);
+    padding: 6px 6px 6px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--color-border-light);
+}
+
+.welcome-text {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-text);
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 10px 24px;
     border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 0.95rem;
-    color: white;
-    background-color: var(--color-primary);
 }
-
-.btn:hover {
+.btn-primary:hover {
     background-color: var(--color-primary-hover);
     transform: translateY(-1px);
 }
 
-.home-btn {
-    background-color: var(--color-primary);
+.btn-danger {
+    background-color: var(--color-error);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
-
-.home-btn:hover {
-    background-color: var(--color-primary-hover);
-}
-
-.complaint-btn {
-    background-color: var(--color-primary);
-}
-
-.complaint-btn:hover {
-    background-color: var(--color-primary-hover);
-}
-
-.groups-btn {
-    background-color: var(--color-primary);
-}
-
-.groups-btn:hover {
-    background-color: var(--color-primary-hover);
-}
-
-.register-btn {
-    background-color: var(--color-primary);
-}
-
-.register-btn:hover {
-    background-color: var(--color-primary-hover);
-}
-
-.history-btn {
-    background-color: var(--color-primary);
-}
-
-.history-btn:hover {
-    background-color: var(--color-primary-hover);
-}
-
-.admin-btn {
-    background-color: var(--color-primary);
-}
-
-.admin-btn:hover {
-    background-color: var(--color-primary-hover);
+.btn-danger:hover {
+    background-color: var(--color-error-hover);
 }
 
 /* --- Stats/GPA Layout --- */
@@ -390,35 +354,42 @@
         max-width: none;
     }
 
-    .header-wrapper {
+    .announcements-navbar {
         flex-direction: column;
-        gap: 1rem;
-        text-align: center;
+        padding: 1.5rem;
     }
 
-    .nav-buttons {
-        gap: 0.75rem;
-    }
-
-    .btn {
-        padding: 10px 16px;
-        font-size: 0.85rem;
-    }
-
-    .user-controls {
+    .navbar-links {
+        order: 3;
         width: 100%;
-        justify-content: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--color-border);
+    }
+
+    .navbar-actions {
+        order: 2;
+    }
+
+    .navbar-brand {
+        order: 1;
+        margin-bottom: 0.5rem;
+    }
+
+    .nav-link {
+        padding: 8px 12px;
+        font-size: 0.9rem;
     }
 }
 
 @media (max-width: 640px) {
-    .nav-buttons {
+    .navbar-links {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 0.75rem;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 0.5rem;
     }
 
-    .btn {
+    .nav-link {
         text-align: center;
         justify-content: center;
     }

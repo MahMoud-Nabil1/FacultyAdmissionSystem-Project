@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './css/announcements.css';
 
 const API_URL = `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api'}`;
 
 const Announcements = () => {
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
     const [user, setUser] = useState(null);
+    const isRTL = i18n.language === 'ar';
     const [loading, setLoading] = useState(true);
     const [gpaMin, setGpaMin] = useState(2.5);
     const [gpaMax, setGpaMax] = useState(5);
@@ -99,12 +102,12 @@ const Announcements = () => {
 
     const getLevelText = (code) => {
         const levels = {
-            '1': 'المستوى الأول',
-            '2': 'المستوى الثاني',
-            '3': 'المستوى الثالث',
-            '4': 'المستوى الرابع'
+            '1': t('announcements.level1'),
+            '2': t('announcements.level2'),
+            '3': t('announcements.level3'),
+            '4': t('announcements.level4')
         };
-        return levels[code] || 'المستوى الأول';
+        return levels[code] || t('announcements.level1');
     };
 
     const renderLevels = () => {
@@ -117,7 +120,7 @@ const Announcements = () => {
 
     // Navigation handlers (all using sessionStorage)
     const handleHomeClick = () => {
-        const token = sessionStorage.getItem('token'); // Changed to sessionStorage
+        const token = sessionStorage.getItem('token');
         if (!token) {
             navigate('/login');
         } else {
@@ -126,9 +129,11 @@ const Announcements = () => {
     };
 
     const handleComplaintsClick = () => {
-        const token = sessionStorage.getItem('token'); // Changed to sessionStorage
+        const token = sessionStorage.getItem('token');
         if (!token) {
             navigate('/login');
+        } else if (user && user.role !== 'student') {
+            navigate('/admin-dashboard/requests');
         } else {
             navigate('/students-complaints');
         }
@@ -157,72 +162,16 @@ const Announcements = () => {
     };
 
     if (loading) {
-        return <div className="loading-container">جاري التحميل...</div>;
+        return <div className="loading-container">{t('announcements.loading')}</div>;
     }
 
     const isLoggedIn = user !== null;
 
     return (
-        <div className="announcements-container">
-            {/* Header */}
-            <div className="header-wrapper">
-                <div className="logo-container">
-                    {!logoError && (
-                        <img
-                            src="/logo.png"
-                            alt="الشعار"
-                            className="logo-img"
-                            onError={() => setLogoError(true)}
-                        />
-                    )}
-                </div>
-                <div className="user-controls">
-                    {!isLoggedIn ? (
-                        <button className="login-btn" onClick={() => navigate('/login')}>
-                            تسجيل الدخول
-                        </button>
-                    ) : (
-                        <div className="user-info">
-                            <span className="user-welcome">مرحباً, {user.name}</span>
-                            <button onClick={handleLogout} className="logout-btn">
-                                تسجيل الخروج
-                            </button>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Navigation Buttons */}
-            <div className="nav-buttons">
-                <button className="btn home-btn" onClick={handleHomeClick}>
-                    🏠 الرئيسية
-                </button>
-                <button className="btn complaint-btn" onClick={handleComplaintsClick}>
-                    📝 الشكاوى
-                </button>
-                <button className="btn groups-btn" onClick={handleGroupsClick}>
-                    👥 المجموعات
-                </button>
-                {isLoggedIn && (
-                    <>
-                        <button className="btn register-btn" onClick={handleRegisterSubjectsClick}>
-                            📚 تسجيل المواد
-                        </button>
-                        <button className="btn history-btn" onClick={handleAcademicHistoryClick}>
-                            📜 السجل الأكاديمي
-                        </button>
-                    </>
-                )}
-                {user?.role === 'admin' && (
-                    <button className="btn admin-btn" onClick={() => navigate('/admin-dashboard')}>
-                        ⚙️ لوحة التحكم
-                    </button>
-                )}
-            </div>
-
+        <div className="announcements-container" dir={isRTL ? 'rtl' : 'ltr'}>
             {/* Combined Requirements Section */}
             <div className="combined-requirements-box">
-                <h4 className="section-title">شروط التسجيل في الجدول</h4>
+                <h4 className="section-title">{t('announcements.gpaSectionTitle')}</h4>
                 <div className="requirements-grid">
                     {/* GPA Requirement */}
                     <div className="requirement-block">
@@ -231,20 +180,20 @@ const Announcements = () => {
                                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                             </svg>
-                            المعدل التراكمي
+                            {t('settingsPanel.gpaRangeLabel')}
                         </div>
                         {hasInvalidGpaSettings ? (
                             <div className="gpa-error-section" style={{margin: 0}}>
-                                <h4>⚠️ تحذير: إعدادات غير صحيحة</h4>
+                                <h4>{t('announcements.gpaWarning')}</h4>
                             </div>
                         ) : (
                             <div className="flex-center-gap">
                                 <div className="gpa-card">
-                                    <span className="card-label">من</span>
+                                    <span className="card-label">{t('announcements.gpaFrom')}</span>
                                     <span className="card-value">{gpaMin}</span>
                                 </div>
                                 <div className="gpa-card">
-                                    <span className="card-label">إلى</span>
+                                    <span className="card-label">{t('announcements.gpaTo')}</span>
                                     <span className="card-value">{gpaMax}</span>
                                 </div>
                             </div>
@@ -259,7 +208,7 @@ const Announcements = () => {
                             <svg className="requirement-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                             </svg>
-                            المستوى الدراسي
+                            {t('announcements.levelSectionTitle')}
                         </div>
                         <div className="levels-container">
                             {renderLevels()}
@@ -268,21 +217,38 @@ const Announcements = () => {
                 </div>
             </div>
 
+            {/* Quick Actions Row */}
+            <div className="quick-actions-row" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', margin: '2rem 0', flexWrap: 'wrap' }}>
+                <button 
+                    className="btn-primary" 
+                    onClick={() => navigate('/Groups')} 
+                    style={{ padding: '0.8rem 2rem', fontSize: '1.1rem', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    {t('announcements.navGroups')}
+                </button>
+            </div>
+
             {/* Announcements List */}
             <div className="posts-list">
-                <h3>الإعلانات</h3>
+                <h3>{t('announcements.announcementsTitle')}</h3>
                 {posts.length > 0 ? (
                     posts.map(post => (
                         <div key={post._id} className="post-card">
                             <h4>{post.title}</h4>
                             <p>{post.content}</p>
                             <small className="post-meta">
-                                نشر بواسطة {post.author} في {new Date(post.createdAt).toLocaleDateString('ar-EG')}
+                                {t('announcements.postedBy', { author: post.author, date: new Date(post.createdAt).toLocaleDateString(t('common.locale', { defaultValue: 'ar-EG' })) })}
                             </small>
                         </div>
                     ))
                 ) : (
-                    <p className="no-announcements">لا توجد إعلانات حتى الآن</p>
+                    <p className="no-announcements">{t('announcements.noAnnouncements')}</p>
                 )}
             </div>
         </div>

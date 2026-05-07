@@ -1,4 +1,4 @@
-﻿/* Import the font to keep it consistent with the Home page */
+/* Import the font to keep it consistent with the Home page */
 @import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;600&display=swap');
 
 /* Theme variables are in src/theme/themeVariables.css (applied via data-theme on <html>) */
@@ -27,6 +27,12 @@
     padding: 24px 0;
     border-right: 1px solid var(--color-border);
     transition: width 0.25s ease, min-width 0.25s ease;
+    
+    /* Keep sidebar fixed on screen when scrolling */
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
 }
 
 .eduadmin-sidebar-header {
@@ -371,8 +377,8 @@
 }
 
 .eduadmin-btn-home:hover {
-    background: var(--color-accent-blue);
-    color: var(--color-primary-dark);
+    background: var(--color-primary-light);
+    color: var(--color-primary-hover);
 }
 
 .eduadmin-btn-signout {

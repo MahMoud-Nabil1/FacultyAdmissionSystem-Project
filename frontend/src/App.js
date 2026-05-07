@@ -29,6 +29,8 @@ import AcademicHistory from "./components/academicHistory/AcademicHistory.tsx";
 import StudentProfileView from "./components/dashboard/students/studentProfileView.tsx";
 import StudentComplaintPage from "./components/complaints/studentsComplaints.tsx";
 import AiChatBox from "./components/common/aiChatBox.tsx"; // Add this import
+import GlobalNavbar from "./components/common/GlobalNavbar.jsx";
+import { useLocation } from 'react-router-dom';
 
 function App() {
     const {t, i18n} = useTranslation();
@@ -41,6 +43,11 @@ function App() {
         document.documentElement.dir = dir;
     }, [i18n.language]);
 
+    const location = useLocation();
+    const hideNavbarRoutes = ['/', '/login', '/forgot-password', '/reset-password', '/ITContact', '/AdminContact'];
+    const isDashboard = location.pathname.startsWith('/admin-dashboard');
+    const showNavbar = !hideNavbarRoutes.includes(location.pathname) && !isDashboard;
+
     const AdminDashboardIndex = () => {
         return <Navigate to="/admin-dashboard/announcements" replace />;
     };
@@ -48,8 +55,10 @@ function App() {
     return (
         <ThemeProvider>
             <div className="App">
-                {/* Add AiChatBox here - outside Routes, but NOT wrapped in ProtectedRoute */}
-                <AiChatBox />
+                {/* Add AiChatBox here - only show for guests or students */}
+                {(!user || user.role === 'student') && <AiChatBox />}
+
+                {showNavbar && <GlobalNavbar />}
 
                 <Routes>
                     {}

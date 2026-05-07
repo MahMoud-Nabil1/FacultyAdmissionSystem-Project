@@ -35,6 +35,13 @@
     "gpa": "المعدل التراكمي"
   },
   "announcements": {
+    "navProfile": "👤 الملف الشخصي",
+    "navComplaints": "📝 الشكاوى",
+    "navGroups": "👥 المجموعات",
+    "navRegister": "📚 تسجيل المواد",
+    "navHistory": "📜 السجل الأكاديمي",
+    "navAdmin": "⚙️ لوحة التحكم",
+    "logoutBtn": "تسجيل الخروج",
     "loading": "جاري التحميل...",
     "logoAlt": "الشعار",
     "loginBtn": "تسجيل الدخول",
@@ -314,10 +321,11 @@
     }
   },
   "roles": {
-    "admin": "ادمن",
-    "academic_guide": "مرشد اكاديمى",
-    "academic_guide_coordinator": "منسق للإرشاد الاكاديمى",
-    "reporter": "مُراجع بيانات"
+    "admin": "مدير",
+    "academic_guide": "مرشد أكاديمي",
+    "academic_guide_coordinator": "منسق إرشاد أكاديمي",
+    "reporter": "مراسل",
+    "student": "طالب"
   },
   "studentProfile": {
     "title": "ملف الطالب",

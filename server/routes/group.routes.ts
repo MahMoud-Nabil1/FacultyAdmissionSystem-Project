@@ -25,7 +25,6 @@ router.get(
 
 router.get(
     '/',
-    authenticate,
     groupController.getAllGroups
 );
 
