@@ -86,110 +86,109 @@ function AcademicHistory() {
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="academicHistoryTableWrapper desktop-view">
-              <table className="academicHistoryTable">
-                <thead>
-                  <tr>
-                    {isRtl ? (
-                      <>
-                        <th>{t("academicHistory.subjectCode")}</th>
-                        <th>{t("academicHistory.subjectName")}</th>
-                        <th>{t("academicHistory.creditHours")}</th>
-                        <th>{t("academicHistory.degree")}</th>
-                        <th>{t("academicHistory.grade")}</th>
-                        <th>{t("academicHistory.gpa")}</th>
-                      </>
-                    ) : (
-                      <>
-                        <th>{t("academicHistory.gpa")}</th>
-                        <th>{t("academicHistory.grade")}</th>
-                        <th>{t("academicHistory.degree")}</th>
-                        <th>{t("academicHistory.creditHours")}</th>
-                        <th>{t("academicHistory.subjectName")}</th>
-                        <th>{t("academicHistory.subjectCode")}</th>
-                      </>
-                    )}
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {data.length > 0 ? (
-                    data.map((item: Item) => (
-                      <tr key={item.s_code}>
-                        {isRtl ? (
-                          <>
-                            <td className="academicHistoryCodeCell">{item.s_code}</td>
-                            <td>{item.s_name}</td>
-                            <td>{item.c_hours}</td>
-                            <td>{item.degree}</td>
-                            <td>
-                              <span className="academicHistoryRateBadge">{item.rate}</span>
-                            </td>
-                            <td>{item.gpa}</td>
-                          </>
-                        ) : (
-                          <>
-                            <td>{item.gpa}</td>
-                            <td>
-                              <span className="academicHistoryRateBadge">{item.rate}</span>
-                            </td>
-                            <td>{item.degree}</td>
-                            <td>{item.c_hours}</td>
-                            <td>{item.s_name}</td>
-                            <td className="academicHistoryCodeCell">{item.s_code}</td>
-                          </>
-                        )}
+              <div className="academicHistoryTableWrapper desktop-view">
+                  <table className="academicHistoryTable">
+                      <thead>
+                      <tr>
+                          {isRtl ? (
+                              <>
+                                  <th>{t("academicHistory.subjectCode")}</th>
+                                  <th>{t("academicHistory.subjectName")}</th>
+                                  <th>{t("academicHistory.creditHours")}</th>
+                                  <th>{t("academicHistory.degree")}</th>
+                                  <th>{t("academicHistory.grade")}</th>
+                                  <th>{t("academicHistory.gpa")}</th>
+                              </>
+                          ) : (
+                              <>
+                                  <th>{t("academicHistory.gpa")}</th>
+                                  <th>{t("academicHistory.grade")}</th>
+                                  <th>{t("academicHistory.degree")}</th>
+                                  <th>{t("academicHistory.creditHours")}</th>
+                                  <th>{t("academicHistory.subjectName")}</th>
+                                  <th>{t("academicHistory.subjectCode")}</th>
+                              </>
+                          )}
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={6} className="academicHistoryEmpty">
-                        {t("academicHistory.noRecords") || "No academic history records found"}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                      </thead>
+
+                      <tbody>
+                      {data.length > 0 ? (
+                          data.map((item: Item) => (
+                              <tr key={item.s_code}>
+                                  {isRtl ? (
+                                      <>
+                                          <td className="academicHistoryCodeCell">{item.s_code}</td>
+                                          <td>{item.s_name}</td>
+                                          <td>{item.c_hours}</td>
+                                          <td>{item.degree}</td>
+                                          <td>
+                                              <span className="academicHistoryRateBadge">{item.rate}</span>
+                                          </td>
+                                          <td>{item.gpa}</td>
+                                      </>
+                                  ) : (
+                                      <>
+                                          <td>{item.gpa}</td>
+                                          <td>
+                                              <span className="academicHistoryRateBadge">{item.rate}</span>
+                                          </td>
+                                          <td>{item.degree}</td>
+                                          <td>{item.c_hours}</td>
+                                          <td>{item.s_name}</td>
+                                          <td className="academicHistoryCodeCell">{item.s_code}</td>
+                                      </>
+                                  )}
+                              </tr>
+                          ))
+                      ) : (
+                          <tr>
+                              <td colSpan={6} className="academicHistoryEmpty">
+                                  {t("academicHistory.noCoursesPassed")}
+                              </td>
+                          </tr>
+                      )}
+                      </tbody>
+                  </table>
+              </div>
 
             {/* Mobile Card View */}
-            <div className="academicHistoryCardWrapper mobile-view">
-              {data.length > 0 ? (
-                data.map((item: Item) => (
-                  <div key={item.s_code} className="academicHistoryCard">
-                    <div className="academicHistoryCardHeader">
-                      <span className="academicHistoryCardCode">{item.s_code}</span>
-                      <span className="academicHistoryCardGrade">
-                        <span className="academicHistoryRateBadge">{item.rate}</span>
-                      </span>
-                    </div>
-                    <div className="academicHistoryCardBody">
-                      <div className="academicHistoryCardRow">
-                        <span className="academicHistoryCardLabel">{t("academicHistory.subjectName")}</span>
-                        <span className="academicHistoryCardValue">{item.s_name}</span>
+              <div className="academicHistoryCardWrapper mobile-view">
+                  {data.length > 0 ? (
+                      data.map((item: Item) => (
+                          <div key={item.s_code} className="academicHistoryCard">
+                              <div className="academicHistoryCardHeader">
+                                  <span className="academicHistoryCardCode">{item.s_code}</span>
+                                  <span className="academicHistoryCardGrade">
+            <span className="academicHistoryRateBadge">{item.rate}</span>
+          </span>
+                              </div>
+                              <div className="academicHistoryCardBody">
+                                  <div className="academicHistoryCardRow">
+                                      <span className="academicHistoryCardLabel">{t("academicHistory.subjectName")}</span>
+                                      <span className="academicHistoryCardValue">{item.s_name}</span>
+                                  </div>
+                                  <div className="academicHistoryCardRow">
+                                      <span className="academicHistoryCardLabel">{t("academicHistory.degree")}</span>
+                                      <span className="academicHistoryCardValue">{item.degree}</span>
+                                  </div>
+                                  <div className="academicHistoryCardRow">
+                                      <span className="academicHistoryCardLabel">{t("academicHistory.creditHours")}</span>
+                                      <span className="academicHistoryCardValue">{item.c_hours}</span>
+                                  </div>
+                                  <div className="academicHistoryCardRow">
+                                      <span className="academicHistoryCardLabel">{t("academicHistory.gpa")}</span>
+                                      <span className="academicHistoryCardValue academicHistoryCardGPA">{item.gpa}</span>
+                                  </div>
+                              </div>
+                          </div>
+                      ))
+                  ) : (
+                      <div className="academicHistoryEmpty">
+                          {t("academicHistory.noCoursesPassed")}
                       </div>
-                      <div className="academicHistoryCardRow">
-                        <span className="academicHistoryCardLabel">{t("academicHistory.degree")}</span>
-                        <span className="academicHistoryCardValue">{item.degree}</span>
-                      </div>
-                      <div className="academicHistoryCardRow">
-                        <span className="academicHistoryCardLabel">{t("academicHistory.creditHours")}</span>
-                        <span className="academicHistoryCardValue">{item.c_hours}</span>
-                      </div>
-                      <div className="academicHistoryCardRow">
-                        <span className="academicHistoryCardLabel">{t("academicHistory.gpa")}</span>
-                        <span className="academicHistoryCardValue academicHistoryCardGPA">{item.gpa}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="academicHistoryEmpty">
-                  {t("academicHistory.noRecords") || "No academic history records found"}
-                </div>
-              )}
-            </div>
-          </>
+                  )}
+              </div>          </>
         )}
       </div>
     </div>

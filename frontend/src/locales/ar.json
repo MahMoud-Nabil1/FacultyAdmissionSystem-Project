@@ -32,7 +32,9 @@
     "creditHours": "الساعات المعتمدة",
     "degree": "الدرجة",
     "grade": "التقدير",
-    "gpa": "المعدل التراكمي"
+    "gpa": "المعدل التراكمي",
+    "noRecords": "السجل الأكاديمي فارغ",
+    "noCoursesPassed": "لم تجتز أي مادة بعد"
   },
   "announcements": {
     "navProfile": "👤 الملف الشخصي",
