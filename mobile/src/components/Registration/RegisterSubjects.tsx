@@ -86,6 +86,7 @@ export default function RegisterSubjects() {
 
     const [student, setStudent] = useState<StudentMe | null>(null);
     const [subjects, setSubjects] = useState<SubjectData[]>([]);
+    const [eligibleSubjects, setEligibleSubjects] = useState<SubjectData[]>([]);
     const [groups, setGroups] = useState<GroupData[]>([]);
     const [myRequests, setMyRequests] = useState<EnrollmentRequestData[]>([]);
     const [registrationOpen, setRegistrationOpen] = useState(true);
@@ -112,16 +113,18 @@ export default function RegisterSubjects() {
             setError(null);
             if (!token) throw new Error(t('login.loginFailed'));
 
-            const [meData, subData, grpData, reqData, settingsData] = await Promise.all([
+            const [meData, subData, eligibleData, grpData, reqData, settingsData] = await Promise.all([
                 apiFetch('/auth/me'),
                 apiFetch('/subjects'),
+                apiFetch('/subjects/eligible'),
                 apiFetch('/groups'),
-                apiFetch('/groups/my-requests').catch(() => []), // fallback if fails somehow
+                apiFetch('/groups/my-requests').catch(() => []),
                 apiFetch('/settings').catch(() => ({ registrationOpen: true })),
             ]);
 
             setStudent(meData);
             setSubjects(subData || []);
+            setEligibleSubjects(eligibleData || []);
             setGroups(grpData || []);
             setMyRequests(reqData || []);
             setRegistrationOpen(settingsData?.registrationOpen ?? true);
@@ -195,14 +198,12 @@ export default function RegisterSubjects() {
     }, [allSelectedSubjectCodes, subjectByCode]);
 
     const availableSubjects = useMemo(() => {
-        return subjects.filter(s => {
+        return eligibleSubjects.filter(s => {
             if (completedIds.has(s._id)) return false;
             if (allSelectedSubjectCodes.has(s.code.toLowerCase())) return false;
-            const prereqsMet = s.prerequisites.every(pre => completedIds.has(pre._id));
-            if (!prereqsMet) return false;
             return true;
         });
-    }, [subjects, completedIds, allSelectedSubjectCodes]);
+    }, [eligibleSubjects, completedIds, allSelectedSubjectCodes]);
 
     const groupsForSelected = useMemo(() => {
         if (!selectedSubject) return [];
@@ -248,7 +249,7 @@ export default function RegisterSubjects() {
         if (sub.corequisites && sub.corequisites.length > 0) {
             const unmet = sub.corequisites.filter(co => {
                 if (completedIds.has(co._id)) return false;
-                if (enrolledSubjectCodes.has(co.code?.toLowerCase() || '')) return false;
+                if (allSelectedSubjectCodes.has(co.code?.toLowerCase() || '')) return false;
                 return true;
             });
             if (unmet.length > 0) {

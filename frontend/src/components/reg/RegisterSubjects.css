@@ -596,3 +596,56 @@
   padding: 4px 10px !important;
   font-size: var(--font-size-xs) !important;
 }
+
+/* ══════════════════════════════════
+   REGISTERED SUBJECTS SUMMARY TABLE
+   ══════════════════════════════════ */
+.regSummarySection {
+  margin-top: 24px;
+}
+
+.regSummaryTableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.regSummaryTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+  min-width: 700px;
+}
+
+.regSummaryTable thead tr {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.regSummaryTable th {
+  padding: 12px 16px;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: #ffffff;
+  text-align: start;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+}
+
+.regSummaryTable td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+  color: var(--color-text);
+}
+
+.regSummaryTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.regSummaryTable tbody tr:hover td {
+  background: var(--color-bg);
+}

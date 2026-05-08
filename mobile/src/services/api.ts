@@ -8,7 +8,7 @@ import { IGroup } from '../components/Dashboards/Groups';
 const API_BASE: string =
     (Constants.expoConfig?.extra?.apiBaseUrl as string) ||
     process.env.EXPO_PUBLIC_API_BASE_URL ||
-    (Platform.OS === 'web' ? 'http://localhost:5000/api' : 'http://10.0.2.2:5000/api');
+    (Platform.OS === 'web' ? 'http://localhost:5000/api' : 'http://192.168.1.6:5000/api');
 
 export { API_BASE };
 async function fetchWithTimeout(url: string, options: RequestInit, ms = 10000): Promise<Response> {
