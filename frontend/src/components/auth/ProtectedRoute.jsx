@@ -6,8 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 const ProtectedRoute = ({ children, allowedRoles }) => {
     const { isAuthenticated, user, loading } = useAuth();
 
-
-    if (loading) return null;
+    if (loading) return <div style={{ display: 'none' }}></div>;
 
     if (!isAuthenticated) {
         return <Navigate to="/announcements" replace />;
