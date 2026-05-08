@@ -71,9 +71,11 @@ export const processEnrollmentRequest = async (req: Request, res: Response): Pro
                 }
             }
 
-            // Check if already enrolled in any other group for the same subject
+            // Check if already enrolled in any other group for the same subject AND same type
+            // (a student can be in both a lecture and a lab/tutorial for the same subject)
             const alreadyEnrolledInSubject = await Group.findOne({
                 subject: group.subject,
+                type: group.type,
                 students: request.student
             }).session(session);
 
@@ -150,9 +152,11 @@ export const requestJoinGroup = async (req: Request, res: Response): Promise<voi
                 throw new Error("registration.errors.alreadyInGroup");
             }
 
-            // Check if already enrolled in any other group for the same subject
+            // Check if already enrolled in any other group for the same subject AND same type
+            // (a student can be in both a lecture and a lab/tutorial for the same subject)
             const alreadyEnrolledInSubject = await Group.findOne({
                 subject: group.subject,
+                type: group.type,
                 students: student._id
             }).session(session);
 

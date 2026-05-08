@@ -383,7 +383,7 @@ const RegisterSubjects = () => {
         if (sub && sub.corequisites && sub.corequisites.length > 0) {
             const unmet = sub.corequisites.filter((co: { _id: string; code: string }) => {
                 if (completedIds.has(co._id)) return false;
-                if (enrolledSubjectCodes.has(co.code?.toLowerCase())) return false;
+                if (allSelectedSubjectCodes.has(co.code?.toLowerCase())) return false;
                 return true;
             });
 

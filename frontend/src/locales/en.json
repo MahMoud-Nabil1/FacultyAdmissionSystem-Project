@@ -32,7 +32,8 @@
     "creditHours": "Credit Hours",
     "degree": "Degree",
     "grade": "Grade",
-    "gpa": "GPA"
+    "gpa": "GPA",
+    "noRecords": "No academic history records found"
   },
   "announcements": {
     "navProfile": "👤 Profile",

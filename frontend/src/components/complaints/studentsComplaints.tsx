@@ -335,7 +335,7 @@ const StudentComplaintPage: React.FC = () => {
                             value={formData.problemDescription}
                             onChange={(e) => setFormData({ ...formData, problemDescription: e.target.value })}
                             required
-                            style={{ width: '100%', padding: '10px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '6px', fontFamily: 'inherit' }}
+                            style={{ width: '100%', padding: '10px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '6px', fontFamily: 'inherit', resize: 'none', overflowY: 'auto' }}
                         />
 
                         <textarea
@@ -343,7 +343,7 @@ const StudentComplaintPage: React.FC = () => {
                             placeholder={t("complaints.additionalDetails") || "تفاصيل إضافية (اختياري)"}
                             value={formData.additionalDetails}
                             onChange={(e) => setFormData({ ...formData, additionalDetails: e.target.value })}
-                            style={{ width: '100%', padding: '10px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '6px', fontFamily: 'inherit' }}
+                            style={{ width: '100%', padding: '10px', marginBottom: '15px', border: '1px solid #ddd', borderRadius: '6px', fontFamily: 'inherit', resize: 'none', overflowY: 'auto' }}
                         />
 
                         <button
@@ -435,14 +435,14 @@ const StudentComplaintPage: React.FC = () => {
                                             onChange={(e) => setEditDescription(e.target.value)}
                                             rows={4}
                                             placeholder={t("complaints.problemDescription") || "وصف المشكلة"}
-                                            style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '10px', fontFamily: 'inherit' }}
+                                            style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '10px', fontFamily: 'inherit', resize: 'none', overflowY: 'auto' }}
                                         />
                                         <textarea
                                             value={editAdditional}
                                             onChange={(e) => setEditAdditional(e.target.value)}
                                             rows={3}
                                             placeholder={t("complaints.additionalDetails") || "تفاصيل إضافية"}
-                                            style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '10px', fontFamily: 'inherit' }}
+                                            style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '10px', fontFamily: 'inherit', resize: 'none', overflowY: 'auto' }}
                                         />
                                         <div style={{ display: 'flex', gap: '10px' }}>
                                             <button
