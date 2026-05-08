@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './css/Login.css';
 import { useNavigate } from 'react-router-dom';
+import {jwtDecode} from "jwt-decode";
 import { useTranslation } from 'react-i18next';
 
 const Login = () => {
@@ -38,9 +39,11 @@ const Login = () => {
             }
 
             login(data.token);
-            setTimeout(() => {
-                navigate('/', { replace: true });
-            }, 0);
+
+            const payload = jwtDecode(data.token);
+
+            if (payload.role) navigate("/admin-dashboard");
+            else navigate("/");
 
         } catch (err) {
             setError(t('login.errorServer'));

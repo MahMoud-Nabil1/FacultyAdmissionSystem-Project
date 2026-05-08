@@ -3,6 +3,5 @@
     "allow": [
       "Bash(\"c:\\program files\\nodejs\\npm.cmd\" *)"
     ]
-  },
-  "$version": 3
+  }
 }
