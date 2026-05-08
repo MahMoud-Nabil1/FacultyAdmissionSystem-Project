@@ -16,7 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { getAllGroups, apiGet, apiPost, apiDelete } from '../../services/api';
+import { getAllGroups, apiGet } from '../../services/api';
 import CustomHeader from '../common/CustomHeader';
 import ScreenContainer from '../common/ScreenContainer';
 
@@ -34,12 +34,6 @@ export interface IGroup {
     place?: string;
     capacity: number;
     students?: Array<{ _id?: string; studentId?: string; name?: string } | string>;
-}
-
-interface IRequest {
-    _id: string;
-    group: string | IGroup;
-    status: 'pending' | 'approved' | 'rejected';
 }
 
 interface ISettings {
@@ -63,10 +57,6 @@ function normalizeStudent(s: { _id?: string; studentId?: string; name?: string }
     return { id: s.studentId || s._id || '', name: s.name || '' };
 }
 
-function getGroupId(g: string | IGroup): string {
-    return typeof g === 'object' ? g._id : g;
-}
-
 function buildCsv(group: IGroup) {
     const rows = [['studentId', 'name']];
     (group.students ?? []).forEach(s => {
@@ -84,11 +74,16 @@ export default function Groups() {
     const userId    = user?.id || user?._id || '';
 
     const [groups,    setGroups]    = useState<IGroup[]>([]);
-    const [myRequests, setMyRequests] = useState<IRequest[]>([]);
     const [settings,  setSettings]  = useState<ISettings>({ registrationOpen: true, withdrawalOpen: true });
     const [loading,   setLoading]   = useState(true);
     const [refreshing, setRefreshing] = useState(false);
-    const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+    // Eligibility state — kept for potential future use or banner display
+    const [allowedLevels, setAllowedLevels] = useState<string[]>([]);
+    const [gpaMin, setGpaMin] = useState<number | null>(null);
+    const [gpaMax, setGpaMax] = useState<number | null>(null);
+    const [studentGpa, setStudentGpa] = useState<number | null>(null);
+    const [studentLevel, setStudentLevel] = useState<string>('1');
 
     const [selectedGroup, setSelectedGroup] = useState<IGroup | null>(null);
     const [modalVisible,  setModalVisible]  = useState(false);
@@ -97,9 +92,10 @@ export default function Groups() {
     const fetchAll = useCallback(async (silent = false) => {
         if (!silent) setLoading(true);
         try {
-            const [groupsData, settingsRes] = await Promise.all([
+            const [groupsData, settingsRes, academicSettingsRes] = await Promise.all([
                 getAllGroups(),
                 apiGet('/settings', false).catch(() => ({ res: { ok: false }, data: {} })),
+                apiGet('/announcements/settings').catch(() => ({ res: { ok: false }, data: {} })),
             ]);
             setGroups(groupsData ?? []);
             if (settingsRes.res.ok) {
@@ -109,9 +105,28 @@ export default function Groups() {
                     withdrawalOpen:   d.withdrawalOpen   ?? true,
                 });
             }
+            if (academicSettingsRes.res.ok) {
+                const d = academicSettingsRes.data as any;
+                setAllowedLevels(d.level ?? []);
+                setGpaMin(d.gpaMin ?? null);
+                setGpaMax(d.gpaMax ?? null);
+            }
             if (isStudent) {
-                const reqRes = await apiGet('/groups/my-requests').catch(() => ({ res: { ok: false }, data: [] }));
-                if (reqRes.res.ok) setMyRequests((reqRes.data as IRequest[]) ?? []);
+                // Fetch student's own GPA and completed hours for level calculation
+                const meRes = await apiGet('/auth/me').catch(() => ({ res: { ok: false }, data: {} }));
+                if (meRes.res.ok) {
+                    const me = meRes.data as any;
+                    setStudentGpa(me.gpa ?? null);
+                    const completedHours: number = (me.completedSubjects ?? []).reduce(
+                        (sum: number, _: any) => sum, 0
+                    );
+                    const hours: number = me.completedHours ?? completedHours;
+                    let level = '1';
+                    if (hours > 90) level = '4';
+                    else if (hours > 60) level = '3';
+                    else if (hours > 30) level = '2';
+                    setStudentLevel(level);
+                }
             }
         } catch (err: any) {
             Alert.alert(t('common.error'), err.message || t('groupsScreen.errors.fetchFailed'));
@@ -132,122 +147,8 @@ export default function Groups() {
             return n.id === userId || n.id === user?.studentId?.toString();
         });
 
-    const getRequest = (group: IGroup) =>
-        myRequests.find(r => getGroupId(r.group) === group._id);
-
     const isFull = (group: IGroup) =>
         (group.students ?? []).length >= group.capacity;
-
-    /* ── actions ── */
-    const handleJoin = async (group: IGroup) => {
-        setActionLoading(group._id);
-        try {
-            const { res, data } = await apiPost(`/groups/${group._id}/request`, {});
-            if (res.ok) {
-                await fetchAll(true);
-            } else {
-                Alert.alert(t('common.error'), (data as any).error || t('register.failed'));
-            }
-        } catch (err: any) {
-            Alert.alert(t('common.error'), err.message);
-        } finally {
-            setActionLoading(null);
-        }
-    };
-
-    const handleLeave = async (group: IGroup) => {
-        setActionLoading(group._id);
-        try {
-            const { res, data } = await apiDelete(`/groups/${group._id}/students/me`);
-            if (res.ok) {
-                await fetchAll(true);
-            } else {
-                Alert.alert(t('common.error'), (data as any).error || t('register.failed'));
-            }
-        } catch (err: any) {
-            Alert.alert(t('common.error'), err.message);
-        } finally {
-            setActionLoading(null);
-        }
-    };
-
-    const handleCancelRequest = async (requestId: string, groupId: string) => {
-        setActionLoading(groupId);
-        try {
-            const { res, data } = await apiDelete(`/groups/requests/${requestId}`);
-            if (res.ok) {
-                await fetchAll(true);
-            } else {
-                Alert.alert(t('common.error'), (data as any).error || t('register.failed'));
-            }
-        } catch (err: any) {
-            Alert.alert(t('common.error'), err.message);
-        } finally {
-            setActionLoading(null);
-        }
-    };
-
-    /* ── action button renderer ── */
-    const renderActionButton = (group: IGroup) => {
-        if (!isStudent) return null;
-
-        const busy    = actionLoading === group._id;
-        const enrolled = isEnrolled(group);
-        const request  = getRequest(group);
-        const full     = isFull(group);
-
-        if (enrolled) {
-            return (
-                <TouchableOpacity
-                    style={[styles.actionBtn, styles.leaveBtn, !settings.withdrawalOpen && styles.disabledBtn]}
-                    disabled={busy || !settings.withdrawalOpen}
-                    onPress={() => handleLeave(group)}
-                >
-                    {busy
-                        ? <ActivityIndicator size="small" color="#fff" />
-                        : <Text style={styles.actionBtnText}>{t('register.removeBtn')}</Text>
-                    }
-                </TouchableOpacity>
-            );
-        }
-
-        if (request) {
-            if (request.status === 'rejected') {
-                return (
-                    <View style={[styles.actionBtn, styles.rejectedBtn]}>
-                        <Text style={styles.rejectedBtnText}>{t('register.status.rejected')}</Text>
-                    </View>
-                );
-            }
-            return (
-                <TouchableOpacity
-                    style={[styles.actionBtn, styles.cancelBtn]}
-                    disabled={busy}
-                    onPress={() => handleCancelRequest(request._id, group._id)}
-                >
-                    {busy
-                        ? <ActivityIndicator size="small" color="#c53030" />
-                        : <Text style={styles.cancelBtnText}>{t('register.cancelRequestBtn')}</Text>
-                    }
-                </TouchableOpacity>
-            );
-        }
-
-        return (
-            <TouchableOpacity
-                style={[styles.actionBtn, styles.joinBtn, (!settings.registrationOpen) && styles.disabledBtn]}
-                disabled={busy || !settings.registrationOpen}
-                onPress={() => handleJoin(group)}
-            >
-                {busy
-                    ? <ActivityIndicator size="small" color="#fff" />
-                    : <Text style={styles.actionBtnText}>
-                        {full ? t('groupsScreen.waitlist') : t('register.requestBtn')}
-                      </Text>
-                }
-            </TouchableOpacity>
-        );
-    };
 
     /* ── CSV download ── */
     const handleDownloadCsv = async (group: IGroup) => {
@@ -305,7 +206,6 @@ export default function Groups() {
                     groups.map((group) => {
                         const badge    = TYPE_STYLE[group.type] || TYPE_STYLE.lecture;
                         const enrolled = isEnrolled(group);
-                        const request  = getRequest(group);
                         const full     = isFull(group);
 
                         return (
@@ -358,21 +258,6 @@ export default function Groups() {
                                         <Text style={styles.enrolledBadgeText}>✓ {t('register.status.enrolled')}</Text>
                                     </View>
                                 )}
-                                {isStudent && request && !enrolled && (
-                                    <View style={[styles.enrolledBadge,
-                                        request.status === 'pending'  ? styles.pendingBadge  :
-                                        request.status === 'rejected' ? styles.rejectedBadge : styles.enrolledBadge
-                                    ]}>
-                                        <Text style={styles.enrolledBadgeText}>
-                                            {t(`register.status.${request.status}`)}
-                                        </Text>
-                                    </View>
-                                )}
-
-                                {/* Action button */}
-                                <View style={styles.actionRow}>
-                                    {renderActionButton(group)}
-                                </View>
                             </TouchableOpacity>
                         );
                     })
@@ -494,24 +379,7 @@ const styles = StyleSheet.create({
     fullText:  { color: '#dc2626' },
 
     enrolledBadge:  { alignSelf: 'flex-start', backgroundColor: '#dcfce7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, marginTop: 8 },
-    pendingBadge:   { backgroundColor: '#fef9c3' },
-    rejectedBadge:  { backgroundColor: '#fee2e2' },
     enrolledBadgeText: { fontSize: 11, fontWeight: '700', color: '#166534' },
-
-    actionRow: { marginTop: 12 },
-    actionBtn: {
-        paddingVertical: 10,
-        borderRadius: 8,
-        alignItems: 'center',
-    },
-    joinBtn:     { backgroundColor: '#1a73e8' },
-    leaveBtn:    { backgroundColor: '#dc2626' },
-    cancelBtn:   { backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fca5a5' },
-    rejectedBtn: { backgroundColor: '#f3f4f6' },
-    disabledBtn: { opacity: 0.45 },
-    actionBtnText:   { color: '#fff', fontWeight: '700', fontSize: 14 },
-    cancelBtnText:   { color: '#dc2626', fontWeight: '700', fontSize: 14 },
-    rejectedBtnText: { color: '#6b7280', fontWeight: '600', fontSize: 13 },
 
     emptyState:    { alignItems: 'center', paddingTop: 80 },
     emptyTitle:    { fontSize: 18, fontWeight: 'bold', color: '#4b5563', marginTop: 10 },

@@ -1,0 +1,267 @@
+/* =============================================
+   Group Panel — Mobile Card View
+   ============================================= */
+
+/* Card list container */
+.group-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+/* Individual group card */
+.group-card {
+    background: var(--color-text-inverse);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    outline: none;
+}
+
+.group-card:hover,
+.group-card:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 12px var(--color-primary-alpha-10, rgba(0, 74, 153, 0.1));
+}
+
+.group-card:active {
+    transform: scale(0.99);
+}
+
+/* Card header: subject + type badge */
+.group-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 8px;
+}
+
+.group-card-subject {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: 0.03em;
+}
+
+.group-card-badge {
+    flex-shrink: 0;
+}
+
+/* Card body: key-value rows */
+.group-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.group-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.group-card-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.group-card-value {
+    font-size: 0.9rem;
+    color: var(--color-text);
+    font-weight: 500;
+    text-align: end;
+}
+
+.group-card-students-count {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+/* Card footer: tap hint */
+.group-card-footer {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+}
+
+.group-card-tap-hint {
+    font-size: 0.8rem;
+    color: var(--color-primary);
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+/* Empty state for cards */
+.group-cards-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+}
+
+/* =============================================
+   Group Details Modal — improved layout
+   ============================================= */
+
+.group-details-modal {
+    max-width: 600px;
+    width: 100%;
+}
+
+/* Info grid */
+.group-details-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    background: var(--color-bg);
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    margin-bottom: 20px;
+}
+
+.group-details-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.group-details-label {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.group-details-value {
+    font-size: 0.9rem;
+    color: var(--color-text);
+    font-weight: 600;
+    text-align: end;
+}
+
+/* Students section */
+.group-details-students-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.group-details-students-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.group-details-students-header strong {
+    font-size: 1rem;
+    color: var(--color-text);
+}
+
+/* Student list */
+.group-details-students-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 8px;
+}
+
+.group-details-student-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--color-bg);
+    transition: background 0.15s ease;
+}
+
+.group-details-student-item:hover {
+    background: var(--color-surface-hover);
+}
+
+.group-details-student-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.group-details-student-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.group-details-student-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.group-details-student-id {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.group-details-no-students {
+    text-align: center;
+    padding: 24px;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    background: var(--color-bg);
+    border-radius: 10px;
+    border: 1px dashed var(--color-border);
+}
+
+/* =============================================
+   Responsive: make modal full-screen on mobile
+   ============================================= */
+
+@media (max-width: 768px) {
+    .group-details-modal {
+        max-width: 100%;
+        margin: 0;
+        border-radius: 16px 16px 0 0;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-overlay:has(.group-details-modal) {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .group-details-students-list {
+        max-height: 240px;
+    }
+}

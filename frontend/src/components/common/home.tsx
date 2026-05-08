@@ -201,11 +201,57 @@ const Home = () => {
                 </div>
 
                 <div className="buttons-horizontal">
+                    {/* Reporter gets a dedicated card-based service menu */}
+                    {user?.role === "reporter" ? (
+                        <div className="reporter-services" style={{ gridColumn: "1 / -1" }}>
+                            <p className="reporter-services-title">Available services</p>
+
+                            {/* Statistics — full width */}
+                            <button className="reporter-service-card reporter-service-card--wide" onClick={() => navigate("/admin-dashboard/analysis")}>
+                                <span className="reporter-service-icon">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <line x1="18" y1="20" x2="18" y2="10" />
+                                        <line x1="12" y1="20" x2="12" y2="4" />
+                                        <line x1="6" y1="20" x2="6" y2="14" />
+                                    </svg>
+                                </span>
+                                <span className="reporter-service-label">Statistics</span>
+                                <svg className="reporter-service-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="9 18 15 12 9 6" />
+                                </svg>
+                            </button>
+
+                            {/* Announcements + Groups — side by side */}
+                            <div className="reporter-service-row">
+                                <button className="reporter-service-card reporter-service-card--half" onClick={() => navigate("/admin-dashboard/announcements")}>
+                                    <span className="reporter-service-icon">
+                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M3 11l19-9-9 19-2-8-8-2z" />
+                                        </svg>
+                                    </span>
+                                    <span className="reporter-service-label">{t("sidePanel.announcements")}</span>
+                                </button>
+
+                                <button className="reporter-service-card reporter-service-card--half" onClick={() => navigate("/admin-dashboard/groups")}>
+                                    <span className="reporter-service-icon">
+                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                            <circle cx="9" cy="7" r="4" />
+                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                        </svg>
+                                    </span>
+                                    <span className="reporter-service-label">{t("sidePanel.groups")}</span>
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
                     <button className="btn" onClick={() => navigate("/groups")}>
                         {t("home.viewAllGroups")}
                     </button>
+                    )}
 
-                    {user?.role && user.role !== "student" && (
+                    {user?.role && user.role !== "student" && user.role !== "reporter" && (
                         <button className="btn admin" onClick={() => navigate("/admin-dashboard")}>
                             {t("home.adminDashboard")}
                         </button>

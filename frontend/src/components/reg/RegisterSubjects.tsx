@@ -117,6 +117,8 @@ const RegisterSubjects = () => {
     const [selectedSubject, setSelectedSubject] = useState("");
     const [actionLoading, setActionLoading] = useState(null as string | null);
     const [allowedLevels, setAllowedLevels] = useState<string[]>([]);
+    const [gpaMin, setGpaMin] = useState<number | null>(null);
+    const [gpaMax, setGpaMax] = useState<number | null>(null);
     const [actionMsg, setActionMsg] = useState(null as { type: "success" | "error"; text: string } | null);
 
     /* ── Fetch all data ── */
@@ -173,10 +175,12 @@ const RegisterSubjects = () => {
                 setRegistrationOpen(systemData.registrationOpen ?? true);
             }
 
-            // Academic settings (contains level array)
+            // Academic settings (contains level array and GPA range)
             if (academicSettingsRes.res.ok) {
                 const academicData = academicSettingsRes.data as any;
                 setAllowedLevels(academicData.level ?? []);
+                setGpaMin(academicData.gpaMin ?? null);
+                setGpaMax(academicData.gpaMax ?? null);
             }
         } catch (err: any) {
             setError(err.message || t("registration.errors.fetchFailed"));
@@ -297,6 +301,28 @@ const RegisterSubjects = () => {
         if (completedHours <= 90) return '3';
         return '4';
     }, [student, completedHours]);
+
+    // Determine if the student is eligible to register (level + GPA checks)
+    const { isEligibleToRegister, ineligibilityReasons } = useMemo(() => {
+        const reasons: string[] = [];
+
+        // Level check: only block if allowedLevels is non-empty and student's level isn't in it
+        if (allowedLevels.length > 0 && !allowedLevels.includes(studentLevel)) {
+            reasons.push(`level`);
+        }
+
+        // GPA check
+        if (student) {
+            if (gpaMin !== null && student.gpa < gpaMin) {
+                reasons.push(`gpa_low`);
+            }
+            if (gpaMax !== null && student.gpa > gpaMax) {
+                reasons.push(`gpa_high`);
+            }
+        }
+
+        return { isEligibleToRegister: reasons.length === 0, ineligibilityReasons: reasons };
+    }, [allowedLevels, studentLevel, student, gpaMin, gpaMax]);
 
     const availableSubjects = useMemo(() => {
         return eligibleSubjects.filter((s: SubjectData) => {
@@ -536,6 +562,43 @@ const RegisterSubjects = () => {
                 </div>
             )}
 
+            {/* ── Eligibility alert (level / GPA) ── */}
+            {registrationOpen && !isEligibleToRegister && (
+                <div style={{
+                    marginBottom: '1rem',
+                    padding: '12px 16px',
+                    backgroundColor: '#f8d7da',
+                    borderLeft: '4px solid #dc3545',
+                    borderRadius: '4px',
+                    color: '#721c24'
+                }}>
+                    <strong>{t("registration.notEligibleTitle") || "Registration Not Available"}</strong>
+                    <ul style={{margin: '8px 0 0 0', paddingInlineStart: '20px'}}>
+                        {ineligibilityReasons.includes('level') && (
+                            <li>
+                                {t("registration.notEligibleLevel") ||
+                                    `Your current level (Level ${studentLevel}) is not eligible for registration this semester.`}
+                            </li>
+                        )}
+                        {ineligibilityReasons.includes('gpa_low') && (
+                            <li>
+                                {t("registration.notEligibleGpaLow") ||
+                                    `Your GPA (${student?.gpa?.toFixed(2)}) is below the minimum required (${gpaMin?.toFixed(2)}).`}
+                            </li>
+                        )}
+                        {ineligibilityReasons.includes('gpa_high') && (
+                            <li>
+                                {t("registration.notEligibleGpaHigh") ||
+                                    `Your GPA (${student?.gpa?.toFixed(2)}) exceeds the maximum allowed (${gpaMax?.toFixed(2)}).`}
+                            </li>
+                        )}
+                    </ul>
+                    <p style={{margin: '8px 0 0 0', fontSize: '0.875rem'}}>
+                        {t("registration.canViewSchedule") || "You can still view your current schedule below."}
+                    </p>
+                </div>
+            )}
+
             {/* ── Action messages ── */}
             {actionMsg && (
                 <div className={actionMsg.type === "success" ? "success" : "error"}>
@@ -615,7 +678,7 @@ const RegisterSubjects = () => {
                                                                 {t(`registration.status.${g.requestStatus === 'enrolled' ? 'approved' : g.requestStatus}`)}
                                                             </span>
                                                         {/* Action button */}
-                                                        {isEnrolled && allowedLevels.includes(studentLevel) && (
+                                                        {isEnrolled && isEligibleToRegister && registrationOpen && allowedLevels.includes(studentLevel) && (
                                                             <button
                                                                 className="regEventRemoveBtn"
                                                                 disabled={!!actionLoading}
@@ -630,7 +693,7 @@ const RegisterSubjects = () => {
                                                                 ✕
                                                             </button>
                                                         )}
-                                                        {isPending && g.requestId && (
+                                                        {isPending && g.requestId && isEligibleToRegister && registrationOpen && (
                                                             <button
                                                                 className="regEventRemoveBtn"
                                                                 disabled={!!actionLoading}
@@ -736,7 +799,7 @@ const RegisterSubjects = () => {
                                                         </span>
                                                     </td>
                                                     <td>
-                                                        {isEnrolled && allowedLevels.includes(studentLevel) && (
+                                                        {isEnrolled && isEligibleToRegister && registrationOpen && allowedLevels.includes(studentLevel) && (
                                                             <button
                                                                 className="btn-danger btn-sm"
                                                                 disabled={!!actionLoading}
@@ -750,7 +813,7 @@ const RegisterSubjects = () => {
                                                                 {t("registration.removeBtn")}
                                                             </button>
                                                         )}
-                                                        {isPending && g.requestId && (
+                                                        {isPending && g.requestId && isEligibleToRegister && registrationOpen && (
                                                             <button
                                                                 className="btn-warning btn-sm"
                                                                 disabled={!!actionLoading}
@@ -821,7 +884,7 @@ const RegisterSubjects = () => {
                                                     </span>
                                             </td>
                                             <td>
-                                                {req.status === 'pending' && (
+                                                {req.status === 'pending' && isEligibleToRegister && registrationOpen && (
                                                     <button
                                                         className="btn-danger btn-sm"
                                                         disabled={!!actionLoading}
@@ -857,7 +920,25 @@ const RegisterSubjects = () => {
                 {/* ════════════════════════════════════
                     RIGHT: Subject Selection Sidebar
                    ════════════════════════════════════ */}
-                <div className="regSidebar">
+                <div className="regSidebar" style={{
+                    position: 'relative',
+                    ...((!isEligibleToRegister || !registrationOpen) && {
+                        opacity: 0.45,
+                        pointerEvents: 'none',
+                        filter: 'grayscale(60%)',
+                        userSelect: 'none',
+                    })
+                }}>
+                    {/* Overlay blocker so nothing is accidentally clickable */}
+                    {(!isEligibleToRegister || !registrationOpen) && (
+                        <div style={{
+                            position: 'absolute',
+                            inset: 0,
+                            zIndex: 10,
+                            borderRadius: 'inherit',
+                            cursor: 'not-allowed',
+                        }} aria-hidden="true" />
+                    )}
                     <h3 className="regSectionTitle">{t("registration.availableTitle")}</h3>
 
                     <div className="regDropdownRow">

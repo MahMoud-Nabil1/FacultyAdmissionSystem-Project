@@ -113,6 +113,7 @@
     "complaints": "الشكاوى",
     "announcements": "الإعلانات",
     "groupsManagement": "المجموعات",
+    "groups": "المجموعات",
     "support": "الدعم الفني",
     "logout": "تسجيل الخروج",
     "changePassword": "تغيير كلمة السر",
@@ -419,7 +420,12 @@
     "cancelSuccess": "تم إلغاء الطلب",
     "removeSuccess": "تمت الإزالة بنجاح",
     "failed": "فشلت العملية",
-    "noRegistered": "لا توجد مواد مسجلة."
+    "noRegistered": "لا توجد مواد مسجلة.",
+    "notEligibleTitle": "التسجيل غير متاح",
+    "notEligibleLevel": "مستواك الدراسي الحالي غير مؤهل للتسجيل هذا الفصل.",
+    "notEligibleGpaLow": "معدلك التراكمي أقل من الحد الأدنى المطلوب للتسجيل.",
+    "notEligibleGpaHigh": "معدلك التراكمي يتجاوز الحد الأقصى المسموح به للتسجيل.",
+    "canViewSchedule": "يمكنك الاطلاع على جدولك الحالي أدناه."
   },
   "groupsScreen": {
     "title": "المجموعات",

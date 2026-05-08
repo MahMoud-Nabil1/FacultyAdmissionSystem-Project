@@ -91,6 +91,8 @@ export default function RegisterSubjects() {
     const [myRequests, setMyRequests] = useState<EnrollmentRequestData[]>([]);
     const [registrationOpen, setRegistrationOpen] = useState(true);
     const [allowedLevels, setAllowedLevels] = useState<string[]>([]);
+    const [gpaMin, setGpaMin] = useState<number | null>(null);
+    const [gpaMax, setGpaMax] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedSubject, setSelectedSubject] = useState("");
@@ -131,6 +133,8 @@ export default function RegisterSubjects() {
             setMyRequests(reqData || []);
             setRegistrationOpen(settingsData?.registrationOpen ?? true);
             setAllowedLevels(academicSettingsData?.level ?? []);
+            setGpaMin(academicSettingsData?.gpaMin ?? null);
+            setGpaMax(academicSettingsData?.gpaMax ?? null);
         } catch (err: any) {
             setError(err.message || t("common.error"));
         } finally {
@@ -217,6 +221,15 @@ export default function RegisterSubjects() {
         if (completedHours <= 90) return '3';
         return '4';
     }, [student, completedHours]);
+
+    const isEligibleToRegister = useMemo(() => {
+        if (allowedLevels.length > 0 && !allowedLevels.includes(studentLevel)) return false;
+        if (student) {
+            if (gpaMin !== null && student.gpa < gpaMin) return false;
+            if (gpaMax !== null && student.gpa > gpaMax) return false;
+        }
+        return true;
+    }, [allowedLevels, studentLevel, student, gpaMin, gpaMax]);
 
     const availableSubjects = useMemo(() => {
         return eligibleSubjects.filter(s => {
@@ -393,6 +406,28 @@ export default function RegisterSubjects() {
                 </View>
             )}
 
+            {registrationOpen && !isEligibleToRegister && (
+                <View style={styles.ineligibleBox}>
+                    <Text style={styles.ineligibleTitle}>{t('register.notEligibleTitle') || 'Registration Not Available'}</Text>
+                    {allowedLevels.length > 0 && !allowedLevels.includes(studentLevel) && (
+                        <Text style={styles.ineligibleText}>
+                            {t('register.notEligibleLevel') || `Your current level (Level ${studentLevel}) is not eligible this semester.`}
+                        </Text>
+                    )}
+                    {student && gpaMin !== null && student.gpa < gpaMin && (
+                        <Text style={styles.ineligibleText}>
+                            {t('register.notEligibleGpaLow') || `Your GPA (${student.gpa.toFixed(2)}) is below the minimum required (${gpaMin.toFixed(2)}).`}
+                        </Text>
+                    )}
+                    {student && gpaMax !== null && student.gpa > gpaMax && (
+                        <Text style={styles.ineligibleText}>
+                            {t('register.notEligibleGpaHigh') || `Your GPA (${student.gpa.toFixed(2)}) exceeds the maximum allowed (${gpaMax.toFixed(2)}).`}
+                        </Text>
+                    )}
+                    <Text style={styles.ineligibleSub}>{t('register.canViewSchedule') || 'You can still view your schedule below.'}</Text>
+                </View>
+            )}
+
             {/* Registered / Timetable substitute (List grouped by day) */}
             <Text style={[styles.sectionTitle, { textAlign: textDir }]}>{t('register.registeredTitle')}</Text>
             {myGroupsWithStatus.length === 0 ? (
@@ -447,7 +482,7 @@ export default function RegisterSubjects() {
                                             </View>
 
                                             <View style={{ justifyContent: 'center' }}>
-                                                {isEnrolled && allowedLevels.includes(studentLevel) && (
+                                                {isEnrolled && isEligibleToRegister && registrationOpen && allowedLevels.includes(studentLevel) && (
                                                     <TouchableOpacity style={styles.actionBtn} disabled={!!actionLoading} onPress={() => {
                                                         const pairGroups = myGroups.filter(mg => mg.subject.toLowerCase() === g.subject.toLowerCase() && mg.number === g.number);
                                                         handleRemovePair(pairGroups.map(pg => pg._id));
@@ -455,7 +490,7 @@ export default function RegisterSubjects() {
                                                         <Text style={styles.actionBtnText}>✕</Text>
                                                     </TouchableOpacity>
                                                 )}
-                                                {isPending && g.requestId && (
+                                                {isPending && g.requestId && isEligibleToRegister && registrationOpen && (
                                                     <TouchableOpacity style={styles.actionBtn} disabled={!!actionLoading} onPress={() => {
                                                         const pairRequestIds = myGroupsWithStatus
                                                             .filter(mg => mg.subject.toLowerCase() === g.subject.toLowerCase() && mg.number === g.number && mg.requestStatus === 'pending' && mg.requestId)
@@ -543,13 +578,17 @@ export default function RegisterSubjects() {
                         </View>
                         <View style={styles.groupCardFooter}>
                             {hasPendingRequest ? (
-                                <TouchableOpacity style={[styles.btn, styles.btnCancel]} disabled={!!actionLoading} onPress={() => handleCancelRequest(pendingRequestIds)}>
-                                    {isPairLoading ? <ActivityIndicator size="small" color="#c53030" /> : <Text style={styles.btnCancelText}>{t('register.cancelRequestBtn')}</Text>}
-                                </TouchableOpacity>
+                                isEligibleToRegister && registrationOpen ? (
+                                    <TouchableOpacity style={[styles.btn, styles.btnCancel]} disabled={!!actionLoading} onPress={() => handleCancelRequest(pendingRequestIds)}>
+                                        {isPairLoading ? <ActivityIndicator size="small" color="#c53030" /> : <Text style={styles.btnCancelText}>{t('register.cancelRequestBtn')}</Text>}
+                                    </TouchableOpacity>
+                                ) : null
                             ) : (
-                                <TouchableOpacity style={[styles.btn, styles.btnRegister]} disabled={!!actionLoading || !registrationOpen} onPress={() => handleRequestPair(allIds)}>
-                                    {isPairLoading ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.btnRegisterText}>{t('register.requestBtn')}</Text>}
-                                </TouchableOpacity>
+                                isEligibleToRegister && registrationOpen ? (
+                                    <TouchableOpacity style={[styles.btn, styles.btnRegister]} disabled={!!actionLoading} onPress={() => handleRequestPair(allIds)}>
+                                        {isPairLoading ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.btnRegisterText}>{t('register.requestBtn')}</Text>}
+                                    </TouchableOpacity>
+                                ) : null
                             )}
                         </View>
                     </View>
@@ -582,6 +621,11 @@ const styles = StyleSheet.create({
     alertBox: { backgroundColor: '#fff3cd', padding: 12, borderRadius: 8, borderLeftWidth: 4, borderLeftColor: '#ffc107', marginBottom: 16 },
     alertTitle: { fontWeight: 'bold', color: '#856404', marginBottom: 4 },
     alertText: { color: '#856404', fontSize: 13 },
+
+    ineligibleBox: { backgroundColor: '#fde8e8', padding: 12, borderRadius: 8, borderLeftWidth: 4, borderLeftColor: '#dc3545', marginBottom: 16 },
+    ineligibleTitle: { fontWeight: 'bold', color: '#721c24', marginBottom: 4, fontSize: 14 },
+    ineligibleText: { color: '#721c24', fontSize: 13, marginTop: 2 },
+    ineligibleSub: { color: '#721c24', fontSize: 12, marginTop: 6, fontStyle: 'italic' },
 
     sectionTitle: { fontSize: 18, fontWeight: '700', color: '#1f2937', marginBottom: 12 },
     emptyText: { color: '#6b7280', fontStyle: 'italic', marginBottom: 16 },

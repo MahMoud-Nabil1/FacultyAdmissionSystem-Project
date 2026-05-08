@@ -113,6 +113,7 @@
     "complaints": "Complaints",
     "announcements": "Announcements",
     "groupsManagement": "Groups",
+    "groups": "Groups",
     "support": "Support",
     "logout": "Sign out",
     "changePassword": "Change Password",
@@ -337,7 +338,12 @@
     "cancelSuccess": "Request cancelled",
     "removeSuccess": "Removed successfully",
     "failed": "Action failed",
-    "noRegistered": "No registered subjects."
+    "noRegistered": "No registered subjects.",
+    "notEligibleTitle": "Registration Not Available",
+    "notEligibleLevel": "Your current level is not eligible for registration this semester.",
+    "notEligibleGpaLow": "Your GPA is below the minimum required for registration.",
+    "notEligibleGpaHigh": "Your GPA exceeds the maximum allowed for registration.",
+    "canViewSchedule": "You can still view your current schedule below."
   },
   "groupsSchedule": {
     "groupNumber": "Group {{number}}",

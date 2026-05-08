@@ -4,6 +4,7 @@ import { useAuth } from "../../../context/AuthContext";
 import Pagination from "../pagination";
 import { PAGE_SIZE } from "../../../services/constants";
 import { getAllSubjects, getAllPlaces, apiGet, apiPost, apiPut, apiDelete } from "../../../services/api";
+import "./groupPanel.css";
 
 interface Group {
     _id?: string;
@@ -21,6 +22,15 @@ interface Group {
 const GroupPanel: React.FC = () => {
     const { user } = useAuth();
     const isAdmin = user?.role === "admin";
+    const isReporter = user?.role === "reporter";
+
+    // Detect mobile viewport for card layout
+    const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+    useEffect(() => {
+        const handler = () => setIsMobile(window.innerWidth <= 768);
+        window.addEventListener("resize", handler);
+        return () => window.removeEventListener("resize", handler);
+    }, []);
 
     const [groups, setGroups] = useState<Group[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -422,44 +432,98 @@ const GroupPanel: React.FC = () => {
                 />
             </div>
 
-            {/* Groups Table */}
-            <table className="staff-table">
-                <thead>
-                    <tr>
-                        {tableHeaders.map(h => (
-                            <th key={h}>{h}</th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {paginatedGroups.map(group => (
-                        <tr
-                            key={group._id}
-                            onClick={() => handleRowClick(group)}
-                            style={{ cursor: "pointer" }}
-                        >
-                            <td>{group.subject.toUpperCase()}</td>
-                            <td>{group.number}</td>
-                            <td>
-                                <span className={`badge badge-${group.type === 'lecture' ? 'info' : group.type === 'lab' ? 'primary' : group.type === 'tutorial' ? 'warning' : 'success'}`}>
-                                    {group.type.charAt(0).toUpperCase() + group.type.slice(1)}
-                                </span>
-                            </td>
-                            <td>{formatDay(group.day)}</td>
-                            <td>{numberToTime(group.from)}</td>
-                            <td>{numberToTime(group.to)}</td>
-                            <td>{placeMap.get((group as any).place) || (group as any).place || "—"}</td>
-                        </tr>
-                    ))}
-                    {paginatedGroups.length === 0 && (
-                        <tr>
-                            <td colSpan={tableHeaders.length} style={{ textAlign: "center" }}>
-                                {t("dashboardCommon.noResults")}
-                            </td>
-                        </tr>
+            {/* Mobile card view (reporter on mobile) */}
+            {isMobile && !isAdmin ? (
+                <div className="group-cards-list">
+                    {paginatedGroups.length === 0 ? (
+                        <p className="group-cards-empty">{t("dashboardCommon.noResults")}</p>
+                    ) : (
+                        paginatedGroups.map(group => (
+                            <div
+                                key={group._id}
+                                className="group-card"
+                                onClick={() => handleRowClick(group)}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={e => e.key === "Enter" && handleRowClick(group)}
+                            >
+                                <div className="group-card-header">
+                                    <span className="group-card-subject">{group.subject.toUpperCase()}</span>
+                                    <span className={`badge badge-${group.type === 'lecture' ? 'info' : group.type === 'lab' ? 'primary' : group.type === 'tutorial' ? 'warning' : 'success'} group-card-badge`}>
+                                        {group.type.charAt(0).toUpperCase() + group.type.slice(1)}
+                                    </span>
+                                </div>
+                                <div className="group-card-body">
+                                    <div className="group-card-row">
+                                        <span className="group-card-label">{t("groupPanel.columnGroupNumber")}</span>
+                                        <span className="group-card-value">{group.number}</span>
+                                    </div>
+                                    <div className="group-card-row">
+                                        <span className="group-card-label">{t("groupPanel.columnDay")}</span>
+                                        <span className="group-card-value">{formatDay(group.day)}</span>
+                                    </div>
+                                    <div className="group-card-row">
+                                        <span className="group-card-label">{t("groupPanel.columnFrom")}</span>
+                                        <span className="group-card-value">{numberToTime(group.from)} – {numberToTime(group.to)}</span>
+                                    </div>
+                                    <div className="group-card-row">
+                                        <span className="group-card-label">{t("groupPanel.placeLabel")}</span>
+                                        <span className="group-card-value">{placeMap.get((group as any).place) || (group as any).place || "—"}</span>
+                                    </div>
+                                    <div className="group-card-row">
+                                        <span className="group-card-label">{t("groupPanel.studentsLabel")}</span>
+                                        <span className="group-card-value group-card-students-count">
+                                            {group.students?.length ?? 0} / {group.capacity}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="group-card-footer">
+                                    <span className="group-card-tap-hint">{t("groupPanel.detailsHeader")} →</span>
+                                </div>
+                            </div>
+                        ))
                     )}
-                </tbody>
-            </table>
+                </div>
+            ) : (
+                /* Desktop table view */
+                <table className="staff-table">
+                    <thead>
+                        <tr>
+                            {tableHeaders.map(h => (
+                                <th key={h}>{h}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {paginatedGroups.map(group => (
+                            <tr
+                                key={group._id}
+                                onClick={() => handleRowClick(group)}
+                                style={{ cursor: "pointer" }}
+                            >
+                                <td>{group.subject.toUpperCase()}</td>
+                                <td>{group.number}</td>
+                                <td>
+                                    <span className={`badge badge-${group.type === 'lecture' ? 'info' : group.type === 'lab' ? 'primary' : group.type === 'tutorial' ? 'warning' : 'success'}`}>
+                                        {group.type.charAt(0).toUpperCase() + group.type.slice(1)}
+                                    </span>
+                                </td>
+                                <td>{formatDay(group.day)}</td>
+                                <td>{numberToTime(group.from)}</td>
+                                <td>{numberToTime(group.to)}</td>
+                                <td>{placeMap.get((group as any).place) || (group as any).place || "—"}</td>
+                            </tr>
+                        ))}
+                        {paginatedGroups.length === 0 && (
+                            <tr>
+                                <td colSpan={tableHeaders.length} style={{ textAlign: "center" }}>
+                                    {t("dashboardCommon.noResults")}
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            )}
 
             <Pagination
                 page={page}
@@ -730,44 +794,89 @@ const GroupPanel: React.FC = () => {
                         setSelectedGroup(null);
                     }
                 }}>
-                    <div className="modal-content" style={{ maxWidth: "700px" }}>
+                    <div className="modal-content group-details-modal">
                         <div className="modal-header">
                             <h3>{t("groupPanel.detailsHeader")}</h3>
                             <button className="modal-close" onClick={() => { setShowDetailsModal(false); setSelectedGroup(null); }} type="button">×</button>
                         </div>
                         <div className="modal-body">
-                            <div style={{ marginBottom: "16px" }}>
-                                <p><strong>{t("groupPanel.columnSubject")}:</strong> {selectedGroup.subject.toUpperCase()}</p>
-                                <p><strong>{t("groupPanel.columnGroupNumber")}:</strong> {selectedGroup.number}</p>
-                                <p><strong>{t("groupPanel.columnType")}:</strong> {selectedGroup.type}</p>
-                                <p><strong>{t("groupPanel.columnDay")}:</strong> {formatDay(selectedGroup.day)}</p>
-                                <p><strong>{t("groupPanel.columnFrom")}:</strong> {numberToTime(selectedGroup.from)}</p>
-                                <p><strong>{t("groupPanel.columnTo")}:</strong> {numberToTime(selectedGroup.to)}</p>
-                                <p><strong>{t("groupPanel.placeLabel") || "Place"}:</strong> {placeMap.get((selectedGroup as any).place) || (selectedGroup as any).place || "—"}</p>
-                                <p><strong>{t("groupPanel.capacityLabel")}:</strong> {selectedGroup.capacity}</p>
-                                <p><strong>{t("groupPanel.studentsLabel") || "Enrolled Students"}:</strong> {selectedGroup.students?.length ?? 0}</p>
+                            {/* Group info summary */}
+                            <div className="group-details-info">
+                                <div className="group-details-row">
+                                    <span className="group-details-label">{t("groupPanel.columnSubject")}</span>
+                                    <span className="group-details-value">{selectedGroup.subject.toUpperCase()}</span>
+                                </div>
+                                <div className="group-details-row">
+                                    <span className="group-details-label">{t("groupPanel.columnGroupNumber")}</span>
+                                    <span className="group-details-value">{selectedGroup.number}</span>
+                                </div>
+                                <div className="group-details-row">
+                                    <span className="group-details-label">{t("groupPanel.columnType")}</span>
+                                    <span className="group-details-value">
+                                        <span className={`badge badge-${selectedGroup.type === 'lecture' ? 'info' : selectedGroup.type === 'lab' ? 'primary' : selectedGroup.type === 'tutorial' ? 'warning' : 'success'}`}>
+                                            {selectedGroup.type.charAt(0).toUpperCase() + selectedGroup.type.slice(1)}
+                                        </span>
+                                    </span>
+                                </div>
+                                <div className="group-details-row">
+                                    <span className="group-details-label">{t("groupPanel.columnDay")}</span>
+                                    <span className="group-details-value">{formatDay(selectedGroup.day)}</span>
+                                </div>
+                                <div className="group-details-row">
+                                    <span className="group-details-label">{t("groupPanel.columnFrom")} / {t("groupPanel.columnTo")}</span>
+                                    <span className="group-details-value">{numberToTime(selectedGroup.from)} – {numberToTime(selectedGroup.to)}</span>
+                                </div>
+                                <div className="group-details-row">
+                                    <span className="group-details-label">{t("groupPanel.placeLabel")}</span>
+                                    <span className="group-details-value">{placeMap.get((selectedGroup as any).place) || (selectedGroup as any).place || "—"}</span>
+                                </div>
+                                <div className="group-details-row">
+                                    <span className="group-details-label">{t("groupPanel.capacityLabel")}</span>
+                                    <span className="group-details-value">{selectedGroup.students?.length ?? 0} / {selectedGroup.capacity}</span>
+                                </div>
                             </div>
-                            <div>
-                                <p>
-                                    <strong>{t("groupPanel.studentsLabel") || "Students"}:</strong>
-                                    {` ${selectedGroup.students?.length ?? 0}`}
-                                </p>
-                                <button
-                                    type="button"
-                                    className="add-btn"
-                                    onClick={exportStudentsCsv}
-                                    disabled={!selectedGroup.students?.length}
-                                >
-                                    {t("groupPanel.exportStudentsBtn")}
-                                </button>
-                                {!selectedGroup.students?.length && (
-                                    <p>{t("groupPanel.noStudents") || "No students are enrolled in this group."}</p>
+
+                            {/* Students list */}
+                            <div className="group-details-students-section">
+                                <div className="group-details-students-header">
+                                    <strong>{t("groupPanel.studentsLabel")} ({selectedGroup.students?.length ?? 0})</strong>
+                                    {isReporter && (
+                                        <button
+                                            type="button"
+                                            className="add-btn"
+                                            style={{ fontSize: "0.85rem", padding: "6px 14px" }}
+                                            onClick={exportStudentsCsv}
+                                            disabled={!selectedGroup.students?.length}
+                                        >
+                                            {t("groupPanel.exportStudentsBtn")}
+                                        </button>
+                                    )}
+                                </div>
+
+                                {selectedGroup.students?.length ? (
+                                    <ul className="group-details-students-list">
+                                        {selectedGroup.students.map((student: any, idx: number) => (
+                                            <li key={student._id || student.id || idx} className="group-details-student-item">
+                                                <span className="group-details-student-avatar">
+                                                    {(student.name || "?").charAt(0).toUpperCase()}
+                                                </span>
+                                                <div className="group-details-student-info">
+                                                    <span className="group-details-student-name">{student.name || "—"}</span>
+                                                    {student.studentId && (
+                                                        <span className="group-details-student-id">{student.studentId}</span>
+                                                    )}
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="group-details-no-students">{t("groupPanel.noStudents")}</p>
                                 )}
                             </div>
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="cancel-btn" onClick={() => { setShowDetailsModal(false); setSelectedGroup(null); }}>
-                                {t("dashboardCommon.close") || "Close"}
+                                {t("dashboardCommon.close")}
                             </button>
                         </div>
                     </div>

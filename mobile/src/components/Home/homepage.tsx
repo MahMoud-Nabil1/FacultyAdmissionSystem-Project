@@ -64,6 +64,7 @@ const COORDINATOR_MENU: MenuEntry[] = [
 const REPORTER_MENU: MenuEntry[] = [
     { labelKey: 'statistics',    icon: 'stats-chart',       route: '/reports'            },
     { labelKey: 'announcements', icon: 'megaphone-outline', route: '/announcements-view' },
+    { labelKey: 'groups',        icon: 'people-outline',    route: '/(tabs)/groups'      },
 ];
 
 const ADMIN_MENU: MenuEntry[] = [

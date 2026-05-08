@@ -657,6 +657,11 @@
       "prerequisitesNotMet": "You have not completed the required prerequisites for this subject",
       "gpaOutOfRange": "Your GPA is outside the allowed range for enrollment",
       "levelNotAllowed": "This subject's level is not available for your current academic level or this semester"
-    }
+    },
+    "notEligibleTitle": "Registration Not Available",
+    "notEligibleLevel": "Your current level is not eligible for registration this semester.",
+    "notEligibleGpaLow": "Your GPA is below the minimum required for registration.",
+    "notEligibleGpaHigh": "Your GPA exceeds the maximum allowed for registration.",
+    "canViewSchedule": "You can still view your current schedule below."
   }
 }
