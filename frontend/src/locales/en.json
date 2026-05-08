@@ -24,17 +24,17 @@
     "successAdmin": "Your request was sent to the administration successfully.",
     "errorGeneric": "Something went wrong.",
     "errorServer": "Failed to connect to the server."
-  },
-  "academicHistory": {
-    "title": "Academic History",
-    "subjectCode": "Subject Code",
-    "subjectName": "Subject Name",
-    "creditHours": "Credit Hours",
-    "degree": "Degree",
-    "grade": "Grade",
-    "gpa": "GPA",
-    "noRecords": "No academic history records found"
-  },
+  },"academicHistory": {
+  "title": "Academic History",
+  "subjectCode": "Subject Code",
+  "subjectName": "Subject Name",
+  "creditHours": "Credit Hours",
+  "degree": "Degree",
+  "grade": "Grade",
+  "gpa": "GPA",
+  "noRecords": "Academic history is empty",
+  "noCoursesPassed": "You haven't passed any courses yet"
+},
   "announcements": {
     "navProfile": "Profile",
     "navComplaints": "Complaints",

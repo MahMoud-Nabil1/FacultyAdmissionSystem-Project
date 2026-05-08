@@ -32,8 +32,9 @@
     "creditHours": "الساعات المعتمدة",
     "degree": "الدرجة",
     "grade": "التقدير",
-    "gpa": "المعدل التراكمي",
-    "noRecords": "لا توجد سجلات أكاديمية"
+    "noRecords": "السجل الأكاديمي فارغ",
+    "noCoursesPassed": "لم تجتز أي مادة بعد",
+    "gpa": "المعدل التراكمي"
   },
   "announcements": {
     "navProfile": "الملف الشخصي",
@@ -448,7 +449,7 @@
     "errorRequired": "الرجاء إدخال العنوان والمحتوى",
     "errorGeneric": "حدث خطأ",
     "errorServer": "حدث خطأ في الاتصال",
-    "searchPlaceholder": "بحث بالإعلان...",
+    "searchPlaceholder": "🔍 بحث بالإعلان...",
     "empty": "لا توجد إعلانات"
   },
   "settingsPanel": {
