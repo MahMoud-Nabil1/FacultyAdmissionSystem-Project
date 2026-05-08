@@ -36,14 +36,14 @@
       "apiBaseUrl": "https://facultyadmissionsystem-project.onrender.com/api",
       "router": {},
       "eas": {
-        "projectId": "bde06d91-fa12-4bbd-81b6-914cedecbdf5"
+        "projectId": "97ca37fd-fb5a-4685-9ce5-d9edc7149c7d"
       }
     },
     "runtimeVersion": {
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/bde06d91-fa12-4bbd-81b6-914cedecbdf5"
+      "url": "https://u.expo.dev/97ca37fd-fb5a-4685-9ce5-d9edc7149c7d"
     }
   }
 }

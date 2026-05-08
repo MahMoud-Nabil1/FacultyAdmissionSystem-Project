@@ -293,6 +293,14 @@ ${groupLines}
         }
     };
 
+    const handleClearChat = () => {
+        if (window.confirm('هل تريد مسح سجل المحادثة؟')) {
+            const storageKey = getStorageKey();
+            if (storageKey) localStorage.removeItem(storageKey);
+            setDefaultMessages();
+        }
+    };
+
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -329,7 +337,12 @@ ${groupLines}
                                 </span>
                             </div>
                         </div>
-                        <button className="minimize-button" onClick={() => setIsOpen(false)} title="إغلاق">✕</button>
+                        <div className="header-actions">
+                            <button className="clear-button" onClick={handleClearChat} title="مسح المحادثة">
+                                مسح
+                            </button>
+                            <button className="minimize-button" onClick={() => setIsOpen(false)} title="إغلاق">✕</button>
+                        </div>
                     </div>
 
                     <div className="ai-chat-messages">

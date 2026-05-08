@@ -129,6 +129,34 @@
     background: rgba(255, 255, 255, 0.25);
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.clear-button {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 0 10px;
+    height: 32px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.clear-button:hover {
+    background: rgba(239, 68, 68, 0.4);
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
 /* ===== Messages Area ===== */
 .ai-chat-messages {
     flex: 1;

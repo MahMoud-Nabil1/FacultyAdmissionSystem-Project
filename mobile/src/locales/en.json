@@ -466,7 +466,8 @@
     "noStudents": "No students enrolled yet.",
     "downloadCsv": "Download CSV",
     "shareCsvFailed": "Unable to share CSV",
-    "waitlist": "Join Waitlist"
+    "waitlist": "Join Waitlist",
+    "notEnrolled": "Not enrolled"
   },
   "academicHistory": {
     "title": "Academic History",

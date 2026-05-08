@@ -13,7 +13,8 @@ import {
     Alert,
     Dimensions,
     Keyboard,
-    ActivityIndicator
+    ActivityIndicator,
+    ScrollView
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
@@ -326,10 +327,10 @@ const AiChatBox: React.FC = () => {
             >
                 <KeyboardAvoidingView
                     style={styles.modalContainer}
-                    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
                 >
-                    <View style={[styles.chatWindow, { width: width * 0.9, height: height * 0.7 }]}>
+                    <View style={[styles.chatWindow, { width: width * 0.9, maxHeight: height * 0.85 }]}>
                         {/* Header */}
                         <View style={styles.header}>
                             <View style={styles.headerInfo}>
@@ -337,8 +338,8 @@ const AiChatBox: React.FC = () => {
                                 <Text style={styles.headerTitle}>المساعد الذكي</Text>
                             </View>
                             <View style={styles.headerActions}>
-                                <TouchableOpacity onPress={clearChatHistory} style={styles.headerButton}>
-                                    <Ionicons name="trash-outline" size={18} color="#fff" />
+                                <TouchableOpacity onPress={clearChatHistory} style={styles.clearButton}>
+                                    <Text style={styles.clearButtonText}>مسح</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => setIsOpen(false)} style={styles.headerButton}>
                                     <Text style={styles.headerButtonText}>−</Text>
@@ -418,9 +419,10 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         alignItems: 'center',
         backgroundColor: 'rgba(0,0,0,0.5)',
+        paddingBottom: 20,
     },
     chatWindow: {
         backgroundColor: 'white',
@@ -431,6 +433,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 8,
         elevation: 10,
+        flex: 1,
+        minHeight: 300,
     },
     header: {
         flexDirection: 'row',
@@ -463,6 +467,21 @@ const styles = StyleSheet.create({
     },
     headerButtonText: {
         fontSize: 16,
+        color: 'white',
+    },
+    clearButton: {
+        height: 32,
+        paddingHorizontal: 10,
+        borderRadius: 8,
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.2)',
+    },
+    clearButtonText: {
+        fontSize: 12,
+        fontWeight: '600',
         color: 'white',
     },
     messagesList: {

@@ -306,29 +306,50 @@ export default function Groups() {
                                     <Text style={styles.modalLabel}>{t('groupsScreen.enrolled')}:</Text>
                                     <Text style={styles.modalValue}>{(selectedGroup.students ?? []).length}</Text>
 
-                                    {(selectedGroup.students ?? []).length > 0 ? (
-                                        <View style={styles.studentsList}>
-                                            {(selectedGroup.students ?? []).map((s, i) => {
-                                                const n = normalizeStudent(s);
-                                                return (
-                                                    <View key={`${n.id}-${i}`} style={styles.studentRow}>
-                                                        <Text style={styles.studentName}>{n.name || n.id || t('groupsScreen.studentAnonymous')}</Text>
-                                                        {n.id ? <Text style={styles.studentId}>{n.id}</Text> : null}
-                                                    </View>
-                                                );
-                                            })}
+                                    {/* Students see only their own enrollment status */}
+                                    {isStudent ? (
+                                        <View style={[
+                                            styles.enrolledBadge,
+                                            { marginTop: 16, alignSelf: 'flex-start' },
+                                            !isEnrolled(selectedGroup) && styles.notEnrolledBadge,
+                                        ]}>
+                                            <Text style={[
+                                                styles.enrolledBadgeText,
+                                                !isEnrolled(selectedGroup) && styles.notEnrolledBadgeText,
+                                            ]}>
+                                                {isEnrolled(selectedGroup)
+                                                    ? `✓ ${t('register.status.enrolled')}`
+                                                    : t('groupsScreen.notEnrolled')}
+                                            </Text>
                                         </View>
                                     ) : (
-                                        <Text style={styles.emptySubtitle}>{t('groupsScreen.noStudents')}</Text>
-                                    )}
+                                        /* Staff / reporters see the full roster + CSV export */
+                                        <>
+                                            {(selectedGroup.students ?? []).length > 0 ? (
+                                                <View style={styles.studentsList}>
+                                                    {(selectedGroup.students ?? []).map((s, i) => {
+                                                        const n = normalizeStudent(s);
+                                                        return (
+                                                            <View key={`${n.id}-${i}`} style={styles.studentRow}>
+                                                                <Text style={styles.studentName}>{n.name || n.id || t('groupsScreen.studentAnonymous')}</Text>
+                                                                {n.id ? <Text style={styles.studentId}>{n.id}</Text> : null}
+                                                            </View>
+                                                        );
+                                                    })}
+                                                </View>
+                                            ) : (
+                                                <Text style={styles.emptySubtitle}>{t('groupsScreen.noStudents')}</Text>
+                                            )}
 
-                                    <TouchableOpacity
-                                        style={styles.downloadButton}
-                                        onPress={() => handleDownloadCsv(selectedGroup)}
-                                    >
-                                        <Ionicons name="download-outline" size={18} color="#fff" />
-                                        <Text style={styles.downloadButtonText}>{t('groupsScreen.downloadCsv')}</Text>
-                                    </TouchableOpacity>
+                                            <TouchableOpacity
+                                                style={styles.downloadButton}
+                                                onPress={() => handleDownloadCsv(selectedGroup)}
+                                            >
+                                                <Ionicons name="download-outline" size={18} color="#fff" />
+                                                <Text style={styles.downloadButtonText}>{t('groupsScreen.downloadCsv')}</Text>
+                                            </TouchableOpacity>
+                                        </>
+                                    )}
                                 </View>
                             )}
                         </View>
@@ -380,6 +401,8 @@ const styles = StyleSheet.create({
 
     enrolledBadge:  { alignSelf: 'flex-start', backgroundColor: '#dcfce7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, marginTop: 8 },
     enrolledBadgeText: { fontSize: 11, fontWeight: '700', color: '#166534' },
+    notEnrolledBadge: { backgroundColor: '#f3f4f6' },
+    notEnrolledBadgeText: { color: '#6b7280' },
 
     emptyState:    { alignItems: 'center', paddingTop: 80 },
     emptyTitle:    { fontSize: 18, fontWeight: 'bold', color: '#4b5563', marginTop: 10 },
