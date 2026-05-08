@@ -3,6 +3,7 @@ import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
+import { API_BASE } from '../services/api';
 
 const setStorageItemAsync = async (key: string, value: string) => {
     if (Platform.OS === 'web') {
@@ -77,14 +78,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [loading, setLoading] = useState(true);
 
     // Fetch full user data from backend
-    const fetchFullUserData = async () => {
-        if (!token) return;
+    // Accepts an explicit token to avoid stale closure issues
+    const fetchFullUserData = async (explicitToken?: string) => {
+        const activeToken = explicitToken ?? token;
+        if (!activeToken) return;
 
         try {
-            const API_BASE = 'http://localhost:5000/api';
             const response = await fetch(`${API_BASE}/auth/me`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${activeToken}`,
                     'Content-Type': 'application/json'
                 }
             });
@@ -137,8 +139,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     avatar: payload.avatar,
                 });
 
-                // Fetch full user data from backend
-                await fetchFullUserData();
+                // Fetch full user data from backend — pass token directly to avoid stale closure
+                await fetchFullUserData(savedToken);
             } catch (error) {
                 console.error('Auth error:', error);
                 await deleteStorageItemAsync('token');
@@ -168,8 +170,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 avatar: payload.avatar,
             });
 
-            // Fetch full user data after login
-            setTimeout(() => fetchFullUserData(), 100);
+            // Fetch full user data after login — pass token directly to avoid stale closure
+            fetchFullUserData(tokenValue);
         } catch (error) {
             console.error('Login decode error:', error);
             setUser(null);

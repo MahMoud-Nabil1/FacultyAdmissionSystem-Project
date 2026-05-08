@@ -210,8 +210,16 @@ export const getRegistrationStats = async (_req: Request, res: Response): Promis
     try {
         const totalStudents = await Student.countDocuments();
 
-        // Count students who have requested subjects with 14+ credit hours
-        const studentsWith14PlusHours = await Student.aggregate([
+        // Aggregate all students with their completed hours, registered hours, and GPA
+        const allStudents = await Student.aggregate([
+            {
+                $lookup: {
+                    from: "subjects",
+                    localField: "completedSubjects",
+                    foreignField: "_id",
+                    as: "completedSubjectsDetails"
+                }
+            },
             {
                 $lookup: {
                     from: "subjects",
@@ -222,23 +230,68 @@ export const getRegistrationStats = async (_req: Request, res: Response): Promis
             },
             {
                 $addFields: {
-                    totalCreditHours: { $sum: "$requestedSubjectsDetails.creditHours" }
+                    completedHours: { $sum: "$completedSubjectsDetails.creditHours" },
+                    registeredHours: { $sum: "$requestedSubjectsDetails.creditHours" }
                 }
             },
             {
-                $match: {
-                    totalCreditHours: { $gte: 14 }
+                $addFields: {
+                    level: {
+                        $switch: {
+                            branches: [
+                                { case: { $gte: ["$completedHours", 90] }, then: "4" },
+                                { case: { $gte: ["$completedHours", 60] }, then: "3" },
+                                { case: { $gte: ["$completedHours", 30] }, then: "2" },
+                            ],
+                            default: "1"
+                        }
+                    },
+                    finishedRegistration: { $gte: ["$registeredHours", 14] }
                 }
-            },
-            {
-                $count: "count"
             }
         ]);
 
-        const finishedRegistration = studentsWith14PlusHours.length > 0 ? studentsWith14PlusHours[0].count : 0;
+        // Overall finished/not finished
+        const finishedRegistration = allStudents.filter(s => s.finishedRegistration).length;
         const didNotFinishRegistration = totalStudents - finishedRegistration;
 
-        res.json({ totalStudents, finishedRegistration, didNotFinishRegistration });
+        // Per-level breakdown
+        const levels = ["1", "2", "3", "4"];
+        const byLevel = levels.map(level => {
+            const levelStudents = allStudents.filter(s => s.level === level);
+            const total = levelStudents.length;
+            const finished = levelStudents.filter(s => s.finishedRegistration).length;
+            const notFinished = total - finished;
+            const gpas = levelStudents.map(s => s.gpa || 0);
+            const avgGpa = total > 0
+                ? Math.round((gpas.reduce((a, b) => a + b, 0) / total) * 100) / 100
+                : 0;
+            return { level, total, finished, notFinished, avgGpa };
+        });
+
+        // GPA distribution buckets (0-1, 1-2, 2-3, 3-4, 4-5)
+        const gpaDistribution = [
+            { range: "0–1", count: allStudents.filter(s => s.gpa >= 0 && s.gpa < 1).length },
+            { range: "1–2", count: allStudents.filter(s => s.gpa >= 1 && s.gpa < 2).length },
+            { range: "2–3", count: allStudents.filter(s => s.gpa >= 2 && s.gpa < 3).length },
+            { range: "3–4", count: allStudents.filter(s => s.gpa >= 3 && s.gpa < 4).length },
+            { range: "4–5", count: allStudents.filter(s => s.gpa >= 4 && s.gpa <= 5).length },
+        ];
+
+        // Overall average GPA
+        const allGpas = allStudents.map(s => s.gpa || 0);
+        const avgGpa = totalStudents > 0
+            ? Math.round((allGpas.reduce((a, b) => a + b, 0) / totalStudents) * 100) / 100
+            : 0;
+
+        res.json({
+            totalStudents,
+            finishedRegistration,
+            didNotFinishRegistration,
+            avgGpa,
+            byLevel,
+            gpaDistribution,
+        });
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }

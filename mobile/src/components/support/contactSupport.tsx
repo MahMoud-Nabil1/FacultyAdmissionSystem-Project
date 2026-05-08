@@ -47,6 +47,13 @@ export default function SupportContact() {
             return;
         }
 
+        // Validate reply email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.replyEmail.trim())) {
+            Alert.alert(t('common.error'), t('supportContact.validateEmail'));
+            return;
+        }
+
         setLoading(true);
         try {
             const endpoint = `${API_BASE}/students/${isIT ? 'contact-it' : 'contact-admin'}`;
@@ -57,7 +64,7 @@ export default function SupportContact() {
             });
             if (res.ok) {
                 Alert.alert(t('supportContact.sentTitle'), t('supportContact.sentMessage'));
-                setFormData({ ...formData, subjectName: '', message: '' });
+                setFormData({ ...formData, subjectName: '', message: '', replyEmail: '' });
             } else {
                 Alert.alert(t('common.error'), t('supportContact.sendFailed'));
             }
@@ -78,7 +85,12 @@ export default function SupportContact() {
             <ScrollView contentContainerStyle={styles.scroll}>
 
                 <View style={styles.card}>
-                    <Text style={styles.headerIcon}>{isIT ? '👨‍💻' : '🏛️'}</Text>
+                    <Ionicons
+                        name={isIT ? 'desktop-outline' : 'business-outline'}
+                        size={48}
+                        color={isIT ? '#1a73e8' : '#4b5563'}
+                        style={{ marginBottom: 10 }}
+                    />
                     <Text style={[styles.title, { textAlign: align }]}>
                         {isIT ? t('supportContact.titleIT') : t('supportContact.titleAdmin')}
                     </Text>
@@ -136,6 +148,21 @@ export default function SupportContact() {
                             textAlign={align}
                         />
 
+                        <Text style={[styles.label, { textAlign: align }]}>
+                            {t('supportContact.labelReplyEmail')}
+                        </Text>
+                        <TextInput
+                            style={styles.input}
+                            value={formData.replyEmail}
+                            onChangeText={(v) => setFormData({ ...formData, replyEmail: v })}
+                            textAlign={align}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            placeholder="email@example.com"
+                            placeholderTextColor="#9ca3af"
+                        />
+
                         <TouchableOpacity
                             style={[styles.submitBtn, isIT ? styles.itBtn : styles.adminBtn]}
                             onPress={handleSubmit}
@@ -165,7 +192,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         elevation: 4,
     },
-    headerIcon: { fontSize: 50, marginBottom: 10 },
     title: { fontSize: 22, fontWeight: 'bold', color: '#1a73e8', marginBottom: 20, width: '100%' },
     toggleRow: {
         flexDirection: 'row',

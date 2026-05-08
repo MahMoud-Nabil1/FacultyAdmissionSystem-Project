@@ -90,6 +90,7 @@ export default function RegisterSubjects() {
     const [groups, setGroups] = useState<GroupData[]>([]);
     const [myRequests, setMyRequests] = useState<EnrollmentRequestData[]>([]);
     const [registrationOpen, setRegistrationOpen] = useState(true);
+    const [allowedLevels, setAllowedLevels] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedSubject, setSelectedSubject] = useState("");
@@ -113,13 +114,14 @@ export default function RegisterSubjects() {
             setError(null);
             if (!token) throw new Error(t('login.loginFailed'));
 
-            const [meData, subData, eligibleData, grpData, reqData, settingsData] = await Promise.all([
+            const [meData, subData, eligibleData, grpData, reqData, settingsData, academicSettingsData] = await Promise.all([
                 apiFetch('/auth/me'),
                 apiFetch('/subjects'),
                 apiFetch('/subjects/eligible'),
                 apiFetch('/groups'),
                 apiFetch('/groups/my-requests').catch(() => []),
                 apiFetch('/settings').catch(() => ({ registrationOpen: true })),
+                apiFetch('/announcements/settings').catch(() => ({ level: [] })),
             ]);
 
             setStudent(meData);
@@ -128,6 +130,7 @@ export default function RegisterSubjects() {
             setGroups(grpData || []);
             setMyRequests(reqData || []);
             setRegistrationOpen(settingsData?.registrationOpen ?? true);
+            setAllowedLevels(academicSettingsData?.level ?? []);
         } catch (err: any) {
             setError(err.message || t("common.error"));
         } finally {
@@ -196,6 +199,24 @@ export default function RegisterSubjects() {
         });
         return total;
     }, [allSelectedSubjectCodes, subjectByCode]);
+
+    // Calculate completed credit hours and derive student level (mirrors web logic)
+    const completedHours = useMemo(() => {
+        let total = 0;
+        student?.completedSubjects?.forEach(id => {
+            const sub = subjectById.get(id);
+            if (sub) total += sub.creditHours;
+        });
+        return total;
+    }, [student, subjectById]);
+
+    const studentLevel = useMemo(() => {
+        if (!student || completedHours === 0) return '1';
+        if (completedHours <= 30) return '1';
+        if (completedHours <= 60) return '2';
+        if (completedHours <= 90) return '3';
+        return '4';
+    }, [student, completedHours]);
 
     const availableSubjects = useMemo(() => {
         return eligibleSubjects.filter(s => {
@@ -367,13 +388,13 @@ export default function RegisterSubjects() {
 
             {!registrationOpen && (
                 <View style={styles.alertBox}>
-                    <Text style={styles.alertTitle}>⚠️ {t('register.closed')}</Text>
+                    <Text style={styles.alertTitle}>{t('register.closed')}</Text>
                     <Text style={styles.alertText}>{t('register.closedMessage')}</Text>
                 </View>
             )}
 
             {/* Registered / Timetable substitute (List grouped by day) */}
-            <Text style={[styles.sectionTitle, { textAlign: textDir }]}>📋 {t('register.registeredTitle')}</Text>
+            <Text style={[styles.sectionTitle, { textAlign: textDir }]}>{t('register.registeredTitle')}</Text>
             {myGroupsWithStatus.length === 0 ? (
                 <Text style={[styles.emptyText, { textAlign: textDir }]}>{t('register.noRegistered')}</Text>
             ) : (
@@ -426,7 +447,7 @@ export default function RegisterSubjects() {
                                             </View>
 
                                             <View style={{ justifyContent: 'center' }}>
-                                                {isEnrolled && (
+                                                {isEnrolled && allowedLevels.includes(studentLevel) && (
                                                     <TouchableOpacity style={styles.actionBtn} disabled={!!actionLoading} onPress={() => {
                                                         const pairGroups = myGroups.filter(mg => mg.subject.toLowerCase() === g.subject.toLowerCase() && mg.number === g.number);
                                                         handleRemovePair(pairGroups.map(pg => pg._id));
@@ -455,7 +476,7 @@ export default function RegisterSubjects() {
             )}
 
             {/* Subject Selection Sidebar Equivalent */}
-            <Text style={[styles.sectionTitle, { textAlign: textDir, marginTop: 24 }]}>📚 {t('register.availableTitle')}</Text>
+            <Text style={[styles.sectionTitle, { textAlign: textDir, marginTop: 24 }]}>{t('register.availableTitle')}</Text>
 
             <View style={styles.pickerContainer}>
                 <Picker
@@ -476,7 +497,7 @@ export default function RegisterSubjects() {
                     if (sub && sub.corequisites && sub.corequisites.length > 0) {
                         return (
                             <View style={styles.coreqNotice}>
-                                <Text style={styles.coreqText}>⚠️ {t('register.corequisiteNotice')}: {sub.corequisites.map(c => formatSubjectCode(c.code || c.name)).join(", ")}</Text>
+                                <Text style={styles.coreqText}>{t('register.corequisiteNotice')}: {sub.corequisites.map(c => formatSubjectCode(c.code || c.name)).join(", ")}</Text>
                             </View>
                         );
                     }
@@ -508,15 +529,15 @@ export default function RegisterSubjects() {
                             {lecture && (
                                 <View style={styles.groupSlot}>
                                     <View style={styles.badge}><Text style={styles.badgeText}>{t('groupsSchedule.typeValues.lecture')}</Text></View>
-                                    <Text style={styles.slotText}>📅 {t(`schedule.days.${lecture.day}`)}</Text>
-                                    <Text style={styles.slotText}>🕐 {formatTime(lecture.from, t)} - {formatTime(lecture.to, t)}</Text>
+                                    <Text style={styles.slotText}>{t(`schedule.days.${lecture.day}`)}</Text>
+                                    <Text style={styles.slotText}>{formatTime(lecture.from, t)} - {formatTime(lecture.to, t)}</Text>
                                 </View>
                             )}
                             {coreq && (
                                 <View style={styles.groupSlot}>
                                     <View style={styles.badge}><Text style={styles.badgeText}>{t(`groupsSchedule.typeValues.${coreq.type.toLowerCase()}`)}</Text></View>
-                                    <Text style={styles.slotText}>📅 {t(`schedule.days.${coreq.day}`)}</Text>
-                                    <Text style={styles.slotText}>🕐 {formatTime(coreq.from, t)} - {formatTime(coreq.to, t)}</Text>
+                                    <Text style={styles.slotText}>{t(`schedule.days.${coreq.day}`)}</Text>
+                                    <Text style={styles.slotText}>{formatTime(coreq.from, t)} - {formatTime(coreq.to, t)}</Text>
                                 </View>
                             )}
                         </View>

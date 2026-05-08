@@ -154,7 +154,7 @@ ${groupLines}
             const groups = groupsRes.status === 'fulfilled'
                 ? (Array.isArray(groupsRes.value) ? groupsRes.value : []) : [];
 
-            console.log('✅ AI Context loaded:', {
+            console.log('AI Context loaded:', {
                 student: studentMe?.name,
                 subjects: subjects.length,
                 groups: groups.length,
@@ -164,10 +164,10 @@ ${groupLines}
                     )
                 ).length
             });
-            // 🔍 DEBUG: log raw shapes so we can see actual field names
-            if (subjects.length > 0) console.log('📚 Sample subject:', JSON.stringify(subjects[0], null, 2));
-            if (groups.length > 0) console.log('👥 Sample group:', JSON.stringify(groups[0], null, 2));
-            console.log('👤 Student /auth/me:', JSON.stringify(studentMe, null, 2));
+            // DEBUG: log raw shapes so we can see actual field names
+            if (subjects.length > 0) console.log('Sample subject:', JSON.stringify(subjects[0], null, 2));
+            if (groups.length > 0) console.log('Sample group:', JSON.stringify(groups[0], null, 2));
+            console.log('Student /auth/me:', JSON.stringify(studentMe, null, 2));
 
             const prompt = buildSystemPrompt(studentMe, subjects, groups);
             setSystemPrompt(prompt);
@@ -211,7 +211,7 @@ ${groupLines}
     const setDefaultMessages = () => {
         const defaults: Message[] = [{
             id: '1',
-            text: `مرحباً ${user?.name ? user.name.split(' ')[0] : ''}! 👋 أنا مساعدك الذكي. يمكنني مساعدتك في معلوماتك الأكاديمية، المواد، المجموعات، وأي استفسار عن النظام.`,
+            text: `مرحباً ${user?.name ? user.name.split(' ')[0] : ''}! أنا مساعدك الذكي. يمكنني مساعدتك في معلوماتك الأكاديمية، المواد، المجموعات، وأي استفسار عن النظام.`,
             sender: 'ai',
             timestamp: new Date()
         }];
@@ -281,7 +281,7 @@ ${groupLines}
                 timestamp: new Date()
             }]);
         } catch (error: any) {
-            console.error('❌ Groq call failed:', error?.message);
+            console.error('Groq call failed:', error?.message);
             setMessages(prev => [...prev, {
                 id: (Date.now() + 1).toString(),
                 text: `عذراً، حدث خطأ: ${error?.message || 'خطأ غير معروف'}`,
@@ -314,18 +314,18 @@ ${groupLines}
                 onClick={() => setIsOpen(!isOpen)}
                 title="المساعد الذكي"
             >
-                {isOpen ? '✕' : '🤖'}
+                {isOpen ? '✕' : 'AI'}
             </button>
 
             {isOpen && (
                 <div className="ai-chat-window">
                     <div className="ai-chat-header">
                         <div className="header-info">
-                            <div className="header-avatar">🤖</div>
+                            <div className="header-avatar">AI</div>
                             <div className="header-text">
                                 <span className="header-title">المساعد الذكي</span>
                                 <span className="header-subtitle">
-                                    {contextLoading ? '⏳ جاري تحميل بياناتك...' : '🟢 متاح الآن'}
+                                    {contextLoading ? 'جاري تحميل بياناتك...' : 'متاح الآن'}
                                 </span>
                             </div>
                         </div>
@@ -335,7 +335,7 @@ ${groupLines}
                     <div className="ai-chat-messages">
                         {messages.map((message) => (
                             <div key={message.id} className={`message ${message.sender === 'user' ? 'user-message' : 'ai-message'}`}>
-                                {message.sender === 'ai' && <div className="message-avatar">🤖</div>}
+                                {message.sender === 'ai' && <div className="message-avatar">AI</div>}
                                 <div className="message-bubble">
                                     <div className="message-text">{message.text}</div>
                                     <div className="message-time">{formatTime(message.timestamp)}</div>
@@ -344,7 +344,7 @@ ${groupLines}
                         ))}
                         {(isLoading || contextLoading) && (
                             <div className="message ai-message">
-                                <div className="message-avatar">🤖</div>
+                                <div className="message-avatar">AI</div>
                                 <div className="message-bubble">
                                     <div className="typing-indicator"><span></span><span></span><span></span></div>
                                 </div>
@@ -364,7 +364,7 @@ ${groupLines}
                             disabled={inputDisabled}
                         />
                         <button onClick={handleSendMessage} disabled={inputDisabled || !inputMessage.trim()}>
-                            {isLoading ? '⏳' : '➤'}
+                            {isLoading ? '...' : '→'}
                         </button>
                     </div>
                 </div>

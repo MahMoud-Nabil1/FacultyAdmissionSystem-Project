@@ -15,15 +15,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLanguage } from '../../context/LanguageContext';
 import { apiPost } from '../../services/api';
 
-type Status = null | 'sent' | 'not_found';
-
 export default function ForgotPassword() {
     const { t, locale } = useLanguage();
     const align = locale === 'ar' ? 'right' : 'left';
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [status, setStatus] = useState<Status>(null);
+    const [sent, setSent] = useState(false);
 
     const handleSubmit = async () => {
         setError('');
@@ -35,15 +33,13 @@ export default function ForgotPassword() {
         setLoading(true);
         try {
             const { res, data } = await apiPost('/auth/forgot-password', { email: trimmed }, false);
-            if (!res.ok) {
+            // Security: treat 404 (email not found) the same as success so we
+            // don't reveal whether an account exists for this email address.
+            if (!res.ok && res.status !== 404) {
                 setError((data as { error?: string }).error || t('forgotPassword.genericError'));
                 return;
             }
-            setStatus(
-                (data as { message?: string }).message === 'message sent to the email'
-                    ? 'sent'
-                    : 'not_found'
-            );
+            setSent(true);
         } catch {
             setError(t('forgotPassword.serverUnreachable'));
         } finally {
@@ -51,30 +47,14 @@ export default function ForgotPassword() {
         }
     };
 
-    // ── Success state ─────────────────────────────────────────────────────────
-    if (status === 'sent') {
+    // ── Success state (shown for both real sends and "not found" — same message) ──
+    if (sent) {
         return (
             <View style={styles.centerContainer}>
-                <Text style={styles.icon}>✅</Text>
+                <Ionicons name="checkmark-circle-outline" size={64} color="#10b981" />
                 <Text style={[styles.statusTitle, { textAlign: align }]}>{t('forgotPassword.sentTitle')}</Text>
                 <Text style={[styles.statusMessage, { textAlign: align }]}>
                     {t('forgotPassword.sentMessage')}
-                </Text>
-                <TouchableOpacity style={styles.btn} onPress={() => router.replace('/(auth)/login')}>
-                    <Text style={styles.btnText}>{t('forgotPassword.backToLogin')}</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    }
-
-    // ── Not found state ───────────────────────────────────────────────────────
-    if (status === 'not_found') {
-        return (
-            <View style={styles.centerContainer}>
-                <Text style={styles.icon}>❌</Text>
-                <Text style={[styles.statusTitle, { textAlign: align }]}>{t('forgotPassword.notFoundTitle')}</Text>
-                <Text style={[styles.statusMessage, { textAlign: align }]}>
-                    {t('forgotPassword.notFoundMessage')}
                 </Text>
                 <TouchableOpacity style={styles.btn} onPress={() => router.replace('/(auth)/login')}>
                     <Text style={styles.btnText}>{t('forgotPassword.backToLogin')}</Text>
@@ -100,7 +80,7 @@ export default function ForgotPassword() {
                 </TouchableOpacity>
 
                 <View style={styles.header}>
-                    <Text style={styles.icon}>🔑</Text>
+                    <Ionicons name="key-outline" size={52} color="#1a73e8" style={{ marginBottom: 12 }} />
                     <Text style={[styles.title, { textAlign: align }]}>{t('forgotPassword.title')}</Text>
                     <Text style={[styles.subtitle, { textAlign: align }]}>{t('forgotPassword.subtitle')}</Text>
                 </View>
@@ -156,7 +136,6 @@ const styles = StyleSheet.create({
         padding: 32,
     },
     header: { alignItems: 'center', marginBottom: 28 },
-    icon: { fontSize: 52, marginBottom: 12 },
     title: { fontSize: 24, fontWeight: '700', color: '#1a73e8', marginBottom: 8, width: '100%' },
     subtitle: { fontSize: 14, color: '#6b7280', lineHeight: 22, width: '100%' },
     statusTitle: { fontSize: 22, fontWeight: '700', color: '#111827', marginBottom: 8, width: '100%' },

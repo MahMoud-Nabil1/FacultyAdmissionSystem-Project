@@ -9,6 +9,10 @@ import {
     Alert,
     Dimensions,
     Image,
+    Modal,
+    TextInput,
+    KeyboardAvoidingView,
+    Platform,
 } from 'react-native';
 import { router } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
@@ -17,6 +21,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { Ionicons } from '@expo/vector-icons';
 import CustomHeader from '../common/CustomHeader';
 import ScreenContainer from '../common/ScreenContainer';
+import { API_BASE } from '../../services/api';
 
 /* ─────────── constants ─────────── */
 const { width } = Dimensions.get('window');
@@ -85,7 +90,12 @@ const Homepage = () => {
     const [loading,  setLoading]  = useState(true);
     const [uploading, setUploading] = useState(false);
 
-    const API_BASE = process.env.EXPO_PUBLIC_API_BASE_URL ?? 'http://10.0.2.2:5000/api';
+    // Change password modal state
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordLoading, setPasswordLoading] = useState(false);
 
     /* fetch profile */
     useEffect(() => {
@@ -157,6 +167,47 @@ const Homepage = () => {
             } finally {
                 setUploading(false);
             }
+        }
+    };
+
+    /* change password */
+    const closePasswordModal = () => {
+        setShowPasswordModal(false);
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+    };
+
+    const handleChangePassword = async () => {
+        if (newPassword !== confirmPassword) {
+            Alert.alert(t('common.error'), t('home.passwordMismatch'));
+            return;
+        }
+        if (newPassword.length < 6) {
+            Alert.alert(t('common.error'), t('resetPassword.passwordMin'));
+            return;
+        }
+        setPasswordLoading(true);
+        try {
+            const res = await fetch(`${API_BASE}/auth/change-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ currentPassword, newPassword }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                Alert.alert(t('common.success'), t('home.passwordUpdateSuccess'));
+                closePasswordModal();
+            } else {
+                Alert.alert(t('common.error'), data.error || t('home.passwordUpdateError'));
+            }
+        } catch {
+            Alert.alert(t('common.error'), t('home.passwordUpdateError'));
+        } finally {
+            setPasswordLoading(false);
         }
     };
 
@@ -319,12 +370,82 @@ const Homepage = () => {
                     <Text style={s.languageLabel}>{locale === 'ar' ? 'English' : 'العربية'}</Text>
                 </TouchableOpacity>
 
+                {/* ── Change Password ── */}
+                <TouchableOpacity style={[s.changePasswordRow, isRTL && s.rowReverse]} onPress={() => setShowPasswordModal(true)}>
+                    <Ionicons name="lock-closed-outline" size={17} color="#4b5563" />
+                    <Text style={s.changePasswordLabel}>{t('home.changePassword')}</Text>
+                </TouchableOpacity>
+
                 {/* ── Sign out (secondary) ── */}
                 <TouchableOpacity style={[s.logoutRow, isRTL && s.rowReverse]} onPress={handleLogout}>
                     <Ionicons name="log-out-outline" size={17} color="#ef4444" />
                     <Text style={s.logoutLabel}>{t('home.logout')}</Text>
                 </TouchableOpacity>
             </ScrollView>
+
+            {/* ── Change Password Modal ── */}
+            <Modal
+                visible={showPasswordModal}
+                animationType="slide"
+                transparent
+                onRequestClose={closePasswordModal}
+            >
+                <KeyboardAvoidingView
+                    style={s.modalOverlay}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                >
+                    <View style={s.modalCard}>
+                        <View style={s.modalHeader}>
+                            <Text style={s.modalTitle}>{t('home.changePasswordTitle')}</Text>
+                            <TouchableOpacity onPress={closePasswordModal}>
+                                <Ionicons name="close" size={22} color="#374151" />
+                            </TouchableOpacity>
+                        </View>
+
+                        <TextInput
+                            style={s.modalInput}
+                            placeholder={t('home.currentPasswordPlaceholder')}
+                            placeholderTextColor="#9ca3af"
+                            secureTextEntry
+                            value={currentPassword}
+                            onChangeText={setCurrentPassword}
+                            textAlign={isRTL ? 'right' : 'left'}
+                            editable={!passwordLoading}
+                        />
+                        <TextInput
+                            style={s.modalInput}
+                            placeholder={t('home.newPasswordPlaceholder')}
+                            placeholderTextColor="#9ca3af"
+                            secureTextEntry
+                            value={newPassword}
+                            onChangeText={setNewPassword}
+                            textAlign={isRTL ? 'right' : 'left'}
+                            editable={!passwordLoading}
+                        />
+                        <TextInput
+                            style={s.modalInput}
+                            placeholder={t('home.confirmPasswordPlaceholder')}
+                            placeholderTextColor="#9ca3af"
+                            secureTextEntry
+                            value={confirmPassword}
+                            onChangeText={setConfirmPassword}
+                            textAlign={isRTL ? 'right' : 'left'}
+                            editable={!passwordLoading}
+                        />
+
+                        <TouchableOpacity
+                            style={[s.modalSaveBtn, passwordLoading && { opacity: 0.6 }]}
+                            onPress={handleChangePassword}
+                            disabled={passwordLoading}
+                        >
+                            {passwordLoading
+                                ? <ActivityIndicator color="#fff" />
+                                : <Text style={s.modalSaveBtnText}>{t('home.save')}</Text>
+                            }
+                        </TouchableOpacity>
+                    </View>
+                </KeyboardAvoidingView>
+            </Modal>
         </ScreenContainer>
     );
 };
@@ -471,6 +592,53 @@ const s = StyleSheet.create({
     /* ── RTL helpers ── */
     rowReverse: { flexDirection: 'row-reverse' },
     textRight:  { textAlign: 'right' },
+
+    /* ── Change password row ── */
+    changePasswordRow: {
+        flexDirection: 'row',
+        alignItems: 'center', justifyContent: 'center',
+        gap: 6, marginTop: 4, paddingVertical: 10,
+    },
+    changePasswordLabel: { color: '#4b5563', fontWeight: '700', fontSize: 14 },
+
+    /* ── Change password modal ── */
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.45)',
+        justifyContent: 'center',
+        padding: 24,
+    },
+    modalCard: {
+        backgroundColor: '#fff',
+        borderRadius: 20,
+        padding: 24,
+        gap: 12,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    modalTitle: { fontSize: 17, fontWeight: '700', color: '#1f2937' },
+    modalInput: {
+        borderWidth: 1,
+        borderColor: '#d1d5db',
+        borderRadius: 10,
+        paddingHorizontal: 14,
+        paddingVertical: 11,
+        fontSize: 15,
+        color: '#111827',
+        backgroundColor: '#f9fafb',
+    },
+    modalSaveBtn: {
+        backgroundColor: ACCENT,
+        borderRadius: 10,
+        paddingVertical: 13,
+        alignItems: 'center',
+        marginTop: 4,
+    },
+    modalSaveBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });
 
 export default Homepage;

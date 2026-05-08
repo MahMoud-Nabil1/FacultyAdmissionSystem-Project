@@ -89,14 +89,13 @@ const SupportContact = ({ target = 'it' }) => {
             <div className="contact-card">
                 <div className="contact-header">
                     <div className={`contact-icon ${isIT ? 'it' : 'admin'}`}>
-                        {isIT ? '💻' : '🛡️'}
                     </div>
                     <h1>{isIT ? t('supportContact.itTitle') : t('supportContact.adminTitle')}</h1>
                 </div>
 
                 <div className="role-toggle">
-                    <button type="button" className={`role-toggle-btn ${isIT ? 'active' : ''}`} onClick={() => setSelectedTarget('it')}> 💻 {t('supportContact.toggleIT')} </button>
-                    <button type="button" className={`role-toggle-btn ${!isIT ? 'active' : ''}`} onClick={() => setSelectedTarget('admin')}> 🛡️ {t('supportContact.toggleAdmin')} </button>
+                    <button type="button" className={`role-toggle-btn ${isIT ? 'active' : ''}`} onClick={() => setSelectedTarget('it')}>{t('supportContact.toggleIT')}</button>
+                    <button type="button" className={`role-toggle-btn ${!isIT ? 'active' : ''}`} onClick={() => setSelectedTarget('admin')}>{t('supportContact.toggleAdmin')}</button>
                 </div>
 
                 <form className="contact-form" onSubmit={handleSubmit} noValidate>

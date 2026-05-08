@@ -15,6 +15,7 @@ import {
     Keyboard,
     ActivityIndicator
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -231,7 +232,7 @@ const AiChatBox: React.FC = () => {
 
             if (!response.ok) {
                 const errBody = await response.json().catch(() => ({}));
-                console.error('❌ Groq API failed:', response.status, JSON.stringify(errBody));
+                console.error('Groq API failed:', response.status, JSON.stringify(errBody));
                 throw new Error(`Groq error ${response.status}: ${errBody?.error?.message || 'Unknown'}`);
             }
 
@@ -246,7 +247,7 @@ const AiChatBox: React.FC = () => {
             };
             setMessages(prev => [...prev, aiResponse]);
         } catch (error: any) {
-            console.error('❌ Groq call failed:', error?.message);
+            console.error('Groq call failed:', error?.message);
             const errorMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 text: `عذراً، حدث خطأ: ${error?.message || 'خطأ غير معروف'}`,
@@ -313,7 +314,7 @@ const AiChatBox: React.FC = () => {
                 }}
                 activeOpacity={0.8}
             >
-                <Text style={styles.chatButtonText}>💬</Text>
+                <Ionicons name="chatbubble-ellipses-outline" size={26} color="#fff" />
             </TouchableOpacity>
 
             {/* Chat Modal */}
@@ -332,12 +333,12 @@ const AiChatBox: React.FC = () => {
                         {/* Header */}
                         <View style={styles.header}>
                             <View style={styles.headerInfo}>
-                                <Text style={styles.headerIcon}>💬</Text>
+                                <Ionicons name="chatbubble-ellipses-outline" size={22} color="#fff" />
                                 <Text style={styles.headerTitle}>المساعد الذكي</Text>
                             </View>
                             <View style={styles.headerActions}>
                                 <TouchableOpacity onPress={clearChatHistory} style={styles.headerButton}>
-                                    <Text style={styles.headerButtonText}>🗑️</Text>
+                                    <Ionicons name="trash-outline" size={18} color="#fff" />
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => setIsOpen(false)} style={styles.headerButton}>
                                     <Text style={styles.headerButtonText}>−</Text>
@@ -389,7 +390,7 @@ const AiChatBox: React.FC = () => {
                                 onPress={sendMessage}
                                 disabled={!inputMessage.trim() || isLoading}
                             >
-                                <Text style={styles.sendButtonText}>➤</Text>
+                                <Ionicons name="send-outline" size={18} color="#fff" />
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -414,9 +415,6 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
         zIndex: 1000,
-    },
-    chatButtonText: {
-        fontSize: 28,
     },
     modalContainer: {
         flex: 1,
@@ -445,9 +443,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-    },
-    headerIcon: {
-        fontSize: 24,
     },
     headerTitle: {
         fontSize: 16,
@@ -550,10 +545,6 @@ const styles = StyleSheet.create({
     },
     sendButtonDisabled: {
         backgroundColor: '#cbd5e1',
-    },
-    sendButtonText: {
-        fontSize: 18,
-        color: 'white',
     },
 });
 

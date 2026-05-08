@@ -531,7 +531,7 @@ const RegisterSubjects = () => {
                     borderRadius: '4px',
                     color: '#856404'
                 }}>
-                    <strong>⚠️ {t("registration.errors.registrationClosed")}</strong>
+                    <strong>{t("registration.errors.registrationClosed")}</strong>
                     <p style={{margin: '8px 0 0 0'}}>{t("registration.closedMessage") || "Registration is currently closed. You cannot request new groups at this time."}</p>
                 </div>
             )}
@@ -549,7 +549,7 @@ const RegisterSubjects = () => {
                     LEFT: Weekly Timetable
                    ════════════════════════════════════ */}
                 <div className="regTimetableSection">
-                    <h3 className="regSectionTitle">📋 {t("registration.registeredTitle")}</h3>
+                    <h3 className="regSectionTitle">{t("registration.registeredTitle")}</h3>
                     <div className="regTimetableWrapper" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
                          style={{direction: i18n.language === 'ar' ? 'rtl' : 'ltr'}}>
                         <table className="regTimetable" style={{direction: i18n.language === 'ar' ? 'rtl' : 'ltr'}}>
@@ -682,7 +682,7 @@ const RegisterSubjects = () => {
                         });
                         return (
                             <div className="regSummarySection" style={{marginTop: 24}}>
-                                <h3 className="regSectionTitle">📑 {t("registration.registeredTitle")}</h3>
+                                <h3 className="regSectionTitle">{t("registration.registeredTitle")}</h3>
                                 <div className="regSummaryTableWrapper">
                                     <table className="regSummaryTable" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
                                         <thead>
@@ -783,7 +783,7 @@ const RegisterSubjects = () => {
                     {/* ── My Requests Table ── */}
                     {myRequests.length > 0 && (
                         <div className="regRequestsSection" style={{marginTop: 24}}>
-                            <h3 className="regSectionTitle">📋 {t("registration.myRequestsTitle")}</h3>
+                            <h3 className="regSectionTitle">{t("registration.myRequestsTitle")}</h3>
                             <table className="regRequestsTable" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
                                 <thead>
                                 <tr>
@@ -858,7 +858,7 @@ const RegisterSubjects = () => {
                     RIGHT: Subject Selection Sidebar
                    ════════════════════════════════════ */}
                 <div className="regSidebar">
-                    <h3 className="regSectionTitle">📚 {t("registration.availableTitle")}</h3>
+                    <h3 className="regSectionTitle">{t("registration.availableTitle")}</h3>
 
                     <div className="regDropdownRow">
                         <label htmlFor="reg-subject-select">{t("registration.chooseSubject")}</label>
@@ -882,7 +882,7 @@ const RegisterSubjects = () => {
                         if (!sub || !sub.corequisites || sub.corequisites.length === 0) return null;
                         return (
                             <div className="info regCoreqNotice">
-                                ⚠️ {t("registration.corequisiteNotice")}: {sub.corequisites.map((c: {
+                                {t("registration.corequisiteNotice")}: {sub.corequisites.map((c: {
                                 code: string;
                                 name: string
                             }) => formatSubjectCode(c.code || c.name)).join(", ")}
@@ -943,11 +943,11 @@ const RegisterSubjects = () => {
                                                             {t("groupsSchedule.typeValues.lecture")}
                                                         </span>
                                                         <div className="regGroupDetail">
-                                                            <span className="regGroupDetailIcon">📅</span>
+                                                            <span className="regGroupDetailIcon"></span>
                                                             <span>{getDayDisplay(lecture.day)}</span>
                                                         </div>
                                                         <div className="regGroupDetail">
-                                                            <span className="regGroupDetailIcon">🕐</span>
+                                                            <span className="regGroupDetailIcon"></span>
                                                             <span>{formatTime(lecture.from, t)} – {formatTime(lecture.to, t)}</span>
                                                         </div>
                                                     </div>
@@ -963,11 +963,11 @@ const RegisterSubjects = () => {
                                                             {t(`groupsSchedule.typeValues.${coreq.type.toLowerCase()}`, {defaultValue: coreq.type})}
                                                         </span>
                                                         <div className="regGroupDetail">
-                                                            <span className="regGroupDetailIcon">📅</span>
+                                                            <span className="regGroupDetailIcon"></span>
                                                             <span>{getDayDisplay(coreq.day)}</span>
                                                         </div>
                                                         <div className="regGroupDetail">
-                                                            <span className="regGroupDetailIcon">🕐</span>
+                                                            <span className="regGroupDetailIcon"></span>
                                                             <span>{formatTime(coreq.from, t)} – {formatTime(coreq.to, t)}</span>
                                                         </div>
                                                     </div>

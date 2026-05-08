@@ -231,7 +231,7 @@ const Groups: React.FC = () => {
 
     const renderActionButtons = (group: Group) => {
         if (isAdmin) {
-            return <button className="delete-btn" onClick={() => console.log("Delete logic here")}>🗑️</button>;
+            return <button className="delete-btn" onClick={() => console.log("Delete logic here")}>X</button>;
         }
         if (!isStudent) return null;
 

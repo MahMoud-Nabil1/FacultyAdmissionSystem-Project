@@ -122,7 +122,7 @@ export default function ResetPassword() {
     if (status === 'invalid') {
         return (
             <View style={styles.centerContainer}>
-                <Text style={styles.icon}>❌</Text>
+                <Ionicons name="close-circle-outline" size={64} color="#ef4444" />
                 <Text style={[styles.statusTitle, { textAlign: align }]}>{t('resetPassword.invalidTitle')}</Text>
                 <Text style={[styles.statusMessage, { textAlign: align }]}>{verifyMessage}</Text>
                 <TouchableOpacity
@@ -139,7 +139,7 @@ export default function ResetPassword() {
     if (status === 'success') {
         return (
             <View style={styles.centerContainer}>
-                <Text style={styles.icon}>✅</Text>
+                <Ionicons name="checkmark-circle-outline" size={64} color="#10b981" />
                 <Text style={[styles.statusTitle, { textAlign: align }]}>{t('resetPassword.successTitle')}</Text>
                 <Text style={[styles.statusMessage, { textAlign: align }]}>
                     {t('resetPassword.successMessage')}
@@ -165,7 +165,7 @@ export default function ResetPassword() {
                 </TouchableOpacity>
 
                 <View style={styles.header}>
-                    <Text style={styles.icon}>🔒</Text>
+                    <Ionicons name="lock-closed-outline" size={52} color="#1a73e8" style={{ marginBottom: 12 }} />
                     <Text style={[styles.title, { textAlign: align }]}>{t('resetPassword.title')}</Text>
                     <Text style={[styles.subtitle, { textAlign: align }]}>{t('resetPassword.subtitle')}</Text>
                 </View>
@@ -235,7 +235,6 @@ const styles = StyleSheet.create({
         padding: 32,
     },
     header: { alignItems: 'center', marginBottom: 28 },
-    icon: { fontSize: 52, marginBottom: 12 },
     title: { fontSize: 24, fontWeight: '700', color: '#1a73e8', marginBottom: 8, width: '100%' },
     subtitle: { fontSize: 14, color: '#6b7280', width: '100%' },
     statusTitle: { fontSize: 22, fontWeight: '700', color: '#111827', marginBottom: 8, width: '100%' },

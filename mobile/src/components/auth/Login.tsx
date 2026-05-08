@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { jwtDecode } from 'jwt-decode';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { API_BASE } from '../../services/api';
@@ -101,7 +102,6 @@ export default function Login() {
 
                 {/* Header */}
                 <View style={styles.header}>
-                    <Text style={styles.logo}>🎓</Text>
                     <Text style={styles.university}>{t('login.university')}</Text>
                     <Text style={styles.title}>{t('login.title')}</Text>
                     <Text style={styles.subtitle}>{t('login.subtitle')}</Text>
@@ -146,7 +146,11 @@ export default function Login() {
                             style={styles.eyeBtn}
                             onPress={() => setShowPassword((v: boolean) => !v)}
                         >
-                            <Text style={styles.eyeText}>{showPassword ? '🙈' : '👁️'}</Text>
+                            <Ionicons
+                                name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                                size={20}
+                                color="#6b7280"
+                            />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -236,8 +240,9 @@ const styles = StyleSheet.create({
         borderRightWidth: 0,
         paddingHorizontal: 12,
         paddingVertical: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    eyeText: { fontSize: 18 },
     link: { color: '#1a73e8', textAlign: 'right', marginBottom: 24, fontSize: 14 },
     btn: { backgroundColor: '#1a73e8', borderRadius: 10, paddingVertical: 14, alignItems: 'center' },
     btnDisabled: { opacity: 0.6 },

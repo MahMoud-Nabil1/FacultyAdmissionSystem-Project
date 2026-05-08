@@ -121,7 +121,7 @@ const WithDrawlPanel: React.FC = () => {
 
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial', direction: 'rtl' }}>
-            <h2>🎓 إدارة الطلبات الأكاديمية</h2>
+            <h2>إدارة الطلبات الأكاديمية</h2>
 
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
                 <div style={{ background: '#f0f0f0', padding: '10px 20px', borderRadius: '8px' }}>

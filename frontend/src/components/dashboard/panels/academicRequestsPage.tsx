@@ -127,7 +127,7 @@ const AcademicRequestsPage: React.FC = () => {
 
     return (
         <div className="dashboard-container" style={{ direction: 'ltr' }}>
-            <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>🎓 {t('complaints.adminPanelTitle')}</h2>
+            <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>{t('complaints.adminPanelTitle')}</h2>
 
             <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
                 <div style={{ background: '#f0f0f0', padding: '10px 20px', borderRadius: '8px' }}>

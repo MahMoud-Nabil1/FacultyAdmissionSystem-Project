@@ -36,12 +36,12 @@
     "noRecords": "لا توجد سجلات أكاديمية"
   },
   "announcements": {
-    "navProfile": "👤 الملف الشخصي",
-    "navComplaints": "📝 الشكاوى",
-    "navGroups": "👥 المجموعات",
-    "navRegister": "📚 تسجيل المواد",
-    "navHistory": "📜 السجل الأكاديمي",
-    "navAdmin": "⚙️ لوحة التحكم",
+    "navProfile": "الملف الشخصي",
+    "navComplaints": "الشكاوى",
+    "navGroups": "المجموعات",
+    "navRegister": "تسجيل المواد",
+    "navHistory": "السجل الأكاديمي",
+    "navAdmin": "لوحة التحكم",
     "logoutBtn": "تسجيل الخروج",
     "loading": "جاري التحميل...",
     "logoAlt": "الشعار",
@@ -385,10 +385,23 @@
   },
   "adminAnalysis": {
     "title": "تحليلات الطلاب",
-    "loading": "جاري التحميل...",
+    "loading": "جاري تحميل الإحصائيات...",
+    "loadError": "فشل تحميل بيانات التحليل",
     "totalStudents": "إجمالي الطلاب",
     "finishedRegistration": "أتموا التسجيل",
-    "didNotFinish": "لم يتموا التسجيل"
+    "didNotFinish": "لم يتموا التسجيل",
+    "avgGpa": "متوسط المعدل",
+    "outOf5": "من 5",
+    "overallRate": "نسبة التسجيل الإجمالية",
+    "registered": "مسجلون",
+    "byLevel": "التوزيع حسب المستوى الدراسي",
+    "levelTable": "جدول ملخص المستويات",
+    "gpaDistribution": "توزيع المعدلات التراكمية",
+    "level": "المستوى",
+    "students": "طالب",
+    "finished": "أتموا",
+    "notFinished": "لم يتموا",
+    "regRate": "نسبة التسجيل"
   },
   "studentsTable": {
     "title": "جدول الطلاب",
@@ -435,7 +448,7 @@
     "errorRequired": "الرجاء إدخال العنوان والمحتوى",
     "errorGeneric": "حدث خطأ",
     "errorServer": "حدث خطأ في الاتصال",
-    "searchPlaceholder": "🔍 بحث بالإعلان...",
+    "searchPlaceholder": "بحث بالإعلان...",
     "empty": "لا توجد إعلانات"
   },
   "settingsPanel": {
