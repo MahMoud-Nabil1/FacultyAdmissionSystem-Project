@@ -174,6 +174,11 @@ npm run start-mobile:android
 - **Mohammed Helmy Abdelsattar** `2328158`
 - **Aya Mohammed Abbas** `1830083`
 
-## Course Context
+## deployment 
+https://faculty-admission-frontend.onrender.com/
+### Student account to test
+
+code : 123
+password : 123
 
 This project was developed as part of the `CS-303 Software Engineering` course.
